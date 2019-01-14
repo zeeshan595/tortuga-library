@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include"
+                "/home/zeeshan/Documents/Projects/Tortuga/Tortuga/Source"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
