@@ -12,10 +12,7 @@ class Sandbox : public Tortuga::Application
     }
 };
 
-int main()
+Tortuga::Application* Tortuga::CreateApplication()
 {
-    auto sandbox = new Sandbox();
-    sandbox->Run();
-    delete sandbox;
-    return 0;
+    return new Sandbox();
 }

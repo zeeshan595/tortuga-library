@@ -5,12 +5,15 @@ namespace Tortuga
 {
 class Application
 {
-    public:
-        Application();
-        virtual ~Application();
+  public:
+    Application();
+    virtual ~Application();
 
-        void Run();
+    void Run();
 };
-}; // namespace Core
+
+//Will be defined in application
+Application *CreateApplication();
+}; // namespace Tortuga
 
 #endif

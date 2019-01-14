@@ -3,7 +3,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "make",
+            "command": "cd ../Tortuga/ && make && cd ${workspaceFolder} && make",
             "group": {
                 "kind": "build",
                 "isDefault": true
