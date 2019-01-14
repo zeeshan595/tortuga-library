@@ -1,6 +1,7 @@
 #CONFIG
 PROJECT_NAME = Tortuga
 COMPILER = g++
+FLAGS = -Wall -g
 SOURCE_DIR = Source
 BUILD_DIR = Build
 
@@ -16,9 +17,11 @@ clean:
 
 #CREATE STATIC LIBRARY
 lib: $(OBJ_FILES)
-	ar rcs $(BUILD_DIR)/lib$(PROJECT_NAME).a $<
+	echo $<
+	#ar rcs $(BUILD_DIR)/lib$(PROJECT_NAME).a $<
 
 #CREATE OBJ FILES
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	echo $@
 	mkdir -p "$(@D)"
-	$(COMPILER) -shared -c $< -o $@
+	$(COMPILER) -c $< -o $@ $(FLAGS)
