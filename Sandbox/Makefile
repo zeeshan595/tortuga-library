@@ -1,7 +1,7 @@
 #CONFIG
 PROJECT_NAME = Sandbox
 COMPILER = g++
-FLAGS = -Wall -g -std=c++17 -lpthread -lvulkan -lSDL2
+FLAGS = -Wall -g -std=c++17 -pthread -lvulkan -lSDL2
 SOURCE_DIR = Source
 BUILD_DIR = Build
 MAIN_PATH = $(SOURCE_DIR)/Application.cpp
@@ -25,7 +25,7 @@ clean:
 
 #CREATE EXECUTABLE
 exe: $(OBJ_FILES)
-	$(COMPILER) $(MAIN_PATH) $(FLAGS) -o $(BUILD_DIR)/Application $< $(ENGINE_INCLUDE_PATH) $(ENGINE_LIB_PATH) $(INCLUDES) $(Libraries)
+	$(COMPILER) $(MAIN_PATH) $(FLAGS) -o $(BUILD_DIR)/Application $(OBJ_FILES) $(ENGINE_INCLUDE_PATH) $(ENGINE_LIB_PATH) $(INCLUDES) $(Libraries)
 
 #CREATE OBJ FILES
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp

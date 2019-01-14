@@ -4,8 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/../Tortuga/Source/**",
-                "${workspaceFolder}/../Includes/**"
+                "${workspaceFolder}/../Tortuga/Source",
+                "${workspaceFolder}/../Includes"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

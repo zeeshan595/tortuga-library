@@ -6,7 +6,7 @@ SOURCE_DIR = Source
 BUILD_DIR = Build
 
 #FILES
-SOURCE_FILES = $(shell find $(SOURCE_DIR) -type f -name '*.cpp')
+SOURCE_FILES = $(shell find $(SOURCE_DIR)/ -type f -name '*.cpp')
 OBJ_FILES = $(patsubst $(SOURCE_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SOURCE_FILES))
 
 all: setup lib
@@ -17,11 +17,13 @@ clean:
 
 #CREATE STATIC LIBRARY
 lib: $(OBJ_FILES)
-	echo $<
-	#ar rcs $(BUILD_DIR)/lib$(PROJECT_NAME).a $<
+	ar rcs $(BUILD_DIR)/lib$(PROJECT_NAME).a $(OBJ_FILES)
 
 #CREATE OBJ FILES
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
-	echo $@
+	echo $<
 	mkdir -p "$(@D)"
 	$(COMPILER) -c $< -o $@ $(FLAGS)
+
+$(SOURCE_DIR)/%.cpp:
+	echo $<

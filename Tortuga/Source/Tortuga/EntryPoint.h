@@ -5,10 +5,11 @@ extern Tortuga::Application* Tortuga::CreateApplication();
 
 int main(int argc, char** argv)
 {
-    Tortuga::Log::Init();
-    Tortuga::Log::GetEngineLogger()->warn("Initialized!");
-    Tortuga::Log::GetApplicationLogger()->info("Application Init");
-
+    Tortuga::Log::Debug("Some Message");
+    Tortuga::Log::Info("Info");
+    Tortuga::Log::Warning("Warning");
+    Tortuga::Log::Error("Error");
+    
     auto app = Tortuga::CreateApplication();
     app->Run();
     delete app;

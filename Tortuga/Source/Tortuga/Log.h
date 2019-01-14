@@ -1,23 +1,18 @@
-#ifndef _LOG
-#define _LOG
+#ifndef _LOGGER
+#define _LOGGER
 
-#include <memory>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_sinks.h>
+#include <string>
+#include <iostream>
 
 namespace Tortuga
 {
 class Log
 {
-  private:
-    static std::shared_ptr<spdlog::logger> _engineLogger;
-    static std::shared_ptr<spdlog::logger> _applicationLogger;
-
-  public:
-    static void Init();
-
-    inline static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return _engineLogger; }
-    inline static std::shared_ptr<spdlog::logger>& GetApplicationLogger() { return _applicationLogger; }
+public:
+  static void Debug(std::string message);
+  static void Info(std::string message);
+  static void Warning(std::string message);
+  static void Error(std::string message);
 };
 }; // namespace Tortuga
 
