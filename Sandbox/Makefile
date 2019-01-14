@@ -4,7 +4,7 @@ COMPILER = g++
 FLAGS = -Wall -g -std=c++17 -lpthread -lvulkan -lSDL2
 SOURCE_DIR = Source
 BUILD_DIR = Build
-MAIN_PATH = $(SOURCE_DIR)/Main.cpp
+MAIN_PATH = $(SOURCE_DIR)/Application.cpp
 
 #ENGINE
 ENGINE_INCLUDE_PATH = -I../Tortuga/Source/
@@ -29,4 +29,5 @@ exe: $(OBJ_FILES)
 
 #CREATE OBJ FILES
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	mkdir -p "$(@D)"
 	$(COMPILER) -c $< -o $@

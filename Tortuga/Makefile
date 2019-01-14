@@ -20,4 +20,5 @@ lib: $(OBJ_FILES)
 
 #CREATE OBJ FILES
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	mkdir -p "$(@D)"
 	$(COMPILER) -shared -c $< -o $@
