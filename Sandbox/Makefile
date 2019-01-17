@@ -1,7 +1,7 @@
 #CONFIG
 PROJECT_NAME = Sandbox
 COMPILER = g++
-FLAGS = -Wall -g -std=c++17 -pthread -lvulkan -lSDL2
+FLAGS = -Wall -g -std=c++17
 SOURCE_DIR = Source
 BUILD_DIR = Build
 MAIN_PATH = $(SOURCE_DIR)/Application.cpp
@@ -15,7 +15,10 @@ SOURCE_FILES = $(filter-out $(MAIN_PATH), $(shell find $(SOURCE_DIR) -type f -na
 OBJ_FILES = $(patsubst $(SOURCE_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SOURCE_FILES))
 
 INCLUDES = -I../Includes
-Libraries = -L../Libs
+PTHREAD_LIB = ../Libs/libpthread.so
+VULKAN_LIB = ../Libs/libvulkan.so
+SDL_LIB = ../Libs/libSDL2.so
+Libraries = $(VULKAN_LIB) $(SDL_LIB) $(PTHREAD_LIB)
 
 all: setup exe
 setup:

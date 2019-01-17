@@ -1,21 +1,28 @@
 #include "Application.h"
-#include <iostream>
 
 namespace Tortuga
 {
-    Application::Application()
-    {
-
-    }
-
-    Application::~Application()
-    {
-
-    }
-
-    void Application::Run()
-    {
-        std::cout << "Tortuga Engine Started!" << std::endl;
-        while (true);
-    }
+Application::Application()
+{
+    SDL_Init(SDL_INIT_EVERYTHING);
 }
+
+Application::~Application()
+{
+    delete _vulkan;
+    delete _mainWindow;
+    SDL_Quit();
+}
+
+void Application::Initialize()
+{
+    Console::Info("Tortuga Engine Started!");
+    _mainWindow = new Window("Hello World", 1024, 768);
+    _vulkan = new Vulkan(_mainWindow);
+}
+
+void Application::Run()
+{
+    SDL_Delay(10000);
+}
+} // namespace Tortuga

@@ -1,15 +1,25 @@
 #ifndef _APPLICATION
 #define _APPLICATION
 
+#include "Core.h"
+#include "Console.h"
+#include "Graphics/Window.h"
+#include "Graphics/Vulkan.h"
+
 namespace Tortuga
 {
 class Application
 {
+  private:
+    Window* _mainWindow;
+    Vulkan* _vulkan;
+
   public:
     Application();
     virtual ~Application();
 
     void Run();
+    void Initialize();
 };
 
 //Will be defined in application

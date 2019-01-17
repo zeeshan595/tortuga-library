@@ -1,7 +1,7 @@
 #CONFIG
 PROJECT_NAME = Tortuga
 COMPILER = g++
-FLAGS = -Wall -g
+FLAGS = -Wall -g -std=c++17
 SOURCE_DIR = Source
 BUILD_DIR = Build
 
