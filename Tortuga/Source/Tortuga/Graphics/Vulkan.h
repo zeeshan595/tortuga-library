@@ -12,16 +12,24 @@ namespace Tortuga
 {
 class Vulkan
 {
-  private:
-    VkInstance _instance;
-    //std::vector<Device> _devices;
+private:
+  VkDebugUtilsMessengerEXT _debugReport;
+  VkInstance _instance;
+  //std::vector<Device> _devices;
+  void GetEnabledExtensions();
+  void CheckValidationSupport(std::vector<const char *> validationLayers);
+  void CreateDebugger();
+  void DestroyDebugger();
 
+  static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+      VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+      VkDebugUtilsMessageTypeFlagsEXT messageType,
+      const VkDebugUtilsMessengerCallbackDataEXT *data,
+      void *userData);
 
-    void CheckExtensionSupport();
-
-  public:
-    Vulkan(Window* window, const char* applicationName);
-    ~Vulkan();
+public:
+  Vulkan(Window *window, const char *applicationName);
+  ~Vulkan();
 };
 }; // namespace Tortuga
 

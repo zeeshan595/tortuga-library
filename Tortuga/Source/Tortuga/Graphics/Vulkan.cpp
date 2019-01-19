@@ -2,14 +2,15 @@
 
 namespace Tortuga
 {
-Vulkan::Vulkan(Window *window, const char* applicationName)
+Vulkan::Vulkan(Window *window, const char *applicationName)
 {
     std::vector<const char *> validationLayers;
+    auto extensions = window->GetVulkanInstanceExtensions();
 #if DEBUG_MODE
     validationLayers.push_back("VK_LAYER_LUNARG_standard_validation");
+    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
-
-    auto extensions = window->GetVulkanInstanceExtensions();
+    CheckValidationSupport(validationLayers);
 
     auto applicationInfo = VkApplicationInfo();
     {
@@ -29,21 +30,30 @@ Vulkan::Vulkan(Window *window, const char* applicationName)
         instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
     }
-    if (vkCreateInstance(&instanceCreateInfo, nullptr, &this->_instance) != VK_SUCCESS)
+    if (vkCreateInstance(&instanceCreateInfo, nullptr, &_instance) != VK_SUCCESS)
     {
         Console::Fatal("Failed to create vulkan instance");
     }
-    CheckExtensionSupport();
+    GetEnabledExtensions();
 
-    auto surface = window->CreateWindowSurface(this->_instance);
+#if DEBUG_MODE
+    CreateDebugger();
+#endif
+
+    //uint32_t deviceCount = 0;
+    //vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
+    //auto surface = window->CreateWindowSurface(_instance);
 }
 
 Vulkan::~Vulkan()
 {
-    vkDestroyInstance(this->_instance, nullptr);
+#if DEBUG_MODE
+    DestroyDebugger();
+#endif
+    vkDestroyInstance(_instance, nullptr);
 }
 
-void Vulkan::CheckExtensionSupport()
+void Vulkan::GetEnabledExtensions()
 {
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -55,6 +65,86 @@ void Vulkan::CheckExtensionSupport()
     {
         Console::Info("\t{0}", extension.extensionName);
     }
+}
+
+void Vulkan::CheckValidationSupport(std::vector<const char *> validationLayers)
+{
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for (const char *layerName : validationLayers)
+    {
+        bool layerFound = false;
+
+        for (const auto &layerProperties : availableLayers)
+        {
+            if (strcmp(layerName, layerProperties.layerName) == 0)
+            {
+                layerFound = true;
+                break;
+            }
+        }
+
+        if (!layerFound)
+            Console::Fatal("Failed to check validation support: {0}", layerName);
+    }
+}
+
+void Vulkan::CreateDebugger()
+{
+    auto debugFunc = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(_instance, "vkCreateDebugUtilsMessengerEXT");
+    if (debugFunc == nullptr)
+    {
+        Console::Fatal("Failed to find 'create vulkan debug utils'");
+    }
+    auto debugCreateInfo = VkDebugUtilsMessengerCreateInfoEXT();
+    {
+        debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                          VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                          VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        debugCreateInfo.pfnUserCallback = DebugCallback;
+        debugCreateInfo.pUserData = nullptr; // Optional
+    }
+    if (debugFunc(_instance, &debugCreateInfo, nullptr, &_debugReport) != VK_SUCCESS)
+    {
+        Console::Fatal("Failed to setup vulkan debug utils");
+    }
+}
+
+void Vulkan::DestroyDebugger()
+{
+    auto debugFunc = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(_instance, "vkDestroyDebugUtilsMessengerEXT");
+    if (debugFunc == nullptr)
+    {
+        Console::Fatal("Failed to find 'destroy vulkan debug utils'");
+    }
+    debugFunc(_instance, _debugReport, nullptr);
+}
+
+VkBool32 Vulkan::DebugCallback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT *data,
+    void *userData)
+{
+    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+    {
+        Console::Fatal(data->pMessage);
+        return VK_FALSE;
+    }
+    else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+    {
+        Console::Warning(data->pMessage);
+    }
+
+    Console::Info(data->pMessage);
+    return VK_TRUE;
 }
 
 }; // namespace Tortuga

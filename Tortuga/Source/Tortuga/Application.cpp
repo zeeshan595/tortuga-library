@@ -23,6 +23,6 @@ void Application::Initialize()
 
 void Application::Run()
 {
-    SDL_Delay(10000);
+    SDL_Delay(1000);
 }
 } // namespace Tortuga
