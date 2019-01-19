@@ -17,8 +17,8 @@ Application::~Application()
 void Application::Initialize()
 {
     Console::Info("Tortuga Engine Started!");
-    _mainWindow = new Window("Hello World", 1024, 768);
-    _vulkan = new Vulkan(_mainWindow);
+    _mainWindow = new Window(this->ApplicationName.c_str(), 1024, 768);
+    _vulkan = new Vulkan(_mainWindow, this->ApplicationName.c_str());
 }
 
 void Application::Run()

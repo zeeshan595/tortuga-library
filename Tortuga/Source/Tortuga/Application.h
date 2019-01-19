@@ -10,16 +10,19 @@ namespace Tortuga
 {
 class Application
 {
-  private:
-    Window* _mainWindow;
-    Vulkan* _vulkan;
+private:
+  Window *_mainWindow;
+  Vulkan *_vulkan;
 
-  public:
-    Application();
-    virtual ~Application();
+protected:
+  std::string ApplicationName = "My Application";
 
-    void Run();
-    void Initialize();
+public:
+  Application();
+  virtual ~Application();
+
+  void Run();
+  void Initialize();
 };
 
 //Will be defined in application

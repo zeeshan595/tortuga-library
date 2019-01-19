@@ -1,9 +1,11 @@
 #ifndef _CONSOLE
 #define _CONSOLE
 
+#include <sstream>
 #include <string>
 #include <iostream>
 #include <exception>
+#include <vector>
 
 #include "Core.h"
 
@@ -30,26 +32,49 @@ private:
   static const int BG_CYAN = 46;
   static const int BG_WHITE = 47;
 
+  static std::string MakeString(std::string message, std::vector<const char *> args)
+  {
+    if (args.size() == 0)
+      return message;
+
+    for (uint32_t i = 0; i < args.size(); i++)
+    {
+      std::ostringstream argString;
+      argString << "{" << i << "}";
+      auto index = message.find(argString.str());
+      message.replace(index, index + argString.str().size(), args[i]);
+    }
+
+    return message;
+  }
+
 public:
-  static void Info(std::string message)
+  template<typename ...Strings>
+  static void Info(std::string message, const Strings&... rest)
   {
 #if DEBUG_MODE
-    std::cout << "\033[" << BG_BLACK << ";" << TEXT_WHITE << "m" << message << " \033[0m" << std::endl;
+    std::cout << "\033[" << BG_BLACK << ";" << TEXT_WHITE << "m" << MakeString(message, { rest... }) << " \033[0m" << std::endl;
 #endif
   }
-  static void Warning(std::string message)
+  
+  template<typename ...Strings>
+  static void Warning(std::string message, const Strings&... rest)
   {
 #if DEBUG_MODE
-    std::cout << "\033[" << BG_BLACK << ";" << TEXT_YELLOW << "m" << message << " \033[0m" << std::endl;
+    std::cout << "\033[" << BG_BLACK << ";" << TEXT_YELLOW << "m" << MakeString(message, { rest... }) << " \033[0m" << std::endl;
 #endif
   }
-  static void Error(std::string message)
+
+  template<typename ...Strings>
+  static void Error(std::string message, const Strings&... rest)
   {
-    std::cout << "\033[" << BG_BLACK << ";" << TEXT_RED << "m" << message << " \033[0m" << std::endl;
+    std::cout << "\033[" << BG_BLACK << ";" << TEXT_RED << "m" << MakeString(message, { rest... }) << " \033[0m" << std::endl;
   }
-  static void Fatal(std::string message)
+
+  template<typename ...Strings>
+  static void Fatal(std::string message, const Strings&... rest)
   {
-    std::cout << "\033[" << BG_BLACK << ";" << TEXT_RED << "m" << message << " \033[0m" << std::endl;
+    std::cout << "\033[" << BG_BLACK << ";" << TEXT_RED << "m" << MakeString(message, { rest... }) << " \033[0m" << std::endl;
     throw std::runtime_error(message);
   }
 };

@@ -16,8 +16,11 @@ class Vulkan
     VkInstance _instance;
     //std::vector<Device> _devices;
 
+
+    void CheckExtensionSupport();
+
   public:
-    Vulkan(Window* window);
+    Vulkan(Window* window, const char* applicationName);
     ~Vulkan();
 };
 }; // namespace Tortuga

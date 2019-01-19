@@ -14,7 +14,7 @@ Window::Window(const char *title, uint32_t width, uint32_t height)
 
     if (this->_window == nullptr)
     {
-        Console::Fatal("Failed to create SLD window");
+        Console::Fatal("Failed to create SLD window: {0}", SDL_GetError());
     }
 }
 
@@ -26,7 +26,7 @@ Window::~Window()
 VkSurfaceKHR Window::CreateWindowSurface(VkInstance instance)
 {
     VkSurfaceKHR surface;
-    if (SDL_Vulkan_CreateSurface(this->_window, instance, &surface))
+    if (SDL_Vulkan_CreateSurface(this->_window, instance, &surface) == false)
     {
         Console::Fatal("Failed to get vulkan surface");
     }

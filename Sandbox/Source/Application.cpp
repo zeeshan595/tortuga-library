@@ -5,6 +5,7 @@ class Sandbox : public Tortuga::Application
   public:
     Sandbox()
     {
+        this->ApplicationName = "Cool Application";
     }
 
     ~Sandbox()
@@ -12,7 +13,7 @@ class Sandbox : public Tortuga::Application
     }
 };
 
-Tortuga::Application* Tortuga::CreateApplication()
+Tortuga::Application *Tortuga::CreateApplication()
 {
     return new Sandbox();
 }
