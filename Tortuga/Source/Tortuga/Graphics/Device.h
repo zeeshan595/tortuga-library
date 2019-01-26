@@ -34,11 +34,11 @@ public:
   SwapChainSupportDetails GetSwapchainSupportDetails() { return _swapchainDetails; }
   VkSurfaceKHR GetSurface() { return _surface; }
 
-  const VkPhysicalDevice GetPhysicalDevice() { return _physicalDevice; }
-  const VkDevice GetVirtualDevice() { return _device; }
-  const VkQueue GetGraphicsQueue() { return _graphicsQueue; }
-  const VkQueue GetPresentQueue() { return _presentQueue; }
-  const bool IsReady() { return _isReady; }
+  VkPhysicalDevice GetPhysicalDevice() { return _physicalDevice; }
+  VkDevice GetVirtualDevice() { return _device; }
+  VkQueue GetGraphicsQueue() { return _graphicsQueue; }
+  VkQueue GetPresentQueue() { return _presentQueue; }
+  bool IsReady() { return _isReady; }
 };
 }; // namespace Tortuga
 

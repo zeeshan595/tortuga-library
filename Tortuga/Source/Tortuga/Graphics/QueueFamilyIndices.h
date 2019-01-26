@@ -18,6 +18,12 @@ struct QueueFamilyIndices
         return {graphicsFamily.value(),
                 presentFamily.value()};
     }
+
+    std::vector<uint32_t> GetFamiliesArray()
+    {
+        return {graphicsFamily.value(),
+                presentFamily.value()};
+    }
 };
 
 #endif

@@ -13,8 +13,10 @@ Swapchain::Swapchain(Device *device, uint32_t width, uint32_t height, VkSwapchai
     _extent = ChooseSwapExtent(details.capabilities, width, height);
 
     uint32_t imageCount = details.capabilities.minImageCount + 1;
-    if (details.capabilities.maxImageCount > 0 && imageCount > details.capabilities.maxImageCount)
-        imageCount = details.capabilities.maxImageCount;
+    {
+        if (details.capabilities.maxImageCount > 0 && imageCount > details.capabilities.maxImageCount)
+            imageCount = details.capabilities.maxImageCount;
+    }
 
     auto swapChainCreateInfo = VkSwapchainCreateInfoKHR();
     {
@@ -28,13 +30,12 @@ Swapchain::Swapchain(Device *device, uint32_t width, uint32_t height, VkSwapchai
         swapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         //Queue family indices
         auto indices = device->GetQueueFamilyIndices();
-        uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(),
-                                         indices.presentFamily.value()};
+        std::vector<uint32_t> queueFamilyIndices = indices.GetFamiliesArray();
         if (indices.graphicsFamily != indices.presentFamily)
         {
             swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-            swapChainCreateInfo.queueFamilyIndexCount = 2;
-            swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
+            swapChainCreateInfo.queueFamilyIndexCount = queueFamilyIndices.size();
+            swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices.data();
         }
         else
         {

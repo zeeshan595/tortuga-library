@@ -54,7 +54,8 @@ Device::Device(VkPhysicalDevice physicalDevice, std::vector<const char *> valida
         deviceCreateInfo.enabledExtensionCount = deviceExtensions.size();
         deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
     }
-    if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &this->_device) != VK_SUCCESS)
+    _device = VK_NULL_HANDLE;
+    if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &_device) != VK_SUCCESS)
     {
         Console::Fatal("Failed to create vulkan device");
     }
