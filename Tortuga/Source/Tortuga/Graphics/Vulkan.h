@@ -1,10 +1,8 @@
 #ifndef _VULKAN
 #define _VULKAN
 
-#include <vector>
-#include <vulkan.h>
-
 #include "../Core.h"
+#include "QueueFamilyIndices.h"
 #include "Window.h"
 #include "Device.h"
 
@@ -15,12 +13,17 @@ class Vulkan
 private:
   VkDebugUtilsMessengerEXT _debugReport;
   VkInstance _instance;
-  //std::vector<Device> _devices;
+  Window* _window;
+  VkSurfaceKHR _surface;
+  std::vector<Device*> _devices;
+
   void GetEnabledExtensions();
   void CheckValidationSupport(std::vector<const char *> validationLayers);
+
   void CreateDebugger();
   void DestroyDebugger();
 
+  //Vulkan Debug API
   static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
       VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
       VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -30,6 +33,11 @@ private:
 public:
   Vulkan(Window *window, const char *applicationName);
   ~Vulkan();
+
+  VkInstance GetVulkanInstance(){ return _instance; }
+  Window* GetWindow(){ return _window; }
+  VkSurfaceKHR GetSurface(){ return _surface; }
+  std::vector<Device*> GetDevices(){ return _devices; }
 };
 }; // namespace Tortuga
 

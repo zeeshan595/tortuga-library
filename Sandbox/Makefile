@@ -14,11 +14,9 @@ ENGINE_LIB_PATH = ../Tortuga/Build/libTortuga.a
 SOURCE_FILES = $(filter-out $(MAIN_PATH), $(shell find $(SOURCE_DIR) -type f -name '*.cpp'))
 OBJ_FILES = $(patsubst $(SOURCE_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SOURCE_FILES))
 
-INCLUDES = -I../Includes
-PTHREAD_LIB = ../Libs/libpthread.so
-VULKAN_LIB = ../Libs/libvulkan.so
-SDL_LIB = ../Libs/libSDL2.so
-Libraries = $(VULKAN_LIB) $(SDL_LIB) $(PTHREAD_LIB)
+INCLUDES = -I/usr/include
+Libraries = -L/usr/lib
+LIB_FLAGS = -pthread -lvulkan -lSDL2 -ldl -lsndio
 
 all: setup exe
 setup:
@@ -28,7 +26,7 @@ clean:
 
 #CREATE EXECUTABLE
 exe: $(OBJ_FILES)
-	$(COMPILER) $(MAIN_PATH) $(FLAGS) -o $(BUILD_DIR)/Application $(OBJ_FILES) $(ENGINE_INCLUDE_PATH) $(ENGINE_LIB_PATH) $(INCLUDES) $(Libraries)
+	$(COMPILER) $(MAIN_PATH) $(FLAGS) -o $(BUILD_DIR)/Application $(OBJ_FILES) $(ENGINE_INCLUDE_PATH) $(ENGINE_LIB_PATH) $(INCLUDES) $(Libraries) $(LIB_FLAGS)
 
 #CREATE OBJ FILES
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp

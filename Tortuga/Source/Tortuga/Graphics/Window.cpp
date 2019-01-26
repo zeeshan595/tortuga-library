@@ -4,6 +4,8 @@ namespace Tortuga
 {
 Window::Window(const char *title, uint32_t width, uint32_t height)
 {
+    this->_width = width;
+    this->_height = height;
     this->_window = SDL_CreateWindow(
         title,
         SDL_WINDOWPOS_CENTERED,
@@ -14,7 +16,7 @@ Window::Window(const char *title, uint32_t width, uint32_t height)
 
     if (this->_window == nullptr)
     {
-        Console::Fatal("Failed to create SLD window: {0}", SDL_GetError());
+        Console::Fatal("Failed to create SDL window: {0}", SDL_GetError());
     }
 }
 

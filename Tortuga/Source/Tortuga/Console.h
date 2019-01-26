@@ -1,12 +1,6 @@
 #ifndef _CONSOLE
 #define _CONSOLE
 
-#include <sstream>
-#include <string>
-#include <iostream>
-#include <exception>
-#include <vector>
-
 #include "Core.h"
 
 namespace Tortuga

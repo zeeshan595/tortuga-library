@@ -4,6 +4,8 @@ namespace Tortuga
 {
 Vulkan::Vulkan(Window *window, const char *applicationName)
 {
+    this->_window = window;
+
     std::vector<const char *> validationLayers;
     auto extensions = window->GetVulkanInstanceExtensions();
 #if DEBUG_MODE
@@ -40,13 +42,36 @@ Vulkan::Vulkan(Window *window, const char *applicationName)
     CreateDebugger();
 #endif
 
-    //uint32_t deviceCount = 0;
-    //vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
-    //auto surface = window->CreateWindowSurface(_instance);
+    //Find supported GPUs
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
+    if (deviceCount == 0)
+        Console::Fatal("Failed to find GPUs with vulkan support!");
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(_instance, &deviceCount, devices.data());
+
+    //Get surface
+    _surface = window->CreateWindowSurface(this->_instance);
+
+    //Setup Devices
+    auto supportedDevices = std::vector<VkPhysicalDevice>();
+    for (const auto &device : devices)
+    {
+        //setup new device and make sure it is in ready state
+        auto newDevice = new Device(device, validationLayers, _surface);
+        if (newDevice->IsReady())
+            _devices.push_back(newDevice);
+    }
+    if (_devices.size() == 0)
+        Console::Fatal("Failed to find compatible GPUs");
 }
 
 Vulkan::~Vulkan()
 {
+    for (uint32_t i = 0; i < this->_devices.size(); i++)
+        delete this->_devices[i];
+
 #if DEBUG_MODE
     DestroyDebugger();
 #endif
