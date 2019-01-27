@@ -81,6 +81,8 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
 CommandBuffer::~CommandBuffer()
 {
     //Wait for device to be free
+    vkQueueWaitIdle(_device->GetGraphicsQueue());
+    vkQueueWaitIdle(_device->GetPresentQueue());
     vkDeviceWaitIdle(_device->GetVirtualDevice());
 
     //Destroy semaphores and free command buffer
