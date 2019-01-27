@@ -6,7 +6,7 @@ extern Tortuga::Application* Tortuga::CreateApplication();
 int main(int argc, char** argv)
 {
     auto app = Tortuga::CreateApplication();
-    app->Initialize();
+    app->Initialize(argv[0]);
     app->Run();
     app->Destroy();
     delete app;

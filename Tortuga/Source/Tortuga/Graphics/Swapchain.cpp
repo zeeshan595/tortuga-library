@@ -6,6 +6,8 @@ namespace Tortuga
 Swapchain::Swapchain(Device *device, uint32_t width, uint32_t height, VkSwapchainKHR previousSwapchain)
 {
     this->_device = device;
+    this->_width = width;
+    this->_height = height;
 
     auto details = device->GetSwapchainSupportDetails();
     _surfaceFormat = ChooseSwapSurfaceFormat(details.formats);
@@ -55,10 +57,46 @@ Swapchain::Swapchain(Device *device, uint32_t width, uint32_t height, VkSwapchai
     {
         Console::Fatal("Failed to create swapchain!");
     }
+
+    //Get swapchain images
+    vkGetSwapchainImagesKHR(device->GetVirtualDevice(), _swapchain, &imageCount, nullptr);
+    _swapchainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(device->GetVirtualDevice(), _swapchain, &imageCount, _swapchainImages.data());
+
+    //Setup swapchain image views
+    _swapchainImageViews.resize(imageCount);
+    for (uint32_t i = 0; i < _swapchainImages.size(); i++)
+    {
+        auto imageViewCreateInfo = VkImageViewCreateInfo();
+        {
+            imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            imageViewCreateInfo.image = _swapchainImages[i];
+            imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            imageViewCreateInfo.format = _surfaceFormat.format;
+            imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+            imageViewCreateInfo.subresourceRange.levelCount = 1;
+            imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+            imageViewCreateInfo.subresourceRange.layerCount = 1;
+        }
+        if (vkCreateImageView(device->GetVirtualDevice(), &imageViewCreateInfo, nullptr, &_swapchainImageViews[i]) != VK_SUCCESS)
+        {
+            Console::Fatal("Failed to create image views for swapchain!");
+        }
+    }
 }
 
 Swapchain::~Swapchain()
 {
+    for (uint32_t i = 0; i < _swapchainImageViews.size(); i++)
+    {
+        vkDestroyImageView(_device->GetVirtualDevice(), _swapchainImageViews[i], nullptr);
+    }
+
     vkDestroySwapchainKHR(_device->GetVirtualDevice(), _swapchain, nullptr);
 }
 

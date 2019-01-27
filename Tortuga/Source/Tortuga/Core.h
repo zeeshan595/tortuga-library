@@ -10,6 +10,7 @@
 #include <exception>
 #include <sstream>
 #include <algorithm>
+#include <fstream>
 
 //3rd Party
 #include <vulkan.h>

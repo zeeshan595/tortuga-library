@@ -15,6 +15,7 @@
 #include "Tortuga/Graphics/Device.h"
 #include "Tortuga/Graphics/Vulkan.h"
 #include "Tortuga/Graphics/Swapchain.h"
+#include "Tortuga/Graphics/Pipeline.h"
 
 //===========Entry Point===========
 #include "Tortuga/EntryPoint.h"

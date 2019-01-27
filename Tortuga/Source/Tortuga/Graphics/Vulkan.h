@@ -13,9 +13,9 @@ class Vulkan
 private:
   VkDebugUtilsMessengerEXT _debugReport;
   VkInstance _instance;
-  Window* _window;
+  Window *_window;
   VkSurfaceKHR _surface;
-  std::vector<Device*> _devices;
+  std::vector<Device *> _devices;
 
   void GetEnabledExtensions();
   void CheckValidationSupport(std::vector<const char *> validationLayers);
@@ -34,10 +34,10 @@ public:
   Vulkan(Window *window, const char *applicationName);
   ~Vulkan();
 
-  VkInstance GetVulkanInstance(){ return _instance; }
-  Window* GetWindow(){ return _window; }
-  VkSurfaceKHR GetSurface(){ return _surface; }
-  std::vector<Device*> GetDevices(){ return _devices; }
+  VkInstance GetVulkanInstance() { return _instance; }
+  Window *GetWindow() { return _window; }
+  VkSurfaceKHR GetSurface() { return _surface; }
+  std::vector<Device *> GetDevices() { return _devices; }
 };
 }; // namespace Tortuga
 
