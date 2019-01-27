@@ -189,6 +189,16 @@ Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fra
         subpass.pColorAttachments = &colorAttachmentRef;
     }
 
+    auto dependency = VkSubpassDependency();
+    {
+        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.dstSubpass = 0;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    }
+
     //Render pass
     auto renderPassInfo = VkRenderPassCreateInfo();
     {
@@ -197,6 +207,8 @@ Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fra
         renderPassInfo.pAttachments = &colorAttachment;
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
+        renderPassInfo.dependencyCount = 1;
+        renderPassInfo.pDependencies = &dependency;
     }
 
     if (vkCreateRenderPass(_device->GetVirtualDevice(), &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS)
@@ -223,7 +235,7 @@ Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fra
         pipelineInfo.renderPass = _renderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
-        pipelineInfo.basePipelineIndex = -1; // Optional
+        pipelineInfo.basePipelineIndex = -1;              // Optional
     }
     if (vkCreateGraphicsPipelines(_device->GetVirtualDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline) != VK_SUCCESS)
     {

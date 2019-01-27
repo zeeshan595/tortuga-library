@@ -62,10 +62,71 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
             Console::Error("Failed to end command buffer");
         }
     }
+
+    //Setup semaphores
+    auto semaphoreInfo = VkSemaphoreCreateInfo();
+    {
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    }
+    if (vkCreateSemaphore(_device->GetVirtualDevice(), &semaphoreInfo, nullptr, &_imageAvailableSemaphore) != VK_SUCCESS)
+    {
+        Console::Error("Failed to create semaphore for command buffer!");
+    }
+    if (vkCreateSemaphore(_device->GetVirtualDevice(), &semaphoreInfo, nullptr, &_imageFinishedSemaphore) != VK_SUCCESS)
+    {
+        Console::Error("Failed to create semaphore for command buffer!");
+    }
 }
 
 CommandBuffer::~CommandBuffer()
 {
+    //Wait for device to be free
+    vkDeviceWaitIdle(_device->GetVirtualDevice());
+
+    //Destroy semaphores and free command buffer
+    vkDestroySemaphore(_device->GetVirtualDevice(), _imageAvailableSemaphore, nullptr);
+    vkDestroySemaphore(_device->GetVirtualDevice(), _imageFinishedSemaphore, nullptr);
     vkFreeCommandBuffers(_device->GetVirtualDevice(), _device->GetCommandPool(), _commandBuffer.size(), _commandBuffer.data());
+}
+
+void CommandBuffer::Render()
+{
+    uint32_t imageIndex;
+    vkAcquireNextImageKHR(_device->GetVirtualDevice(), _swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::max(), _imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+
+    std::vector<VkSemaphore> signalSemaphores = {_imageFinishedSemaphore};
+    std::vector<VkSemaphore> waitSemaphores = {_imageAvailableSemaphore};
+    std::vector<VkPipelineStageFlags> waitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    std::vector<VkSwapchainKHR> swapchains = {_swapchain->GetSwapchain()};
+
+    auto submitInfo = VkSubmitInfo();
+    {
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.waitSemaphoreCount = waitSemaphores.size();
+        submitInfo.pWaitSemaphores = waitSemaphores.data();
+        submitInfo.pWaitDstStageMask = waitStages.data();
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &_commandBuffer[imageIndex];
+        submitInfo.signalSemaphoreCount = signalSemaphores.size();
+        submitInfo.pSignalSemaphores = signalSemaphores.data();
+    }
+    if (vkQueueSubmit(_device->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+    {
+        Console::Error("Failed to submit render queue");
+    }
+
+    //Submit the results back to swap chain
+    auto presentInfo = VkPresentInfoKHR();
+    {
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        presentInfo.waitSemaphoreCount = signalSemaphores.size();
+        presentInfo.pWaitSemaphores = signalSemaphores.data();
+        presentInfo.swapchainCount = swapchains.size();
+        presentInfo.pSwapchains = swapchains.data();
+        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pResults = nullptr; // Optional
+    }
+    vkQueuePresentKHR(_device->GetPresentQueue(), &presentInfo);
+    vkQueueWaitIdle(_device->GetPresentQueue());
 }
 } // namespace Tortuga

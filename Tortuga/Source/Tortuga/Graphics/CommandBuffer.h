@@ -19,9 +19,16 @@ private:
   std::vector<Framebuffer *> _frameBuffers;
   std::vector<VkCommandBuffer> _commandBuffer;
 
+  VkSemaphore _imageAvailableSemaphore;
+  VkSemaphore _imageFinishedSemaphore;
+
 public:
   CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> frameBuffers);
   ~CommandBuffer();
+
+  void Render();
+
+  std::vector<VkCommandBuffer> GetCommandBuffers() { return _commandBuffer; }
 };
 }; // namespace Tortuga
 
