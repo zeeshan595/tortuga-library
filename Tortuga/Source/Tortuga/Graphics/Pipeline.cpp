@@ -4,6 +4,7 @@ namespace Tortuga
 {
 Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fragmentPath)
 {
+    this->_swapchain = swapchain;
     this->_device = swapchain->GetDevice();
 
     _vertexShader = CreateShader(_device->GetVirtualDevice(), ReadFile(vertexPath));

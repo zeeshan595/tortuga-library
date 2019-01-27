@@ -7,6 +7,8 @@
 #include "Graphics/Vulkan.h"
 #include "Graphics/Swapchain.h"
 #include "Graphics/Pipeline.h"
+#include "Graphics/Framebuffer.h"
+#include "Graphics/CommandBuffer.h"
 
 namespace Tortuga
 {
@@ -19,6 +21,8 @@ private:
   Vulkan *_vulkan;
   Swapchain *_swapchain;
   Pipeline *_pipeline;
+  std::vector<Framebuffer *> _frameBuffers;
+  CommandBuffer *_commandBuffer;
 
 protected:
   std::string ApplicationName = "My Application";

@@ -14,10 +14,22 @@ void Application::Initialize(std::string path)
     _vulkan = new Vulkan(_mainWindow, this->ApplicationName.c_str());
     _swapchain = new Swapchain(_vulkan->GetDevices()[0], _mainWindow->GetWidth(), _mainWindow->GetHeight());
     _pipeline = new Pipeline(_swapchain, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
+
+    auto imageViews = _swapchain->GetSwapchainImageViews();
+    _frameBuffers.resize(imageViews.size());
+    for (uint32_t i = 0; i < imageViews.size(); i++)
+        _frameBuffers[i] = new Framebuffer(_pipeline, { imageViews[i] });
+
+    _commandBuffer = new CommandBuffer(_pipeline, _frameBuffers);
 }
 
 void Application::Destroy()
 {
+    delete _commandBuffer;
+
+    for (uint32_t i = 0; i < _frameBuffers.size(); i++)
+        delete _frameBuffers[i];
+
     delete _pipeline;
     delete _swapchain;
     delete _vulkan;
@@ -27,6 +39,15 @@ void Application::Destroy()
 
 void Application::Run()
 {
-    SDL_Delay(2000);
+    int i = 0;
+    while (true)
+    {
+        _commandBuffer->Render();
+        SDL_Delay(1);
+        i++;
+        if (i > 5000) {
+            break;
+        }
+    }
 }
 } // namespace Tortuga

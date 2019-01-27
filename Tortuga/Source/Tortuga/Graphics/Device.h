@@ -19,6 +19,7 @@ private:
   VkDevice _device;
   VkQueue _graphicsQueue;
   VkQueue _presentQueue;
+  VkCommandPool _commandPool;
 
   bool CheckDeviceSupport(VkPhysicalDevice device);
   bool CheckSwapchainSupport(SwapChainSupportDetails details);
@@ -34,6 +35,7 @@ public:
   SwapChainSupportDetails GetSwapchainSupportDetails() { return _swapchainDetails; }
   VkSurfaceKHR GetSurface() { return _surface; }
 
+  VkCommandPool GetCommandPool() { return _commandPool; }
   VkPhysicalDevice GetPhysicalDevice() { return _physicalDevice; }
   VkDevice GetVirtualDevice() { return _device; }
   VkQueue GetGraphicsQueue() { return _graphicsQueue; }

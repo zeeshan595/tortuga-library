@@ -61,6 +61,19 @@ Device::Device(VkPhysicalDevice physicalDevice, std::vector<const char *> valida
     }
     vkGetDeviceQueue(this->_device, _familyQueues.graphicsFamily.value(), 0, &_graphicsQueue);
     vkGetDeviceQueue(this->_device, _familyQueues.presentFamily.value(), 0, &_presentQueue);
+
+    //Setup command pool
+    auto poolInfo = VkCommandPoolCreateInfo();
+    {
+        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        poolInfo.queueFamilyIndex = _familyQueues.graphicsFamily.value();
+        poolInfo.flags = 0; // Optional
+    }
+    if (vkCreateCommandPool(_device, &poolInfo, nullptr, &_commandPool) != VK_SUCCESS)
+    {
+        Console::Error("Failed to create command pool for device!");
+        return;
+    }
     _isReady = true;
 }
 Device::~Device()
@@ -68,6 +81,7 @@ Device::~Device()
     if (_isReady == false)
         return;
 
+    vkDestroyCommandPool(this->_device, _commandPool, nullptr);
     vkDestroyDevice(this->_device, nullptr);
 }
 

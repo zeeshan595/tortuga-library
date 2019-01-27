@@ -34,6 +34,7 @@ public:
   VkSurfaceFormatKHR GetSurfaceFormat() { return _surfaceFormat; }
   VkPresentModeKHR GetPresentMode() { return _presentMode; }
   std::vector<VkImage> GetSwapchainRawImages() { return _swapchainImages; }
+  std::vector<VkImageView> GetSwapchainImageViews() { return _swapchainImageViews; }
   uint32_t GetWidth() { return _width; }
   uint32_t GetHeight() { return _height; }
 };
