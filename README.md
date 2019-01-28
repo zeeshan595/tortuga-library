@@ -6,7 +6,6 @@ Tortuga is a open source Game Engine built in C++. Tortuga ONLY uses vulkan for 
 **Building the Project**
 
 Before building Tortuga, you must install the required dependencies. Below is a list of required dependencies for Tortuga to function. The project expects to find all of the dependencies in `/usr/lib` and `/usr/include` folders.
-* gcc (C++ 17 or Higher)
 * pthread
 * vulkan (1.1.92)
 * SDL2 (with vulkan compatibility)
