@@ -52,12 +52,16 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
     }
     _currentFrame = 0;
 
-    vertexBuffer = new Buffer(_device, sizeof(vertices[0]) * vertices.size());
+    vertexBuffer = new Buffer(_device, sizeof(vertices[0]) * vertices.size(), Buffer::VERTEX_BUFFER_FLAGS);
     vertexBuffer->Fill(vertices);
+
+    indexBuffer = new Buffer(_device, sizeof(indices[0]) * indices.size(), Buffer::INDEX_BUFFER_FLAGS);
+    indexBuffer->Fill(indices);
 }
 
 CommandBuffer::~CommandBuffer()
 {
+    delete indexBuffer;
     delete vertexBuffer;
     //Wait for device to be free
     vkQueueWaitIdle(_device->GetGraphicsQueue());
@@ -110,8 +114,11 @@ void CommandBuffer::SetupDrawCall()
 
         std::vector<VkBuffer> buffers = {vertexBuffer->GetDeviceBuffer()};
         std::vector<VkDeviceSize> offsets = {0};
+
         vkCmdBindVertexBuffers(_commandBuffer[i], 0, 1, buffers.data(), offsets.data());
-        vkCmdDraw(_commandBuffer[i], vertices.size(), 1, 0, 0);
+        vkCmdBindIndexBuffer(_commandBuffer[i], indexBuffer->GetDeviceBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+        vkCmdDrawIndexed(_commandBuffer[i], indices.size(), 1, 0, 0, 0);
 
         //Exit rendering
         vkCmdEndRenderPass(_commandBuffer[i]);

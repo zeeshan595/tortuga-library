@@ -22,11 +22,14 @@ private:
   VkDeviceMemory _deviceMemory;
 
   void SetupStagingBuffer();
-  void SetupDeviceBuffer();
+  void SetupDeviceBuffer(VkBufferUsageFlags flag);
   uint32_t FindMemoryType(uint32_t filter, VkMemoryPropertyFlags properties);
 
 public:
-  Buffer(Device *device, uint32_t bufferSize);
+  static const VkBufferUsageFlags VERTEX_BUFFER_FLAGS = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+  static const VkBufferUsageFlags INDEX_BUFFER_FLAGS = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+
+  Buffer(Device *device, uint32_t bufferSize, VkBufferUsageFlags flag);
   ~Buffer();
 
   void CopyToDevice();

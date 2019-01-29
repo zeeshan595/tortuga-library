@@ -2,13 +2,13 @@
 
 namespace Tortuga
 {
-Buffer::Buffer(Device *device, uint32_t bufferSize)
+Buffer::Buffer(Device *device, uint32_t bufferSize, VkBufferUsageFlags flag)
 {
     _device = device;
     _size = bufferSize;
 
     SetupStagingBuffer();
-    SetupDeviceBuffer();
+    SetupDeviceBuffer(flag);
 }
 
 Buffer::~Buffer()
@@ -17,13 +17,13 @@ Buffer::~Buffer()
     vkFreeMemory(_device->GetVirtualDevice(), _stagingMemory, nullptr);
 }
 
-void Buffer::SetupDeviceBuffer()
+void Buffer::SetupDeviceBuffer(VkBufferUsageFlags flag)
 {
     auto bufferInfo = VkBufferCreateInfo();
     {
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferInfo.size = _size;
-        bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        bufferInfo.usage = flag;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
     if (vkCreateBuffer(_device->GetVirtualDevice(), &bufferInfo, nullptr, &_deviceBuffer) != VK_SUCCESS)
