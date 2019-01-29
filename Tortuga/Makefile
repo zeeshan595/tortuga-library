@@ -10,7 +10,7 @@ SOURCE_FILES = $(shell find $(SOURCE_DIR)/ -type f -name '*.cpp')
 OBJ_FILES = $(patsubst $(SOURCE_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SOURCE_FILES))
 
 all: setup lib
-build: clean setup exe
+build: clean setup lib
 setup: 
 	mkdir -p $(BUILD_DIR)
 clean: 
