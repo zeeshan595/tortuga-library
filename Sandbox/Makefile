@@ -24,6 +24,7 @@ FRAG_SHADERS = $(shell find $(SOURCE_DIR) -type f -name '*.frag')
 COMPILED_FRAG_SHADERS = $(patsubst $(SOURCE_DIR)/%.frag, $(BUILD_DIR)/%.frag.spv, $(FRAG_SHADERS))
 
 all: setup exe
+build: clean setup exe
 setup:
 	mkdir -p $(BUILD_DIR)
 clean: 
