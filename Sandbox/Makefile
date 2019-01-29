@@ -8,7 +8,7 @@ MAIN_PATH = $(SOURCE_DIR)/Application.cpp
 
 INCLUDES = -I/usr/include
 Libraries = -L/usr/lib
-LIB_FLAGS = -lvulkan -lSDL2 -ldl -lsndio
+LIB_FLAGS = -pthread -lvulkan -lSDL2 -ldl -lsndio
 
 #ENGINE
 ENGINE_INCLUDE_PATH = -I../Tortuga/Source/

@@ -108,7 +108,7 @@ void CommandBuffer::SetupDrawCall()
         //Actuall rendering
         vkCmdBindPipeline(_commandBuffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->GetVulkanPipeline());
 
-        std::vector<VkBuffer> buffers = {vertexBuffer->GetBuffer()};
+        std::vector<VkBuffer> buffers = {vertexBuffer->GetDeviceBuffer()};
         std::vector<VkDeviceSize> offsets = {0};
         vkCmdBindVertexBuffers(_commandBuffer[i], 0, 1, buffers.data(), offsets.data());
         vkCmdDraw(_commandBuffer[i], vertices.size(), 1, 0, 0);

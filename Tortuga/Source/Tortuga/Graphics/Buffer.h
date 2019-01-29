@@ -12,25 +12,41 @@ class Buffer
 private:
   uint32_t _size;
   Device *_device;
-  VkBuffer _buffer;
-  VkDeviceMemory _bufferMemory;
 
+  //RAM
+  VkBuffer _stagingBuffer;
+  VkDeviceMemory _stagingMemory;
+
+  //GPU Memory
+  VkBuffer _deviceBuffer;
+  VkDeviceMemory _deviceMemory;
+
+  void SetupStagingBuffer();
+  void SetupDeviceBuffer();
   uint32_t FindMemoryType(uint32_t filter, VkMemoryPropertyFlags properties);
 
 public:
   Buffer(Device *device, uint32_t bufferSize);
   ~Buffer();
 
+  void CopyToDevice();
+
   template <typename T>
-  void Fill(std::vector<T> data)
+  void Fill(std::vector<T> data, bool copyToDevice = true)
   {
     void *temp;
-    vkMapMemory(_device->GetVirtualDevice(), _bufferMemory, 0, _size, NULL, &temp);
+    vkMapMemory(_device->GetVirtualDevice(), _stagingMemory, 0, _size, NULL, &temp);
     memcpy(temp, data.data(), (sizeof(data) * data.size()));
-    vkUnmapMemory(_device->GetVirtualDevice(), _bufferMemory);
+    vkUnmapMemory(_device->GetVirtualDevice(), _stagingMemory);
+
+    if (copyToDevice)
+      CopyToDevice();
   }
 
-  VkBuffer GetBuffer() { return _buffer; }
+  VkBuffer GetStagingBuffer() { return _stagingBuffer; }
+  VkDeviceMemory GetStagingMemory() { return _stagingMemory; }
+  VkBuffer GetDeviceBuffer() { return _deviceBuffer; }
+  VkDeviceMemory GetDeviceMemory() { return _deviceMemory; }
   Device *GetDevice() { return _device; }
 };
 }; // namespace Tortuga
