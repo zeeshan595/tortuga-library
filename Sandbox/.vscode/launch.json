@@ -8,7 +8,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "debug",
             "program": "${workspaceFolder}/Build/Application",
             "args": [],
             "stopAtEntry": false,

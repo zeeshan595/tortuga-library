@@ -1,7 +1,7 @@
 {
     "tasks": [
         {
-            "label": "build",
+            "label": "debug",
             "type": "shell",
             "command": "cd ../Tortuga/ && make && cd ${workspaceFolder} && make",
             "group": {
@@ -13,7 +13,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "make build",
+            "command": "cd ../Tortuga/ && make build && cd ${workspaceFolder} && make build",
             "group": "none"
         }
     ]

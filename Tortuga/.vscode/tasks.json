@@ -1,7 +1,7 @@
 {
     "tasks": [
         {
-            "label": "build",
+            "label": "debug",
             "type": "shell",
             "command": "make",
             "group": "build",
