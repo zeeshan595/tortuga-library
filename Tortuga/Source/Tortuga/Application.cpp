@@ -21,6 +21,7 @@ void Application::Initialize(std::string path)
         _frameBuffers[i] = new Framebuffer(_pipeline, { imageViews[i] });
 
     _commandBuffer = new CommandBuffer(_pipeline, _frameBuffers);
+    _commandBuffer->SetupDrawCall();
 }
 
 void Application::Destroy()

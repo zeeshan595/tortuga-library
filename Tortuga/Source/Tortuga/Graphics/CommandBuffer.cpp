@@ -22,6 +22,60 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
         Console::Error("Failed to allocate command buffer on device!");
     }
 
+    //Setup semaphores
+    _imageAvailableSemaphore.resize(MAX_FRAMES_QUEUED);
+    _imageFinishedSemaphore.resize(MAX_FRAMES_QUEUED);
+    _fences.resize(MAX_FRAMES_QUEUED);
+    auto semaphoreInfo = VkSemaphoreCreateInfo();
+    {
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    }
+    auto fenceInfo = VkFenceCreateInfo();
+    {
+        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+    }
+    for (uint32_t i = 0; i < MAX_FRAMES_QUEUED; i++)
+    {
+        if (vkCreateSemaphore(_device->GetVirtualDevice(), &semaphoreInfo, nullptr, &_imageAvailableSemaphore[i]) != VK_SUCCESS)
+        {
+            Console::Error("Failed to create semaphore for command buffer!");
+        }
+        if (vkCreateSemaphore(_device->GetVirtualDevice(), &semaphoreInfo, nullptr, &_imageFinishedSemaphore[i]) != VK_SUCCESS)
+        {
+            Console::Error("Failed to create semaphore for command buffer!");
+        }
+        if (vkCreateFence(_device->GetVirtualDevice(), &fenceInfo, nullptr, &_fences[i]) != VK_SUCCESS)
+        {
+            Console::Error("Failed to create fence for command buffer!");
+        }
+    }
+    _currentFrame = 0;
+
+    vertexBuffer = new Buffer(_device, sizeof(vertices[0]) * vertices.size());
+    vertexBuffer->Fill(vertices);
+}
+
+CommandBuffer::~CommandBuffer()
+{
+    delete vertexBuffer;
+    //Wait for device to be free
+    vkQueueWaitIdle(_device->GetGraphicsQueue());
+    vkQueueWaitIdle(_device->GetPresentQueue());
+    vkDeviceWaitIdle(_device->GetVirtualDevice());
+
+    //Destroy semaphores and free command buffer
+    for (uint32_t i = 0; i < MAX_FRAMES_QUEUED; i++)
+    {
+        vkDestroySemaphore(_device->GetVirtualDevice(), _imageAvailableSemaphore[i], nullptr);
+        vkDestroySemaphore(_device->GetVirtualDevice(), _imageFinishedSemaphore[i], nullptr);
+        vkDestroyFence(_device->GetVirtualDevice(), _fences[i], nullptr);
+    }
+    vkFreeCommandBuffers(_device->GetVirtualDevice(), _device->GetCommandPool(), _commandBuffer.size(), _commandBuffer.data());
+}
+
+void CommandBuffer::SetupDrawCall()
+{
     //Tell GPU how to render
     for (uint32_t i = 0; i < _commandBuffer.size(); i++)
     {
@@ -53,7 +107,11 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
 
         //Actuall rendering
         vkCmdBindPipeline(_commandBuffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->GetVulkanPipeline());
-        vkCmdDraw(_commandBuffer[i], 3, 1, 0, 0);
+
+        std::vector<VkBuffer> buffers = {vertexBuffer->GetBuffer()};
+        std::vector<VkDeviceSize> offsets = {0};
+        vkCmdBindVertexBuffers(_commandBuffer[i], 0, 1, buffers.data(), offsets.data());
+        vkCmdDraw(_commandBuffer[i], vertices.size(), 1, 0, 0);
 
         //Exit rendering
         vkCmdEndRenderPass(_commandBuffer[i]);
@@ -62,42 +120,18 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
             Console::Error("Failed to end command buffer");
         }
     }
-
-    //Setup semaphores
-    auto semaphoreInfo = VkSemaphoreCreateInfo();
-    {
-        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    }
-    if (vkCreateSemaphore(_device->GetVirtualDevice(), &semaphoreInfo, nullptr, &_imageAvailableSemaphore) != VK_SUCCESS)
-    {
-        Console::Error("Failed to create semaphore for command buffer!");
-    }
-    if (vkCreateSemaphore(_device->GetVirtualDevice(), &semaphoreInfo, nullptr, &_imageFinishedSemaphore) != VK_SUCCESS)
-    {
-        Console::Error("Failed to create semaphore for command buffer!");
-    }
-}
-
-CommandBuffer::~CommandBuffer()
-{
-    //Wait for device to be free
-    vkQueueWaitIdle(_device->GetGraphicsQueue());
-    vkQueueWaitIdle(_device->GetPresentQueue());
-    vkDeviceWaitIdle(_device->GetVirtualDevice());
-
-    //Destroy semaphores and free command buffer
-    vkDestroySemaphore(_device->GetVirtualDevice(), _imageAvailableSemaphore, nullptr);
-    vkDestroySemaphore(_device->GetVirtualDevice(), _imageFinishedSemaphore, nullptr);
-    vkFreeCommandBuffers(_device->GetVirtualDevice(), _device->GetCommandPool(), _commandBuffer.size(), _commandBuffer.data());
 }
 
 void CommandBuffer::Render()
 {
-    uint32_t imageIndex;
-    vkAcquireNextImageKHR(_device->GetVirtualDevice(), _swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::max(), _imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    vkWaitForFences(_device->GetVirtualDevice(), 1, &_fences[_currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+    vkResetFences(_device->GetVirtualDevice(), 1, &_fences[_currentFrame]);
 
-    std::vector<VkSemaphore> signalSemaphores = {_imageFinishedSemaphore};
-    std::vector<VkSemaphore> waitSemaphores = {_imageAvailableSemaphore};
+    uint32_t imageIndex;
+    vkAcquireNextImageKHR(_device->GetVirtualDevice(), _swapchain->GetSwapchain(), std::numeric_limits<uint64_t>::max(), _imageAvailableSemaphore[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+    std::vector<VkSemaphore> signalSemaphores = {_imageFinishedSemaphore[_currentFrame]};
+    std::vector<VkSemaphore> waitSemaphores = {_imageAvailableSemaphore[_currentFrame]};
     std::vector<VkPipelineStageFlags> waitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     std::vector<VkSwapchainKHR> swapchains = {_swapchain->GetSwapchain()};
 
@@ -112,7 +146,7 @@ void CommandBuffer::Render()
         submitInfo.signalSemaphoreCount = signalSemaphores.size();
         submitInfo.pSignalSemaphores = signalSemaphores.data();
     }
-    if (vkQueueSubmit(_device->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+    if (vkQueueSubmit(_device->GetGraphicsQueue(), 1, &submitInfo, _fences[_currentFrame]) != VK_SUCCESS)
     {
         Console::Error("Failed to submit render queue");
     }
@@ -128,7 +162,7 @@ void CommandBuffer::Render()
         presentInfo.pImageIndices = &imageIndex;
         presentInfo.pResults = nullptr; // Optional
     }
+    _currentFrame = (_currentFrame + 1) % MAX_FRAMES_QUEUED;
     vkQueuePresentKHR(_device->GetPresentQueue(), &presentInfo);
-    vkQueueWaitIdle(_device->GetPresentQueue());
 }
 } // namespace Tortuga

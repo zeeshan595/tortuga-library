@@ -31,14 +31,17 @@ Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fra
     //====PIPE LINE====
     //=================
 
+    auto bindingDescription = Vertex::GetBindingPerDescription(0);
+    auto attributeDescriptions = Vertex::GetVertexDescription(0);
+
     //Vertex input state
     auto vertexInputInfo = VkPipelineVertexInputStateCreateInfo();
     {
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount = attributeDescriptions.size();
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
     }
 
     //Input assembly

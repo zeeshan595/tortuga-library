@@ -1,6 +1,7 @@
 #define DEBUG_MODE true
 
 //General
+#include <array>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -11,6 +12,7 @@
 #include <sstream>
 #include <algorithm>
 #include <fstream>
+#include <glm/glm.hpp>
 
 //3rd Party
 #include <vulkan.h>

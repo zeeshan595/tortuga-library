@@ -7,25 +7,40 @@
 #include "Device.h"
 #include "Pipeline.h"
 #include "Framebuffer.h"
+#include "Buffer.h"
+#include "Vertex.h"
 
 namespace Tortuga
 {
 class CommandBuffer
 {
 private:
+  size_t _currentFrame;
   Pipeline *_pipeline;
   Device *_device;
   Swapchain *_swapchain;
   std::vector<Framebuffer *> _frameBuffers;
   std::vector<VkCommandBuffer> _commandBuffer;
 
-  VkSemaphore _imageAvailableSemaphore;
-  VkSemaphore _imageFinishedSemaphore;
+  std::vector<VkFence> _fences;
+  std::vector<VkSemaphore> _imageAvailableSemaphore;
+  std::vector<VkSemaphore> _imageFinishedSemaphore;
+
+  Buffer *vertexBuffer;
+
+  const std::vector<Vertex> vertices = {
+    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+};
 
 public:
+  const uint32_t MAX_FRAMES_QUEUED = 2;
+
   CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> frameBuffers);
   ~CommandBuffer();
 
+  void SetupDrawCall();
   void Render();
 
   std::vector<VkCommandBuffer> GetCommandBuffers() { return _commandBuffer; }

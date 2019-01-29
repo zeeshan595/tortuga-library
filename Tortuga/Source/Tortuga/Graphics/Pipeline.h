@@ -4,6 +4,7 @@
 #include "../Core.h"
 #include "../Console.h"
 #include "Swapchain.h"
+#include "Vertex.h"
 
 namespace Tortuga
 {
