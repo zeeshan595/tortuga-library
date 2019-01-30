@@ -12,6 +12,6 @@ Before building Tortuga, you must install the required dependencies. Below is a 
 
 If using `vs code` open the `Project.code-workspace` and you can debug The project `Sandbox` from there. Otherwise build the project manually:
 
-1. Go into Tortuga sub-folder and run `make`
-2. Navigate to Sandbox sub-folder and run `make`
+1. Go into Tortuga sub-folder and run `make build`
+2. Navigate to Sandbox sub-folder and run `make build`
 3. Open the application inside `Sandbox/Build/Application`
