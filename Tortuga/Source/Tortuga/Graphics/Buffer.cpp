@@ -2,81 +2,76 @@
 
 namespace Tortuga
 {
-Buffer::Buffer(Device *device, uint32_t bufferSize, VkBufferUsageFlags flag)
+Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType type, StorageType storage)
 {
+    _bufferType = type;
+    _storageType = storage;
     _device = device;
     _size = bufferSize;
 
-    SetupStagingBuffer();
-    SetupDeviceBuffer(flag);
+    if (storage == StorageType::SyncToDevice)
+    {
+        _hostBuffer = CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, GetMemoryFlags(MemoryType::HostMemory));
+        _deviceBuffer = CreateBuffer(GetBufferFlags(type, storage), GetMemoryFlags(MemoryType::DeviceMemory));
+    }
+    else if (storage == StorageType::SyncToDevice)
+    {
+        _deviceBuffer = CreateBuffer(GetBufferFlags(type, storage), GetMemoryFlags(MemoryType::DeviceMemory));
+    }
+    else
+    {
+        Console::Error("Unknown storage type, failed to create buffer!");
+    }
 }
 
 Buffer::~Buffer()
 {
-    vkDestroyBuffer(_device->GetVirtualDevice(), _stagingBuffer, nullptr);
-    vkFreeMemory(_device->GetVirtualDevice(), _stagingMemory, nullptr);
+    if (_storageType == StorageType::SyncToDevice)
+    {
+        vkFreeMemory(_device->GetVirtualDevice(), _hostBuffer.Location, nullptr);
+        vkDestroyBuffer(_device->GetVirtualDevice(), _hostBuffer.Handler, nullptr);
+        vkFreeMemory(_device->GetVirtualDevice(), _deviceBuffer.Location, nullptr);
+        vkDestroyBuffer(_device->GetVirtualDevice(), _deviceBuffer.Handler, nullptr);
+    }
+    else if (_storageType == StorageType::OnlyOnDevice)
+    {
+        vkFreeMemory(_device->GetVirtualDevice(), _deviceBuffer.Location, nullptr);
+        vkDestroyBuffer(_device->GetVirtualDevice(), _deviceBuffer.Handler, nullptr);
+    }
 }
 
-void Buffer::SetupDeviceBuffer(VkBufferUsageFlags flag)
+Buffer::BufferMemoryObject Buffer::CreateBuffer(VkBufferUsageFlags bufferFlags, VkMemoryPropertyFlags memoryFlags)
 {
+    auto bmo = BufferMemoryObject();
+
     auto bufferInfo = VkBufferCreateInfo();
     {
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferInfo.size = _size;
-        bufferInfo.usage = flag;
+        bufferInfo.usage = bufferFlags;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
-    if (vkCreateBuffer(_device->GetVirtualDevice(), &bufferInfo, nullptr, &_deviceBuffer) != VK_SUCCESS)
+    if (vkCreateBuffer(_device->GetVirtualDevice(), &bufferInfo, nullptr, &bmo.Handler) != VK_SUCCESS)
     {
         Console::Fatal("Failed to create buffer!");
     }
 
     VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(_device->GetVirtualDevice(), _deviceBuffer, &memoryRequirements);
+    vkGetBufferMemoryRequirements(_device->GetVirtualDevice(), bmo.Handler, &memoryRequirements);
 
     auto allocateInfo = VkMemoryAllocateInfo();
     {
         allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocateInfo.allocationSize = memoryRequirements.size;
-        allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, memoryFlags);
     }
-    if (vkAllocateMemory(_device->GetVirtualDevice(), &allocateInfo, nullptr, &_deviceMemory) != VK_SUCCESS)
+    if (vkAllocateMemory(_device->GetVirtualDevice(), &allocateInfo, nullptr, &bmo.Location) != VK_SUCCESS)
     {
         Console::Fatal("Failed to allocate memory for buffer!");
     }
-    vkBindBufferMemory(_device->GetVirtualDevice(), _deviceBuffer, _deviceMemory, 0);
-}
-
-void Buffer::SetupStagingBuffer()
-{
-    auto bufferInfo = VkBufferCreateInfo();
-    {
-        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferInfo.size = _size;
-        bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    }
-    if (vkCreateBuffer(_device->GetVirtualDevice(), &bufferInfo, nullptr, &_stagingBuffer) != VK_SUCCESS)
-    {
-        Console::Fatal("Failed to create buffer!");
-    }
-
-    VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(_device->GetVirtualDevice(), _stagingBuffer, &memoryRequirements);
-
-    auto allocateInfo = VkMemoryAllocateInfo();
-    {
-        allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocateInfo.allocationSize = memoryRequirements.size;
-        allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    }
-    if (vkAllocateMemory(_device->GetVirtualDevice(), &allocateInfo, nullptr, &_stagingMemory) != VK_SUCCESS)
-    {
-        Console::Fatal("Failed to allocate memory for buffer!");
-    }
-    vkBindBufferMemory(_device->GetVirtualDevice(), _stagingBuffer, _stagingMemory, 0);
+    vkBindBufferMemory(_device->GetVirtualDevice(), bmo.Handler, bmo.Location, 0);
+    return bmo;
 }
 
 uint32_t Buffer::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags properties)
@@ -92,6 +87,7 @@ uint32_t Buffer::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags propertie
     }
 
     Console::Fatal("Failed to find GPUs memory type!");
+    return 0;
 }
 
 void Buffer::CopyToDevice()
@@ -119,7 +115,7 @@ void Buffer::CopyToDevice()
         copyRegion.dstOffset = 0; // Optional
         copyRegion.size = _size;
     }
-    vkCmdCopyBuffer(commandBuffer, _stagingBuffer, _deviceBuffer, 1, &copyRegion);
+    vkCmdCopyBuffer(commandBuffer, _hostBuffer.Handler, _deviceBuffer.Handler, 1, &copyRegion);
     vkEndCommandBuffer(commandBuffer);
 
     auto submitInfo = VkSubmitInfo();
@@ -132,5 +128,51 @@ void Buffer::CopyToDevice()
     vkQueueWaitIdle(_device->GetGraphicsQueue());
 
     vkFreeCommandBuffers(_device->GetVirtualDevice(), _device->GetCommandPool(), 1, &commandBuffer);
+}
+
+VkBufferUsageFlags Buffer::GetBufferFlags(BufferType type, StorageType storage)
+{
+    if (storage == StorageType::OnlyOnDevice)
+    {
+        switch (type)
+        {
+        case BufferType::Vertex:
+            return VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        case BufferType::Index:
+            return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        case BufferType::Uniform:
+            return VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        }
+    }
+    else if (storage == StorageType::SyncToDevice)
+    {
+        switch (type)
+        {
+        case BufferType::Vertex:
+            return VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        case BufferType::Index:
+            return VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        case BufferType::Uniform:
+            return VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        }
+    }
+    else
+    {
+        Console::Error("Invalid storage type, failed to create buffer");
+    }
+
+    return -1;
+}
+VkMemoryPropertyFlags Buffer::GetMemoryFlags(MemoryType type)
+{
+    switch (type)
+    {
+    case MemoryType::HostMemory:
+        return VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    case MemoryType::DeviceMemory:
+        return VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+    }
+
+    return -1;
 }
 }; // namespace Tortuga

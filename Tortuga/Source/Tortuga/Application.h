@@ -23,6 +23,17 @@ private:
   Pipeline *_pipeline;
   std::vector<Framebuffer *> _frameBuffers;
   CommandBuffer *_commandBuffer;
+  std::vector<Buffer*> _vertexBuffer;
+  std::vector<Buffer*> _indexBuffer;
+
+  const std::vector<Vertex> vertices = {
+      {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+      {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+      {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+      {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+
+  const std::vector<uint16_t> indices = {
+      0, 1, 2, 2, 3, 0};
 
 protected:
   std::string ApplicationName = "My Application";

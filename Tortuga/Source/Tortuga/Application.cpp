@@ -18,15 +18,30 @@ void Application::Initialize(std::string path)
     auto imageViews = _swapchain->GetSwapchainImageViews();
     _frameBuffers.resize(imageViews.size());
     for (uint32_t i = 0; i < imageViews.size(); i++)
-        _frameBuffers[i] = new Framebuffer(_pipeline, { imageViews[i] });
+        _frameBuffers[i] = new Framebuffer(_pipeline, {imageViews[i]});
+
+    _vertexBuffer.resize(1);
+    _indexBuffer.resize(1);
+    {
+        _vertexBuffer[0] = new Buffer(_vulkan->GetDevices()[0], sizeof(vertices[0]) * vertices.size(), Buffer::Vertex);
+        _vertexBuffer[0]->UpdateBufferData(vertices);
+
+        _indexBuffer[0] = new Buffer(_vulkan->GetDevices()[0], sizeof(indices) * indices.size(), Buffer::Index);
+        _indexBuffer[0]->UpdateBufferData(indices);
+    }
 
     _commandBuffer = new CommandBuffer(_pipeline, _frameBuffers);
-    _commandBuffer->SetupDrawCall();
+    _commandBuffer->SetupDrawCall(_vertexBuffer[0], _indexBuffer[0], indices.size(), true);
 }
 
 void Application::Destroy()
 {
     delete _commandBuffer;
+
+    for (uint32_t i = 0; i < _vertexBuffer.size(); i++)
+        delete _vertexBuffer[i];
+    for (uint32_t i = 0; i < _indexBuffer.size(); i++)
+        delete _indexBuffer[i];
 
     for (uint32_t i = 0; i < _frameBuffers.size(); i++)
         delete _frameBuffers[i];
@@ -46,7 +61,8 @@ void Application::Run()
         _commandBuffer->Render();
         SDL_Delay(1);
         i++;
-        if (i > 5000) {
+        if (i > 5000)
+        {
             break;
         }
     }
