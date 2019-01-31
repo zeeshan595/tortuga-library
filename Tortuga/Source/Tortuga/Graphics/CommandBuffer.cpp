@@ -51,10 +51,18 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
         }
     }
     _currentFrame = 0;
+
+    vertexBuffer = new Buffer(_device, sizeof(vertices[0]) * vertices.size(), Buffer::VERTEX_BUFFER_FLAGS);
+    vertexBuffer->Fill(vertices);
+
+    indexBuffer = new Buffer(_device, sizeof(indices[0]) * indices.size(), Buffer::INDEX_BUFFER_FLAGS);
+    indexBuffer->Fill(indices);
 }
 
 CommandBuffer::~CommandBuffer()
 {
+    delete indexBuffer;
+    delete vertexBuffer;
     //Wait for device to be free
     vkQueueWaitIdle(_device->GetGraphicsQueue());
     vkQueueWaitIdle(_device->GetPresentQueue());
@@ -70,7 +78,7 @@ CommandBuffer::~CommandBuffer()
     vkFreeCommandBuffers(_device->GetVirtualDevice(), _device->GetCommandPool(), _commandBuffer.size(), _commandBuffer.data());
 }
 
-void CommandBuffer::SetupDrawCall(Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize, bool clear)
+void CommandBuffer::SetupDrawCall()
 {
     //Tell GPU how to render
     for (uint32_t i = 0; i < _commandBuffer.size(); i++)
@@ -89,29 +97,28 @@ void CommandBuffer::SetupDrawCall(Buffer *vertexBuffer, Buffer *indexBuffer, uin
 
         auto renderPassInfo = VkRenderPassBeginInfo();
         {
+            VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+
             renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
             renderPassInfo.renderPass = _pipeline->GetRenderPass();
             renderPassInfo.framebuffer = _frameBuffers[i]->GetFramebuffer();
             renderPassInfo.renderArea.offset = {0, 0};
             renderPassInfo.renderArea.extent = _swapchain->GetExtent2D();
-            VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+            renderPassInfo.clearValueCount = 1;
             renderPassInfo.pClearValues = &clearColor;
-            if (clear == false)
-                renderPassInfo.clearValueCount = 0;
-            else
-                renderPassInfo.clearValueCount = 1;
         }
         vkCmdBeginRenderPass(_commandBuffer[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         //Actuall rendering
         vkCmdBindPipeline(_commandBuffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->GetVulkanPipeline());
 
-        std::vector<VkBuffer> buffers = {vertexBuffer->GetBuffer().Handler};
+        std::vector<VkBuffer> buffers = {vertexBuffer->GetDeviceBuffer()};
         std::vector<VkDeviceSize> offsets = {0};
 
         vkCmdBindVertexBuffers(_commandBuffer[i], 0, 1, buffers.data(), offsets.data());
-        vkCmdBindIndexBuffer(_commandBuffer[i], indexBuffer->GetBuffer().Handler, 0, VK_INDEX_TYPE_UINT16);
-        vkCmdDrawIndexed(_commandBuffer[i], indicesSize, 1, 0, 0, 0);
+        vkCmdBindIndexBuffer(_commandBuffer[i], indexBuffer->GetDeviceBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+        vkCmdDrawIndexed(_commandBuffer[i], indices.size(), 1, 0, 0, 0);
 
         //Exit rendering
         vkCmdEndRenderPass(_commandBuffer[i]);
