@@ -2,7 +2,7 @@
 #define _BUFFER
 
 #include "../../Core.h"
-#include "../../Core.h"
+#include "../../Console.h"
 #include "Device.h"
 #include "CommandPool.h"
 

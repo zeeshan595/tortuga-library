@@ -2,7 +2,7 @@
 #define _RENDER_PASS
 
 #include "../../Core.h"
-#include "../../Core.h"
+#include "../../Console.h"
 #include "Device.h"
 #include "Swapchain.h"
 

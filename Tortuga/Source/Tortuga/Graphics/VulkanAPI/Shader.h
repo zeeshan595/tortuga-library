@@ -2,7 +2,7 @@
 #define _SHADER
 
 #include "../../Core.h"
-#include "../../Core.h"
+#include "../../Console.h"
 #include "Device.h"
 
 namespace Tortuga

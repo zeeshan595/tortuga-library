@@ -2,7 +2,7 @@
 #define _PIPELINE
 
 #include "../../Core.h"
-#include "../../Core.h"
+#include "../../Console.h"
 #include "Device.h"
 #include "RenderPass.h"
 #include "Swapchain.h"

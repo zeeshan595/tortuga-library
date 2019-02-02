@@ -2,7 +2,7 @@
 #define _WINDOW
 
 #include "../../Core.h"
-#include "../../Core.h"
+#include "../../Console.h"
 
 namespace Tortuga
 {

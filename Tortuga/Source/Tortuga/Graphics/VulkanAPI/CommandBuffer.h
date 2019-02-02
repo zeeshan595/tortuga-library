@@ -2,7 +2,7 @@
 #define _COMMAND_BUFFER
 
 #include "../../Core.h"
-#include "../../Core.h"
+#include "../../Console.h"
 #include "Device.h"
 #include "CommandPool.h"
 #include "Pipeline.h"

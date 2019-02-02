@@ -2,7 +2,7 @@
 #define _DEVICE
 
 #include "../../Core.h"
-#include "../../Core.h"
+#include "../../Console.h"
 #include "QueueFamilyIndices.h"
 #include "SwapChainSupportDetails.h"
 
