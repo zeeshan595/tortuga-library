@@ -7,6 +7,7 @@
 #include "RenderPass.h"
 #include "Swapchain.h"
 #include "Vertex.h"
+#include "Shader.h"
 
 namespace Tortuga
 {
@@ -15,16 +16,11 @@ class Pipeline
 private:
   Swapchain *_swapchain;
   Device *_device;
-  VkShaderModule _vertexShader;
-  VkShaderModule _fragmentShader;
   VkPipelineLayout _pipelineLayout;
   VkPipeline _graphicsPipeline;
 
-  static std::vector<char> ReadFile(const std::string &filename);
-  static VkShaderModule CreateShader(VkDevice device, std::vector<char> code);
-
 public:
-  Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain, std::string vertexPath, std::string fragmentPath);
+  Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain, Shader *shader);
   ~Pipeline();
 
   Swapchain *GetSwapchain() { return _swapchain; }

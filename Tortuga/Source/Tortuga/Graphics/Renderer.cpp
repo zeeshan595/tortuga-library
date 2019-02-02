@@ -46,13 +46,13 @@ void Renderer::RecordCommandBuffers(std::vector<CommandBuffer *> secondaryBuffer
     for (uint32_t i = 0; i < _frameBuffersSize; i++)
     {
         _commandBuffers->BeginCommandBuffer(i);
-        _commandBuffers->BeginRenderPass(i, _pipeline, _renderPass, _frameBuffers[i]);
-        _commandBuffers->EndRenderPass(i);
+        _commandBuffers->BeginRenderPass(i, _pipeline, _renderPass, _frameBuffers[i], VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
         for (uint32_t j = 0; j < secondaryBuffers.size(); j++)
         {
             auto tempCommandBuffers = secondaryBuffers[j]->GetCommandBuffers();
             vkCmdExecuteCommands(_commandBuffers->GetCommandBuffers()[i], tempCommandBuffers.size(), tempCommandBuffers.data());
         }
+        _commandBuffers->EndRenderPass(i);
         _commandBuffers->EndCommandBuffer(i);
     }
 }
@@ -104,7 +104,7 @@ void Renderer::RenderFrame()
     _currentFrame = (_currentFrame + 1) % MAX_FRAMES_QUEUED;
 }
 
-void Renderer::WaitGPUIdle()
+void Renderer::WaitForGPUIdle()
 {
     //Wait for device to be free
     vkQueueWaitIdle(_device->GetGraphicsQueue());

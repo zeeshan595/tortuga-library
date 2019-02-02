@@ -6,6 +6,7 @@
 #include "Graphics/Window.h"
 #include "Graphics/Vulkan.h"
 #include "Graphics/Swapchain.h"
+#include "Graphics/Shader.h"
 #include "Graphics/Pipeline.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/CommandPool.h"
@@ -24,6 +25,7 @@ private:
   Vulkan *_vulkan;
   Swapchain *_swapchain;
   RenderPass *_renderPass;
+  Shader *_shader;
   Pipeline *_pipeline;
   std::vector<FrameBuffer *> _frameBuffers;
   Renderer *_renderer;

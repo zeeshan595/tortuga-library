@@ -77,7 +77,7 @@ void CommandBuffer::EndCommandBuffer(uint32_t index)
     }
 }
 
-void CommandBuffer::BeginRenderPass(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, FrameBuffer *framebuffer)
+void CommandBuffer::BeginRenderPass(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, FrameBuffer *framebuffer, VkSubpassContents subPassFlags)
 {
     auto renderPassInfo = VkRenderPassBeginInfo();
     {
@@ -91,7 +91,7 @@ void CommandBuffer::BeginRenderPass(uint32_t index, Pipeline *pipeline, RenderPa
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
     }
-    vkCmdBeginRenderPass(_commandBuffers[index], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(_commandBuffers[index], &renderPassInfo, subPassFlags);
 }
 
 void CommandBuffer::EndRenderPass(uint32_t index)

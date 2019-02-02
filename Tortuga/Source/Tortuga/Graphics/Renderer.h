@@ -44,7 +44,7 @@ class Renderer
     void RecordCommandBuffers(std::vector<CommandBuffer *> secondaryBuffers);
     void RenderFrame();
 
-    void WaitGPUIdle();
+    void WaitForGPUIdle();
 };
 }; // namespace Tortuga
 

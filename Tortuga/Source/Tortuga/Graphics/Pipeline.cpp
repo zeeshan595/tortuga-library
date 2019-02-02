@@ -2,30 +2,10 @@
 
 namespace Tortuga
 {
-Pipeline::Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain, std::string vertexPath, std::string fragmentPath)
+Pipeline::Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain, Shader *shader)
 {
     this->_swapchain = swapchain;
     this->_device = swapchain->GetDevice();
-
-    _vertexShader = CreateShader(_device->GetVirtualDevice(), ReadFile(vertexPath));
-    _fragmentShader = CreateShader(_device->GetVirtualDevice(), ReadFile(fragmentPath));
-
-    auto vertexCreateInfo = VkPipelineShaderStageCreateInfo();
-    {
-        vertexCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        vertexCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-        vertexCreateInfo.module = _vertexShader;
-        vertexCreateInfo.pName = "main";
-    }
-    auto fragmentCreateInfo = VkPipelineShaderStageCreateInfo();
-    {
-        fragmentCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        fragmentCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentCreateInfo.module = _fragmentShader;
-        fragmentCreateInfo.pName = "main";
-    }
-
-    std::vector<VkPipelineShaderStageCreateInfo> shaderStages = {vertexCreateInfo, fragmentCreateInfo};
 
     //=================
     //====PIPE LINE====
@@ -165,12 +145,15 @@ Pipeline::Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain,
         Console::Fatal("Failed to create pipeline!");
     }
 
+    //Shader helper
+    auto pipelineShaderInfo = shader->GetPipelineShaderInfo();
+
     //Vulkan Pipeline
     auto pipelineInfo = VkGraphicsPipelineCreateInfo();
     {
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineInfo.stageCount = shaderStages.size();
-        pipelineInfo.pStages = shaderStages.data();
+        pipelineInfo.stageCount = pipelineShaderInfo.size();
+        pipelineInfo.pStages = pipelineShaderInfo.data();
         pipelineInfo.pVertexInputState = &vertexInputInfo;
         pipelineInfo.pInputAssemblyState = &inputAssembly;
         pipelineInfo.pViewportState = &viewportState;
@@ -195,38 +178,5 @@ Pipeline::~Pipeline()
 {
     vkDestroyPipeline(_device->GetVirtualDevice(), _graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(_device->GetVirtualDevice(), _pipelineLayout, nullptr);
-
-    vkDestroyShaderModule(_device->GetVirtualDevice(), _vertexShader, nullptr);
-    vkDestroyShaderModule(_device->GetVirtualDevice(), _fragmentShader, nullptr);
-}
-
-std::vector<char> Pipeline::ReadFile(const std::string &filename)
-{
-    std::ifstream file(filename.c_str(), std::ios::ate | std::ios::binary);
-    if (!file.is_open())
-        Console::Fatal("Failed to open file! {0}", filename.c_str());
-
-    size_t fileSize = (size_t)file.tellg();
-    std::vector<char> buffer(fileSize);
-    file.seekg(0);
-    file.read(buffer.data(), fileSize);
-    file.close();
-    return buffer;
-}
-
-VkShaderModule Pipeline::CreateShader(VkDevice device, std::vector<char> code)
-{
-    auto shaderCreateInfo = VkShaderModuleCreateInfo();
-    {
-        shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        shaderCreateInfo.codeSize = code.size();
-        shaderCreateInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
-    }
-    VkShaderModule shader;
-    if (vkCreateShaderModule(device, &shaderCreateInfo, nullptr, &shader) != VK_SUCCESS)
-    {
-        Console::Fatal("Failed to load shader!");
-    }
-    return shader;
 }
 } // namespace Tortuga

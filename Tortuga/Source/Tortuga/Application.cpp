@@ -16,7 +16,8 @@ void Application::Initialize(std::string path)
 
     _swapchain = new Swapchain(device, _mainWindow->GetWidth(), _mainWindow->GetHeight());
     _renderPass = new RenderPass(device, _swapchain);
-    _pipeline = new Pipeline(device, _renderPass, _swapchain, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
+    _shader = new Shader(device, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
+    _pipeline = new Pipeline(device, _renderPass, _swapchain, _shader);
 
     auto imageViews = _swapchain->GetSwapchainImageViews();
     _frameBuffers.resize(imageViews.size());
@@ -47,7 +48,7 @@ void Application::Initialize(std::string path)
 
 void Application::Destroy()
 {
-    _renderer->WaitGPUIdle();
+    _renderer->WaitForGPUIdle();
     delete _commandBuffer;
     delete _commandPool;
 
@@ -60,6 +61,7 @@ void Application::Destroy()
         delete _frameBuffers[i];
 
     delete _pipeline;
+    delete _shader;
     delete _renderPass;
     delete _swapchain;
     delete _vulkan;
