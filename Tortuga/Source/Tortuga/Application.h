@@ -55,9 +55,10 @@ protected:
   std::string ApplicationName = "My Application";
 
 public:
-  void Run();
   void Initialize(std::string path);
   void Destroy();
+
+  void Run();
 
   std::string GetApplicationPath() { return _applicationPath; }
   std::string GetApplicationDirectory() { return _applicationDir; }

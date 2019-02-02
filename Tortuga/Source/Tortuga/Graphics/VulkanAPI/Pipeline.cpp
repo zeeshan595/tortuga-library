@@ -2,14 +2,10 @@
 
 namespace Tortuga
 {
-Pipeline::Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain, Shader *shader)
+Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass, Shader *shader)
 {
     this->_swapchain = swapchain;
-    this->_device = swapchain->GetDevice();
-
-    //=================
-    //====PIPE LINE====
-    //=================
+    this->_device = device;
 
     auto bindingDescription = Vertex::GetBindingPerDescription(0);
     auto attributeDescriptions = Vertex::GetVertexDescription(0);

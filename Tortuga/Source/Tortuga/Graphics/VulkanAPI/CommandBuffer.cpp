@@ -77,7 +77,7 @@ void CommandBuffer::EndCommandBuffer(uint32_t index)
     }
 }
 
-void CommandBuffer::BeginRenderPass(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, FrameBuffer *framebuffer, VkSubpassContents subPassFlags)
+void CommandBuffer::BeginRenderPass(uint32_t index, Swapchain *swapchain, RenderPass *renderPass, FrameBuffer *framebuffer, VkSubpassContents subPassFlags)
 {
     auto renderPassInfo = VkRenderPassBeginInfo();
     {
@@ -87,7 +87,7 @@ void CommandBuffer::BeginRenderPass(uint32_t index, Pipeline *pipeline, RenderPa
         renderPassInfo.renderPass = renderPass->GetRenderPass();
         renderPassInfo.framebuffer = framebuffer->GetFramebuffer();
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = pipeline->GetSwapchain()->GetExtent2D();
+        renderPassInfo.renderArea.extent = swapchain->GetExtent2D();
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
     }

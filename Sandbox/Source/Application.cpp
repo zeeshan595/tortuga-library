@@ -5,7 +5,7 @@ class Sandbox : public Tortuga::Application
   public:
     Sandbox()
     {
-        this->ApplicationName = "Cool Application";
+        this->ApplicationName = "Tortuga Testing Tool";
     }
 };
 

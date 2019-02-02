@@ -17,7 +17,7 @@ void Application::Initialize(std::string path)
     _swapchain = new Swapchain(device, _mainWindow->GetWidth(), _mainWindow->GetHeight());
     _renderPass = new RenderPass(device, _swapchain);
     _shader = new Shader(device, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
-    _pipeline = new Pipeline(device, _renderPass, _swapchain, _shader);
+    _pipeline = new Pipeline(device, _swapchain, _renderPass, _shader);
 
     auto imageViews = _swapchain->GetSwapchainImageViews();
     _frameBuffers.resize(imageViews.size());
@@ -33,7 +33,7 @@ void Application::Initialize(std::string path)
     _indexBuffer = new Buffer(device, indices.size() * sizeof(indices[0]), Buffer::BufferType::Index, Buffer::StorageType::DeviceCopy);
     _indexBuffer->UpdateData(indices);
 
-    _renderer = new Renderer(device, _pipeline, _renderPass, _frameBuffers);
+    _renderer = new Renderer(device, _swapchain, _renderPass, _frameBuffers);
 
     _commandPool = new CommandPool(device);
 

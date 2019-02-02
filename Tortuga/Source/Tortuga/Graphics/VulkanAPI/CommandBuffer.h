@@ -8,6 +8,7 @@
 #include "Pipeline.h"
 #include "FrameBuffer.h"
 #include "Buffer.h"
+#include "Swapchain.h"
 
 namespace Tortuga
 {
@@ -27,7 +28,7 @@ public:
   void BeginCommandBuffer(uint32_t index);
   void BeginCommandBuffer(uint32_t index, RenderPass *renderPass, uint32_t subPass);
   void EndCommandBuffer(uint32_t index);
-  void BeginRenderPass(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, FrameBuffer *frameBuffer, VkSubpassContents subPassFlags);
+  void BeginRenderPass(uint32_t index, Swapchain *swapchain, RenderPass *renderPass, FrameBuffer *frameBuffer, VkSubpassContents subPassFlags);
   void EndRenderPass(uint32_t index);
   void BindPipeline(uint32_t index, Pipeline *pipeline);
 

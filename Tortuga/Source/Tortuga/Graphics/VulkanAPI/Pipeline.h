@@ -20,7 +20,7 @@ private:
   VkPipeline _graphicsPipeline;
 
 public:
-  Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain, Shader *shader);
+  Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass, Shader *shader);
   ~Pipeline();
 
   Swapchain *GetSwapchain() { return _swapchain; }
