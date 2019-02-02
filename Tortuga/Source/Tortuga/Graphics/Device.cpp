@@ -146,6 +146,11 @@ bool Device::CheckDeviceSupport(VkPhysicalDevice device)
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
+    {
+        _deviceName = deviceProperties.deviceName;
+        _vendorIdentifier = deviceProperties.vendorID;
+    }
+
     bool isDiscreteGPU = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
     bool geometryCheck = deviceFeatures.geometryShader;
     return isDiscreteGPU && geometryCheck;

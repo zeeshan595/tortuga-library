@@ -20,6 +20,8 @@ private:
   VkQueue _graphicsQueue;
   VkQueue _presentQueue;
   VkCommandPool _commandPool;
+  std::string _deviceName;
+  uint32_t _vendorIdentifier;
 
   bool CheckDeviceSupport(VkPhysicalDevice device);
   bool CheckSwapchainSupport(SwapChainSupportDetails details);
@@ -41,6 +43,8 @@ public:
   VkQueue GetGraphicsQueue() { return _graphicsQueue; }
   VkQueue GetPresentQueue() { return _presentQueue; }
   bool IsReady() { return _isReady; }
+  std::string GetDeviceName() { return _deviceName; }
+  uint32_t GetVendorIdentifier() { return _vendorIdentifier; }
 };
 }; // namespace Tortuga
 

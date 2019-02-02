@@ -51,12 +51,6 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
         }
     }
     _currentFrame = 0;
-
-    vertexBuffer = new Buffer(_device, sizeof(vertices[0]) * vertices.size(), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
-    vertexBuffer->UpdateData(vertices);
-
-    indexBuffer = new Buffer(_device, sizeof(indices[0]) * indices.size(), Buffer::BufferType::Index, Buffer::StorageType::DeviceCopy);
-    indexBuffer->UpdateData(indices);
 }
 
 CommandBuffer::~CommandBuffer()
@@ -65,9 +59,6 @@ CommandBuffer::~CommandBuffer()
     vkQueueWaitIdle(_device->GetGraphicsQueue());
     vkQueueWaitIdle(_device->GetPresentQueue());
     vkDeviceWaitIdle(_device->GetVirtualDevice());
-
-    delete indexBuffer;
-    delete vertexBuffer;
 
     //Destroy semaphores and free command buffer
     for (uint32_t i = 0; i < MAX_FRAMES_QUEUED; i++)
@@ -79,7 +70,7 @@ CommandBuffer::~CommandBuffer()
     vkFreeCommandBuffers(_device->GetVirtualDevice(), _device->GetCommandPool(), _commandBuffer.size(), _commandBuffer.data());
 }
 
-void CommandBuffer::SetupDrawCall()
+void CommandBuffer::SetupDrawCall(Buffer* vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize)
 {
     //Tell GPU how to render
     for (uint32_t i = 0; i < _commandBuffer.size(); i++)
@@ -113,13 +104,13 @@ void CommandBuffer::SetupDrawCall()
         //Actuall rendering
         vkCmdBindPipeline(_commandBuffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->GetVulkanPipeline());
 
-        std::vector<VkBuffer> buffers = {vertexBuffer->GetBuffer()};
+        std::vector<VkBuffer> buffers = { vertexBuffer->GetBuffer() };
         std::vector<VkDeviceSize> offsets = {0};
 
         vkCmdBindVertexBuffers(_commandBuffer[i], 0, 1, buffers.data(), offsets.data());
         vkCmdBindIndexBuffer(_commandBuffer[i], indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
 
-        vkCmdDrawIndexed(_commandBuffer[i], indices.size(), 1, 0, 0, 0);
+        vkCmdDrawIndexed(_commandBuffer[i], indicesSize, 1, 0, 0, 0);
 
         //Exit rendering
         vkCmdEndRenderPass(_commandBuffer[i]);

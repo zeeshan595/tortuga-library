@@ -12,7 +12,9 @@ void Application::Initialize(std::string path)
 
     _mainWindow = new Window(this->ApplicationName.c_str(), 1024, 768);
     _vulkan = new Vulkan(_mainWindow, this->ApplicationName.c_str());
-    _swapchain = new Swapchain(_vulkan->GetDevices()[0], _mainWindow->GetWidth(), _mainWindow->GetHeight());
+    Device *device = _vulkan->GetDevices()[0];
+    
+    _swapchain = new Swapchain(device, _mainWindow->GetWidth(), _mainWindow->GetHeight());
     _pipeline = new Pipeline(_swapchain, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
 
     auto imageViews = _swapchain->GetSwapchainImageViews();
@@ -20,13 +22,22 @@ void Application::Initialize(std::string path)
     for (uint32_t i = 0; i < imageViews.size(); i++)
         _frameBuffers[i] = new Framebuffer(_pipeline, { imageViews[i] });
 
+    _vertexBuffer = new Buffer(device, vertices.size() * sizeof(vertices[0]), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
+    _vertexBuffer->UpdateData(vertices);
+
+    _indexBuffer = new Buffer(device, indices.size() * sizeof(indices[0]), Buffer::BufferType::Index, Buffer::StorageType::DeviceCopy);
+    _indexBuffer->UpdateData(indices);
+
     _commandBuffer = new CommandBuffer(_pipeline, _frameBuffers);
-    _commandBuffer->SetupDrawCall();
+    _commandBuffer->SetupDrawCall(_vertexBuffer, _indexBuffer, indices.size());
 }
 
 void Application::Destroy()
 {
     delete _commandBuffer;
+
+    delete _indexBuffer;
+    delete _vertexBuffer;
 
     for (uint32_t i = 0; i < _frameBuffers.size(); i++)
         delete _frameBuffers[i];
