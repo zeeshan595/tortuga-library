@@ -26,6 +26,9 @@ void Application::Initialize(std::string path)
     _vertexBuffer = new Buffer(device, vertices.size() * sizeof(vertices[0]), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
     _vertexBuffer->UpdateData(vertices);
 
+    _vertexBuffer2 = new Buffer(device, vertices2.size() * sizeof(vertices2[0]), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
+    _vertexBuffer2->UpdateData(vertices2);
+
     _indexBuffer = new Buffer(device, indices.size() * sizeof(indices[0]), Buffer::BufferType::Index, Buffer::StorageType::DeviceCopy);
     _indexBuffer->UpdateData(indices);
 
@@ -36,7 +39,10 @@ void Application::Initialize(std::string path)
     _commandBuffer = new CommandBuffer(device, _commandPool, 1, false);
     _commandBuffer->CreateDrawCommand(0, _pipeline, _renderPass, 0, _vertexBuffer, _indexBuffer, indices.size());
 
-    _renderer->RecordCommandBuffers({_commandBuffer});
+    _commandBuffer2 = new CommandBuffer(device, _commandPool, 1, false);
+    _commandBuffer2->CreateDrawCommand(0, _pipeline, _renderPass, 0, _vertexBuffer2, _indexBuffer, indices.size());
+
+    _renderer->RecordCommandBuffers({_commandBuffer, _commandBuffer2});
 }
 
 void Application::Destroy()

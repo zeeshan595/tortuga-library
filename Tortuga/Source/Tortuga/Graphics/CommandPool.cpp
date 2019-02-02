@@ -15,8 +15,7 @@ CommandPool::CommandPool(Device *device)
     }
     if (vkCreateCommandPool(_device->GetVirtualDevice(), &poolInfo, nullptr, &_commandPool) != VK_SUCCESS)
     {
-        Console::Error("Failed to create command pool for device!");
-        return;
+        Console::Fatal("Failed to create command pool for device!");
     }
 }
 

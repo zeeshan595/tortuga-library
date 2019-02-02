@@ -55,7 +55,7 @@ RenderPass::RenderPass(Device *device, Swapchain *swapchain)
 
     if (vkCreateRenderPass(_device->GetVirtualDevice(), &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS)
     {
-        Console::Error("Failed to create render pass for vulkan pipeline");
+        Console::Fatal("Failed to create render pass for vulkan pipeline");
         return;
     }
 }

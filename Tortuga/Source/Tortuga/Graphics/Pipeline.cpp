@@ -162,8 +162,7 @@ Pipeline::Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain,
     }
     if (vkCreatePipelineLayout(_device->GetVirtualDevice(), &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS)
     {
-        Console::Error("Failed to create pipeline!");
-        return;
+        Console::Fatal("Failed to create pipeline!");
     }
 
     //Vulkan Pipeline
@@ -188,7 +187,7 @@ Pipeline::Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain,
     }
     if (vkCreateGraphicsPipelines(_device->GetVirtualDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline) != VK_SUCCESS)
     {
-        Console::Error("Failed to create graphics pipeline");
+        Console::Fatal("Failed to create graphics pipeline");
     }
 }
 
@@ -226,7 +225,7 @@ VkShaderModule Pipeline::CreateShader(VkDevice device, std::vector<char> code)
     VkShaderModule shader;
     if (vkCreateShaderModule(device, &shaderCreateInfo, nullptr, &shader) != VK_SUCCESS)
     {
-        Console::Error("Failed to load shader!");
+        Console::Fatal("Failed to load shader!");
     }
     return shader;
 }

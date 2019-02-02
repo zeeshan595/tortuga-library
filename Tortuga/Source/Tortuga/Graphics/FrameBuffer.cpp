@@ -20,7 +20,7 @@ FrameBuffer::FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *rende
 
     if (vkCreateFramebuffer(_device->GetVirtualDevice(), &frameBufferInfo, nullptr, &_frameBuffer) != VK_SUCCESS)
     {
-        Console::Error("Failed to create frame buffer!");
+        Console::Fatal("Failed to create frame buffer!");
     }
 }
 

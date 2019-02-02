@@ -11,7 +11,7 @@ Semaphore::Semaphore(Device *device)
 
     if (vkCreateSemaphore(_device->GetVirtualDevice(), &semaphoreInfo, nullptr, &_semaphore) != VK_SUCCESS)
     {
-        Console::Error("Failed to create semaphore for command buffer!");
+        Console::Fatal("Failed to create semaphore for command buffer!");
     }
 }
 

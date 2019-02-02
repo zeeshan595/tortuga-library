@@ -29,14 +29,22 @@ private:
   Renderer *_renderer;
   CommandPool *_commandPool;
   CommandBuffer *_commandBuffer;
+  CommandBuffer *_commandBuffer2;
   Buffer *_vertexBuffer;
   Buffer *_indexBuffer;
+  Buffer *_vertexBuffer2;
 
   const std::vector<Vertex> vertices = {
-      {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-      {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-      {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-      {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+      {{-1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}},
+      {{0.0f, -1.0f}, {0.0f, 1.0f, 0.0f}},
+      {{0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+      {{-1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
+
+  const std::vector<Vertex> vertices2 = {
+      {{-0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+      {{1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+      {{1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+      {{0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}};
 
   const std::vector<uint16_t> indices = {
       0, 1, 2, 2, 3, 0};

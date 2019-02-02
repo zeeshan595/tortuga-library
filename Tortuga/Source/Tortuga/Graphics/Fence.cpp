@@ -13,7 +13,7 @@ Fence::Fence(Device *device)
     }
     if (vkCreateFence(_device->GetVirtualDevice(), &fenceInfo, nullptr, &_fence) != VK_SUCCESS)
     {
-        Console::Error("Failed to create fence for command buffer!");
+        Console::Fatal("Failed to create fence for command buffer!");
     }
 }
 

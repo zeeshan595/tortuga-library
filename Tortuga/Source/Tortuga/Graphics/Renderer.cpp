@@ -83,7 +83,7 @@ void Renderer::RenderFrame()
     }
     if (vkQueueSubmit(_device->GetGraphicsQueue(), 1, &submitInfo, _fences[_currentFrame]->GetFence()) != VK_SUCCESS)
     {
-        Console::Error("Failed to submit render queue");
+        Console::Fatal("Failed to submit render queue");
     }
 
     //Submit the results back to swap chain

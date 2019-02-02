@@ -23,7 +23,7 @@ CommandBuffer::CommandBuffer(Device *device, CommandPool *commandPool, uint32_t 
     }
     if (vkAllocateCommandBuffers(_device->GetVirtualDevice(), &allocInfo, _commandBuffers.data()) != VK_SUCCESS)
     {
-        Console::Error("Failed to allocate command buffer on device!");
+        Console::Fatal("Failed to allocate command buffer on device!");
     }
 }
 
@@ -43,8 +43,7 @@ void CommandBuffer::BeginCommandBuffer(uint32_t index)
 
     if (vkBeginCommandBuffer(_commandBuffers[index], &beginInfo) != VK_SUCCESS)
     {
-        Console::Error("Failed to begin command buffer!");
-        return;
+        Console::Fatal("Failed to begin command buffer!");
     }
 }
 
@@ -66,8 +65,7 @@ void CommandBuffer::BeginCommandBuffer(uint32_t index, RenderPass *renderPass, u
 
     if (vkBeginCommandBuffer(_commandBuffers[index], &beginInfo) != VK_SUCCESS)
     {
-        Console::Error("Failed to begin command buffer!");
-        return;
+        Console::Fatal("Failed to begin command buffer!");
     }
 }
 
@@ -75,7 +73,7 @@ void CommandBuffer::EndCommandBuffer(uint32_t index)
 {
     if (vkEndCommandBuffer(_commandBuffers[index]) != VK_SUCCESS)
     {
-        Console::Error("Failed to end command buffer");
+        Console::Fatal("Failed to end command buffer");
     }
 }
 
