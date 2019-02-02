@@ -1,7 +1,7 @@
 #ifndef _SWAPCHAIN_SUPPORT_DETAILS
 #define _SWAPCHAIN_SUPPORT_DETAILS
 
-#include "../Core.h"
+#include "../../Core.h"
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;

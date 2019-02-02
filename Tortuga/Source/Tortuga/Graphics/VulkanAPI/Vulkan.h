@@ -1,7 +1,7 @@
 #ifndef _VULKAN
 #define _VULKAN
 
-#include "../Core.h"
+#include "../../Core.h"
 #include "QueueFamilyIndices.h"
 #include "Window.h"
 #include "Device.h"

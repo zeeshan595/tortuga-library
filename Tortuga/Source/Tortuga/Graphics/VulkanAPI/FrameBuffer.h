@@ -1,8 +1,8 @@
 #ifndef _FRAME_BUFFER
 #define _FRAME_BUFFER
 
-#include "../Core.h"
-#include "../Console.h"
+#include "../../Core.h"
+#include "../../Core.h"
 #include "Device.h"
 #include "Pipeline.h"
 

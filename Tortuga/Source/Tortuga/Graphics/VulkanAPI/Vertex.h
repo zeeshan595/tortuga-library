@@ -1,7 +1,7 @@
 #ifndef _VERTEX
 #define _VERTEX
 
-#include "../Core.h"
+#include "../../Core.h"
 
 namespace Tortuga
 {

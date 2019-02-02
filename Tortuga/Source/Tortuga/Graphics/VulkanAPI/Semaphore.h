@@ -1,8 +1,8 @@
 #ifndef _SEMAPHORE
 #define _SEMAPHORE
 
-#include "../Core.h"
-#include "../Console.h"
+#include "../../Core.h"
+#include "../../Core.h"
 #include "Device.h"
 
 namespace Tortuga

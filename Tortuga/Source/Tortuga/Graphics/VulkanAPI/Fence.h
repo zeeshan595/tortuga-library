@@ -1,8 +1,8 @@
 #ifndef _FENCE
 #define _FENCE
 
-#include "../Core.h"
-#include "../Console.h"
+#include "../../Core.h"
+#include "../../Core.h"
 #include "Device.h"
 
 namespace Tortuga

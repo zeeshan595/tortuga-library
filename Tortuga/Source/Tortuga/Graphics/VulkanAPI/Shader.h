@@ -1,8 +1,8 @@
 #ifndef _SHADER
 #define _SHADER
 
-#include "../Core.h"
-#include "../Console.h"
+#include "../../Core.h"
+#include "../../Core.h"
 #include "Device.h"
 
 namespace Tortuga

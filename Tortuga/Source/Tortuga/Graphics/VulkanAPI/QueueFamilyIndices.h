@@ -1,7 +1,7 @@
 #ifndef _QUEUE_FAMILY_INDICES
 #define _QUEUE_FAMILY_INDICES
 
-#include "../Core.h"
+#include "../../Core.h"
 
 struct QueueFamilyIndices
 {

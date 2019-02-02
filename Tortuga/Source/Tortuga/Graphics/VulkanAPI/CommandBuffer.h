@@ -1,8 +1,8 @@
 #ifndef _COMMAND_BUFFER
 #define _COMMAND_BUFFER
 
-#include "../Core.h"
-#include "../Console.h"
+#include "../../Core.h"
+#include "../../Core.h"
 #include "Device.h"
 #include "CommandPool.h"
 #include "Pipeline.h"

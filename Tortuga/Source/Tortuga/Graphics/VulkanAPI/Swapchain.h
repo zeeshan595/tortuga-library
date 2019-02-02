@@ -1,7 +1,7 @@
 #ifndef _SWAPCHAIN
 #define _SWAPCHAIN
 
-#include "../Core.h"
+#include "../../Core.h"
 #include "SwapChainSupportDetails.h"
 #include "Device.h"
 

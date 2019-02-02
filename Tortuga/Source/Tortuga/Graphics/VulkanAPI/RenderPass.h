@@ -1,8 +1,8 @@
 #ifndef _RENDER_PASS
 #define _RENDER_PASS
 
-#include "../Core.h"
-#include "../Console.h"
+#include "../../Core.h"
+#include "../../Core.h"
 #include "Device.h"
 #include "Swapchain.h"
 
