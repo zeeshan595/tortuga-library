@@ -2,81 +2,98 @@
 
 namespace Tortuga
 {
-Buffer::Buffer(Device *device, uint32_t bufferSize, VkBufferUsageFlags flag)
+Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, StorageType storageType)
 {
+    _bufferType = bufferType;
+    _storageType = storageType;
     _device = device;
     _size = bufferSize;
 
-    SetupStagingBuffer();
-    SetupDeviceBuffer(flag);
+    
+    VkBufferUsageFlags bufferFlags;
+    if (storageType == StorageType::DeviceCopy)
+    {
+        switch (bufferType)
+        {
+        case BufferType::Index:
+            bufferFlags = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+            break;
+        case BufferType::Vertex:
+            bufferFlags = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+            break;
+        case BufferType::Uniform:
+            bufferFlags = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        }
+
+        //host buffer
+        CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _hostBuffer, _hostMemory);
+        //device buffer
+        CreateBuffer(bufferFlags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _deviceBuffer, _deviceMemory);
+    }
+    else if (storageType == StorageType::DeviceOnly)
+    {
+        switch (bufferType)
+        {
+        case BufferType::Index:
+            bufferFlags = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+            break;
+        case BufferType::Vertex:
+            bufferFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+            break;
+        case BufferType::Uniform:
+            bufferFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        }
+
+        //device buffer
+        CreateBuffer(bufferFlags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _deviceBuffer, _deviceMemory);
+    }
+    else
+    {
+        Console::Fatal("Used unknown storage type for buffer!");
+    }
 }
 
 Buffer::~Buffer()
 {
-    vkDestroyBuffer(_device->GetVirtualDevice(), _stagingBuffer, nullptr);
-    vkFreeMemory(_device->GetVirtualDevice(), _stagingMemory, nullptr);
+    if (_storageType == StorageType::DeviceCopy)
+    {
+        vkFreeMemory(_device->GetVirtualDevice(), _hostMemory, nullptr);
+        vkDestroyBuffer(_device->GetVirtualDevice(), _hostBuffer, nullptr);
+    }
+
+    vkFreeMemory(_device->GetVirtualDevice(), _deviceMemory, nullptr);
+    vkDestroyBuffer(_device->GetVirtualDevice(), _deviceBuffer, nullptr);
 }
 
-void Buffer::SetupDeviceBuffer(VkBufferUsageFlags flag)
+void Buffer::CreateBuffer(VkBufferUsageFlags flags, VkMemoryPropertyFlags memoryProperties, VkBuffer &handler, VkDeviceMemory &deviceMemory)
 {
     auto bufferInfo = VkBufferCreateInfo();
     {
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferInfo.size = _size;
-        bufferInfo.usage = flag;
+        bufferInfo.usage = flags;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
-    if (vkCreateBuffer(_device->GetVirtualDevice(), &bufferInfo, nullptr, &_deviceBuffer) != VK_SUCCESS)
+    if (vkCreateBuffer(_device->GetVirtualDevice(), &bufferInfo, nullptr, &handler) != VK_SUCCESS)
     {
         Console::Fatal("Failed to create buffer!");
     }
 
     VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(_device->GetVirtualDevice(), _deviceBuffer, &memoryRequirements);
+    vkGetBufferMemoryRequirements(_device->GetVirtualDevice(), handler, &memoryRequirements);
 
     auto allocateInfo = VkMemoryAllocateInfo();
     {
         allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocateInfo.allocationSize = memoryRequirements.size;
-        allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, memoryProperties);
     }
-    if (vkAllocateMemory(_device->GetVirtualDevice(), &allocateInfo, nullptr, &_deviceMemory) != VK_SUCCESS)
+    if (vkAllocateMemory(_device->GetVirtualDevice(), &allocateInfo, nullptr, &deviceMemory) != VK_SUCCESS)
     {
         Console::Fatal("Failed to allocate memory for buffer!");
     }
-    vkBindBufferMemory(_device->GetVirtualDevice(), _deviceBuffer, _deviceMemory, 0);
-}
-
-void Buffer::SetupStagingBuffer()
-{
-    auto bufferInfo = VkBufferCreateInfo();
-    {
-        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferInfo.size = _size;
-        bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    }
-    if (vkCreateBuffer(_device->GetVirtualDevice(), &bufferInfo, nullptr, &_stagingBuffer) != VK_SUCCESS)
-    {
-        Console::Fatal("Failed to create buffer!");
-    }
-
-    VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(_device->GetVirtualDevice(), _stagingBuffer, &memoryRequirements);
-
-    auto allocateInfo = VkMemoryAllocateInfo();
-    {
-        allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocateInfo.allocationSize = memoryRequirements.size;
-        allocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    }
-    if (vkAllocateMemory(_device->GetVirtualDevice(), &allocateInfo, nullptr, &_stagingMemory) != VK_SUCCESS)
-    {
-        Console::Fatal("Failed to allocate memory for buffer!");
-    }
-    vkBindBufferMemory(_device->GetVirtualDevice(), _stagingBuffer, _stagingMemory, 0);
+    vkBindBufferMemory(_device->GetVirtualDevice(), handler, deviceMemory, 0);
 }
 
 uint32_t Buffer::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags properties)
@@ -92,9 +109,10 @@ uint32_t Buffer::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags propertie
     }
 
     Console::Fatal("Failed to find GPUs memory type!");
+    return 0;
 }
 
-void Buffer::CopyToDevice()
+void Buffer::CopyToDevice(VkBuffer &hostBuffer, VkBuffer &deviceBuffer)
 {
     auto allocInfo = VkCommandBufferAllocateInfo();
     {
@@ -119,7 +137,7 @@ void Buffer::CopyToDevice()
         copyRegion.dstOffset = 0; // Optional
         copyRegion.size = _size;
     }
-    vkCmdCopyBuffer(commandBuffer, _stagingBuffer, _deviceBuffer, 1, &copyRegion);
+    vkCmdCopyBuffer(commandBuffer, hostBuffer, deviceBuffer, 1, &copyRegion);
     vkEndCommandBuffer(commandBuffer);
 
     auto submitInfo = VkSubmitInfo();

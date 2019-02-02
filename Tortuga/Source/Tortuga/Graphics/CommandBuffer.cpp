@@ -52,21 +52,22 @@ CommandBuffer::CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> fram
     }
     _currentFrame = 0;
 
-    vertexBuffer = new Buffer(_device, sizeof(vertices[0]) * vertices.size(), Buffer::VERTEX_BUFFER_FLAGS);
-    vertexBuffer->Fill(vertices);
+    vertexBuffer = new Buffer(_device, sizeof(vertices[0]) * vertices.size(), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
+    vertexBuffer->UpdateData(vertices);
 
-    indexBuffer = new Buffer(_device, sizeof(indices[0]) * indices.size(), Buffer::INDEX_BUFFER_FLAGS);
-    indexBuffer->Fill(indices);
+    indexBuffer = new Buffer(_device, sizeof(indices[0]) * indices.size(), Buffer::BufferType::Index, Buffer::StorageType::DeviceCopy);
+    indexBuffer->UpdateData(indices);
 }
 
 CommandBuffer::~CommandBuffer()
 {
-    delete indexBuffer;
-    delete vertexBuffer;
     //Wait for device to be free
     vkQueueWaitIdle(_device->GetGraphicsQueue());
     vkQueueWaitIdle(_device->GetPresentQueue());
     vkDeviceWaitIdle(_device->GetVirtualDevice());
+
+    delete indexBuffer;
+    delete vertexBuffer;
 
     //Destroy semaphores and free command buffer
     for (uint32_t i = 0; i < MAX_FRAMES_QUEUED; i++)
@@ -112,11 +113,11 @@ void CommandBuffer::SetupDrawCall()
         //Actuall rendering
         vkCmdBindPipeline(_commandBuffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->GetVulkanPipeline());
 
-        std::vector<VkBuffer> buffers = {vertexBuffer->GetDeviceBuffer()};
+        std::vector<VkBuffer> buffers = {vertexBuffer->GetBuffer()};
         std::vector<VkDeviceSize> offsets = {0};
 
         vkCmdBindVertexBuffers(_commandBuffer[i], 0, 1, buffers.data(), offsets.data());
-        vkCmdBindIndexBuffer(_commandBuffer[i], indexBuffer->GetDeviceBuffer(), 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(_commandBuffer[i], indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
 
         vkCmdDrawIndexed(_commandBuffer[i], indices.size(), 1, 0, 0, 0);
 
