@@ -3,16 +3,16 @@
 
 #include "Core.h"
 #include "Console.h"
-#include "Graphics/Window.h"
-#include "Graphics/Vulkan.h"
-#include "Graphics/Swapchain.h"
-#include "Graphics/Shader.h"
-#include "Graphics/Pipeline.h"
-#include "Graphics/FrameBuffer.h"
-#include "Graphics/CommandPool.h"
-#include "Graphics/CommandBuffer.h"
-#include "Graphics/Buffer.h"
-#include "Graphics/Renderer.h"
+#include "Graphics/VulkanAPI/Window.h"
+#include "Graphics/VulkanAPI/Vulkan.h"
+#include "Graphics/VulkanAPI/Swapchain.h"
+#include "Graphics/VulkanAPI/Shader.h"
+#include "Graphics/VulkanAPI/Pipeline.h"
+#include "Graphics/VulkanAPI/FrameBuffer.h"
+#include "Graphics/VulkanAPI/CommandPool.h"
+#include "Graphics/VulkanAPI/CommandBuffer.h"
+#include "Graphics/VulkanAPI/Buffer.h"
+#include "Graphics/VulkanAPI/Renderer.h"
 
 namespace Tortuga
 {
