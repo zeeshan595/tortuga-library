@@ -2,7 +2,7 @@
 
 namespace Tortuga
 {
-Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fragmentPath)
+Pipeline::Pipeline(Device *device, RenderPass *renderPass, Swapchain *swapchain, std::string vertexPath, std::string fragmentPath)
 {
     this->_swapchain = swapchain;
     this->_device = swapchain->GetDevice();
@@ -166,60 +166,6 @@ Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fra
         return;
     }
 
-    //Attachment description
-    auto colorAttachment = VkAttachmentDescription();
-    {
-        colorAttachment.format = swapchain->GetSurfaceFormat().format;
-        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    }
-
-    auto colorAttachmentRef = VkAttachmentReference();
-    {
-        colorAttachmentRef.attachment = 0;
-        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    }
-
-    auto subpass = VkSubpassDescription();
-    {
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &colorAttachmentRef;
-    }
-
-    auto dependency = VkSubpassDependency();
-    {
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.srcAccessMask = 0;
-        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    }
-
-    //Render pass
-    auto renderPassInfo = VkRenderPassCreateInfo();
-    {
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassInfo.attachmentCount = 1;
-        renderPassInfo.pAttachments = &colorAttachment;
-        renderPassInfo.subpassCount = 1;
-        renderPassInfo.pSubpasses = &subpass;
-        renderPassInfo.dependencyCount = 1;
-        renderPassInfo.pDependencies = &dependency;
-    }
-
-    if (vkCreateRenderPass(_device->GetVirtualDevice(), &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS)
-    {
-        Console::Error("Failed to create render pass for vulkan pipeline");
-        return;
-    }
-
     //Vulkan Pipeline
     auto pipelineInfo = VkGraphicsPipelineCreateInfo();
     {
@@ -235,7 +181,7 @@ Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fra
         pipelineInfo.pColorBlendState = &colorBlendState;
         pipelineInfo.pDynamicState = nullptr; // Optional
         pipelineInfo.layout = _pipelineLayout;
-        pipelineInfo.renderPass = _renderPass;
+        pipelineInfo.renderPass = renderPass->GetRenderPass();
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
         pipelineInfo.basePipelineIndex = -1;              // Optional
@@ -249,7 +195,6 @@ Pipeline::Pipeline(Swapchain *swapchain, std::string vertexPath, std::string fra
 Pipeline::~Pipeline()
 {
     vkDestroyPipeline(_device->GetVirtualDevice(), _graphicsPipeline, nullptr);
-    vkDestroyRenderPass(_device->GetVirtualDevice(), _renderPass, nullptr);
     vkDestroyPipelineLayout(_device->GetVirtualDevice(), _pipelineLayout, nullptr);
 
     vkDestroyShaderModule(_device->GetVirtualDevice(), _vertexShader, nullptr);

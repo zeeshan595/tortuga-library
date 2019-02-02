@@ -1,9 +1,10 @@
-#ifndef _VULKAN_BUFFER
-#define _VULKAN_BUFFER
+#ifndef _BUFFER
+#define _BUFFER
 
 #include "../Core.h"
 #include "../Console.h"
 #include "Device.h"
+#include "CommandPool.h"
 
 namespace Tortuga
 {

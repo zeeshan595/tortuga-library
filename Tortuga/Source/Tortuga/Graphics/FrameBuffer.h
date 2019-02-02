@@ -1,5 +1,5 @@
-#ifndef _FRAMEBUFFER
-#define _FRAMEBUFFER
+#ifndef _FRAME_BUFFER
+#define _FRAME_BUFFER
 
 #include "../Core.h"
 #include "../Console.h"
@@ -8,15 +8,15 @@
 
 namespace Tortuga
 {
-class Framebuffer
+class FrameBuffer
 {
   private:
     Device *_device;
     VkFramebuffer _frameBuffer;
 
   public:
-    Framebuffer(Pipeline *pipeline, std::vector<VkImageView> images);
-    ~Framebuffer();
+    FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass, std::vector<VkImageView> images);
+    ~FrameBuffer();
 
     VkFramebuffer GetFramebuffer() { return _frameBuffer; }
 };

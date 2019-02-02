@@ -3,39 +3,36 @@
 
 #include "../Core.h"
 #include "../Console.h"
-
 #include "Device.h"
+#include "CommandPool.h"
 #include "Pipeline.h"
-#include "Framebuffer.h"
+#include "FrameBuffer.h"
 #include "Buffer.h"
-#include "Vertex.h"
 
 namespace Tortuga
 {
 class CommandBuffer
 {
 private:
-  size_t _currentFrame;
-  Pipeline *_pipeline;
+  bool _isPrimary;
   Device *_device;
-  Swapchain *_swapchain;
-  std::vector<Framebuffer *> _frameBuffers;
-  std::vector<VkCommandBuffer> _commandBuffer;
-
-  std::vector<VkFence> _fences;
-  std::vector<VkSemaphore> _imageAvailableSemaphore;
-  std::vector<VkSemaphore> _imageFinishedSemaphore;
+  CommandPool *_commandPool;
+  std::vector<VkCommandBuffer> _commandBuffers;
 
 public:
-  const uint32_t MAX_FRAMES_QUEUED = 2;
-
-  CommandBuffer(Pipeline *pipeline, std::vector<Framebuffer *> frameBuffers);
+  CommandBuffer(Device *device, CommandPool *commandPool, uint32_t amount, bool isPrimary);
   ~CommandBuffer();
 
-  void SetupDrawCall(Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize);
-  void Render();
+  void CreateDrawCommand(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, uint32_t subPass, Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize);
+  void BeginCommandBuffer(uint32_t index);
+  void BeginCommandBuffer(uint32_t index, RenderPass *renderPass, uint32_t subPass);
+  void EndCommandBuffer(uint32_t index);
+  void BeginRenderPass(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, FrameBuffer *frameBuffer);
+  void EndRenderPass(uint32_t index);
+  void BindPipeline(uint32_t index, Pipeline *pipeline);
 
-  std::vector<VkCommandBuffer> GetCommandBuffers() { return _commandBuffer; }
+  std::vector<VkCommandBuffer> &GetCommandBuffers() { return _commandBuffers; }
+  bool IsPrimary() { return _isPrimary; }
 };
 }; // namespace Tortuga
 

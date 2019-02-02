@@ -19,7 +19,6 @@ private:
   VkDevice _device;
   VkQueue _graphicsQueue;
   VkQueue _presentQueue;
-  VkCommandPool _commandPool;
   std::string _deviceName;
   uint32_t _vendorIdentifier;
 
@@ -33,11 +32,10 @@ public:
   Device(VkPhysicalDevice physicalDevice, std::vector<const char *> validationLayers, VkSurfaceKHR surface);
   ~Device();
 
-  QueueFamilyIndices GetQueueFamilyIndices() { return _familyQueues; }
-  SwapChainSupportDetails GetSwapchainSupportDetails() { return _swapchainDetails; }
-  VkSurfaceKHR GetSurface() { return _surface; }
+  QueueFamilyIndices &GetQueueFamilyIndices() { return _familyQueues; }
+  SwapChainSupportDetails &GetSwapchainSupportDetails() { return _swapchainDetails; }
+  VkSurfaceKHR &GetSurface() { return _surface; }
 
-  VkCommandPool GetCommandPool() { return _commandPool; }
   VkPhysicalDevice GetPhysicalDevice() { return _physicalDevice; }
   VkDevice GetVirtualDevice() { return _device; }
   VkQueue GetGraphicsQueue() { return _graphicsQueue; }

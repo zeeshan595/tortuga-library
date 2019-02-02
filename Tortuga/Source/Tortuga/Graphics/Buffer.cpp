@@ -9,8 +9,7 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
     _device = device;
     _size = bufferSize;
 
-    
-    VkBufferUsageFlags bufferFlags;
+        VkBufferUsageFlags bufferFlags;
     if (storageType == StorageType::DeviceCopy)
     {
         switch (bufferType)
@@ -114,11 +113,13 @@ uint32_t Buffer::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags propertie
 
 void Buffer::CopyToDevice(VkBuffer &hostBuffer, VkBuffer &deviceBuffer)
 {
+    CommandPool commandPool = CommandPool(_device);
+
     auto allocInfo = VkCommandBufferAllocateInfo();
     {
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandPool = _device->GetCommandPool();
+        allocInfo.commandPool = commandPool.GetCommandPool();
         allocInfo.commandBufferCount = 1;
     }
     VkCommandBuffer commandBuffer;
@@ -149,6 +150,6 @@ void Buffer::CopyToDevice(VkBuffer &hostBuffer, VkBuffer &deviceBuffer)
     vkQueueSubmit(_device->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(_device->GetGraphicsQueue());
 
-    vkFreeCommandBuffers(_device->GetVirtualDevice(), _device->GetCommandPool(), 1, &commandBuffer);
+    vkFreeCommandBuffers(_device->GetVirtualDevice(), commandPool.GetCommandPool(), 1, &commandBuffer);
 }
 }; // namespace Tortuga

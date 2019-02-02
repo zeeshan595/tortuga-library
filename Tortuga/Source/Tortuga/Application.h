@@ -7,8 +7,11 @@
 #include "Graphics/Vulkan.h"
 #include "Graphics/Swapchain.h"
 #include "Graphics/Pipeline.h"
-#include "Graphics/Framebuffer.h"
+#include "Graphics/FrameBuffer.h"
+#include "Graphics/CommandPool.h"
 #include "Graphics/CommandBuffer.h"
+#include "Graphics/Buffer.h"
+#include "Graphics/Renderer.h"
 
 namespace Tortuga
 {
@@ -20,8 +23,11 @@ private:
   Window *_mainWindow;
   Vulkan *_vulkan;
   Swapchain *_swapchain;
+  RenderPass *_renderPass;
   Pipeline *_pipeline;
-  std::vector<Framebuffer *> _frameBuffers;
+  std::vector<FrameBuffer *> _frameBuffers;
+  Renderer *_renderer;
+  CommandPool *_commandPool;
   CommandBuffer *_commandBuffer;
   Buffer *_vertexBuffer;
   Buffer *_indexBuffer;

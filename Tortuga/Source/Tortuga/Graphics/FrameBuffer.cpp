@@ -1,16 +1,16 @@
-#include "Framebuffer.h"
+#include "FrameBuffer.h"
 
 namespace Tortuga
 {
-Framebuffer::Framebuffer(Pipeline *pipeline, std::vector<VkImageView> images)
+FrameBuffer::FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass, std::vector<VkImageView> images)
 {
-    this->_device = pipeline->GetDevice();
-    auto swapchainExtent = pipeline->GetSwapchain()->GetExtent2D();
+    this->_device = device;
+    auto swapchainExtent = swapchain->GetExtent2D();
 
     auto frameBufferInfo = VkFramebufferCreateInfo();
     {
         frameBufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        frameBufferInfo.renderPass = pipeline->GetRenderPass();
+        frameBufferInfo.renderPass = renderPass->GetRenderPass();
         frameBufferInfo.attachmentCount = images.size();
         frameBufferInfo.pAttachments = images.data();
         frameBufferInfo.width = swapchainExtent.width;
@@ -24,7 +24,7 @@ Framebuffer::Framebuffer(Pipeline *pipeline, std::vector<VkImageView> images)
     }
 }
 
-Framebuffer::~Framebuffer()
+FrameBuffer::~FrameBuffer()
 {
     vkDestroyFramebuffer(_device->GetVirtualDevice(), _frameBuffer, nullptr);
 }
