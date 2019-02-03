@@ -26,7 +26,7 @@ private:
   Device *_device;
   Swapchain *_swapchain;
   RenderPass *_renderPass;
-  std::vector<FrameBuffer *> _frameBuffers;
+  FrameBuffer * _frameBuffer;
 
   CommandPool *_commandPool;
   CommandBuffer *_commandBuffers;
@@ -38,7 +38,7 @@ private:
 public:
   const uint32_t MAX_FRAMES_QUEUED = 2;
 
-  Renderer(Device *device, Swapchain *swapchain, RenderPass *renderPass, std::vector<FrameBuffer *> frameBuffers);
+  Renderer(Device *device, Swapchain *swapchain, RenderPass *renderPass, FrameBuffer *frameBuffer);
   ~Renderer();
 
   void RecordCommandBuffers(std::vector<CommandBuffer *> secondaryBuffers);

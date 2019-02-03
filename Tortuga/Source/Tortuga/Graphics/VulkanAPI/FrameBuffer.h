@@ -12,13 +12,15 @@ class FrameBuffer
 {
   private:
     Device *_device;
-    VkFramebuffer _frameBuffer;
+    std::vector<VkFramebuffer> _frameBuffer;
+
+    void CreateDepthImageView();
 
   public:
-    FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass, std::vector<VkImageView> images);
+    FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass);
     ~FrameBuffer();
 
-    VkFramebuffer GetFramebuffer() { return _frameBuffer; }
+    std::vector<VkFramebuffer> GetFramebuffers() { return _frameBuffer; }
 };
 }; // namespace Tortuga
 

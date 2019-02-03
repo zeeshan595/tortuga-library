@@ -13,23 +13,22 @@ void Application::Initialize(std::string path)
     _mainWindow = new Window(this->ApplicationName.c_str(), 1024, 768);
     _vulkan = new Vulkan(_mainWindow, this->ApplicationName.c_str());
     Device *device = _vulkan->GetDevices()[0];
-
     _swapchain = new Swapchain(device, _mainWindow->GetWidth(), _mainWindow->GetHeight());
-    _renderPass = new RenderPass(device, _swapchain);
 
     _descriptorSetLayouts = {new DescriptorSetLayout(device)};
-    _descriptorPool = new DescriptorPool(device, _swapchain->GetSwapchainRawImages().size());
-    _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool, 1);
     _pipelineLayout = new PipelineLayout(device, _descriptorSetLayouts);
+    _renderPass = new RenderPass(device, _swapchain);
     _shader = new Shader(device, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
     _pipeline = new Pipeline(device, _swapchain, _renderPass, _shader, _pipelineLayout);
 
-    auto imageViews = _swapchain->GetSwapchainImageViews();
-    _frameBuffers.resize(imageViews.size());
-    for (uint32_t i = 0; i < imageViews.size(); i++)
-        _frameBuffers[i] = new FrameBuffer(device, _swapchain, _renderPass, {imageViews[i]});
+    _frameBuffer = new FrameBuffer(device, _swapchain, _renderPass);
 
-    _vertexBuffer = new Buffer(device, vertices.size() * sizeof(vertices[0]), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
+    //////////////////////
+
+    _descriptorPool = new DescriptorPool(device, _swapchain->GetSwapchainRawImages().size());
+    _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool, 1);
+
+    _vertexBuffer = new Buffer(device, vertices.size() * sizeof(Vertex), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
     _vertexBuffer->UpdateData(vertices);
 
     _indexBuffer = new Buffer(device, indices.size() * sizeof(indices[0]), Buffer::BufferType::Index, Buffer::StorageType::DeviceCopy);
@@ -46,7 +45,7 @@ void Application::Initialize(std::string path)
     _commandBuffer->CreateDrawCommand(0, _vertexBuffer, _indexBuffer, indices.size());
     _commandBuffer->EndCommandBuffer(0);
 
-    _renderer = new Renderer(device, _swapchain, _renderPass, _frameBuffers);
+    _renderer = new Renderer(device, _swapchain, _renderPass, _frameBuffer);
     _renderer->RecordCommandBuffers({_commandBuffer});
 }
 
@@ -64,8 +63,7 @@ void Application::Destroy()
 
     delete _descriptorPool;
 
-    for (uint32_t i = 0; i < _frameBuffers.size(); i++)
-        delete _frameBuffers[i];
+    delete _frameBuffer;
 
     delete _pipeline;
     delete _shader;

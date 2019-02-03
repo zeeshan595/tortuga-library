@@ -30,7 +30,7 @@ public:
   void BeginCommandBuffer(uint32_t index);
   void BeginCommandBuffer(uint32_t index, RenderPass *renderPass, uint32_t subPass);
   void EndCommandBuffer(uint32_t index);
-  void BeginRenderPass(uint32_t index, Swapchain *swapchain, RenderPass *renderPass, FrameBuffer *frameBuffer, VkSubpassContents subPassFlags);
+  void BeginRenderPass(uint32_t index, Swapchain *swapchain, RenderPass *renderPass, VkFramebuffer framebuffer, VkSubpassContents subPassFlags);
   void EndRenderPass(uint32_t index);
   void BindPipeline(uint32_t index, Pipeline *pipeline);
   void BindDescriptorSet(uint32_t index, PipelineLayout *pipelineLayout, VkDescriptorSet descriptorSet);

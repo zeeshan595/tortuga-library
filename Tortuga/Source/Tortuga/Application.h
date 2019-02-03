@@ -33,7 +33,7 @@ private:
   Shader *_shader;
   PipelineLayout *_pipelineLayout;
   Pipeline *_pipeline;
-  std::vector<FrameBuffer *> _frameBuffers;
+  FrameBuffer *_frameBuffer;
   Renderer *_renderer;
   CommandPool *_commandPool;
   CommandBuffer *_commandBuffer;
@@ -48,10 +48,10 @@ private:
   UniformBufferObject ubo = {};
 
   const std::vector<Vertex> vertices = {
-      {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-      {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-      {{0.0f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-      {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
+      {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+      {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+      {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+      {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
 
   const std::vector<uint16_t> indices = {
       0, 1, 2, 2, 3, 0};

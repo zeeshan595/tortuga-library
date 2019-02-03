@@ -2,13 +2,13 @@
 
 namespace Tortuga
 {
-Renderer::Renderer(Device *device, Swapchain *swapchain, RenderPass *renderPass, std::vector<FrameBuffer *> frameBuffers)
+Renderer::Renderer(Device *device, Swapchain *swapchain, RenderPass *renderPass, FrameBuffer *frameBuffer)
 {
     _renderPass = renderPass;
-    _frameBuffersSize = frameBuffers.size();
+    _frameBuffersSize = frameBuffer->GetFramebuffers().size();
     _device = device;
     _swapchain = swapchain;
-    _frameBuffers = frameBuffers;
+    _frameBuffer = frameBuffer;
 
     _commandPool = new CommandPool(_device);
     _commandBuffers = new CommandBuffer(_device, _commandPool, _frameBuffersSize, true);
@@ -45,8 +45,8 @@ void Renderer::RecordCommandBuffers(std::vector<CommandBuffer *> secondaryBuffer
     for (uint32_t i = 0; i < _frameBuffersSize; i++)
     {
         _commandBuffers->BeginCommandBuffer(i);
-        _commandBuffers->BeginRenderPass(i, _swapchain, _renderPass, _frameBuffers[i], VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
-        
+        _commandBuffers->BeginRenderPass(i, _swapchain, _renderPass, _frameBuffer->GetFramebuffers()[i], VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+
         for (uint32_t j = 0; j < secondaryBuffers.size(); j++)
         {
             auto tempCommandBuffers = secondaryBuffers[j]->GetCommandBuffers();
