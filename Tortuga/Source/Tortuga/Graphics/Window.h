@@ -1,14 +1,12 @@
 #ifndef _WINDOW
 #define _WINDOW
 
-#include "../../Core.h"
-#include "../../Console.h"
+#include "../Core.h"
+#include "../Console.h"
 
 namespace Tortuga
 {
 namespace Graphics
-{
-namespace VulkanAPI
 {
 class Window
 {
@@ -27,7 +25,6 @@ public:
   uint32_t GetWidth() { return _width; }
   uint32_t GetHeight() { return _height; }
 };
-}; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga
 

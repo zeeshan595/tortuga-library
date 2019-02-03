@@ -3,7 +3,7 @@
 
 #include "Core.h"
 #include "Console.h"
-#include "Graphics/VulkanAPI/Window.h"
+#include "Graphics/Window.h"
 #include "Graphics/VulkanAPI/Vulkan.h"
 #include "Graphics/VulkanAPI/Swapchain.h"
 #include "Graphics/VulkanAPI/Shader.h"
@@ -21,7 +21,9 @@
 
 namespace Tortuga
 {
+using namespace Graphics;
 using namespace Graphics::VulkanAPI;
+
 class Application
 {
 private:

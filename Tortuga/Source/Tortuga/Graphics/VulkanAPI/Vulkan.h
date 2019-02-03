@@ -2,8 +2,8 @@
 #define _VULKAN
 
 #include "../../Core.h"
+#include "../Window.h"
 #include "QueueFamilyIndices.h"
-#include "Window.h"
 #include "Device.h"
 
 namespace Tortuga
