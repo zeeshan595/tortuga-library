@@ -2,7 +2,7 @@
 
 namespace Tortuga
 {
-Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass, Shader *shader)
+Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass, Shader *shader, PipelineLayout *pipelineLayout)
 {
     this->_swapchain = swapchain;
     this->_device = device;
@@ -65,7 +65,7 @@ Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass,
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
         rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+        rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
         rasterizer.depthBiasConstantFactor = 0.0f; // Optional
         rasterizer.depthBiasClamp = 0.0f;          // Optional
@@ -127,20 +127,6 @@ Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass,
     dynamicState.dynamicStateCount = dynamicStates.size();
     dynamicState.pDynamicStates = dynamicStates.data();
 
-    //Pipeline layout
-    auto pipelineLayoutInfo = VkPipelineLayoutCreateInfo();
-    {
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 0;            // Optional
-        pipelineLayoutInfo.pSetLayouts = nullptr;         // Optional
-        pipelineLayoutInfo.pushConstantRangeCount = 0;    // Optional
-        pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
-    }
-    if (vkCreatePipelineLayout(_device->GetVirtualDevice(), &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS)
-    {
-        Console::Fatal("Failed to create pipeline!");
-    }
-
     //Shader helper
     auto pipelineShaderInfo = shader->GetPipelineShaderInfo();
 
@@ -158,7 +144,7 @@ Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass,
         pipelineInfo.pDepthStencilState = nullptr; // Optional
         pipelineInfo.pColorBlendState = &colorBlendState;
         pipelineInfo.pDynamicState = nullptr; // Optional
-        pipelineInfo.layout = _pipelineLayout;
+        pipelineInfo.layout = pipelineLayout->GetPipelineLayout();
         pipelineInfo.renderPass = renderPass->GetRenderPass();
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
@@ -173,6 +159,5 @@ Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass,
 Pipeline::~Pipeline()
 {
     vkDestroyPipeline(_device->GetVirtualDevice(), _graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(_device->GetVirtualDevice(), _pipelineLayout, nullptr);
 }
 } // namespace Tortuga

@@ -3,6 +3,8 @@
 
 #include "../../Core.h"
 
+namespace Tortuga
+{
 struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
@@ -25,5 +27,6 @@ struct QueueFamilyIndices
                 presentFamily.value()};
     }
 };
+}; // namespace Tortuga
 
 #endif

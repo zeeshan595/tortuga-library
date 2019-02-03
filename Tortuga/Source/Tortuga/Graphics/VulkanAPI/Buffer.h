@@ -70,6 +70,31 @@ public:
     }
   }
 
+  template <typename T>
+  void UpdateData(T data)
+  {
+    if (_storageType == StorageType::DeviceOnly)
+    {
+      void *temp;
+      vkMapMemory(_device->GetVirtualDevice(), _deviceMemory, 0, _size, VK_NULL_HANDLE, &temp);
+      memcpy(temp, &data, (sizeof(data)));
+      vkUnmapMemory(_device->GetVirtualDevice(), _deviceMemory);
+    }
+    else if (_storageType == StorageType::DeviceCopy)
+    {
+      void *temp;
+      vkMapMemory(_device->GetVirtualDevice(), _hostMemory, 0, _size, VK_NULL_HANDLE, &temp);
+      memcpy(temp, &data, (sizeof(data)));
+      vkUnmapMemory(_device->GetVirtualDevice(), _hostMemory);
+      CopyToDevice(_hostBuffer, _deviceBuffer);
+    }
+    else
+    {
+      Console::Fatal("Used unknown storage type for buffer!");
+    }
+  }
+
+  uint32_t GetSize() { return _size; }
   VkBuffer GetBuffer() { return _deviceBuffer; }
   VkDeviceMemory GetMemory() { return _deviceMemory; }
   Device *GetDevice() { return _device; }

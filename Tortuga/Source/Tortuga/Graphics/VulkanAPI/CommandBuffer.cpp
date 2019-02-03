@@ -104,18 +104,18 @@ void CommandBuffer::BindPipeline(uint32_t index, Pipeline *pipeline)
     vkCmdBindPipeline(_commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->GetVulkanPipeline());
 }
 
-void CommandBuffer::CreateDrawCommand(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, uint32_t subPass, Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize)
+void CommandBuffer::CreateDrawCommand(uint32_t index, Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize)
 {
     std::vector<VkBuffer> buffers = {vertexBuffer->GetBuffer()};
     std::vector<VkDeviceSize> offsets = {0};
 
-    BeginCommandBuffer(0, renderPass, subPass);
-    BindPipeline(index, pipeline);
-
     vkCmdBindVertexBuffers(_commandBuffers[index], 0, 1, buffers.data(), offsets.data());
     vkCmdBindIndexBuffer(_commandBuffers[index], indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
     vkCmdDrawIndexed(_commandBuffers[index], indicesSize, 1, 0, 0, 0);
+}
 
-    EndCommandBuffer(0);
+void CommandBuffer::BindDescriptorSet(uint32_t index, PipelineLayout *pipelineLayout, VkDescriptorSet descriptorSet)
+{
+    vkCmdBindDescriptorSets(_commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 }
 }; // namespace Tortuga

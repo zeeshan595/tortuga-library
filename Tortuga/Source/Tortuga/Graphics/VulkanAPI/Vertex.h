@@ -7,7 +7,7 @@ namespace Tortuga
 {
 struct Vertex
 {
-    glm::vec2 pos;
+    glm::vec3 pos;
     glm::vec3 color;
 
     static VkVertexInputBindingDescription GetBindingPerDescription(uint32_t bindingIdentity, bool perInstance = false)

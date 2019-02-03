@@ -16,8 +16,13 @@ void Application::Initialize(std::string path)
 
     _swapchain = new Swapchain(device, _mainWindow->GetWidth(), _mainWindow->GetHeight());
     _renderPass = new RenderPass(device, _swapchain);
+
+    _descriptorSetLayouts = {new DescriptorSetLayout(device)};
+    _descriptorPool = new DescriptorPool(device, _swapchain->GetSwapchainRawImages().size());
+    _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool, 1);
+    _pipelineLayout = new PipelineLayout(device, _descriptorSetLayouts);
     _shader = new Shader(device, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
-    _pipeline = new Pipeline(device, _swapchain, _renderPass, _shader);
+    _pipeline = new Pipeline(device, _swapchain, _renderPass, _shader, _pipelineLayout);
 
     auto imageViews = _swapchain->GetSwapchainImageViews();
     _frameBuffers.resize(imageViews.size());
@@ -27,23 +32,22 @@ void Application::Initialize(std::string path)
     _vertexBuffer = new Buffer(device, vertices.size() * sizeof(vertices[0]), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
     _vertexBuffer->UpdateData(vertices);
 
-    _vertexBuffer2 = new Buffer(device, vertices2.size() * sizeof(vertices2[0]), Buffer::BufferType::Vertex, Buffer::StorageType::DeviceCopy);
-    _vertexBuffer2->UpdateData(vertices2);
-
     _indexBuffer = new Buffer(device, indices.size() * sizeof(indices[0]), Buffer::BufferType::Index, Buffer::StorageType::DeviceCopy);
     _indexBuffer->UpdateData(indices);
-
-    _renderer = new Renderer(device, _swapchain, _renderPass, _frameBuffers);
+    _uniformBuffer = new Buffer(device, sizeof(ubo), Buffer::BufferType::Uniform, Buffer::StorageType::DeviceOnly);
+    _descriptorSet->UpdateDescriptorSet({_uniformBuffer}, sizeof(ubo));
 
     _commandPool = new CommandPool(device);
 
     _commandBuffer = new CommandBuffer(device, _commandPool, 1, false);
-    _commandBuffer->CreateDrawCommand(0, _pipeline, _renderPass, 0, _vertexBuffer, _indexBuffer, indices.size());
+    _commandBuffer->BeginCommandBuffer(0, _renderPass, 0);
+    _commandBuffer->BindPipeline(0, _pipeline);
+    _commandBuffer->BindDescriptorSet(0, _pipelineLayout, _descriptorSet->GetDescriptorSets()[0]);
+    _commandBuffer->CreateDrawCommand(0, _vertexBuffer, _indexBuffer, indices.size());
+    _commandBuffer->EndCommandBuffer(0);
 
-    _commandBuffer2 = new CommandBuffer(device, _commandPool, 1, false);
-    _commandBuffer2->CreateDrawCommand(0, _pipeline, _renderPass, 0, _vertexBuffer2, _indexBuffer, indices.size());
-
-    _renderer->RecordCommandBuffers({_commandBuffer, _commandBuffer2});
+    _renderer = new Renderer(device, _swapchain, _renderPass, _frameBuffers);
+    _renderer->RecordCommandBuffers({_commandBuffer});
 }
 
 void Application::Destroy()
@@ -54,14 +58,20 @@ void Application::Destroy()
 
     delete _indexBuffer;
     delete _vertexBuffer;
+    delete _uniformBuffer;
 
     delete _renderer;
+
+    delete _descriptorPool;
 
     for (uint32_t i = 0; i < _frameBuffers.size(); i++)
         delete _frameBuffers[i];
 
     delete _pipeline;
     delete _shader;
+    for (uint32_t i = 0; i < _descriptorSetLayouts.size(); i++)
+        delete _descriptorSetLayouts[i];
+
     delete _renderPass;
     delete _swapchain;
     delete _vulkan;
@@ -74,8 +84,19 @@ void Application::Run()
     int i = 0;
     while (true)
     {
-        _renderer->RenderFrame();
+        static auto startTime = std::chrono::high_resolution_clock::now();
         SDL_Delay(1);
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        auto swapChainExtent = _swapchain->GetExtent2D();
+        ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+        ubo.proj[1][1] *= -1;
+        _uniformBuffer->UpdateData(ubo);
+
+        _renderer->RenderFrame();
         i++;
         if (i > 5000)
         {

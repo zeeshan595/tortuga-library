@@ -9,6 +9,8 @@
 #include "FrameBuffer.h"
 #include "Buffer.h"
 #include "Swapchain.h"
+#include "PipelineLayout.h"
+#include "DescriptorSet.h"
 
 namespace Tortuga
 {
@@ -24,13 +26,14 @@ public:
   CommandBuffer(Device *device, CommandPool *commandPool, uint32_t amount, bool isPrimary);
   ~CommandBuffer();
 
-  void CreateDrawCommand(uint32_t index, Pipeline *pipeline, RenderPass *renderPass, uint32_t subPass, Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize);
+  void CreateDrawCommand(uint32_t index, Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize);
   void BeginCommandBuffer(uint32_t index);
   void BeginCommandBuffer(uint32_t index, RenderPass *renderPass, uint32_t subPass);
   void EndCommandBuffer(uint32_t index);
   void BeginRenderPass(uint32_t index, Swapchain *swapchain, RenderPass *renderPass, FrameBuffer *frameBuffer, VkSubpassContents subPassFlags);
   void EndRenderPass(uint32_t index);
   void BindPipeline(uint32_t index, Pipeline *pipeline);
+  void BindDescriptorSet(uint32_t index, PipelineLayout *pipelineLayout, VkDescriptorSet descriptorSet);
 
   std::vector<VkCommandBuffer> &GetCommandBuffers() { return _commandBuffers; }
   bool IsPrimary() { return _isPrimary; }

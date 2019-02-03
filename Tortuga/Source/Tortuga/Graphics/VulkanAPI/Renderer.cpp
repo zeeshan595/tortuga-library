@@ -46,6 +46,7 @@ void Renderer::RecordCommandBuffers(std::vector<CommandBuffer *> secondaryBuffer
     {
         _commandBuffers->BeginCommandBuffer(i);
         _commandBuffers->BeginRenderPass(i, _swapchain, _renderPass, _frameBuffers[i], VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+        
         for (uint32_t j = 0; j < secondaryBuffers.size(); j++)
         {
             auto tempCommandBuffers = secondaryBuffers[j]->GetCommandBuffers();

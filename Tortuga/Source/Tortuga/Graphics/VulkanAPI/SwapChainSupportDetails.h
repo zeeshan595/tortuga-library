@@ -3,10 +3,14 @@
 
 #include "../../Core.h"
 
-struct SwapChainSupportDetails {
+namespace Tortuga
+{
+struct SwapChainSupportDetails
+{
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
 };
+}; // namespace Tortuga
 
 #endif

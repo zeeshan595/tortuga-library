@@ -13,6 +13,11 @@
 #include "Graphics/VulkanAPI/CommandBuffer.h"
 #include "Graphics/VulkanAPI/Buffer.h"
 #include "Graphics/VulkanAPI/Renderer.h"
+#include "Graphics/VulkanAPI/DescriptorSetLayout.h"
+#include "Graphics/VulkanAPI/DescriptorPool.h"
+#include "Graphics/VulkanAPI/DescriptorSet.h"
+#include "Graphics/VulkanAPI/UniformBufferObject.h"
+#include "Graphics/VulkanAPI/PipelineLayout.h"
 
 namespace Tortuga
 {
@@ -26,27 +31,27 @@ private:
   Swapchain *_swapchain;
   RenderPass *_renderPass;
   Shader *_shader;
+  PipelineLayout *_pipelineLayout;
   Pipeline *_pipeline;
   std::vector<FrameBuffer *> _frameBuffers;
   Renderer *_renderer;
   CommandPool *_commandPool;
   CommandBuffer *_commandBuffer;
-  CommandBuffer *_commandBuffer2;
   Buffer *_vertexBuffer;
   Buffer *_indexBuffer;
-  Buffer *_vertexBuffer2;
+  Buffer *_uniformBuffer;
+
+  DescriptorPool *_descriptorPool;
+  std::vector<DescriptorSetLayout *> _descriptorSetLayouts;
+  DescriptorSet *_descriptorSet;
+
+  UniformBufferObject ubo = {};
 
   const std::vector<Vertex> vertices = {
-      {{-1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}},
-      {{0.0f, -1.0f}, {0.0f, 1.0f, 0.0f}},
-      {{0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-      {{-1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
-
-  const std::vector<Vertex> vertices2 = {
-      {{-0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-      {{1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-      {{1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-      {{0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}};
+      {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+      {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+      {{0.0f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+      {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
 
   const std::vector<uint16_t> indices = {
       0, 1, 2, 2, 3, 0};
