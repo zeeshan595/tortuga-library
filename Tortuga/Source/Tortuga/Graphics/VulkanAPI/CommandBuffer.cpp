@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 CommandBuffer::CommandBuffer(Device *device, CommandPool *commandPool, uint32_t amount, bool isPrimary)
 {
     this->_isPrimary = isPrimary;
@@ -118,4 +122,6 @@ void CommandBuffer::BindDescriptorSet(uint32_t index, PipelineLayout *pipelineLa
 {
     vkCmdBindDescriptorSets(_commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

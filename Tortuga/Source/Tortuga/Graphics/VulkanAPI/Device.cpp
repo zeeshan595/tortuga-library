@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 Device::Device(VkPhysicalDevice physicalDevice, std::vector<const char *> validationLayers, VkSurfaceKHR surface)
 {
     this->_isReady = false;
@@ -164,4 +168,6 @@ bool Device::CheckExtensionSupport(VkPhysicalDevice device, std::vector<const ch
     return requiredExtensions.empty();
 }
 
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

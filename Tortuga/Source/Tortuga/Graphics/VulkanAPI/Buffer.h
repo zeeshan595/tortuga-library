@@ -8,6 +8,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Buffer
 {
 public:
@@ -99,6 +103,8 @@ public:
   VkDeviceMemory GetMemory() { return _deviceMemory; }
   Device *GetDevice() { return _device; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

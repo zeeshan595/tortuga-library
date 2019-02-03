@@ -8,18 +8,24 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class RenderPass
 {
-  private:
-    Device *_device;
-    VkRenderPass _renderPass;
+private:
+  Device *_device;
+  VkRenderPass _renderPass;
 
-  public:
-    RenderPass(Device *device, Swapchain *swapchain);
-    ~RenderPass();
+public:
+  RenderPass(Device *device, Swapchain *swapchain);
+  ~RenderPass();
 
-    VkRenderPass GetRenderPass() { return _renderPass; }
+  VkRenderPass GetRenderPass() { return _renderPass; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

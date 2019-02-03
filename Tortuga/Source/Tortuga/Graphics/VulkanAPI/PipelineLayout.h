@@ -8,18 +8,24 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class PipelineLayout
 {
-  private:
-    Device *_device;
-    VkPipelineLayout _pipelineLayout;
+private:
+  Device *_device;
+  VkPipelineLayout _pipelineLayout;
 
-  public:
-    PipelineLayout(Device *device, std::vector<DescriptorSetLayout *> descriptorSetLayouts);
-    ~PipelineLayout();
+public:
+  PipelineLayout(Device *device, std::vector<DescriptorSetLayout *> descriptorSetLayouts);
+  ~PipelineLayout();
 
-    VkPipelineLayout GetPipelineLayout() { return _pipelineLayout; }
+  VkPipelineLayout GetPipelineLayout() { return _pipelineLayout; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

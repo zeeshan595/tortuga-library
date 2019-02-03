@@ -2,6 +2,11 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
+
 Shader::Shader(Device *device, std::string vertexPath, std::string fragmentPath)
 {
     this->_device = device;
@@ -62,4 +67,6 @@ VkShaderModule Shader::CreateShader(VkDevice device, std::vector<char> code)
     }
     return shader;
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 
 Swapchain::Swapchain(Device *device, uint32_t width, uint32_t height, VkSwapchainKHR previousSwapchain)
 {
@@ -150,4 +154,6 @@ const VkExtent2D Swapchain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR &cap
         return actualExtent;
     }
 }
-} // namespace Tortuga
+}; // namespace VulkanAPI
+}; // namespace Graphics
+}; // namespace Tortuga

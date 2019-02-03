@@ -2,6 +2,11 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
+
 RenderPass::RenderPass(Device *device, Swapchain *swapchain)
 {
     this->_device = device;
@@ -22,7 +27,7 @@ RenderPass::RenderPass(Device *device, Swapchain *swapchain)
         colorAttachmentRef.attachment = 0;
         colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     }
-    
+
     auto depthAttachment = VkAttachmentDescription();
     {
         //depthAttachment.format = FindDepthFormat();
@@ -45,7 +50,7 @@ RenderPass::RenderPass(Device *device, Swapchain *swapchain)
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments = &colorAttachmentRef;
-        subpass.pDepthStencilAttachment = nullptr;//&depthAttachmentRef;
+        subpass.pDepthStencilAttachment = nullptr; //&depthAttachmentRef;
     }
 
     auto dependency = VkSubpassDependency();
@@ -83,4 +88,6 @@ RenderPass::~RenderPass()
 {
     vkDestroyRenderPass(_device->GetVirtualDevice(), _renderPass, nullptr);
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

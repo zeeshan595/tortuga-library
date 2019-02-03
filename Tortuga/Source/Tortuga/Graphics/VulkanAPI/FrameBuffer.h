@@ -8,20 +8,26 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class FrameBuffer
 {
-  private:
-    Device *_device;
-    std::vector<VkFramebuffer> _frameBuffer;
+private:
+  Device *_device;
+  std::vector<VkFramebuffer> _frameBuffer;
 
-    void CreateDepthImageView();
+  void CreateDepthImageView();
 
-  public:
-    FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass);
-    ~FrameBuffer();
+public:
+  FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass);
+  ~FrameBuffer();
 
-    std::vector<VkFramebuffer> GetFramebuffers() { return _frameBuffer; }
+  std::vector<VkFramebuffer> GetFramebuffers() { return _frameBuffer; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

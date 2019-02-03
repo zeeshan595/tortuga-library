@@ -8,6 +8,11 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
+
 class Device
 {
 private:
@@ -44,6 +49,8 @@ public:
   std::string GetDeviceName() { return _deviceName; }
   uint32_t GetVendorIdentifier() { return _vendorIdentifier; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

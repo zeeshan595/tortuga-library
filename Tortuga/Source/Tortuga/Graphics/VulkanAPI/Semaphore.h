@@ -7,18 +7,24 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Semaphore
 {
-  private:
-    Device *_device;
-    VkSemaphore _semaphore;
+private:
+  Device *_device;
+  VkSemaphore _semaphore;
 
-  public:
-    Semaphore(Device *device);
-    ~Semaphore();
+public:
+  Semaphore(Device *device);
+  ~Semaphore();
 
-    VkSemaphore GetSemaphore() { return _semaphore; }
+  VkSemaphore GetSemaphore() { return _semaphore; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

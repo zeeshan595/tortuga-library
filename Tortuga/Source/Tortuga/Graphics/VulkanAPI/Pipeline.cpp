@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass, Shader *shader, PipelineLayout *pipelineLayout)
 {
     this->_swapchain = swapchain;
@@ -160,4 +164,6 @@ Pipeline::~Pipeline()
 {
     vkDestroyPipeline(_device->GetVirtualDevice(), _graphicsPipeline, nullptr);
 }
-} // namespace Tortuga
+}; // namespace VulkanAPI
+}; // namespace Graphics
+}; // namespace Tortuga

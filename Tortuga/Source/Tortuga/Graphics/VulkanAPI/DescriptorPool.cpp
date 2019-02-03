@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 DescriptorPool::DescriptorPool(Device *device, uint32_t size)
 {
     _device = device;
@@ -30,4 +34,6 @@ DescriptorPool::~DescriptorPool()
 {
     vkDestroyDescriptorPool(_device->GetVirtualDevice(), _descriptorPool, nullptr);
 }
+}; // namespace Vulkan
+}; // namespace Graphics
 }; // namespace Tortuga

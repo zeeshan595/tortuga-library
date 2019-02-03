@@ -21,6 +21,7 @@
 
 namespace Tortuga
 {
+using namespace Graphics::VulkanAPI;
 class Application
 {
 private:

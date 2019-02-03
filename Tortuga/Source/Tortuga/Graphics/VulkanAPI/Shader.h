@@ -7,6 +7,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Shader
 {
 private:
@@ -26,6 +30,8 @@ public:
   VkShaderModule GetFragmentShader() { return _fragmentShader; }
   std::vector<VkPipelineShaderStageCreateInfo> GetPipelineShaderInfo() { return _pipelineShaderInfo; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

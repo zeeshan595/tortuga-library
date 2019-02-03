@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 DescriptorSetLayout::DescriptorSetLayout(Device *device)
 {
     this->_device = device;
@@ -32,4 +36,6 @@ DescriptorSetLayout::~DescriptorSetLayout()
 {
     vkDestroyDescriptorSetLayout(_device->GetVirtualDevice(), _descriptorSetLayout, nullptr);
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

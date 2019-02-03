@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 PipelineLayout::PipelineLayout(Device *device, std::vector<DescriptorSetLayout *> descriptorSetLayouts)
 {
     this->_device = device;
@@ -28,4 +32,6 @@ PipelineLayout::~PipelineLayout()
 {
     vkDestroyPipelineLayout(_device->GetVirtualDevice(), _pipelineLayout, nullptr);
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

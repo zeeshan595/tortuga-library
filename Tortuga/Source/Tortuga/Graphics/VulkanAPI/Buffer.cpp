@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, StorageType storageType)
 {
     _bufferType = bufferType;
@@ -9,7 +13,7 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
     _device = device;
     _size = bufferSize;
 
-        VkBufferUsageFlags bufferFlags;
+    VkBufferUsageFlags bufferFlags;
     if (storageType == StorageType::DeviceCopy)
     {
         switch (bufferType)
@@ -151,5 +155,7 @@ void Buffer::CopyToDevice(VkBuffer &hostBuffer, VkBuffer &deviceBuffer)
     vkQueueWaitIdle(_device->GetGraphicsQueue());
 
     vkFreeCommandBuffers(_device->GetVirtualDevice(), commandPool.GetCommandPool(), 1, &commandBuffer);
-}
+};
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

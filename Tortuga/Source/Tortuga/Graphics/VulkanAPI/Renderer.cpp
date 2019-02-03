@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 Renderer::Renderer(Device *device, Swapchain *swapchain, RenderPass *renderPass, FrameBuffer *frameBuffer)
 {
     _renderPass = renderPass;
@@ -111,4 +115,6 @@ void Renderer::WaitForGPUIdle()
     vkQueueWaitIdle(_device->GetPresentQueue());
     vkDeviceWaitIdle(_device->GetVirtualDevice());
 }
-} // namespace Tortuga
+}; // namespace VulkanAPI
+}; // namespace Graphics
+}; // namespace Tortuga

@@ -5,6 +5,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 struct Vertex
 {
     glm::vec3 position;
@@ -50,6 +54,8 @@ struct Vertex
         return attributeDescription;
     }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

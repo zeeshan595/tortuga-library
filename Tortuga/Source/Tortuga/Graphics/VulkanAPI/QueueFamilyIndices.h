@@ -5,6 +5,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
@@ -27,6 +31,8 @@ struct QueueFamilyIndices
                 presentFamily.value()};
     }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

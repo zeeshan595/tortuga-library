@@ -10,6 +10,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class DescriptorSet
 {
 private:
@@ -24,6 +28,8 @@ public:
   std::vector<VkDescriptorSet> GetDescriptorSets() { return _descriptorSets; }
   void UpdateDescriptorSet(std::vector<Buffer *> buffer, uint32_t bufferObjectSize);
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

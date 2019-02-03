@@ -14,6 +14,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class CommandBuffer
 {
 private:
@@ -38,6 +42,8 @@ public:
   std::vector<VkCommandBuffer> &GetCommandBuffers() { return _commandBuffers; }
   bool IsPrimary() { return _isPrimary; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 CommandPool::CommandPool(Device *device)
 {
     _device = device;
@@ -23,4 +27,6 @@ CommandPool::~CommandPool()
 {
     vkDestroyCommandPool(_device->GetVirtualDevice(), _commandPool, nullptr);
 }
-};
+}; // namespace VulkanAPI
+}; // namespace Graphics
+}; // namespace Tortuga

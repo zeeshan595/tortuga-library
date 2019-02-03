@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 Window::Window(const char *title, uint32_t width, uint32_t height)
 {
     this->_width = width;
@@ -49,5 +53,6 @@ std::vector<const char *> Window::GetVulkanInstanceExtensions()
     }
     return extensions;
 }
-
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

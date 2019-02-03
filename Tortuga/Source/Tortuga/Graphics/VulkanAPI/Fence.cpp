@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 Fence::Fence(Device *device)
 {
     this->_device = device;
@@ -21,4 +25,6 @@ Fence::~Fence()
 {
     vkDestroyFence(_device->GetVirtualDevice(), _fence, nullptr);
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

@@ -17,6 +17,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Renderer
 {
 private:
@@ -26,7 +30,7 @@ private:
   Device *_device;
   Swapchain *_swapchain;
   RenderPass *_renderPass;
-  FrameBuffer * _frameBuffer;
+  FrameBuffer *_frameBuffer;
 
   CommandPool *_commandPool;
   CommandBuffer *_commandBuffers;
@@ -45,7 +49,9 @@ public:
   void RenderFrame();
 
   void WaitForGPUIdle();
-};
+}; // namespace VulkanAPI
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

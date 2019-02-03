@@ -8,6 +8,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Vulkan
 {
 private:
@@ -39,6 +43,8 @@ public:
   VkSurfaceKHR GetSurface() { return _surface; }
   std::vector<Device *> GetDevices() { return _devices; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 FrameBuffer::FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass)
 {
     this->_device = device;
@@ -40,6 +44,7 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::CreateDepthImageView()
 {
-    
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

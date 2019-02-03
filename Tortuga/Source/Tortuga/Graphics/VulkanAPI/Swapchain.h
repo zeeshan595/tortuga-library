@@ -7,6 +7,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Swapchain
 {
 private:
@@ -38,6 +42,8 @@ public:
   uint32_t GetWidth() { return _width; }
   uint32_t GetHeight() { return _height; }
 };
-} // namespace Tortuga
+}; // namespace VulkanAPI
+}; // namespace Graphics
+}; // namespace Tortuga
 
 #endif

@@ -7,18 +7,24 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class DescriptorSetLayout
 {
-  private:
-    Device *_device;
-    VkDescriptorSetLayout _descriptorSetLayout;
+private:
+  Device *_device;
+  VkDescriptorSetLayout _descriptorSetLayout;
 
-  public:
-    DescriptorSetLayout(Device *device);
-    ~DescriptorSetLayout();
+public:
+  DescriptorSetLayout(Device *device);
+  ~DescriptorSetLayout();
 
-    VkDescriptorSetLayout GetDescriptorSetLayout() { return _descriptorSetLayout; }
+  VkDescriptorSetLayout GetDescriptorSetLayout() { return _descriptorSetLayout; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

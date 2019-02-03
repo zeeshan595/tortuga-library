@@ -6,6 +6,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Window
 {
 private:
@@ -20,9 +24,11 @@ public:
   VkSurfaceKHR CreateWindowSurface(VkInstance instance);
   std::vector<const char *> GetVulkanInstanceExtensions();
 
-  uint32_t GetWidth(){ return _width; }
-  uint32_t GetHeight(){ return _height; } 
+  uint32_t GetWidth() { return _width; }
+  uint32_t GetHeight() { return _height; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif

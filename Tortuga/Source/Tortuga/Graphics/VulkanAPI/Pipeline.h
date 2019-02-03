@@ -13,6 +13,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Pipeline
 {
 private:
@@ -28,6 +32,8 @@ public:
   Device *GetDevice() { return _device; }
   VkPipeline GetVulkanPipeline() { return _graphicsPipeline; }
 };
-} // namespace Tortuga
+}; // namespace VulkanAPI
+}; // namespace Graphics
+}; // namespace Tortuga
 
 #endif

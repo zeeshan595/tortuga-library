@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 Vulkan::Vulkan(Window *window, const char *applicationName)
 {
     this->_window = window;
@@ -171,5 +175,6 @@ VkBool32 Vulkan::DebugCallback(
     Console::Info(data->pMessage);
     return VK_TRUE;
 }
-
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

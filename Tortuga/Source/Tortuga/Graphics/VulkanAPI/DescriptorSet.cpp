@@ -2,6 +2,11 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
+
 DescriptorSet::DescriptorSet(Device *device, DescriptorSetLayout *descriptorSetLayout, DescriptorPool *descriptorPool, uint32_t size)
 {
     this->_size = size;
@@ -52,4 +57,6 @@ void DescriptorSet::UpdateDescriptorSet(std::vector<Buffer *> buffer, uint32_t b
         vkUpdateDescriptorSets(_device->GetVirtualDevice(), 1, &descriptorWrite, 0, nullptr);
     }
 }
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga

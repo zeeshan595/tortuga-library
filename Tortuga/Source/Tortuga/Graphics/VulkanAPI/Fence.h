@@ -7,6 +7,10 @@
 
 namespace Tortuga
 {
+namespace Graphics
+{
+namespace VulkanAPI
+{
 class Fence
 {
 private:
@@ -19,6 +23,8 @@ public:
 
   VkFence &GetFence() { return _fence; }
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
 }; // namespace Tortuga
 
 #endif
