@@ -147,7 +147,7 @@ Pipeline::Pipeline(Device *device, Swapchain *swapchain, RenderPass *renderPass,
         pipelineInfo.pMultisampleState = &multisampling;
         pipelineInfo.pDepthStencilState = nullptr; // Optional
         pipelineInfo.pColorBlendState = &colorBlendState;
-        pipelineInfo.pDynamicState = nullptr; // Optional
+        pipelineInfo.pDynamicState = &dynamicState; // Optional
         pipelineInfo.layout = pipelineLayout->GetPipelineLayout();
         pipelineInfo.renderPass = renderPass->GetRenderPass();
         pipelineInfo.subpass = 0;

@@ -41,6 +41,7 @@ void Application::Initialize(std::string path)
     _commandBuffer = new CommandBuffer(device, _commandPool, 1, false);
     _commandBuffer->BeginCommandBuffer(0, _renderPass, 0);
     _commandBuffer->BindPipeline(0, _pipeline);
+    _commandBuffer->SetViewport(0, 0, 0, 1024, 768);
     _commandBuffer->BindDescriptorSet(0, _pipelineLayout, _descriptorSet->GetDescriptorSets()[0]);
     _commandBuffer->CreateDrawCommand(0, _vertexBuffer, _indexBuffer, indices.size());
     _commandBuffer->EndCommandBuffer(0);

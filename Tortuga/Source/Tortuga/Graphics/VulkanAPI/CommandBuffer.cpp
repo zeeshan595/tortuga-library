@@ -122,6 +122,19 @@ void CommandBuffer::BindDescriptorSet(uint32_t index, PipelineLayout *pipelineLa
 {
     vkCmdBindDescriptorSets(_commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 }
+void CommandBuffer::SetViewport(uint32_t index, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+{
+    auto viewport = VkViewport();
+    {
+        viewport.x = x;
+        viewport.y = y;
+        viewport.width = width;
+        viewport.height = height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+    }
+    vkCmdSetViewport(_commandBuffers[index], 0, 1, &viewport);
+}
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

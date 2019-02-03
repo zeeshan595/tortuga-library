@@ -37,10 +37,54 @@ VulkanImage::VulkanImage(Device *device, uint32_t width, uint32_t height, ImageT
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                 _deviceImage,
                 _deviceImageMemory);
+
+    auto viewInfo = VkImageViewCreateInfo();
+    {
+        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        viewInfo.image = _deviceImage;
+        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+        viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        viewInfo.subresourceRange.baseMipLevel = 0;
+        viewInfo.subresourceRange.levelCount = 1;
+        viewInfo.subresourceRange.baseArrayLayer = 0;
+        viewInfo.subresourceRange.layerCount = 1;
+    }
+    if (vkCreateImageView(_device->GetVirtualDevice(), &viewInfo, nullptr, &_imageView) != VK_SUCCESS)
+    {
+        Console::Fatal("Failed to create texture image view!");
+    }
+
+    auto samplerInfo = VkSamplerCreateInfo();
+    {
+        samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        samplerInfo.magFilter = VK_FILTER_LINEAR;
+        samplerInfo.minFilter = VK_FILTER_LINEAR;
+        samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerInfo.anisotropyEnable = VK_TRUE;
+        samplerInfo.maxAnisotropy = 16;
+        samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+        samplerInfo.unnormalizedCoordinates = VK_FALSE;
+        samplerInfo.compareEnable = VK_FALSE;
+        samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerInfo.mipLodBias = 0.0f;
+        samplerInfo.minLod = 0.0f;
+        samplerInfo.maxLod = 0.0f;
+    }
+    if (vkCreateSampler(_device->GetVirtualDevice(), &samplerInfo, nullptr, &_textureSampler) != VK_SUCCESS)
+    {
+        Console::Fatal("Failed to setup image sampler!");
+    }
 }
 
 VulkanImage::~VulkanImage()
 {
+    vkDestroySampler(_device->GetVirtualDevice(), _textureSampler, nullptr);
+    vkDestroyImageView(_device->GetVirtualDevice(), _imageView, nullptr);
+
     vkDestroyBuffer(_device->GetVirtualDevice(), _stagingBuffer, nullptr);
     vkFreeMemory(_device->GetVirtualDevice(), _stangingMemory, nullptr);
 

@@ -45,7 +45,7 @@ Device::Device(VkPhysicalDevice physicalDevice, std::vector<const char *> valida
 
     auto deviceFeatures = VkPhysicalDeviceFeatures();
     {
-        //todo
+        deviceFeatures.samplerAnisotropy = VK_TRUE;
     }
 
     auto deviceCreateInfo = VkDeviceCreateInfo();
@@ -57,6 +57,7 @@ Device::Device(VkPhysicalDevice physicalDevice, std::vector<const char *> valida
         deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
         deviceCreateInfo.enabledExtensionCount = deviceExtensions.size();
         deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+        deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
     }
     _device = VK_NULL_HANDLE;
     if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &_device) != VK_SUCCESS)

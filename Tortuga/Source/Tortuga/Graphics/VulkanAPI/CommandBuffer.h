@@ -38,6 +38,7 @@ public:
   void EndRenderPass(uint32_t index);
   void BindPipeline(uint32_t index, Pipeline *pipeline);
   void BindDescriptorSet(uint32_t index, PipelineLayout *pipelineLayout, VkDescriptorSet descriptorSet);
+  void SetViewport(uint32_t index, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 
   std::vector<VkCommandBuffer> &GetCommandBuffers() { return _commandBuffers; }
   bool IsPrimary() { return _isPrimary; }

@@ -36,6 +36,9 @@ private:
   VkImage _deviceImage;
   VkDeviceMemory _deviceImageMemory;
 
+  VkImageView _imageView;
+  VkSampler _textureSampler;
+
   void CopyToDevice(SDL_Surface *image);
   uint32_t FindMemoryType(uint32_t filter, VkMemoryPropertyFlags properties);
   void TransitionImageLayout(VkCommandBuffer commandBuffer,
