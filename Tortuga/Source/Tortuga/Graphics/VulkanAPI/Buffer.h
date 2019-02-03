@@ -5,6 +5,7 @@
 #include "../../Console.h"
 #include "Device.h"
 #include "CommandPool.h"
+#include "StorageType.h"
 
 namespace Tortuga
 {
@@ -21,11 +22,6 @@ public:
     Vertex,
     Uniform
   };
-  enum StorageType
-  {
-    DeviceCopy,
-    DeviceOnly
-  };
 
 private:
   BufferType _bufferType;
@@ -34,8 +30,8 @@ private:
   Device *_device;
 
   //RAM
-  VkBuffer _hostBuffer;
-  VkDeviceMemory _hostMemory;
+  VkBuffer _stagingBuffer;
+  VkDeviceMemory _stagingMemory;
 
   //GPU Memory
   VkBuffer _deviceBuffer;
@@ -63,10 +59,10 @@ public:
     else if (_storageType == StorageType::DeviceCopy)
     {
       void *temp;
-      vkMapMemory(_device->GetVirtualDevice(), _hostMemory, 0, _size, VK_NULL_HANDLE, &temp);
+      vkMapMemory(_device->GetVirtualDevice(), _stagingMemory, 0, _size, VK_NULL_HANDLE, &temp);
       memcpy(temp, data.data(), (sizeof(data) * data.size()));
-      vkUnmapMemory(_device->GetVirtualDevice(), _hostMemory);
-      CopyToDevice(_hostBuffer, _deviceBuffer);
+      vkUnmapMemory(_device->GetVirtualDevice(), _stagingMemory);
+      CopyToDevice(_stagingBuffer, _deviceBuffer);
     }
     else
     {
@@ -87,10 +83,10 @@ public:
     else if (_storageType == StorageType::DeviceCopy)
     {
       void *temp;
-      vkMapMemory(_device->GetVirtualDevice(), _hostMemory, 0, _size, VK_NULL_HANDLE, &temp);
+      vkMapMemory(_device->GetVirtualDevice(), _stagingMemory, 0, _size, VK_NULL_HANDLE, &temp);
       memcpy(temp, &data, (sizeof(data)));
-      vkUnmapMemory(_device->GetVirtualDevice(), _hostMemory);
-      CopyToDevice(_hostBuffer, _deviceBuffer);
+      vkUnmapMemory(_device->GetVirtualDevice(), _stagingMemory);
+      CopyToDevice(_stagingBuffer, _deviceBuffer);
     }
     else
     {

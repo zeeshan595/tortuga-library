@@ -29,7 +29,7 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
         }
 
         //host buffer
-        CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _hostBuffer, _hostMemory);
+        CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _stagingBuffer, _stagingMemory);
         //device buffer
         CreateBuffer(bufferFlags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _deviceBuffer, _deviceMemory);
     }
@@ -59,13 +59,13 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
 Buffer::~Buffer()
 {
     if (_storageType == StorageType::DeviceCopy)
-    {
-        vkFreeMemory(_device->GetVirtualDevice(), _hostMemory, nullptr);
-        vkDestroyBuffer(_device->GetVirtualDevice(), _hostBuffer, nullptr);
+    {        
+        vkDestroyBuffer(_device->GetVirtualDevice(), _stagingBuffer, nullptr);
+        vkFreeMemory(_device->GetVirtualDevice(), _stagingMemory, nullptr);
     }
 
-    vkFreeMemory(_device->GetVirtualDevice(), _deviceMemory, nullptr);
     vkDestroyBuffer(_device->GetVirtualDevice(), _deviceBuffer, nullptr);
+    vkFreeMemory(_device->GetVirtualDevice(), _deviceMemory, nullptr);
 }
 
 void Buffer::CreateBuffer(VkBufferUsageFlags flags, VkMemoryPropertyFlags memoryProperties, VkBuffer &handler, VkDeviceMemory &deviceMemory)
