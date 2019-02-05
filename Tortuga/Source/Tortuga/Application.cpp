@@ -28,7 +28,7 @@ void Application::Initialize(std::string path)
     _descriptorPool = new DescriptorPool(device, _swapchain->GetSwapchainRawImages().size());
     _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool, 1);
 
-    _vertexBuffer = new Buffer(device, vertices.size() * sizeof(Vertex), Buffer::BufferType::Vertex, StorageType::DeviceCopy);
+    _vertexBuffer = new Buffer(device, vertices.size() * sizeof(vertices[0]), Buffer::BufferType::Vertex, StorageType::DeviceCopy);
     _vertexBuffer->UpdateData(vertices);
 
     _indexBuffer = new Buffer(device, indices.size() * sizeof(indices[0]), Buffer::BufferType::Index, StorageType::DeviceCopy);
@@ -42,7 +42,8 @@ void Application::Initialize(std::string path)
     _commandBuffer->BeginCommandBuffer(0, _renderPass, 0);
     _commandBuffer->BindPipeline(0, _pipeline);
     _commandBuffer->SetViewport(0, 0, 0, 1024, 768);
-    _commandBuffer->BindDescriptorSet(0, _pipelineLayout, _descriptorSet->GetDescriptorSets()[0]);
+    _commandBuffer->SetScissor(0, 0, 0, 1024, 768);
+    _commandBuffer->BindDescriptorSet(0, _pipelineLayout, _descriptorSet->GetDescriptorSets());
     _commandBuffer->CreateDrawCommand(0, _vertexBuffer, _indexBuffer, indices.size());
     _commandBuffer->EndCommandBuffer(0);
 
@@ -67,6 +68,7 @@ void Application::Destroy()
     delete _frameBuffer;
 
     delete _pipeline;
+    delete _pipelineLayout;
     delete _shader;
     for (uint32_t i = 0; i < _descriptorSetLayouts.size(); i++)
         delete _descriptorSetLayouts[i];

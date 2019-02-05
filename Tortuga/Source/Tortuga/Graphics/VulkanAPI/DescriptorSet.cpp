@@ -41,7 +41,7 @@ void DescriptorSet::UpdateDescriptorSet(std::vector<Buffer *> buffer, uint32_t b
         auto bufferInfo = VkDescriptorBufferInfo();
         bufferInfo.buffer = buffer[i]->GetBuffer();
         bufferInfo.offset = 0;
-        bufferInfo.range = bufferObjectSize;
+        bufferInfo.range = buffer[i]->GetSize();
 
         auto descriptorWrite = VkWriteDescriptorSet();
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
