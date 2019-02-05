@@ -28,10 +28,10 @@ void Application::Initialize(std::string path)
     _descriptorPool = new DescriptorPool(device, _swapchain->GetSwapchainRawImages().size());
     _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool, 1);
 
-    _vertexBuffer = new Buffer(device, vertices.size() * sizeof(vertices[0]), Buffer::BufferType::Vertex, StorageType::DeviceCopy);
+    _vertexBuffer = new Buffer(device, vertices.size() * sizeof(Vertex), Buffer::BufferType::Vertex, StorageType::DeviceCopy);
     _vertexBuffer->UpdateData(vertices);
 
-    _indexBuffer = new Buffer(device, indices.size() * sizeof(indices[0]), Buffer::BufferType::Index, StorageType::DeviceCopy);
+    _indexBuffer = new Buffer(device, indices.size() * sizeof(uint16_t), Buffer::BufferType::Index, StorageType::DeviceCopy);
     _indexBuffer->UpdateData(indices);
     _uniformBuffer = new Buffer(device, sizeof(ubo), Buffer::BufferType::Uniform, StorageType::DeviceOnly);
     _descriptorSet->UpdateDescriptorSet({_uniformBuffer}, sizeof(ubo));

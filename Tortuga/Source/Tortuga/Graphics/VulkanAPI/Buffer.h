@@ -53,14 +53,14 @@ public:
     {
       void *temp;
       vkMapMemory(_device->GetVirtualDevice(), _deviceMemory, 0, _size, VK_NULL_HANDLE, &temp);
-      memcpy(temp, data.data(), (sizeof(data) * data.size()));
+      memcpy(temp, data.data(), (sizeof(data[0]) * data.size()));
       vkUnmapMemory(_device->GetVirtualDevice(), _deviceMemory);
     }
     else if (_storageType == StorageType::DeviceCopy)
     {
       void *temp;
       vkMapMemory(_device->GetVirtualDevice(), _stagingMemory, 0, _size, VK_NULL_HANDLE, &temp);
-      memcpy(temp, data.data(), (sizeof(data) * data.size()));
+      memcpy(temp, data.data(), (sizeof(data[0]) * data.size()));
       vkUnmapMemory(_device->GetVirtualDevice(), _stagingMemory);
       CopyToDevice(_stagingBuffer, _deviceBuffer);
     }
