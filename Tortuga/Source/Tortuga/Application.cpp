@@ -25,7 +25,7 @@ void Application::Initialize(std::string path)
 
     //////////////////////
 
-    _descriptorPool = new DescriptorPool(device, _swapchain->GetSwapchainRawImages().size());
+    _descriptorPool = new DescriptorPool(device, 1);
     _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool, 1);
 
     _vertexBuffer = new Buffer(device, vertices.size() * sizeof(Vertex), Buffer::BufferType::Vertex, StorageType::DeviceCopy);
@@ -34,7 +34,12 @@ void Application::Initialize(std::string path)
     _indexBuffer = new Buffer(device, indices.size() * sizeof(uint16_t), Buffer::BufferType::Index, StorageType::DeviceCopy);
     _indexBuffer->UpdateData(indices);
     _uniformBuffer = new Buffer(device, sizeof(ubo), Buffer::BufferType::Uniform, StorageType::DeviceOnly);
-    _descriptorSet->UpdateDescriptorSet({_uniformBuffer}, sizeof(ubo));
+
+    _imageAsset = new Image(_applicationDir + "/../example.jpg");
+    _imageBuffer = new VulkanImage(device, _imageAsset->GetWidth(), _imageAsset->GetHeight(), _imageAsset->GetPixelsBytesSize(), VulkanImage::ImageType::Color);
+    _imageBuffer->UpdateImageData(_imageAsset->GetPixels());
+
+    _descriptorSet->UpdateDescriptorSet({_uniformBuffer}, _imageBuffer);
 
     _commandPool = new CommandPool(device);
 
@@ -60,6 +65,9 @@ void Application::Destroy()
     delete _indexBuffer;
     delete _vertexBuffer;
     delete _uniformBuffer;
+
+    delete _imageBuffer;
+    delete _imageAsset;
 
     delete _renderer;
 
