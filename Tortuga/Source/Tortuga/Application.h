@@ -18,9 +18,13 @@
 #include "Graphics/VulkanAPI/DescriptorSet.h"
 #include "Graphics/VulkanAPI/UniformBufferObject.h"
 #include "Graphics/VulkanAPI/PipelineLayout.h"
+#include "Graphics/VulkanAPI/VulkanImage.h"
+
+#include "AssetManager/Image.h"
 
 namespace Tortuga
 {
+using namespace AssetManager;
 using namespace Graphics;
 using namespace Graphics::VulkanAPI;
 
@@ -44,6 +48,9 @@ private:
   Buffer *_indexBuffer;
   Buffer *_uniformBuffer;
 
+  Image *_imageAsset;
+  VulkanImage *_imageBuffer;
+
   DescriptorPool *_descriptorPool;
   std::vector<DescriptorSetLayout *> _descriptorSetLayouts;
   DescriptorSet *_descriptorSet;
@@ -51,10 +58,10 @@ private:
   UniformBufferObject ubo = {};
 
   const std::vector<Vertex> vertices = {
-      {{-1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-      {{+1.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-      {{+1.0f, +1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-      {{-1.0f, +1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
+      {{-1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+      {{+1.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+      {{+1.0f, +1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+      {{-1.0f, +1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
 
   const std::vector<uint16_t> indices = {
       0, 1, 2, 2, 3, 0};

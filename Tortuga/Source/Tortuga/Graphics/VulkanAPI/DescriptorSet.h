@@ -7,6 +7,7 @@
 #include "DescriptorSetLayout.h"
 #include "DescriptorPool.h"
 #include "Buffer.h"
+#include "VulkanImage.h"
 
 namespace Tortuga
 {
@@ -26,7 +27,7 @@ public:
   DescriptorSet(Device *device, DescriptorSetLayout *descriptorSetLayout, DescriptorPool *descriptorPool, uint32_t size);
 
   std::vector<VkDescriptorSet> GetDescriptorSets() { return _descriptorSets; }
-  void UpdateDescriptorSet(std::vector<Buffer *> buffer, uint32_t bufferObjectSize);
+  void UpdateDescriptorSet(std::vector<Buffer *> buffer, VulkanImage *image);
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

@@ -6,8 +6,10 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-VulkanImage::VulkanImage(Device *device, uint32_t width, uint32_t height, ImageType imageType, uint32_t size)
+VulkanImage::VulkanImage(Device *device, uint32_t width, uint32_t height, uint32_t size, ImageType imageType)
 {
+    this->_width = width;
+    this->_height = height;
     this->_size = size;
     this->_device = device;
     this->_imageType = imageType;
@@ -92,19 +94,7 @@ VulkanImage::~VulkanImage()
     vkFreeMemory(_device->GetVirtualDevice(), _deviceImageMemory, nullptr);
 }
 
-void VulkanImage::UpdateImageData(SDL_Surface *image)
-{
-    VkDeviceSize imageSize = image->format->BytesPerPixel * static_cast<uint32_t>(image->h) * static_cast<uint32_t>(image->w);
-    void *mappedData;
-
-    vkMapMemory(_device->GetVirtualDevice(), _stangingMemory, 0, imageSize, 0, &mappedData);
-    memcpy(mappedData, image->pixels, imageSize);
-    vkUnmapMemory(_device->GetVirtualDevice(), _stangingMemory);
-
-    CopyToDevice(image);
-}
-
-void VulkanImage::CopyToDevice(SDL_Surface *image)
+void VulkanImage::CopyToDevice()
 {
     CommandPool commandPool = CommandPool(_device);
 
@@ -141,8 +131,8 @@ void VulkanImage::CopyToDevice(SDL_Surface *image)
 
         copyRegion.imageOffset = {0, 0, 0};
         copyRegion.imageExtent = {
-            static_cast<uint32_t>(image->w),
-            static_cast<uint32_t>(image->h),
+            static_cast<uint32_t>(_width),
+            static_cast<uint32_t>(_height),
             1};
     }
     vkCmdCopyBufferToImage(commandBuffer, _stagingBuffer, _deviceImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);

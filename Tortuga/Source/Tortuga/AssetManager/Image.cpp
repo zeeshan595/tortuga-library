@@ -6,6 +6,7 @@ namespace AssetManager
 {
 Image::Image(std::string filePath)
 {
+    SDL_Surface *imageSurface;
     SDL_RWops *io = SDL_RWFromFile(filePath.c_str(), "rb");
     if (io == NULL)
     {
@@ -14,76 +15,91 @@ Image::Image(std::string filePath)
     }
     if (IMG_isPNG(io))
     {
-        _imageSurface = IMG_LoadPNG_RW(io);
-        _imageFormat = ImageFormat::PNG;
+        imageSurface = IMG_LoadPNG_RW(io);
+        _imageFileFormat = ImageFormat::PNG;
     }
     else if (IMG_isJPG(io))
     {
-        _imageSurface = IMG_LoadJPG_RW(io);
-        _imageFormat = ImageFormat::JPG;
+        imageSurface = IMG_LoadJPG_RW(io);
+        _imageFileFormat = ImageFormat::JPG;
     }
     else if (IMG_isBMP(io))
     {
-        _imageSurface = IMG_LoadBMP_RW(io);
-        _imageFormat = ImageFormat::BMP;
+        imageSurface = IMG_LoadBMP_RW(io);
+        _imageFileFormat = ImageFormat::BMP;
     }
     else if (IMG_isGIF(io))
     {
-        _imageSurface = IMG_LoadGIF_RW(io);
-        _imageFormat = ImageFormat::GIF;
+        imageSurface = IMG_LoadGIF_RW(io);
+        _imageFileFormat = ImageFormat::GIF;
     }
     else if (IMG_isICO(io))
     {
-        _imageSurface = IMG_LoadICO_RW(io);
-        _imageFormat = ImageFormat::ICO;
+        imageSurface = IMG_LoadICO_RW(io);
+        _imageFileFormat = ImageFormat::ICO;
     }
     else if (IMG_isCUR(io))
     {
-        _imageSurface = IMG_LoadCUR_RW(io);
-        _imageFormat = ImageFormat::CUR;
+        imageSurface = IMG_LoadCUR_RW(io);
+        _imageFileFormat = ImageFormat::CUR;
     }
     else if (IMG_isLBM(io))
     {
-        _imageSurface = IMG_LoadLBM_RW(io);
-        _imageFormat = ImageFormat::LBM;
+        imageSurface = IMG_LoadLBM_RW(io);
+        _imageFileFormat = ImageFormat::LBM;
     }
     else if (IMG_isPCX(io))
     {
-        _imageSurface = IMG_LoadPCX_RW(io);
-        _imageFormat = ImageFormat::PCX;
+        imageSurface = IMG_LoadPCX_RW(io);
+        _imageFileFormat = ImageFormat::PCX;
     }
     else if (IMG_isPNM(io))
     {
-        _imageSurface = IMG_LoadPNM_RW(io);
-        _imageFormat = ImageFormat::PNM;
+        imageSurface = IMG_LoadPNM_RW(io);
+        _imageFileFormat = ImageFormat::PNM;
     }
     else if (IMG_isTIF(io))
     {
-        _imageSurface = IMG_LoadTIF_RW(io);
-        _imageFormat = ImageFormat::TIF;
+        imageSurface = IMG_LoadTIF_RW(io);
+        _imageFileFormat = ImageFormat::TIF;
     }
     else if (IMG_isWEBP(io))
     {
-        _imageSurface = IMG_LoadWEBP_RW(io);
-        _imageFormat = ImageFormat::WEBP;
+        imageSurface = IMG_LoadWEBP_RW(io);
+        _imageFileFormat = ImageFormat::WEBP;
     }
     else if (IMG_isXCF(io))
     {
-        _imageSurface = IMG_LoadXCF_RW(io);
-        _imageFormat = ImageFormat::XCF;
+        imageSurface = IMG_LoadXCF_RW(io);
+        _imageFileFormat = ImageFormat::XCF;
     }
     else if (IMG_isXV(io))
     {
-        _imageSurface = IMG_LoadXV_RW(io);
-        _imageFormat = ImageFormat::XV;
+        imageSurface = IMG_LoadXV_RW(io);
+        _imageFileFormat = ImageFormat::XV;
     }
     else
     {
         Console::Error("Unknown Image format!");
-        _imageFormat = ImageFormat::UNKNOWN;
+        _imageFileFormat = ImageFormat::UNKNOWN;
     }
 
     SDL_RWclose(io);
+    
+    //Copy image width and height from SDL surface
+    _width = imageSurface->w;
+    _height = imageSurface->h;
+
+    //Copy pixels from SDL surface
+    for (int i = 0; i < imageSurface->w * imageSurface->h; i++)
+    {
+        const Uint32 *in = (Uint32 *)(imageSurface->pixels + i * imageSurface->format->BytesPerPixel);
+        SDL_Color color;
+        SDL_GetRGBA(*in, imageSurface->format, &color.r, &color.g, &color.b, &color.a);
+        _pixels.push_back({color.r, color.g, color.b, color.a});
+    }
+
+    SDL_FreeSurface(imageSurface);
 }
 Image::Image(uint32_t width, uint32_t height)
 {
@@ -91,7 +107,6 @@ Image::Image(uint32_t width, uint32_t height)
 }
 Image::~Image()
 {
-    SDL_FreeSurface(_imageSurface);
 }
 }; // namespace AssetManager
 }; // namespace Tortuga

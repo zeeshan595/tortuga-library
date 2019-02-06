@@ -21,7 +21,7 @@ DescriptorSetLayout::DescriptorSetLayout(Device *device)
     auto albedoTexture = VkDescriptorSetLayoutBinding();
     {
         albedoTexture.binding = 1;
-        albedoTexture.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        albedoTexture.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         albedoTexture.descriptorCount = 1;
         albedoTexture.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     }

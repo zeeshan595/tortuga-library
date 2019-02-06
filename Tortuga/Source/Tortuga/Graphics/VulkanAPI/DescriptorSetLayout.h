@@ -22,6 +22,7 @@ public:
   ~DescriptorSetLayout();
 
   VkDescriptorSetLayout GetDescriptorSetLayout() { return _descriptorSetLayout; }
+  uint32_t GetSize() { return 2; }
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

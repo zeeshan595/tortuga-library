@@ -26,9 +26,10 @@ public:
 
 private:
   uint32_t _size;
+  uint32_t _width;
+  uint32_t _height;
   Device *_device;
   ImageType _imageType;
-  VkDeviceSize _imageSize;
 
   VkBuffer _stagingBuffer;
   VkDeviceMemory _stangingMemory;
@@ -39,7 +40,7 @@ private:
   VkImageView _imageView;
   VkSampler _textureSampler;
 
-  void CopyToDevice(SDL_Surface *image);
+  void CopyToDevice();
   uint32_t FindMemoryType(uint32_t filter, VkMemoryPropertyFlags properties);
   void TransitionImageLayout(VkCommandBuffer commandBuffer,
                              VkImage image,
@@ -60,10 +61,25 @@ private:
                    VkDeviceMemory &imageMemory);
 
 public:
-  VulkanImage(Device *device, uint32_t width, uint32_t height, ImageType imageType, uint32_t size);
+  VulkanImage(Device *device, uint32_t width, uint32_t height, uint32_t size, ImageType imageType);
   ~VulkanImage();
 
-  void UpdateImageData(SDL_Surface *image);
+  template <typename T>
+  void UpdateImageData(std::vector<T> pixels)
+  {
+    void *mappedData;
+
+    vkMapMemory(_device->GetVirtualDevice(), _stangingMemory, 0, _size, 0, &mappedData);
+    memcpy(mappedData, pixels.data(), _size);
+    vkUnmapMemory(_device->GetVirtualDevice(), _stangingMemory);
+
+    CopyToDevice();
+  }
+
+  VkImageView GetImageView() { return _imageView; }
+  VkSampler GetSampler() { return _textureSampler; }
+  VkImage GetImage() { return _deviceImage; }
+  VkDeviceMemory GetMemory() { return _deviceImageMemory; }
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics
