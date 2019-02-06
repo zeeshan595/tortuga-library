@@ -18,16 +18,15 @@ namespace VulkanAPI
 class DescriptorSet
 {
 private:
-  uint32_t _size;
   Device *_device;
   DescriptorPool *_descriptorPool;
-  std::vector<VkDescriptorSet> _descriptorSets;
+  VkDescriptorSet _descriptorSet;
 
 public:
-  DescriptorSet(Device *device, DescriptorSetLayout *descriptorSetLayout, DescriptorPool *descriptorPool, uint32_t size);
+  DescriptorSet(Device *device, DescriptorSetLayout *descriptorSetLayout, DescriptorPool *descriptorPool);
 
-  std::vector<VkDescriptorSet> GetDescriptorSets() { return _descriptorSets; }
-  void UpdateDescriptorSet(std::vector<Buffer *> buffer, VulkanImage *image);
+  VkDescriptorSet GetDescriptorSet() { return _descriptorSet; }
+  void UpdateDescriptorSet(Buffer * buffer, VulkanImage *image);
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

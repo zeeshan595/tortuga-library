@@ -13,12 +13,19 @@ namespace VulkanAPI
 {
 class DescriptorPool
 {
+public:
+  enum PoolType
+  {
+    Buffer,
+    Image
+  };
+
 private:
   Device *_device;
   VkDescriptorPool _descriptorPool;
 
 public:
-  DescriptorPool(Device *device, uint32_t size);
+  DescriptorPool(Device *device, std::vector<PoolType> types);
   ~DescriptorPool();
 
   VkDescriptorPool GetDescriptorPool() { return _descriptorPool; }

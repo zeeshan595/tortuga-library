@@ -13,16 +13,25 @@ namespace VulkanAPI
 {
 class DescriptorSetLayout
 {
+public:
+  enum LayoutType
+  {
+    Buffer,
+    Image
+  };
+
 private:
   Device *_device;
   VkDescriptorSetLayout _descriptorSetLayout;
+  std::vector<LayoutType> _layouts;
 
 public:
-  DescriptorSetLayout(Device *device);
+  DescriptorSetLayout(Device *device, std::vector<LayoutType> layouts);
   ~DescriptorSetLayout();
 
   VkDescriptorSetLayout GetDescriptorSetLayout() { return _descriptorSetLayout; }
-  uint32_t GetSize() { return 2; }
+  uint32_t GetSize() { return _layouts.size(); }
+  std::vector<LayoutType> GetLyouts() { return _layouts; }
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

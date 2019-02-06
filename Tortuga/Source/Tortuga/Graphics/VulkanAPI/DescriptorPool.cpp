@@ -6,17 +6,23 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-DescriptorPool::DescriptorPool(Device *device, uint32_t size)
+DescriptorPool::DescriptorPool(Device *device, std::vector<PoolType> types)
 {
     _device = device;
 
-    std::vector<VkDescriptorPoolSize> poolSize(2);
+    std::vector<VkDescriptorPoolSize> poolSize(types.size());
+    for (uint32_t i = 0; i < poolSize.size(); i++)
     {
-        poolSize[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSize[0].descriptorCount = size;
-
-        poolSize[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSize[1].descriptorCount = size;
+        if (types[i] == PoolType::Buffer)
+        {
+            poolSize[i].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            poolSize[i].descriptorCount = 1;
+        }
+        else if (types[i] == PoolType::Image)
+        {
+            poolSize[i].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            poolSize[i].descriptorCount = 1;
+        }
     }
 
     auto poolInfo = VkDescriptorPoolCreateInfo();
@@ -24,7 +30,7 @@ DescriptorPool::DescriptorPool(Device *device, uint32_t size)
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = poolSize.size();
         poolInfo.pPoolSizes = poolSize.data();
-        poolInfo.maxSets = size;
+        poolInfo.maxSets = 1;
     }
 
     if (vkCreateDescriptorPool(device->GetVirtualDevice(), &poolInfo, nullptr, &_descriptorPool) != VK_SUCCESS)
@@ -37,6 +43,6 @@ DescriptorPool::~DescriptorPool()
 {
     vkDestroyDescriptorPool(_device->GetVirtualDevice(), _descriptorPool, nullptr);
 }
-}; // namespace Vulkan
+}; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

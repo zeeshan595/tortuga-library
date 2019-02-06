@@ -15,7 +15,7 @@ void Application::Initialize(std::string path)
     Device *device = _vulkan->GetDevices()[0];
     _swapchain = new Swapchain(device, _mainWindow->GetWidth(), _mainWindow->GetHeight());
 
-    _descriptorSetLayouts = {new DescriptorSetLayout(device)};
+    _descriptorSetLayouts = {new DescriptorSetLayout(device, {DescriptorSetLayout::Buffer, DescriptorSetLayout::Image})};
     _pipelineLayout = new PipelineLayout(device, _descriptorSetLayouts);
     _renderPass = new RenderPass(device, _swapchain);
     _shader = new Shader(device, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
@@ -25,8 +25,8 @@ void Application::Initialize(std::string path)
 
     //////////////////////
 
-    _descriptorPool = new DescriptorPool(device, 1);
-    _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool, 1);
+    _descriptorPool = new DescriptorPool(device, {DescriptorPool::Buffer, DescriptorPool::Image});
+    _descriptorSet = new DescriptorSet(device, _descriptorSetLayouts[0], _descriptorPool);
 
     _vertexBuffer = new Buffer(device, vertices.size() * sizeof(Vertex), Buffer::BufferType::Vertex, StorageType::DeviceCopy);
     _vertexBuffer->UpdateData(vertices);
@@ -39,7 +39,7 @@ void Application::Initialize(std::string path)
     _imageBuffer = new VulkanImage(device, _imageAsset->GetWidth(), _imageAsset->GetHeight(), _imageAsset->GetPixelsBytesSize(), VulkanImage::ImageType::Color);
     _imageBuffer->UpdateImageData(_imageAsset->GetPixels());
 
-    _descriptorSet->UpdateDescriptorSet({_uniformBuffer}, _imageBuffer);
+    _descriptorSet->UpdateDescriptorSet(_uniformBuffer, _imageBuffer);
 
     _commandPool = new CommandPool(device);
 
@@ -48,7 +48,7 @@ void Application::Initialize(std::string path)
     _commandBuffer->BindPipeline(0, _pipeline);
     _commandBuffer->SetViewport(0, 0, 0, 1024, 768);
     _commandBuffer->SetScissor(0, 0, 0, 1024, 768);
-    _commandBuffer->BindDescriptorSet(0, _pipelineLayout, _descriptorSet->GetDescriptorSets());
+    _commandBuffer->BindDescriptorSet(0, _pipelineLayout, {_descriptorSet->GetDescriptorSet()});
     _commandBuffer->CreateDrawCommand(0, _vertexBuffer, _indexBuffer, indices.size());
     _commandBuffer->EndCommandBuffer(0);
 

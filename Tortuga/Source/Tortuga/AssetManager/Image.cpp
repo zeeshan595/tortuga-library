@@ -91,9 +91,9 @@ Image::Image(std::string filePath)
     _height = imageSurface->h;
 
     //Copy pixels from SDL surface
-    for (int i = 0; i < imageSurface->w * imageSurface->h; i++)
+    for (uint32_t i = 0; i < _width * _height; i++)
     {
-        const Uint32 *in = (Uint32 *)(imageSurface->pixels + i * imageSurface->format->BytesPerPixel);
+        const Uint32 *in = (Uint32 *)((uint8_t *)imageSurface->pixels + i * imageSurface->format->BytesPerPixel);
         SDL_Color color;
         SDL_GetRGBA(*in, imageSurface->format, &color.r, &color.g, &color.b, &color.a);
         _pixels.push_back({color.r, color.g, color.b, color.a});
