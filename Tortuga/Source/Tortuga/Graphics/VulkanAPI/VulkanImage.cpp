@@ -300,6 +300,41 @@ uint32_t VulkanImage::FindMemoryType(uint32_t filter, VkMemoryPropertyFlags prop
     Console::Fatal("Failed to find GPUs memory type!");
     return 0;
 }
+
+bool VulkanImage::HasStencilComponent(VkFormat format)
+{
+    return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+}
+
+VkFormat VulkanImage::FindDepthFormat()
+{
+    return FindSupportedFormat(
+        {VK_FORMAT_D32_SFLOAT,
+         VK_FORMAT_D32_SFLOAT_S8_UINT,
+         VK_FORMAT_D24_UNORM_S8_UINT},
+        VK_IMAGE_TILING_OPTIMAL,
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+
+VkFormat VulkanImage::FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+{
+    for (VkFormat format : candidates)
+    {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(_device->GetPhysicalDevice(), format, &props);
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+        {
+            return format;
+        }
+        else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+        {
+            return format;
+        }
+    }
+
+    Console::Fatal("Format not supported!");
+    return {};
+}
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

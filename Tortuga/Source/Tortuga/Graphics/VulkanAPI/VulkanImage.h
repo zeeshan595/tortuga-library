@@ -60,6 +60,10 @@ private:
                    VkImage &image,
                    VkDeviceMemory &imageMemory);
 
+  VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+  VkFormat FindDepthFormat();
+  bool HasStencilComponent(VkFormat format);
+
 public:
   VulkanImage(Device *device, uint32_t width, uint32_t height, uint32_t size, ImageType imageType);
   ~VulkanImage();
