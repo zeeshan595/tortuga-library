@@ -49,7 +49,8 @@ private:
   Buffer *_uniformBuffer;
 
   Image *_imageAsset;
-  VulkanImage *_imageBuffer;
+  Buffer *_imageBuffer;
+  VulkanImage *_imageView;
 
   DescriptorPool *_descriptorPool;
   std::vector<DescriptorSetLayout *> _descriptorSetLayouts;

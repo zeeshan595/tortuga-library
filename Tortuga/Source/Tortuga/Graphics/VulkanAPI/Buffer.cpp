@@ -26,6 +26,10 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
             break;
         case BufferType::Uniform:
             bufferFlags = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+            break;
+        case BufferType::Staging:
+            Console::Fatal("Staging type not supported for DeviceCopy storage type!");
+            break;
         }
 
         //host buffer
@@ -38,17 +42,31 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
         switch (bufferType)
         {
         case BufferType::Index:
-            bufferFlags = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+            CreateBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                         _deviceBuffer,
+                         _deviceMemory);
             break;
         case BufferType::Vertex:
-            bufferFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+            CreateBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                         _deviceBuffer,
+                         _deviceMemory);
             break;
         case BufferType::Uniform:
-            bufferFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+            CreateBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                         _deviceBuffer,
+                         _deviceMemory);
+            break;
+        case BufferType::Staging:
+            bufferFlags = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+            CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                         _deviceBuffer,
+                         _deviceMemory);
+            break;
         }
-
-        //device buffer
-        CreateBuffer(bufferFlags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, _deviceBuffer, _deviceMemory);
     }
     else
     {
@@ -59,7 +77,7 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
 Buffer::~Buffer()
 {
     if (_storageType == StorageType::DeviceCopy)
-    {        
+    {
         vkDestroyBuffer(_device->GetVirtualDevice(), _stagingBuffer, nullptr);
         vkFreeMemory(_device->GetVirtualDevice(), _stagingMemory, nullptr);
     }

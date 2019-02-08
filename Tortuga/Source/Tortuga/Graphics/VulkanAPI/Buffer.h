@@ -20,7 +20,8 @@ public:
   {
     Index,
     Vertex,
-    Uniform
+    Uniform,
+    Staging
   };
 
 private:

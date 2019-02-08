@@ -38,6 +38,11 @@ Image::Image(std::string filePath)
         imageSurface = IMG_LoadICO_RW(io);
         _imageFileFormat = ImageFormat::ICO;
     }
+    else if (IMG_isTIF(io))
+    {
+        imageSurface = IMG_LoadTIF_RW(io);
+        _imageFileFormat = ImageFormat::TIF;
+    }
     else if (IMG_isCUR(io))
     {
         imageSurface = IMG_LoadCUR_RW(io);
@@ -57,11 +62,6 @@ Image::Image(std::string filePath)
     {
         imageSurface = IMG_LoadPNM_RW(io);
         _imageFileFormat = ImageFormat::PNM;
-    }
-    else if (IMG_isTIF(io))
-    {
-        imageSurface = IMG_LoadTIF_RW(io);
-        _imageFileFormat = ImageFormat::TIF;
     }
     else if (IMG_isWEBP(io))
     {

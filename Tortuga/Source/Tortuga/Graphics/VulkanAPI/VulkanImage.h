@@ -25,14 +25,10 @@ public:
   };
 
 private:
-  uint32_t _size;
   uint32_t _width;
   uint32_t _height;
   Device *_device;
   ImageType _imageType;
-
-  VkBuffer _stagingBuffer;
-  VkDeviceMemory _stangingMemory;
 
   VkImage _deviceImage;
   VkDeviceMemory _deviceImageMemory;
@@ -40,17 +36,12 @@ private:
   VkImageView _imageView;
   VkSampler _textureSampler;
 
-  void CopyToDevice();
   uint32_t FindMemoryType(uint32_t filter, VkMemoryPropertyFlags properties);
   void TransitionImageLayout(VkCommandBuffer commandBuffer,
                              VkImage image,
                              VkFormat format,
                              VkImageLayout oldLayout,
                              VkImageLayout newLayout);
-  void CreateBuffer(VkBufferUsageFlags flags,
-                    VkMemoryPropertyFlags memoryProperties,
-                    VkBuffer &handler,
-                    VkDeviceMemory &deviceMemory);
   void CreateImage(uint32_t width,
                    uint32_t height,
                    VkFormat format,
@@ -65,20 +56,10 @@ private:
   bool HasStencilComponent(VkFormat format);
 
 public:
-  VulkanImage(Device *device, uint32_t width, uint32_t height, uint32_t size, ImageType imageType);
+  VulkanImage(Device *device, uint32_t width, uint32_t height);
   ~VulkanImage();
 
-  template <typename T>
-  void UpdateImageData(std::vector<T> pixels)
-  {
-    void *mappedData;
-
-    vkMapMemory(_device->GetVirtualDevice(), _stangingMemory, 0, _size, 0, &mappedData);
-    memcpy(mappedData, pixels.data(), _size);
-    vkUnmapMemory(_device->GetVirtualDevice(), _stangingMemory);
-
-    CopyToDevice();
-  }
+  void UpdateImageData(Buffer* stagingBuffer);
 
   VkImageView GetImageView() { return _imageView; }
   VkSampler GetSampler() { return _textureSampler; }

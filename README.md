@@ -16,3 +16,8 @@ If using `vs code` open the `Project.code-workspace` and you can debug The proje
 1. Go into Tortuga sub-folder and run `make build`
 2. Navigate to Sandbox sub-folder and run `make build`
 3. Open the application inside `Sandbox/Build/Application`
+
+**Supported Formats**
+
+Image: `PNG, JPG, BMP, GIF, ICO, TIF, CUR, LBM, PCX, PNM, WEBP, XCF, XV`
+

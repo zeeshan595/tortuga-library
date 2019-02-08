@@ -36,10 +36,12 @@ void Application::Initialize(std::string path)
     _uniformBuffer = new Buffer(device, sizeof(ubo), Buffer::BufferType::Uniform, StorageType::DeviceOnly);
 
     _imageAsset = new Image(_applicationDir + "/../example.jpg");
-    _imageBuffer = new VulkanImage(device, _imageAsset->GetWidth(), _imageAsset->GetHeight(), _imageAsset->GetPixelsBytesSize(), VulkanImage::ImageType::Color);
-    _imageBuffer->UpdateImageData(_imageAsset->GetPixels());
+    _imageBuffer = new Buffer(device, _imageAsset->GetPixelsBytesSize(), Buffer::Staging, StorageType::DeviceOnly);
+    _imageBuffer->UpdateData(_imageAsset->GetPixels());
+    _imageView = new VulkanImage(device, _imageAsset->GetWidth(), _imageAsset->GetHeight());
+    _imageView->UpdateImageData(_imageBuffer);
 
-    _descriptorSet->UpdateDescriptorSet(_uniformBuffer, _imageBuffer);
+    _descriptorSet->UpdateDescriptorSet(_uniformBuffer, _imageView);
 
     _commandPool = new CommandPool(device);
 
@@ -66,8 +68,9 @@ void Application::Destroy()
     delete _vertexBuffer;
     delete _uniformBuffer;
 
-    delete _imageBuffer;
+    delete _imageView;
     delete _imageAsset;
+    delete _imageBuffer;
 
     delete _renderer;
 
