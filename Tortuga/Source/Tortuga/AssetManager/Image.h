@@ -4,7 +4,7 @@
 #include "../Core.h"
 #include "../Console.h"
 
-#include "Pixel.h"
+#include "../Core/Pixel.h"
 
 namespace Tortuga
 {
