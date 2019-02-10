@@ -6,13 +6,14 @@
             "type": "shell",
             "command": "make",
             "group": "build",
-            "problemMatcher": []
+            "problemMatcher":"$gcc"
         },
         {
             "label": "build",
             "type": "shell",
             "command": "make build",
             "group": "none",
+            "problemMatcher":"$gcc"
         }
     ]
 }

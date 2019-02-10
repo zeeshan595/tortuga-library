@@ -15,7 +15,11 @@ void Application::Initialize(std::string path)
     Device *device = _vulkan->GetDevices()[0];
     _swapchain = new Swapchain(device, _mainWindow->GetWidth(), _mainWindow->GetHeight());
 
-    _descriptorSetLayouts = {new DescriptorSetLayout(device, {DescriptorSetLayout::Buffer, DescriptorSetLayout::Image})};
+    std::vector<DescriptorSetLayout::DescriptorType> layouts =
+        {
+            {DescriptorSetLayout::LayoutType::Buffer, DescriptorSetLayout::ShaderType::Vertex},
+            {DescriptorSetLayout::LayoutType::Image, DescriptorSetLayout::ShaderType::Fragment}};
+    _descriptorSetLayouts = {new DescriptorSetLayout(device, layouts)};
     _pipelineLayout = new PipelineLayout(device, _descriptorSetLayouts);
     _renderPass = new RenderPass(device, _swapchain);
     _shader = new Shader(device, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
@@ -45,7 +49,7 @@ void Application::Initialize(std::string path)
 
     _commandPool = new CommandPool(device);
 
-    _commandBuffer = new CommandBuffer(device, _commandPool, 1, false);
+    _commandBuffer = new CommandBuffer(device, _commandPool, 1);
     _commandBuffer->BeginCommandBuffer(0, _renderPass, 0);
     _commandBuffer->BindPipeline(0, _pipeline);
     _commandBuffer->SetViewport(0, 0, 0, 1024, 768);
@@ -96,6 +100,8 @@ void Application::Run()
     int i = 0;
     while (true)
     {
+        _renderer->RecordCommandBuffers({_commandBuffer});
+
         static auto startTime = std::chrono::high_resolution_clock::now();
         SDL_Delay(1);
         auto currentTime = std::chrono::high_resolution_clock::now();

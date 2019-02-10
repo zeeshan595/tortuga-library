@@ -9,14 +9,14 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": []
+            "problemMatcher":"$gcc"
         },
         {
             "label": "build",
             "type": "shell",
             "command": "cd ../Tortuga/ && make build && cd ${workspaceFolder} && make build",
             "group": "none",
-            "problemMatcher": []
+            "problemMatcher":"$gcc"
         }
     ]
 }

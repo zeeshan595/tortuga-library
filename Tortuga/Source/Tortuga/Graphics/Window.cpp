@@ -6,6 +6,7 @@ namespace Graphics
 {
 Window::Window(const char *title, uint32_t width, uint32_t height)
 {
+    this->_title = title;
     this->_width = width;
     this->_height = height;
     this->_window = SDL_CreateWindow(
