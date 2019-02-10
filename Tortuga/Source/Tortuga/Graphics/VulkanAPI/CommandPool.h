@@ -1,5 +1,5 @@
-#ifndef _COMMAND_POOL
-#define _COMMAND_POOL
+#ifndef _VULKAN_API_COMMAND_POOL
+#define _VULKAN_API_COMMAND_POOL
 
 #include "../../Core.h"
 #include "../../Console.h"
@@ -18,7 +18,7 @@ private:
   VkCommandPool _commandPool;
 
 public:
-  CommandPool(Device *device);
+  CommandPool(Device *device, bool canReRecord = false);
   ~CommandPool();
 
   VkCommandPool GetCommandPool() { return _commandPool; }

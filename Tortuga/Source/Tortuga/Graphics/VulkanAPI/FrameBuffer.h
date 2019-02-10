@@ -1,5 +1,5 @@
-#ifndef _FRAME_BUFFER
-#define _FRAME_BUFFER
+#ifndef _VULKAN_API_FRAME_BUFFER
+#define _VULKAN_API_FRAME_BUFFER
 
 #include "../../Core.h"
 #include "../../Console.h"

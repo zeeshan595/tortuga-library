@@ -1,5 +1,5 @@
-#ifndef DESCRIPTOR_POOL
-#define DESCRIPTOR_POOL
+#ifndef _VULKAN_API_DESCRIPTOR_POOL
+#define _VULKAN_API_DESCRIPTOR_POOL
 
 #include "../../Core.h"
 #include "../../Console.h"

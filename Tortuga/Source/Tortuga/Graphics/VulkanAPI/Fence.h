@@ -1,5 +1,5 @@
-#ifndef _FENCE
-#define _FENCE
+#ifndef _VULKAN_API_FENCE
+#define _VULKAN_API_FENCE
 
 #include "../../Core.h"
 #include "../../Console.h"

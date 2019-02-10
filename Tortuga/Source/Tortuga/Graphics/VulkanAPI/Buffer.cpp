@@ -60,7 +60,6 @@ Buffer::Buffer(Device *device, uint32_t bufferSize, BufferType bufferType, Stora
                          _deviceMemory);
             break;
         case BufferType::Staging:
-            bufferFlags = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
             CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                          _deviceBuffer,

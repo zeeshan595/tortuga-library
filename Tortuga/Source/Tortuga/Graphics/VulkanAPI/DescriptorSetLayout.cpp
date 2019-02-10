@@ -6,7 +6,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-DescriptorSetLayout::DescriptorSetLayout(Device *device, std::vector<LayoutType> layouts)
+DescriptorSetLayout::DescriptorSetLayout(Device *device, std::vector<DescriptorType> layouts)
 {
     this->_layouts = layouts;
     this->_device = device;
@@ -14,20 +14,18 @@ DescriptorSetLayout::DescriptorSetLayout(Device *device, std::vector<LayoutType>
     std::vector<VkDescriptorSetLayoutBinding> bindings(layouts.size());
     for (uint32_t i = 0; i < bindings.size(); i++)
     {
-        if (layouts[i] == LayoutType::Buffer)
-        {
-            bindings[i].binding = 0;
+        bindings[i].binding = i;
+        bindings[i].descriptorCount = 1;
+
+        if (layouts[i].layout == LayoutType::Buffer)
             bindings[i].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            bindings[i].descriptorCount = 1;
-            bindings[i].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        }
-        else if (layouts[i] == LayoutType::Image)
-        {
-            bindings[i].binding = 1;
+        else if (layouts[i].layout == LayoutType::Image)
             bindings[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            bindings[i].descriptorCount = 1;
+
+        if (layouts[i].shader == ShaderType::Vertex)
+            bindings[i].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        else if (layouts[i].shader == ShaderType::Fragment)
             bindings[i].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        }
     }
 
     auto layoutInfo = VkDescriptorSetLayoutCreateInfo();

@@ -1,5 +1,5 @@
-#ifndef _BUFFER
-#define _BUFFER
+#ifndef _VULKAN_API_BUFFER
+#define _VULKAN_API_BUFFER
 
 #include "../../Core.h"
 #include "../../Console.h"

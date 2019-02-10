@@ -1,5 +1,5 @@
-#ifndef _VULKAN
-#define _VULKAN
+#ifndef _VULKAN_API
+#define _VULKAN_API
 
 #include "../../Core.h"
 #include "../Window.h"

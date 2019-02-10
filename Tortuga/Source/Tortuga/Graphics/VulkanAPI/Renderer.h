@@ -1,5 +1,5 @@
-#ifndef _RENDERER
-#define _RENDERER
+#ifndef _VULKAN_API_RENDERER
+#define _VULKAN_API_RENDERER
 
 #include "../../Core.h"
 #include "../../Console.h"

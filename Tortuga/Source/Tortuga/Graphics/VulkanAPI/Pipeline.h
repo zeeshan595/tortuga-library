@@ -1,5 +1,5 @@
-#ifndef _PIPELINE
-#define _PIPELINE
+#ifndef _VULKAN_API_PIPELINE
+#define _VULKAN_API_PIPELINE
 
 #include "../../Core.h"
 #include "../../Console.h"

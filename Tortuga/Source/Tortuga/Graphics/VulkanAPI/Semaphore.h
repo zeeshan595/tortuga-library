@@ -1,5 +1,5 @@
-#ifndef _SEMAPHORE
-#define _SEMAPHORE
+#ifndef _VULKAN_API_SEMAPHORE
+#define _VULKAN_API_SEMAPHORE
 
 #include "../../Core.h"
 #include "../../Console.h"

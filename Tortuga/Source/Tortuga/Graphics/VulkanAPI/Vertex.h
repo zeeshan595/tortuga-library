@@ -1,5 +1,5 @@
-#ifndef _VERTEX
-#define _VERTEX
+#ifndef _VULKAN_API_VERTEX
+#define _VULKAN_API_VERTEX
 
 #include "../../Core.h"
 

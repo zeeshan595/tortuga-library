@@ -1,5 +1,5 @@
-#ifndef _DEVICE
-#define _DEVICE
+#ifndef _VULKAN_API_DEVICE
+#define _VULKAN_API_DEVICE
 
 #include "../../Core.h"
 #include "../../Console.h"

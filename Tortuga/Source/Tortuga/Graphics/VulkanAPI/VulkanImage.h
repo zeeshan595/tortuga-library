@@ -1,5 +1,5 @@
-#ifndef _VULKAN_IMAGE
-#define _VULKAN_IMAGE
+#ifndef _VULKAN_API_IMAGE
+#define _VULKAN_API_IMAGE
 
 #include "../../Core.h"
 #include "../../Console.h"
@@ -51,7 +51,7 @@ private:
                    VkImage &image,
                    VkDeviceMemory &imageMemory);
 
-  VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+  VkFormat FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
   VkFormat FindDepthFormat();
   bool HasStencilComponent(VkFormat format);
 
@@ -59,7 +59,7 @@ public:
   VulkanImage(Device *device, uint32_t width, uint32_t height);
   ~VulkanImage();
 
-  void UpdateImageData(Buffer* stagingBuffer);
+  void UpdateImageData(Buffer *stagingBuffer);
 
   VkImageView GetImageView() { return _imageView; }
   VkSampler GetSampler() { return _textureSampler; }

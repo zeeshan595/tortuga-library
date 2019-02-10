@@ -1,5 +1,5 @@
-#ifndef _PIPELINE_LAYOUT
-#define _PIPELINE_LAYOUT
+#ifndef _VULKAN_API_PIPELINE_LAYOUT
+#define _VULKAN_API_PIPELINE_LAYOUT
 
 #include "../../Core.h"
 #include "../../Console.h"

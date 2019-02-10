@@ -1,5 +1,5 @@
-#ifndef _SHADER
-#define _SHADER
+#ifndef _VULKAN_API_SHADER
+#define _VULKAN_API_SHADER
 
 #include "../../Core.h"
 #include "../../Console.h"

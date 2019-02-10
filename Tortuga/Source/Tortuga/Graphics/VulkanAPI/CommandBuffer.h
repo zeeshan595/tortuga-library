@@ -1,5 +1,5 @@
-#ifndef _COMMAND_BUFFER
-#define _COMMAND_BUFFER
+#ifndef _VULKAN_API_COMMAND_BUFFER
+#define _VULKAN_API_COMMAND_BUFFER
 
 #include "../../Core.h"
 #include "../../Console.h"
@@ -27,7 +27,7 @@ private:
   std::vector<VkCommandBuffer> _commandBuffers;
 
 public:
-  CommandBuffer(Device *device, CommandPool *commandPool, uint32_t amount, bool isPrimary);
+  CommandBuffer(Device *device, CommandPool *commandPool, uint32_t amount, bool isPrimary = false);
   ~CommandBuffer();
 
   void CreateDrawCommand(uint32_t index, Buffer *vertexBuffer, Buffer *indexBuffer, uint32_t indicesSize);

@@ -14,7 +14,7 @@ Renderer::Renderer(Device *device, Swapchain *swapchain, RenderPass *renderPass,
     _swapchain = swapchain;
     _frameBuffer = frameBuffer;
 
-    _commandPool = new CommandPool(_device);
+    _commandPool = new CommandPool(_device, true);
     _commandBuffers = new CommandBuffer(_device, _commandPool, _frameBuffersSize, true);
 
     //Setup semaphores
@@ -45,7 +45,11 @@ Renderer::~Renderer()
 
 void Renderer::RecordCommandBuffers(std::vector<CommandBuffer *> secondaryBuffers)
 {
-    //Tell GPU how to render
+    //Make sure were not already rendering a frame
+    for (uint32_t i = 0; i < MAX_FRAMES_QUEUED; i++)
+        vkWaitForFences(_device->GetVirtualDevice(), 1, &_fences[i]->GetFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+
+    //Record GPU command
     for (uint32_t i = 0; i < _frameBuffersSize; i++)
     {
         _commandBuffers->BeginCommandBuffer(i);

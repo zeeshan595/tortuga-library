@@ -1,5 +1,5 @@
-#ifndef _RENDER_PASS
-#define _RENDER_PASS
+#ifndef _VULKAN_API_RENDER_PASS
+#define _VULKAN_API_RENDER_PASS
 
 #include "../../Core.h"
 #include "../../Console.h"

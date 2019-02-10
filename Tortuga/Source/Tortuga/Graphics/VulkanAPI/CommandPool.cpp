@@ -6,7 +6,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-CommandPool::CommandPool(Device *device)
+CommandPool::CommandPool(Device *device, bool canReRecord)
 {
     _device = device;
 
@@ -15,7 +15,8 @@ CommandPool::CommandPool(Device *device)
     {
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.queueFamilyIndex = _device->GetQueueFamilyIndices().graphicsFamily.value();
-        poolInfo.flags = 0; // Optional
+        if (canReRecord)
+            poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     }
     if (vkCreateCommandPool(_device->GetVirtualDevice(), &poolInfo, nullptr, &_commandPool) != VK_SUCCESS)
     {

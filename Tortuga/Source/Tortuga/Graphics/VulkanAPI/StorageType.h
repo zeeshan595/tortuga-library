@@ -1,5 +1,5 @@
-#ifndef _STORAGE_TYPE
-#define _STORAGE_TYPE
+#ifndef _VULKAN_API_STORAGE_TYPE
+#define _VULKAN_API_STORAGE_TYPE
 
 namespace Tortuga
 {

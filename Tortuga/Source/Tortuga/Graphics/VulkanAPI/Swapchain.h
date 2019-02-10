@@ -1,5 +1,5 @@
-#ifndef _SWAPCHAIN
-#define _SWAPCHAIN
+#ifndef _VULKAN_API_SWAPCHAIN
+#define _VULKAN_API_SWAPCHAIN
 
 #include "../../Core.h"
 #include "SwapChainSupportDetails.h"

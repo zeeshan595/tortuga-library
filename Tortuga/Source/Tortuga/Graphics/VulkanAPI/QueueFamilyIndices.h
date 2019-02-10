@@ -1,5 +1,5 @@
-#ifndef _QUEUE_FAMILY_INDICES
-#define _QUEUE_FAMILY_INDICES
+#ifndef _VULKAN_API_QUEUE_FAMILY_INDICES
+#define _VULKAN_API_QUEUE_FAMILY_INDICES
 
 #include "../../Core.h"
 

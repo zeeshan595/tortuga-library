@@ -1,5 +1,5 @@
-#ifndef _DESCRIPTOR_SET
-#define _DESCRIPTOR_SET
+#ifndef _VULKAN_API_DESCRIPTOR_SET
+#define _VULKAN_API_DESCRIPTOR_SET
 
 #include "../../Core.h"
 #include "../../Console.h"
@@ -26,7 +26,7 @@ public:
   DescriptorSet(Device *device, DescriptorSetLayout *descriptorSetLayout, DescriptorPool *descriptorPool);
 
   VkDescriptorSet GetDescriptorSet() { return _descriptorSet; }
-  void UpdateDescriptorSet(Buffer * buffer, VulkanImage *image);
+  void UpdateDescriptorSet(Buffer *buffer, VulkanImage *image);
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

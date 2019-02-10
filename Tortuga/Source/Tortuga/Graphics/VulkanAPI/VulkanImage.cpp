@@ -67,8 +67,8 @@ VulkanImage::VulkanImage(Device *device, uint32_t width, uint32_t height)
 VulkanImage::~VulkanImage()
 {
     vkDestroySampler(_device->GetVirtualDevice(), _textureSampler, nullptr);
+    
     vkDestroyImageView(_device->GetVirtualDevice(), _imageView, nullptr);
-
     vkDestroyImage(_device->GetVirtualDevice(), _deviceImage, nullptr);
     vkFreeMemory(_device->GetVirtualDevice(), _deviceImageMemory, nullptr);
 }
