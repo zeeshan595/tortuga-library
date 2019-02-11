@@ -25,7 +25,8 @@ void Application::Initialize(std::string path)
     _shader = new Shader(device, _applicationDir + "/Shaders/simple.vert.spv", _applicationDir + "/Shaders/simple.frag.spv");
     _pipeline = new Pipeline(device, _swapchain, _renderPass, _shader, _pipelineLayout);
 
-    _frameBuffer = new FrameBuffer(device, _swapchain, _renderPass);
+    _depthImage = new VulkanImage(device, _mainWindow->GetWidth(), _mainWindow->GetHeight(), VulkanImage::ImageType::Depth, false);
+    _frameBuffer = new FrameBuffer(device, _swapchain, _depthImage, _renderPass);
 
     //////////////////////
 
@@ -42,13 +43,12 @@ void Application::Initialize(std::string path)
     _imageAsset = new Image(_applicationDir + "/../example.jpg");
     _imageBuffer = new Buffer(device, _imageAsset->GetPixelsBytesSize(), Buffer::Staging, StorageType::DeviceOnly);
     _imageBuffer->UpdateData(_imageAsset->GetPixels());
-    _imageView = new VulkanImage(device, _imageAsset->GetWidth(), _imageAsset->GetHeight());
+    _imageView = new VulkanImage(device, _imageAsset->GetWidth(), _imageAsset->GetHeight(), VulkanImage::Color);
     _imageView->UpdateImageData(_imageBuffer);
 
     _descriptorSet->UpdateDescriptorSet(_uniformBuffer, _imageView);
 
     _commandPool = new CommandPool(device);
-
     _commandBuffer = new CommandBuffer(device, _commandPool, 1);
     _commandBuffer->BeginCommandBuffer(0, _renderPass, 0);
     _commandBuffer->BindPipeline(0, _pipeline);
@@ -81,6 +81,7 @@ void Application::Destroy()
     delete _descriptorPool;
 
     delete _frameBuffer;
+    delete _depthImage;
 
     delete _pipeline;
     delete _pipelineLayout;
@@ -100,7 +101,7 @@ void Application::Run()
     int i = 0;
     while (true)
     {
-        _renderer->RecordCommandBuffers({_commandBuffer});
+        //_renderer->RecordCommandBuffers({_commandBuffer});
 
         static auto startTime = std::chrono::high_resolution_clock::now();
         SDL_Delay(1);
@@ -116,7 +117,7 @@ void Application::Run()
 
         _renderer->RenderFrame();
         i++;
-        if (i > 5000)
+        if (i > 50000)
         {
             break;
         }

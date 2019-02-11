@@ -18,6 +18,9 @@ private:
   Device *_device;
   VkRenderPass _renderPass;
 
+  static VkFormat FindDepthFormat(Device *device);
+  static VkFormat FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features, Device *device);
+
 public:
   RenderPass(Device *device, Swapchain *swapchain);
   ~RenderPass();

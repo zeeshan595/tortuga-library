@@ -42,6 +42,7 @@ public:
   void SetScissor(uint32_t index, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 
   std::vector<VkCommandBuffer> &GetCommandBuffers() { return _commandBuffers; }
+  VkCommandBuffer &GetCommandBuffer(uint32_t index) { return _commandBuffers[index]; }
   bool IsPrimary() { return _isPrimary; }
 };
 }; // namespace VulkanAPI

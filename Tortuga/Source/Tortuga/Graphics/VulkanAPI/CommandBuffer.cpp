@@ -85,15 +85,19 @@ void CommandBuffer::BeginRenderPass(uint32_t index, Swapchain *swapchain, Render
 {
     auto renderPassInfo = VkRenderPassBeginInfo();
     {
-        VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+        std::vector<VkClearValue> clearColor(2);
+        {
+            clearColor[0] = {0.0f, 0.0f, 0.0f, 1.0f};
+            clearColor[1] = {1.0f, 0};
+        }
 
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPass->GetRenderPass();
         renderPassInfo.framebuffer = framebuffer;
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent = swapchain->GetExtent2D();
-        renderPassInfo.clearValueCount = 1;
-        renderPassInfo.pClearValues = &clearColor;
+        renderPassInfo.clearValueCount = clearColor.size();
+        renderPassInfo.pClearValues = clearColor.data();
     }
     vkCmdBeginRenderPass(_commandBuffers[index], &renderPassInfo, subPassFlags);
 }

@@ -29,6 +29,7 @@ private:
   uint32_t _height;
   Device *_device;
   ImageType _imageType;
+  VkFormat _imageFormat;
 
   VkImage _deviceImage;
   VkDeviceMemory _deviceImageMemory;
@@ -51,12 +52,12 @@ private:
                    VkImage &image,
                    VkDeviceMemory &imageMemory);
 
-  VkFormat FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-  VkFormat FindDepthFormat();
+  static VkFormat FindDepthFormat(Device *device);
+  static VkFormat FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features, Device *device);
   bool HasStencilComponent(VkFormat format);
 
 public:
-  VulkanImage(Device *device, uint32_t width, uint32_t height);
+  VulkanImage(Device *device, uint32_t width, uint32_t height, ImageType imageType, bool sampledImage = true);
   ~VulkanImage();
 
   void UpdateImageData(Buffer *stagingBuffer);

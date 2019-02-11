@@ -40,6 +40,7 @@ private:
   Shader *_shader;
   PipelineLayout *_pipelineLayout;
   Pipeline *_pipeline;
+  VulkanImage *_depthImage;
   FrameBuffer *_frameBuffer;
   Renderer *_renderer;
   CommandPool *_commandPool;

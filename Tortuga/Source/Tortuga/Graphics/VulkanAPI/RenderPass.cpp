@@ -30,7 +30,7 @@ RenderPass::RenderPass(Device *device, Swapchain *swapchain)
 
     auto depthAttachment = VkAttachmentDescription();
     {
-        //depthAttachment.format = FindDepthFormat();
+        depthAttachment.format = FindDepthFormat(_device);
         depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -50,7 +50,7 @@ RenderPass::RenderPass(Device *device, Swapchain *swapchain)
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments = &colorAttachmentRef;
-        subpass.pDepthStencilAttachment = nullptr; //&depthAttachmentRef;
+        subpass.pDepthStencilAttachment = &depthAttachmentRef; //&depthAttachmentRef;
     }
 
     auto dependency = VkSubpassDependency();
@@ -63,7 +63,7 @@ RenderPass::RenderPass(Device *device, Swapchain *swapchain)
         dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     }
 
-    std::vector<VkAttachmentDescription> attachments = {colorAttachment};
+    std::vector<VkAttachmentDescription> attachments = {colorAttachment, depthAttachment};
 
     //Render pass
     auto renderPassInfo = VkRenderPassCreateInfo();
@@ -87,6 +87,36 @@ RenderPass::RenderPass(Device *device, Swapchain *swapchain)
 RenderPass::~RenderPass()
 {
     vkDestroyRenderPass(_device->GetVirtualDevice(), _renderPass, nullptr);
+}
+
+VkFormat RenderPass::FindDepthFormat(Device *device)
+{
+    return FindSupportedFormat(
+        {VK_FORMAT_D32_SFLOAT,
+         VK_FORMAT_D32_SFLOAT_S8_UINT,
+         VK_FORMAT_D24_UNORM_S8_UINT},
+        VK_IMAGE_TILING_OPTIMAL,
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT, device);
+}
+
+VkFormat RenderPass::FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features, Device *device)
+{
+    for (VkFormat format : candidates)
+    {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(device->GetPhysicalDevice(), format, &props);
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+        {
+            return format;
+        }
+        else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+        {
+            return format;
+        }
+    }
+
+    Console::Fatal("Format not supported!");
+    return {};
 }
 }; // namespace VulkanAPI
 }; // namespace Graphics

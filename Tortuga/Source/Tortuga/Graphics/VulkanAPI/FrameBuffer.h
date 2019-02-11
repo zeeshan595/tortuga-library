@@ -5,6 +5,7 @@
 #include "../../Console.h"
 #include "Device.h"
 #include "Pipeline.h"
+#include "VulkanImage.h"
 
 namespace Tortuga
 {
@@ -18,10 +19,8 @@ private:
   Device *_device;
   std::vector<VkFramebuffer> _frameBuffer;
 
-  void CreateDepthImageView();
-
 public:
-  FrameBuffer(Device *device, Swapchain *swapchain, RenderPass *renderPass);
+  FrameBuffer(Device *device, Swapchain *swapchain, VulkanImage *depthImage, RenderPass *renderPass);
   ~FrameBuffer();
 
   std::vector<VkFramebuffer> GetFramebuffers() { return _frameBuffer; }

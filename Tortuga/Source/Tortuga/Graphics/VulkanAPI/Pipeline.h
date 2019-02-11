@@ -4,12 +4,12 @@
 #include "../../Core.h"
 #include "../../Console.h"
 #include "Device.h"
-#include "RenderPass.h"
 #include "Swapchain.h"
 #include "Vertex.h"
 #include "Shader.h"
 #include "DescriptorSetLayout.h"
 #include "PipelineLayout.h"
+#include "RenderPass.h"
 
 namespace Tortuga
 {
