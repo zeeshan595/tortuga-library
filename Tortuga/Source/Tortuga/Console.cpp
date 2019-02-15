@@ -36,7 +36,7 @@ void Tortuga::Console::ProcessLog(Tortuga::Console::Level level, std::string mes
   std::cout << stream.str();
 }
 
-void Tortuga::Console::Print(std::string message, Arguments args = {})
+void Tortuga::Console::Print(std::string message, Arguments args)
 {
   ProcessLog(LEVEL_NONE, message, args);
 }

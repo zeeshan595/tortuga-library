@@ -14,6 +14,9 @@ void InitializeEngine(const char *applicationName)
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         1024, 768,
         SDL_WINDOW_VULKAN);
+
+    auto vulkan = Graphics::VulkanAPI::CreateVulkanInstance();
+    Graphics::VulkanAPI::DestroyVulkanInstance(vulkan);
 }
 
 void MainLoop()

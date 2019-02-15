@@ -4,6 +4,9 @@
 #include "Core.h"
 #include "Console.h"
 
+#include "Graphics/VulkanAPI/DataStructures.h"
+#include "Graphics/VulkanAPI/Vulkan.h"
+
 namespace Tortuga
 {
 void InitializeEngine(const char *applicationName);
