@@ -16,6 +16,8 @@ void InitializeEngine(const char *applicationName)
         SDL_WINDOW_VULKAN);
 
     auto vulkan = Graphics::VulkanAPI::CreateVulkanInstance();
+    auto devices = Graphics::VulkanAPI::CreateDevices(vulkan);
+    Graphics::VulkanAPI::DestroyDevices(devices);
     Graphics::VulkanAPI::DestroyVulkanInstance(vulkan);
 }
 

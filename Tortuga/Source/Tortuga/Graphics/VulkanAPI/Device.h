@@ -1,5 +1,5 @@
-#ifndef _VULKAN_API
-#define _VULKAN_API
+#ifndef _VULKAN_API_DEVICE
+#define _VULKAN_API_DEVICE
 
 #include "DataStructures.h"
 
@@ -9,8 +9,8 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-VulkanData CreateVulkanInstance();
-void DestroyVulkanInstance(VulkanData &data);
+std::vector<DeviceData> CreateDevices(VulkanData data);
+void DestroyDevices(std::vector<DeviceData> data);
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga
