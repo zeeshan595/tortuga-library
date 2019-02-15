@@ -10,7 +10,7 @@ Image::Image(std::string filePath)
     SDL_RWops *io = SDL_RWFromFile(filePath.c_str(), "rb");
     if (io == NULL)
     {
-        Console::Error("Could not load image file!");
+        //Console::Error("Could not load image file!");
         return;
     }
     if (IMG_isPNG(io))
@@ -80,12 +80,12 @@ Image::Image(std::string filePath)
     }
     else
     {
-        Console::Error("Unknown Image format!");
+        //Console::Error("Unknown Image format!");
         _imageFileFormat = ImageFormat::UNKNOWN;
     }
 
     SDL_RWclose(io);
-    
+
     //Copy image width and height from SDL surface
     _width = imageSurface->w;
     _height = imageSurface->h;
@@ -103,7 +103,7 @@ Image::Image(std::string filePath)
 }
 Image::Image(uint32_t width, uint32_t height)
 {
-    Console::Fatal("Not implimented!");
+    //Console::Fatal("Not implimented!");
 }
 Image::~Image()
 {

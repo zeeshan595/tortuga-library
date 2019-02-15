@@ -4,7 +4,7 @@
 			"path": "Tortuga"
 		},
 		{
-			"path": "Sandbox"
+			"path": "Editor"
 		}
 	],
 	"settings": {
@@ -56,7 +56,8 @@
 			"typeinfo": "cpp",
 			"utility": "cpp",
 			"numeric": "cpp"
-		}
+		},
+		"search.usePCRE2": true
 		
 	}
 }

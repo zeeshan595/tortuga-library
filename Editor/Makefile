@@ -1,5 +1,5 @@
 #CONFIG
-PROJECT_NAME = Sandbox
+PROJECT_NAME = Editor
 COMPILER = g++
 FLAGS = -Wall -g -std=c++17
 SOURCE_DIR = Source
