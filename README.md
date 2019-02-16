@@ -5,11 +5,17 @@ Tortuga is a open source Game Engine built in C++. Tortuga ONLY uses vulkan for 
 
 **Building the Project**
 
-Before building Tortuga, you must install the required dependencies. Below is a list of required dependencies for Tortuga to function. The project expects to find all of the dependencies in `/usr/lib` and `/usr/include` folders.
+Before building Tortuga, you must install the required dependencies. Below is a list of required dependencies for Tortuga to function.
 * vulkan (1.1.92)
 * SDL2 (with vulkan compatibility)
 * SDL_Image
 * sndio
+
+You can follow the instructions to install these dependencies in Ubuntu
+
+1. `sudo apt install libvulkan1 libvulkan-dev libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev`
+2. SDL2 might not come with vulkan support. But you can compile SDL2 yourself from `https://www.libsdl.org/download-2.0.php`
+3. Replace the compiled SDL2 with the system SDL2. `/usr/include` & `/usr/lib`
 
 If using `vs code` open the `Project.code-workspace` and you can debug The project `Sandbox` from there. Otherwise build the project manually:
 
