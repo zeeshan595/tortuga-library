@@ -14,8 +14,8 @@ struct VulkanData
 {
   std::vector<const char *> InstanceExtensions;
   std::vector<const char *> ValidationLayers;
-  VkInstance Instance;
-  VkDebugUtilsMessengerEXT Debugger;
+  VkInstance Instance = VK_NULL_HANDLE;
+  VkDebugUtilsMessengerEXT Debugger = VK_NULL_HANDLE;
 };
 
 struct QueueFamilyIndices
@@ -35,10 +35,10 @@ struct DeviceData
   QueueFamilyIndices QueueFamilies;
   VkPhysicalDeviceProperties Properties;
   VkPhysicalDeviceFeatures Features;
-  VkPhysicalDevice PhysicalDevice;
-  VkDevice Device;
+  VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;
+  VkDevice Device = VK_NULL_HANDLE;
   uint32_t Score;
-  VkQueue PresentQueue;
+  VkQueue PresentQueue = VK_NULL_HANDLE;
 };
 
 struct SwapChainSupportDetails
@@ -50,7 +50,7 @@ struct SwapChainSupportDetails
 
 struct SwapchainData
 {
-  VkDevice Device;
+  VkDevice Device = VK_NULL_HANDLE;
   SwapChainSupportDetails SupportDetails;
   VkSurfaceFormatKHR SurfaceFormat;
   VkPresentModeKHR PresentMode;
@@ -59,6 +59,13 @@ struct SwapchainData
   VkSwapchainKHR Swapchain;
   std::vector<VkImage> Images;
   std::vector<VkImageView> ImageViews;
+};
+
+struct ShaderData
+{
+  VkDevice Device = VK_NULL_HANDLE;
+  std::vector<char> Code;
+  VkShaderModule Shader = VK_NULL_HANDLE;
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

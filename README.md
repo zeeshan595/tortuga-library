@@ -1,7 +1,7 @@
 Tortuga
 ===
 
-Tortuga is a open source Game Engine built in C++. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. Tortuga is built in Linux but it should be cross platform compatible if you wish to build it for a different platform. For editing the source code & building the project, a `Linux` system is recomended with a copy of `vs code`.
+Tortuga is a open source Game Engine built in C++. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. Tortuga is built in Linux but it should be cross platform compatible if you wish to build it for a different platform. For editing the source code & building the project, a `Linux` system is recommended with a copy of `vs code`.
 
 **Building the Project**
 
@@ -17,7 +17,11 @@ If using `vs code` open the `Project.code-workspace` and you can debug The proje
 2. Navigate to Sandbox sub-folder and run `make build`
 3. Open the application inside `Sandbox/Build/Application`
 
+**Key Features**
+
+Data Oriented Design
+Multi-Threaded Rendering
+
 **Supported Formats**
 
 Image: `PNG, JPG, BMP, GIF, ICO, TIF, CUR, LBM, PCX, PNM, WEBP, XCF, XV`
-

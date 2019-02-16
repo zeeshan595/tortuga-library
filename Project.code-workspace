@@ -57,7 +57,9 @@
 			"utility": "cpp",
 			"numeric": "cpp"
 		},
-		"search.usePCRE2": true
+		"search.usePCRE2": true,
+		"C_Cpp.default.cppStandard": "c++17",
+		"C_Cpp.default.intelliSenseMode": "gcc-x64"
 		
 	}
 }
