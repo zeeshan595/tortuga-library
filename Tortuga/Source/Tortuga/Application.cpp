@@ -15,8 +15,18 @@ void InitializeEngine(const char *applicationName)
         1024, 768,
         SDL_WINDOW_VULKAN);
 
+    VkSurfaceKHR surface;
+
     auto vulkan = Graphics::VulkanAPI::CreateVulkanInstance();
     auto devices = Graphics::VulkanAPI::CreateDevices(vulkan);
+    if (SDL_Vulkan_CreateSurface(window, vulkan.Instance, &surface) == false)
+    {
+        Console::Fatal("Failed to create vulkan surface!");
+    }
+    auto swapchain = Graphics::VulkanAPI::CreateSwapchain(devices[0], surface, 1024, 768);
+    Graphics::VulkanAPI::DestroySwapchain(swapchain);
+    vkDestroySurfaceKHR(vulkan.Instance, surface, nullptr);
+
     Graphics::VulkanAPI::DestroyDevices(devices);
     Graphics::VulkanAPI::DestroyVulkanInstance(vulkan);
 }
@@ -41,7 +51,7 @@ void DestroyEngine()
 {
     SDL_DestroyWindow(window);
 
-    //Console::Info("Shutting Down!");
+    Console::Info("Shutting Down!");
     SDL_Quit();
 }
 } // namespace Tortuga

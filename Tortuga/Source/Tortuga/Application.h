@@ -7,6 +7,7 @@
 #include "Graphics/VulkanAPI/DataStructures.h"
 #include "Graphics/VulkanAPI/Vulkan.h"
 #include "Graphics/VulkanAPI/Device.h"
+#include "Graphics/VulkanAPI/Swapchain.h"
 
 namespace Tortuga
 {
