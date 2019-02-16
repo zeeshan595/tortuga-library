@@ -19,9 +19,9 @@ If using `vs code` open the `Project.code-workspace` and you can debug The proje
 
 **Key Features**
 
-Multi GPU Support
-Multi-Threaded Rendering
-Data Oriented Design
+* Multi GPU Support
+* Multi-Threaded Rendering
+* Data Oriented Design
 
 **Supported Formats**
 
