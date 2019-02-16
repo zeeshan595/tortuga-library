@@ -11,12 +11,13 @@ RenderingEngine CreateRenderingEngine()
   auto devices = VulkanAPI::CreateDevices(data.Vulkan);
 
   data.Devices.resize(devices.size());
-  uint32_t mainDevice;
+  uint32_t mainDevice = 0;
   for (uint32_t i = 0; i < devices.size(); i++)
   {
     data.Devices[i].VulkanDevice = devices[i];
 
-    if (data.Devices[i].VulkanDevice.Score > data.Devices[mainDevice].VulkanDevice.Score)
+    if (i != mainDevice &&
+        data.Devices[i].VulkanDevice.Score > data.Devices[mainDevice].VulkanDevice.Score)
       mainDevice = i;
   }
   data.MainDeviceIndex = mainDevice;
