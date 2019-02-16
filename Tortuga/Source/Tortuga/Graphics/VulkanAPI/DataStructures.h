@@ -96,6 +96,12 @@ struct RenderPassData
   VkDevice Device;
   VkRenderPass RenderPass;
 };
+
+struct FrameBufferData
+{
+  VkDevice Device;
+  std::vector<VkFramebuffer> FrameBuffers;
+};
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

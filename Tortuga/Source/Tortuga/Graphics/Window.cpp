@@ -4,14 +4,14 @@ namespace Tortuga
 {
 namespace Graphics
 {
-WindowData CreateWindow(std::vector<RenderingDevice> devices, std::string title, uint32_t width, uint32_t height, WindowType type)
+Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uint32_t width, uint32_t height, WindowType type)
 {
   if (devices.size() <= 0)
   {
     Console::Fatal("Cannot create a window without a device!");
   }
 
-  auto data = WindowData();
+  auto data = Window();
 
   uint32_t maxDevicesScore = 0;
   data.VulkanDevicesInUse.resize(devices.size());
@@ -56,7 +56,7 @@ WindowData CreateWindow(std::vector<RenderingDevice> devices, std::string title,
   return data;
 }
 
-void DestroyWindow(WindowData data)
+void DestroyWindow(Window data)
 {
   for (uint32_t i = 0; i < data.VulkanSwapchain.size(); i++)
   {

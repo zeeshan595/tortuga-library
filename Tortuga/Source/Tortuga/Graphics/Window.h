@@ -19,15 +19,15 @@ enum WindowType
   BorderlessWindowed
 };
 
-struct WindowData
+struct Window
 {
   VulkanAPI::WindowData VulkanWindow;
   std::vector<VulkanAPI::SwapchainData> VulkanSwapchain;
   std::vector<VulkanAPI::DeviceData> VulkanDevicesInUse;
 };
 
-WindowData CreateWindow(std::vector<RenderingDevice> devices, std::string title, uint32_t width, uint32_t height, WindowType type);
-void DestroyWindow(WindowData data);
+Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uint32_t width, uint32_t height, WindowType type);
+void DestroyWindow(Window data);
 }; // namespace Graphics
 }; // namespace Tortuga
 

@@ -8,6 +8,8 @@
 #include "Tortuga/Graphics/RenderingEngine.h"
 #include "Tortuga/Graphics/Window.h"
 #include "Tortuga/Graphics/Shader.h"
+#include "Tortuga/Graphics/RenderPass.h"
 #include "Tortuga/Graphics/Pipeline.h"
+#include "Tortuga/Graphics/FrameBuffers.h"
 
 #endif

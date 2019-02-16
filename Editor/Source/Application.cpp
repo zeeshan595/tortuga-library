@@ -33,7 +33,9 @@ int main(int argc, char **argv)
         workingDirectory + "/Shaders/simple.frag.spv",
         Graphics::ShaderType::Fragment);
 
-    auto pipeline = Graphics::CreatePipeline(window, {vertexShader, fragmentShader});
+    auto renderpass = Graphics::CreateRenderPass(window);
+    auto pipeline = Graphics::CreatePipeline(window, renderpass, {vertexShader, fragmentShader});
+    auto framebuffers = Graphics::CreateFrameBuffers(window, renderpass);
 
     //Main loop
     bool isRunning = true;
@@ -51,7 +53,10 @@ int main(int argc, char **argv)
         }
     }
 
+    Graphics::DestroyFrameBuffers(framebuffers);
+
     Graphics::DestroyPipeline(pipeline);
+    Graphics::DestroyRenderPass(renderpass);
 
     Graphics::DestroyShader(vertexShader);
     Graphics::DestroyShader(fragmentShader);

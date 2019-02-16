@@ -23,8 +23,8 @@ struct Shader
   std::vector<VulkanAPI::ShaderData> VulkanShader;
 };
 
-Shader CreateShaderFromFile(WindowData window, std::string filePath, ShaderType type);
-Shader CreateShader(WindowData window, std::vector<char> code, ShaderType type);
+Shader CreateShaderFromFile(Window window, std::string filePath, ShaderType type);
+Shader CreateShader(Window window, std::vector<char> code, ShaderType type);
 void DestroyShader(Shader data);
 }; // namespace Graphics
 }; // namespace Tortuga

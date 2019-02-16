@@ -4,7 +4,7 @@ namespace Tortuga
 {
 namespace Graphics
 {
-Shader CreateShaderFromFile(WindowData window, std::string filePath, ShaderType type)
+Shader CreateShaderFromFile(Window window, std::string filePath, ShaderType type)
 {
   std::ifstream file(filePath, std::ios::ate | std::ios::binary);
   if (!file.is_open())
@@ -22,7 +22,7 @@ Shader CreateShaderFromFile(WindowData window, std::string filePath, ShaderType 
   return CreateShader(window, buffer, type);
 }
 
-Shader CreateShader(WindowData window, std::vector<char> code, ShaderType type)
+Shader CreateShader(Window window, std::vector<char> code, ShaderType type)
 {
   auto data = Shader();
 
