@@ -4,6 +4,12 @@
 #include "../../Core.h"
 #include "../../Console.h"
 
+namespace Tortuga
+{
+namespace Graphics
+{
+namespace VulkanAPI
+{
 struct VulkanData
 {
   std::vector<const char *> InstanceExtensions;
@@ -54,5 +60,8 @@ struct SwapchainData
   std::vector<VkImage> Images;
   std::vector<VkImageView> ImageViews;
 };
+}; // namespace VulkanAPI
+}; // namespace Graphics
+}; // namespace Tortuga
 
 #endif

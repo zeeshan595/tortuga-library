@@ -2,7 +2,7 @@
 
 namespace Tortuga
 {
-namespace AssetManager
+namespace Assets
 {
 namespace Image
 {
@@ -14,8 +14,7 @@ ImageData LoadImage(std::string file)
     SDL_RWops *io = SDL_RWFromFile(file.c_str(), "rb");
     if (io == NULL)
     {
-        //Console::Error("Could not load image file!");
-        return;
+        Console::Error("Could not load image file: {0}", Console::Arguments() << file);
     }
     if (IMG_isPNG(io))
     {
@@ -108,5 +107,5 @@ ImageData LoadImage(std::string file)
     return data;
 }
 }; // namespace Image
-}; // namespace AssetManager
+}; // namespace Assets
 }; // namespace Tortuga

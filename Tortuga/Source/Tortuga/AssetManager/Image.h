@@ -4,20 +4,17 @@
 #include "../Core.h"
 #include "../Console.h"
 
-#include "../Core/Pixel.h"
-
 namespace Tortuga
 {
-namespace AssetManager
+struct Pixel
 {
-struct ImageData
-{
-  Image::ImageFileFormat FileFormat;
-  uint32_t Width;
-  uint32_t Height;
-  std::vector<Pixel> Pixels;
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+  uint8_t a;
 };
-
+namespace Assets
+{
 namespace Image
 {
 enum ImageFileFormat
@@ -37,9 +34,16 @@ enum ImageFileFormat
   XV,
   UNKNOWN
 };
+struct ImageData
+{
+  ImageFileFormat FileFormat;
+  uint32_t Width;
+  uint32_t Height;
+  std::vector<Pixel> Pixels;
+};
 ImageData LoadImage(std::string file);
 }; // namespace Image
-}; // namespace AssetManager
+}; // namespace Assets
 }; // namespace Tortuga
 
 #endif

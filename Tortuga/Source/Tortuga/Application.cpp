@@ -2,33 +2,20 @@
 
 namespace Tortuga
 {
-SDL_Window *window;
+Graphics::VulkanAPI::VulkanData vulkan;
+std::vector<Graphics::VulkanAPI::DeviceData> devices;
+Graphics::WindowData window;
+Graphics::VulkanAPI::SwapchainData swapchain;
 
 void InitializeEngine(const char *applicationName)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
     Console::Info("Tortuga Engine Started!");
 
-    window = SDL_CreateWindow(
-        applicationName,
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        1024, 768,
-        SDL_WINDOW_VULKAN);
-
-    VkSurfaceKHR surface;
-
-    auto vulkan = Graphics::VulkanAPI::CreateVulkanInstance();
-    auto devices = Graphics::VulkanAPI::CreateDevices(vulkan);
-    if (SDL_Vulkan_CreateSurface(window, vulkan.Instance, &surface) == false)
-    {
-        Console::Fatal("Failed to create vulkan surface!");
-    }
-    auto swapchain = Graphics::VulkanAPI::CreateSwapchain(devices[0], surface, 1024, 768);
-    Graphics::VulkanAPI::DestroySwapchain(swapchain);
-    vkDestroySurfaceKHR(vulkan.Instance, surface, nullptr);
-
-    Graphics::VulkanAPI::DestroyDevices(devices);
-    Graphics::VulkanAPI::DestroyVulkanInstance(vulkan);
+    vulkan = Graphics::VulkanAPI::CreateVulkanInstance();
+    devices = Graphics::VulkanAPI::CreateDevices(vulkan);
+    window = Graphics::CreateWindow(vulkan, applicationName, 1024, 768, Graphics::WindowType::ResizeableWindowed);
+    swapchain = Graphics::VulkanAPI::CreateSwapchain(devices[0], window.Surface, 1024, 768);
 }
 
 void MainLoop()
@@ -49,7 +36,10 @@ void MainLoop()
 
 void DestroyEngine()
 {
-    SDL_DestroyWindow(window);
+    Graphics::VulkanAPI::DestroySwapchain(swapchain);
+    Graphics::DestroyWindow(window);
+    Graphics::VulkanAPI::DestroyDevices(devices);
+    Graphics::VulkanAPI::DestroyVulkanInstance(vulkan);
 
     Console::Info("Shutting Down!");
     SDL_Quit();

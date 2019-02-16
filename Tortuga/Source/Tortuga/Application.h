@@ -9,6 +9,8 @@
 #include "Graphics/VulkanAPI/Device.h"
 #include "Graphics/VulkanAPI/Swapchain.h"
 
+#include "Graphics/Window.h"
+
 namespace Tortuga
 {
 void InitializeEngine(const char *applicationName);
