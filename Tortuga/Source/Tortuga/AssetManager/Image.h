@@ -10,45 +10,35 @@ namespace Tortuga
 {
 namespace AssetManager
 {
-class Image
+struct ImageData
 {
-public:
-  enum ImageFormat
-  {
-    PNG,
-    JPG,
-    BMP,
-    GIF,
-    ICO,
-    CUR,
-    LBM,
-    PCX,
-    PNM,
-    TIF,
-    WEBP,
-    XCF,
-    XV,
-    UNKNOWN
-  };
-
-private:
-  ImageFormat _imageFileFormat;
-  uint32_t _width;
-  uint32_t _height;
-  std::vector<Pixel> _pixels;
-
-public:
-  Image(std::string filePath);
-  Image(uint32_t width, uint32_t height);
-  ~Image();
-
-  ImageFormat GetFileFormat() { return _imageFileFormat; }
-  uint32_t GetWidth() { return _width; }
-  uint32_t GetHeight() { return _height; }
-  uint32_t GetPixelSize() { return sizeof(Pixel); }
-  uint32_t GetPixelsBytesSize() { return _width * _height * sizeof(Pixel); }
-  std::vector<Pixel> GetPixels() { return _pixels; }
+  Image::ImageFileFormat FileFormat;
+  uint32_t Width;
+  uint32_t Height;
+  std::vector<Pixel> Pixels;
 };
+
+namespace Image
+{
+enum ImageFileFormat
+{
+  PNG,
+  JPG,
+  BMP,
+  GIF,
+  ICO,
+  CUR,
+  LBM,
+  PCX,
+  PNM,
+  TIF,
+  WEBP,
+  XCF,
+  XV,
+  UNKNOWN
+};
+ImageData LoadImage(std::string file);
+}; // namespace Image
 }; // namespace AssetManager
 }; // namespace Tortuga
 

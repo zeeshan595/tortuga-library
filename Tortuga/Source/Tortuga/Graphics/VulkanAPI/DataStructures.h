@@ -51,6 +51,8 @@ struct SwapchainData
   VkExtent2D Extent;
   uint32_t ImageCount;
   VkSwapchainKHR Swapchain;
+  std::vector<VkImage> Images;
+  std::vector<VkImageView> ImageViews;
 };
 
 #endif

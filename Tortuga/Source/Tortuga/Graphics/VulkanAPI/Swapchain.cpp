@@ -164,10 +164,45 @@ SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t 
     Console::Fatal("Failed to create swapchain on device {0}", Console::Arguments() << device.Properties.deviceName);
   }
 
+  uint32_t imageCount;
+  vkGetSwapchainImagesKHR(device.Device, data.Swapchain, &imageCount, nullptr);
+  data.Images.resize(imageCount);
+  vkGetSwapchainImagesKHR(device.Device, data.Swapchain, &imageCount, data.Images.data());
+
+  data.ImageViews.resize(imageCount);
+  for (uint32_t i = 0; i < imageCount; i++)
+  {
+    auto imageViewInfo = VkImageViewCreateInfo();
+    {
+      imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+      imageViewInfo.image = data.Images[i];
+      imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+      imageViewInfo.format = data.SurfaceFormat.format;
+      imageViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+      imageViewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+      imageViewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+      imageViewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+      imageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+      imageViewInfo.subresourceRange.baseMipLevel = 0;
+      imageViewInfo.subresourceRange.levelCount = 1;
+      imageViewInfo.subresourceRange.baseArrayLayer = 0;
+      imageViewInfo.subresourceRange.layerCount = 1;
+      if (vkCreateImageView(device.Device, &imageViewInfo, nullptr, &data.ImageViews[i]) != VK_SUCCESS)
+      {
+        Console::Fatal("Failed to create Image views for swapchains on device: {0}", Console::Arguments() << device.Properties.deviceName);
+      }
+    }
+  }
+
   return data;
 }
 void DestroySwapchain(SwapchainData data)
 {
+  for (uint32_t i = 0; i < data.ImageViews.size(); i++)
+  {
+    vkDestroyImageView(data.Device, data.ImageViews[i], nullptr);
+  }
+
   vkDestroySwapchainKHR(data.Device, data.Swapchain, nullptr);
 }
 } // namespace VulkanAPI

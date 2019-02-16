@@ -4,10 +4,14 @@ namespace Tortuga
 {
 namespace AssetManager
 {
-Image::Image(std::string filePath)
+namespace Image
 {
+ImageData LoadImage(std::string file)
+{
+    ImageData data;
+
     SDL_Surface *imageSurface;
-    SDL_RWops *io = SDL_RWFromFile(filePath.c_str(), "rb");
+    SDL_RWops *io = SDL_RWFromFile(file.c_str(), "rb");
     if (io == NULL)
     {
         //Console::Error("Could not load image file!");
@@ -16,97 +20,93 @@ Image::Image(std::string filePath)
     if (IMG_isPNG(io))
     {
         imageSurface = IMG_LoadPNG_RW(io);
-        _imageFileFormat = ImageFormat::PNG;
+        data.FileFormat = ImageFileFormat::PNG;
     }
     else if (IMG_isJPG(io))
     {
         imageSurface = IMG_LoadJPG_RW(io);
-        _imageFileFormat = ImageFormat::JPG;
+        data.FileFormat = ImageFileFormat::JPG;
     }
     else if (IMG_isBMP(io))
     {
         imageSurface = IMG_LoadBMP_RW(io);
-        _imageFileFormat = ImageFormat::BMP;
+        data.FileFormat = ImageFileFormat::BMP;
     }
     else if (IMG_isGIF(io))
     {
         imageSurface = IMG_LoadGIF_RW(io);
-        _imageFileFormat = ImageFormat::GIF;
+        data.FileFormat = ImageFileFormat::GIF;
     }
     else if (IMG_isICO(io))
     {
         imageSurface = IMG_LoadICO_RW(io);
-        _imageFileFormat = ImageFormat::ICO;
+        data.FileFormat = ImageFileFormat::ICO;
     }
     else if (IMG_isTIF(io))
     {
         imageSurface = IMG_LoadTIF_RW(io);
-        _imageFileFormat = ImageFormat::TIF;
+        data.FileFormat = ImageFileFormat::TIF;
     }
     else if (IMG_isCUR(io))
     {
         imageSurface = IMG_LoadCUR_RW(io);
-        _imageFileFormat = ImageFormat::CUR;
+        data.FileFormat = ImageFileFormat::CUR;
     }
     else if (IMG_isLBM(io))
     {
         imageSurface = IMG_LoadLBM_RW(io);
-        _imageFileFormat = ImageFormat::LBM;
+        data.FileFormat = ImageFileFormat::LBM;
     }
     else if (IMG_isPCX(io))
     {
         imageSurface = IMG_LoadPCX_RW(io);
-        _imageFileFormat = ImageFormat::PCX;
+        data.FileFormat = ImageFileFormat::PCX;
     }
     else if (IMG_isPNM(io))
     {
         imageSurface = IMG_LoadPNM_RW(io);
-        _imageFileFormat = ImageFormat::PNM;
+        data.FileFormat = ImageFileFormat::PNM;
     }
     else if (IMG_isWEBP(io))
     {
         imageSurface = IMG_LoadWEBP_RW(io);
-        _imageFileFormat = ImageFormat::WEBP;
+        data.FileFormat = ImageFileFormat::WEBP;
     }
     else if (IMG_isXCF(io))
     {
         imageSurface = IMG_LoadXCF_RW(io);
-        _imageFileFormat = ImageFormat::XCF;
+        data.FileFormat = ImageFileFormat::XCF;
     }
     else if (IMG_isXV(io))
     {
         imageSurface = IMG_LoadXV_RW(io);
-        _imageFileFormat = ImageFormat::XV;
+        data.FileFormat = ImageFileFormat::XV;
     }
     else
     {
         //Console::Error("Unknown Image format!");
-        _imageFileFormat = ImageFormat::UNKNOWN;
+        data.FileFormat = ImageFileFormat::UNKNOWN;
     }
 
     SDL_RWclose(io);
 
     //Copy image width and height from SDL surface
-    _width = imageSurface->w;
-    _height = imageSurface->h;
+    data.Width = imageSurface->w;
+    data.Height = imageSurface->h;
 
     //Copy pixels from SDL surface
-    for (uint32_t i = 0; i < _width * _height; i++)
+    for (uint32_t i = 0; i < data.Width * data.Height; i++)
     {
         const Uint32 *in = (Uint32 *)((uint8_t *)imageSurface->pixels + i * imageSurface->format->BytesPerPixel);
         SDL_Color color;
         SDL_GetRGBA(*in, imageSurface->format, &color.r, &color.g, &color.b, &color.a);
-        _pixels.push_back({color.r, color.g, color.b, color.a});
+        data.Pixels.push_back({color.r, color.g, color.b, color.a});
     }
 
     SDL_FreeSurface(imageSurface);
+
+    return data;
 }
-Image::Image(uint32_t width, uint32_t height)
-{
-    //Console::Fatal("Not implimented!");
-}
-Image::~Image()
-{
-}
+}; // namespace Image
 }; // namespace AssetManager
 }; // namespace Tortuga
