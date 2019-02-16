@@ -16,13 +16,11 @@ int main(int argc, char **argv)
     SDL_Init(SDL_INIT_EVERYTHING);
     Console::Info("Tortuga Engine Started!");
 
-    auto vulkan = Graphics::VulkanAPI::CreateVulkanInstance();
-    auto devices = Graphics::VulkanAPI::CreateDevices(vulkan);
-    auto window = Graphics::CreateWindow(vulkan, "Test application", 1024, 768, Graphics::WindowType::ResizeableWindowed);
-    auto swapchain = Graphics::VulkanAPI::CreateSwapchain(devices[0], window.Surface, 1024, 768);
-
-    auto vertexShader = Graphics::VulkanAPI::CreateShaderFromFile(devices[0], workingDirectory + "/Shaders/simple.vert.spv");
-    auto fragmentShader = Graphics::VulkanAPI::CreateShaderFromFile(devices[0], workingDirectory + "/Shaders/simple.frag.spv");
+    auto renderingEngine = Graphics::CreateRenderingEngine();
+    auto window = Graphics::CreateWindow({renderingEngine.Devices[0], renderingEngine.Devices[0]},
+                                         "Hello World",
+                                         1024, 768,
+                                         Graphics::WindowType::ResizeableWindowed);
 
     //Main loop
     bool isRunning = true;
@@ -36,19 +34,12 @@ int main(int argc, char **argv)
             case SDL_WINDOWEVENT_CLOSE:
                 isRunning = false;
                 break;
-            case SDL_WINDOWEVENT_RESIZED:
-
-                break;
             }
         }
     }
 
-    Graphics::VulkanAPI::DestroyShader(vertexShader);
-    Graphics::VulkanAPI::DestroyShader(fragmentShader);
-    Graphics::VulkanAPI::DestroySwapchain(swapchain);
     Graphics::DestroyWindow(window);
-    Graphics::VulkanAPI::DestroyDevices(devices);
-    Graphics::VulkanAPI::DestroyVulkanInstance(vulkan);
+    Graphics::DestroyRenderingEngine(renderingEngine);
 
     Console::Info("Shutting Down!");
     SDL_Quit();

@@ -179,6 +179,7 @@ std::vector<DeviceData> CreateDevices(VulkanData vulkan)
     }
 
     vkGetDeviceQueue(data[i].Device, data[i].QueueFamilies.PresentFamily.value(), 0, &data[i].PresentQueue);
+    data[i].Instance = vulkan.Instance;
   }
 
   //Destroy helper surface & window

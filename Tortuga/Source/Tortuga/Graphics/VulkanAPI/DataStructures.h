@@ -32,6 +32,7 @@ struct QueueFamilyIndices
 
 struct DeviceData
 {
+  VkInstance Instance;
   QueueFamilyIndices QueueFamilies;
   VkPhysicalDeviceProperties Properties;
   VkPhysicalDeviceFeatures Features;
@@ -39,6 +40,19 @@ struct DeviceData
   VkDevice Device = VK_NULL_HANDLE;
   uint32_t Score;
   VkQueue PresentQueue = VK_NULL_HANDLE;
+};
+
+struct SurfaceData
+{
+  VkInstance Instance;
+  VkDevice Device;
+  VkSurfaceKHR Surface;
+};
+
+struct WindowData
+{
+  SDL_Window *Window;
+  std::vector<SurfaceData> Surface;
 };
 
 struct SwapChainSupportDetails

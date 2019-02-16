@@ -1,9 +1,11 @@
-#ifndef _TORTUGA_WINDOW
-#define _TORTUGA_WINDOW
+#ifndef _WINDOW
+#define _WINDOW
 
-#include "../Core.h"
-#include "../Console.h"
 #include "VulkanAPI/DataStructures.h"
+#include "VulkanAPI/Window.h"
+#include "VulkanAPI/Swapchain.h"
+
+#include "RenderingEngine.h"
 
 namespace Tortuga
 {
@@ -19,12 +21,12 @@ enum WindowType
 
 struct WindowData
 {
-  VkInstance Instance;
-  SDL_Window *Window;
-  VkSurfaceKHR Surface;
+  VulkanAPI::WindowData VulkanWindow;
+  std::vector<VulkanAPI::SwapchainData> VulkanSwapchain;
+  std::vector<VulkanAPI::DeviceData> VulkanDevicesInUse;
 };
 
-WindowData CreateWindow(VulkanAPI::VulkanData vulkan, std::string title, uint32_t width, uint32_t height, WindowType type);
+WindowData CreateWindow(std::vector<RenderingDevice> devices, std::string title, uint32_t width, uint32_t height, WindowType type);
 void DestroyWindow(WindowData data);
 }; // namespace Graphics
 }; // namespace Tortuga
