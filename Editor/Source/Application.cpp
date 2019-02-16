@@ -17,10 +17,23 @@ int main(int argc, char **argv)
     Console::Info("Tortuga Engine Started!");
 
     auto renderingEngine = Graphics::CreateRenderingEngine();
-    auto window = Graphics::CreateWindow({renderingEngine.Devices[0], renderingEngine.Devices[0]},
-                                         "Hello World",
-                                         1024, 768,
-                                         Graphics::WindowType::ResizeableWindowed);
+    auto window = Graphics::CreateWindow(
+        {renderingEngine.Devices[0], renderingEngine.Devices[0]},
+        "Hello World",
+        1024, 768,
+        Graphics::WindowType::ResizeableWindowed);
+
+    auto vertexShader = Graphics::CreateShaderFromFile(
+        window,
+        workingDirectory + "/Shaders/simple.vert.spv",
+        Graphics::ShaderType::Vertex);
+
+    auto fragmentShader = Graphics::CreateShaderFromFile(
+        window,
+        workingDirectory + "/Shaders/simple.frag.spv",
+        Graphics::ShaderType::Fragment);
+
+    auto pipeline = Graphics::CreatePipeline(window, {vertexShader, fragmentShader});
 
     //Main loop
     bool isRunning = true;
@@ -37,6 +50,11 @@ int main(int argc, char **argv)
             }
         }
     }
+
+    Graphics::DestroyPipeline(pipeline);
+
+    Graphics::DestroyShader(vertexShader);
+    Graphics::DestroyShader(fragmentShader);
 
     Graphics::DestroyWindow(window);
     Graphics::DestroyRenderingEngine(renderingEngine);

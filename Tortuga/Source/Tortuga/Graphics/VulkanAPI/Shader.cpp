@@ -6,7 +6,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-ShaderData CreateShader(DeviceData device, std::vector<char> code)
+ShaderData CreateShader(DeviceData device, std::vector<char> code, VkShaderStageFlagBits options)
 {
   auto data = ShaderData();
   data.Device = device.Device;
@@ -21,11 +21,19 @@ ShaderData CreateShader(DeviceData device, std::vector<char> code)
   {
     Console::Fatal("Failed to create shader module on device: {0}", Console::Arguments() << device.Properties.deviceName);
   }
+  auto stageInfo = VkPipelineShaderStageCreateInfo();
+  {
+    stageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stageInfo.stage = options;
+    stageInfo.module = data.Shader;
+    stageInfo.pName = "main";
+  }
+  data.StageInfo = stageInfo;
 
   return data;
 }
 
-ShaderData CreateShaderFromFile(DeviceData device, std::string filePath)
+ShaderData CreateShaderFromFile(DeviceData device, std::string filePath, VkShaderStageFlagBits options)
 {
   std::ifstream file(filePath, std::ios::ate | std::ios::binary);
   if (!file.is_open())
@@ -40,7 +48,7 @@ ShaderData CreateShaderFromFile(DeviceData device, std::string filePath)
   file.read(buffer.data(), fileSize);
   file.close();
 
-  return CreateShader(device, buffer);
+  return CreateShader(device, buffer, options);
 }
 
 void DestroyShader(ShaderData data)

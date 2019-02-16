@@ -39,15 +39,19 @@ WindowData CreateWindow(std::vector<RenderingDevice> devices, std::string title,
   }
   data.VulkanWindow = VulkanAPI::CreateWindow(data.VulkanDevicesInUse, title, width, height, windowFlags);
   data.VulkanSwapchain.resize(data.VulkanDevicesInUse.size());
+  float swapchainOffset = 0.0f;
   for (uint32_t i = 0; i < data.VulkanDevicesInUse.size(); i++)
   {
     float ratio = (float)devices[i].VulkanDevice.Score / (float)maxDevicesScore;
 
+    data.VulkanSwapchain[i].Offset.x = swapchainOffset;
     data.VulkanSwapchain[i] = VulkanAPI::CreateSwapchain(
         devices[i].VulkanDevice,
         data.VulkanWindow.Surface[i].Surface,
         width * ratio,
         height);
+
+    swapchainOffset += width * ratio;
   }
   return data;
 }

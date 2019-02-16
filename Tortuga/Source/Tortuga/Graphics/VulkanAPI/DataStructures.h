@@ -64,6 +64,7 @@ struct SwapChainSupportDetails
 
 struct SwapchainData
 {
+  glm::vec2 Offset = {0, 0};
   VkDevice Device = VK_NULL_HANDLE;
   SwapChainSupportDetails SupportDetails;
   VkSurfaceFormatKHR SurfaceFormat;
@@ -80,6 +81,20 @@ struct ShaderData
   VkDevice Device = VK_NULL_HANDLE;
   std::vector<char> Code;
   VkShaderModule Shader = VK_NULL_HANDLE;
+  VkPipelineShaderStageCreateInfo StageInfo;
+};
+
+struct PipelineData
+{
+  VkDevice Device = VK_NULL_HANDLE;
+  VkPipelineLayout Layout = VK_NULL_HANDLE;
+  VkPipeline Pipeline;
+};
+
+struct RenderPassData
+{
+  VkDevice Device;
+  VkRenderPass RenderPass;
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

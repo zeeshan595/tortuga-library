@@ -9,8 +9,8 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-ShaderData CreateShaderFromFile(DeviceData device, std::string filePath);
-ShaderData CreateShader(DeviceData device, std::vector<char> code);
+ShaderData CreateShaderFromFile(DeviceData device, std::string filePath, VkShaderStageFlagBits options);
+ShaderData CreateShader(DeviceData device, std::vector<char> code, VkShaderStageFlagBits options);
 void DestroyShader(ShaderData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics
