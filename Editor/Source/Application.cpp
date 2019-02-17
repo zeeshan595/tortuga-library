@@ -37,6 +37,9 @@ int main(int argc, char **argv)
     auto pipeline = Graphics::CreatePipeline(window, renderpass, {vertexShader, fragmentShader});
     auto framebuffers = Graphics::CreateFrameBuffers(window, renderpass);
 
+    auto commandPool = Graphics::CreateCommandPool(window);
+    auto commandBuffer = Graphics::CreateCommandBuffer(window, commandPool, Graphics::CommandBufferLevel::CommandBufferPrimary, 1);
+
     //Main loop
     bool isRunning = true;
     while (isRunning)
@@ -52,6 +55,8 @@ int main(int argc, char **argv)
             }
         }
     }
+
+    Graphics::DestroyCommandPool(commandPool);
 
     Graphics::DestroyFrameBuffers(framebuffers);
 

@@ -102,6 +102,18 @@ struct FrameBufferData
   VkDevice Device;
   std::vector<VkFramebuffer> FrameBuffers;
 };
+
+struct CommandPoolData
+{
+  VkDevice Device;
+  VkCommandPool Pool;
+};
+
+struct CommandBufferData
+{
+  VkDevice Device;
+  std::vector<VkCommandBuffer> Buffer;
+};
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

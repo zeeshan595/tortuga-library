@@ -11,5 +11,7 @@
 #include "Tortuga/Graphics/RenderPass.h"
 #include "Tortuga/Graphics/Pipeline.h"
 #include "Tortuga/Graphics/FrameBuffers.h"
+#include "Tortuga/Graphics/CommandPool.h"
+#include "Tortuga/Graphics/CommandBuffer.h"
 
 #endif
