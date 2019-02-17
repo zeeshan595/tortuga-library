@@ -40,6 +40,7 @@ struct DeviceData
   VkDevice Device = VK_NULL_HANDLE;
   uint32_t Score;
   VkQueue PresentQueue = VK_NULL_HANDLE;
+  VkQueue GraphicQueue = VK_NULL_HANDLE;
 };
 
 struct SurfaceData
@@ -113,6 +114,20 @@ struct CommandBufferData
 {
   VkDevice Device;
   std::vector<VkCommandBuffer> Buffer;
+};
+
+struct RendererData
+{
+  DeviceData Device;
+  SwapchainData Swapchain;
+  FrameBufferData FrameBuffers;
+  RenderPassData RenderPass;
+
+  CommandPoolData CommandPool;
+  CommandBufferData CommandBuffer;
+
+  VkSemaphore ImageAvailableSemaphore;
+  VkSemaphore RenderFinishedSemaphore;
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

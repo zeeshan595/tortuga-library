@@ -6,6 +6,45 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+void SetScissors(CommandBufferData data, uint32_t index, VkRect2D rect)
+{
+  vkCmdSetScissor(data.Buffer[index], 0, 1, &rect);
+}
+void SetViewport(CommandBufferData data, uint32_t index, VkViewport viewport)
+{
+  vkCmdSetViewport(data.Buffer[index], 0, 1, &viewport);
+}
+void CommandBufferDrawExample(CommandBufferData data, uint32_t index)
+{
+  vkCmdDraw(data.Buffer[index], 3, 1, 0, 0);
+}
+void BindCommandBufferPipeline(CommandBufferData data, uint32_t index, PipelineData pipeline)
+{
+  vkCmdBindPipeline(data.Buffer[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.Pipeline);
+}
+void BeginCommandBufferRenderPass(CommandBufferData data, uint32_t index, VkFramebuffer framebuffer, VkRenderPass renderPass, VkExtent2D swapchainExtent)
+{
+  std::vector<VkClearValue> clearColor(1);
+  {
+    clearColor[0] = {0.0f, 0.0f, 0.0f, 1.0f};
+  }
+
+  auto renderPassInfo = VkRenderPassBeginInfo();
+  {
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = framebuffer;
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = swapchainExtent;
+    renderPassInfo.clearValueCount = clearColor.size();
+    renderPassInfo.pClearValues = clearColor.data();
+  }
+  vkCmdBeginRenderPass(data.Buffer[index], &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+}
+void EndCommandBufferRenderPass(CommandBufferData data, uint32_t index)
+{
+  vkCmdEndRenderPass(data.Buffer[index]);
+}
 void BeginCommandBufferRecording(CommandBufferData data, uint32_t index, RenderPassData renderPass, uint32_t subPass)
 {
   auto inheritanceInfo = VkCommandBufferInheritanceInfo();
@@ -18,7 +57,7 @@ void BeginCommandBufferRecording(CommandBufferData data, uint32_t index, RenderP
   auto beginInfo = VkCommandBufferBeginInfo();
   {
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
     beginInfo.pInheritanceInfo = &inheritanceInfo;
   }
 

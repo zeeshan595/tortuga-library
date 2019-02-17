@@ -12,6 +12,8 @@ Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uin
   }
 
   auto data = Window();
+  data.Width = width;
+  data.Height = height;
 
   uint32_t maxDevicesScore = 0;
   data.VulkanDevicesInUse.resize(devices.size());
@@ -39,19 +41,21 @@ Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uin
   }
   data.VulkanWindow = VulkanAPI::CreateWindow(data.VulkanDevicesInUse, title, width, height, windowFlags);
   data.VulkanSwapchain.resize(data.VulkanDevicesInUse.size());
+  data.devicesViewportSize.resize(data.VulkanDevicesInUse.size());
   float swapchainOffset = 0.0f;
   for (uint32_t i = 0; i < data.VulkanDevicesInUse.size(); i++)
   {
     float ratio = (float)devices[i].VulkanDevice.Score / (float)maxDevicesScore;
+    data.devicesViewportSize[i] = ratio * width;
 
     data.VulkanSwapchain[i].Offset.x = swapchainOffset;
     data.VulkanSwapchain[i] = VulkanAPI::CreateSwapchain(
         devices[i].VulkanDevice,
         data.VulkanWindow.Surface[i].Surface,
-        width * ratio,
+        data.devicesViewportSize[i],
         height);
 
-    swapchainOffset += width * ratio;
+    swapchainOffset += data.devicesViewportSize[i];
   }
   return data;
 }

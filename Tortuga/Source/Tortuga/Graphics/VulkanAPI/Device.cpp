@@ -178,6 +178,7 @@ std::vector<DeviceData> CreateDevices(VulkanData vulkan)
       Console::Fatal("Failed to create device: {0}", data[i].Properties.deviceName);
     }
 
+    vkGetDeviceQueue(data[i].Device, data[i].QueueFamilies.GraphicsFamily.value(), 0, &data[i].GraphicQueue);
     vkGetDeviceQueue(data[i].Device, data[i].QueueFamilies.PresentFamily.value(), 0, &data[i].PresentQueue);
     data[i].Instance = vulkan.Instance;
   }

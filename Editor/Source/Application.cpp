@@ -23,6 +23,9 @@ int main(int argc, char **argv)
         1024, 768,
         Graphics::WindowType::ResizeableWindowed);
 
+    auto renderpass = Graphics::CreateRenderPass(window);
+    auto framebuffers = Graphics::CreateFrameBuffers(window, renderpass);
+
     auto vertexShader = Graphics::CreateShaderFromFile(
         window,
         workingDirectory + "/Shaders/simple.vert.spv",
@@ -32,13 +35,19 @@ int main(int argc, char **argv)
         window,
         workingDirectory + "/Shaders/simple.frag.spv",
         Graphics::ShaderType::Fragment);
-
-    auto renderpass = Graphics::CreateRenderPass(window);
     auto pipeline = Graphics::CreatePipeline(window, renderpass, {vertexShader, fragmentShader});
-    auto framebuffers = Graphics::CreateFrameBuffers(window, renderpass);
 
     auto commandPool = Graphics::CreateCommandPool(window);
-    auto commandBuffer = Graphics::CreateCommandBuffer(window, commandPool, Graphics::CommandBufferLevel::CommandBufferPrimary, 1);
+    auto commandBuffer = Graphics::CreateCommandBuffer(window, commandPool, Graphics::CommandBufferLevel::CommandBufferSecondary, 1);
+
+    auto renderer = Graphics::CreateRenderer(window, framebuffers, renderpass);
+
+    Graphics::BeginCommandBuffer(commandBuffer, 0, renderpass, 0);
+    Graphics::BindCommandBufferPipeline(commandBuffer, 0, pipeline);
+    Graphics::CommandBufferDrawExample(commandBuffer, 0);
+    Graphics::EndCommandBuffer(commandBuffer, 0);
+
+    Graphics::SubmitCommands(renderer, {commandBuffer});
 
     //Main loop
     bool isRunning = true;
@@ -54,13 +63,17 @@ int main(int argc, char **argv)
                 break;
             }
         }
+
+        Graphics::DrawFrame(renderer);
     }
+
+    Graphics::DestroyRenderer(renderer);
 
     Graphics::DestroyCommandPool(commandPool);
 
-    Graphics::DestroyFrameBuffers(framebuffers);
-
     Graphics::DestroyPipeline(pipeline);
+
+    Graphics::DestroyFrameBuffers(framebuffers);
     Graphics::DestroyRenderPass(renderpass);
 
     Graphics::DestroyShader(vertexShader);

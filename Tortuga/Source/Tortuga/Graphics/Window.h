@@ -21,6 +21,9 @@ enum WindowType
 
 struct Window
 {
+  uint32_t Width;
+  uint32_t Height;
+  std::vector<uint32_t> devicesViewportSize;
   VulkanAPI::WindowData VulkanWindow;
   std::vector<VulkanAPI::SwapchainData> VulkanSwapchain;
   std::vector<VulkanAPI::DeviceData> VulkanDevicesInUse;

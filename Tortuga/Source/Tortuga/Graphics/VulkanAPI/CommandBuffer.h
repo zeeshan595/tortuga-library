@@ -9,6 +9,12 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+void SetScissors(CommandBufferData data, uint32_t index, VkRect2D rect);
+void SetViewport(CommandBufferData data, uint32_t index, VkViewport viewport);
+void CommandBufferDrawExample(CommandBufferData data, uint32_t index);
+void BindCommandBufferPipeline(CommandBufferData data, uint32_t index, PipelineData pipeline);
+void BeginCommandBufferRenderPass(CommandBufferData data, uint32_t index, VkFramebuffer framebuffer, VkRenderPass renderPass, VkExtent2D swapchainExtent);
+void EndCommandBufferRenderPass(CommandBufferData data, uint32_t index);
 void BeginCommandBufferRecording(CommandBufferData data, uint32_t index);
 void BeginCommandBufferRecording(CommandBufferData data, uint32_t index, RenderPassData renderPass, uint32_t subPass);
 void EndCommandBufferRecording(CommandBufferData data, uint32_t index);

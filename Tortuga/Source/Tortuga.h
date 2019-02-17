@@ -13,5 +13,6 @@
 #include "Tortuga/Graphics/FrameBuffers.h"
 #include "Tortuga/Graphics/CommandPool.h"
 #include "Tortuga/Graphics/CommandBuffer.h"
+#include "Tortuga/Graphics/Renderer.h"
 
 #endif
