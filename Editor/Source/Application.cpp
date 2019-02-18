@@ -48,6 +48,7 @@ int main(int argc, char **argv)
     Graphics::EndCommandBuffer(commandBuffer, 0);
 
     Graphics::SubmitCommands(renderer, {commandBuffer});
+    Graphics::DrawFrame(renderer);
 
     //Main loop
     bool isRunning = true;
@@ -62,9 +63,13 @@ int main(int argc, char **argv)
                 isRunning = false;
                 break;
             }
+            switch (event.type)
+            {
+            case SDL_KEYDOWN:
+                Graphics::DrawFrame(renderer);
+                break;
+            }
         }
-
-        Graphics::DrawFrame(renderer);
     }
 
     Graphics::DestroyRenderer(renderer);

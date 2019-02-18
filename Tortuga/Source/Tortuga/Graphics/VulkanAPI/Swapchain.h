@@ -9,7 +9,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t width, uint32_t height);
+SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t offsetX, uint32_t offsetY, uint32_t width, uint32_t height);
 void DestroySwapchain(SwapchainData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics

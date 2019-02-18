@@ -29,8 +29,8 @@ PipelineData CreatePipeline(DeviceData device, SwapchainData swapchain, RenderPa
 
   auto viewport = VkViewport();
   {
-    viewport.x = swapchain.Offset.x;
-    viewport.y = swapchain.Offset.y;
+    viewport.x = 0;
+    viewport.y = 0;
     viewport.width = (float)swapchain.Extent.width;
     viewport.height = (float)swapchain.Extent.height;
     viewport.minDepth = 0.0f;
@@ -39,8 +39,8 @@ PipelineData CreatePipeline(DeviceData device, SwapchainData swapchain, RenderPa
 
   auto scissor = VkRect2D();
   {
-    scissor.offset = {swapchain.Offset.x, swapchain.Offset.y};
-    scissor.extent = swapchain.Extent;
+    scissor.offset = {swapchain.OffsetX, swapchain.OffsetY};
+    scissor.extent = {swapchain.RenderWidth, swapchain.RenderHeight};
   }
 
   auto viewportState = VkPipelineViewportStateCreateInfo();

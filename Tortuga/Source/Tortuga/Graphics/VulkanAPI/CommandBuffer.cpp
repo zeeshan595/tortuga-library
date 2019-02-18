@@ -22,7 +22,7 @@ void BindCommandBufferPipeline(CommandBufferData data, uint32_t index, PipelineD
 {
   vkCmdBindPipeline(data.Buffer[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.Pipeline);
 }
-void BeginCommandBufferRenderPass(CommandBufferData data, uint32_t index, VkFramebuffer framebuffer, VkRenderPass renderPass, VkExtent2D swapchainExtent)
+void BeginCommandBufferRenderPass(CommandBufferData data, uint32_t index, VkFramebuffer framebuffer, VkRenderPass renderPass, VkOffset2D offset, VkExtent2D extent)
 {
   std::vector<VkClearValue> clearColor(1);
   {
@@ -34,8 +34,8 @@ void BeginCommandBufferRenderPass(CommandBufferData data, uint32_t index, VkFram
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = renderPass;
     renderPassInfo.framebuffer = framebuffer;
-    renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = swapchainExtent;
+    renderPassInfo.renderArea.offset = offset;
+    renderPassInfo.renderArea.extent = extent;
     renderPassInfo.clearValueCount = clearColor.size();
     renderPassInfo.pClearValues = clearColor.data();
   }

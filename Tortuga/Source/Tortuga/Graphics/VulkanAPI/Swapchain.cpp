@@ -102,7 +102,7 @@ VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities, uint32
   }
 }
 
-SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t width, uint32_t height)
+SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t offsetX, uint32_t offsetY, uint32_t width, uint32_t height)
 {
   VkBool32 isSurfaceSupported;
   if (vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.PresentFamily.value(), surface, &isSurfaceSupported) != VK_SUCCESS)
@@ -111,6 +111,10 @@ SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t 
   }
 
   auto data = SwapchainData();
+  data.OffsetX = offsetX;
+  data.OffsetY = offsetY;
+  data.RenderWidth = width;
+  data.RenderHeight = height;
 
   data.Device = device.Device;
   data.SupportDetails = QuerySwapChainSupport(device, surface);

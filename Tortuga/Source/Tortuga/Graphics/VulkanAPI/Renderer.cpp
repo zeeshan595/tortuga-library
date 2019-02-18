@@ -29,7 +29,8 @@ void SubmitCommands(RendererData data, std::vector<CommandBufferData> commandBuf
         data.CommandBuffer, i,
         data.FrameBuffers.FrameBuffers[i],
         data.RenderPass.RenderPass,
-        data.Swapchain.Extent);
+        {data.OffsetX, data.OffsetY},
+        {data.Width, data.Height});
 
     for (uint32_t j = 0; j < commandBuffers.size(); j++)
     {
@@ -87,6 +88,10 @@ RendererData CreateRenderer(DeviceData device, SwapchainData swapchain, FrameBuf
   data.Swapchain = swapchain;
   data.FrameBuffers = frameBuffers;
   data.RenderPass = renderPass;
+  data.OffsetX = swapchain.OffsetX;
+  data.OffsetY = swapchain.OffsetY;
+  data.Width = swapchain.RenderWidth;
+  data.Height = swapchain.RenderHeight;
 
   data.CommandPool = CreateCommandPool(device);
   data.CommandBuffer = CreateCommandBuffer(device, data.CommandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, swapchain.ImageCount);

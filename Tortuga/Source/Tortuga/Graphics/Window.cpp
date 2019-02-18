@@ -48,12 +48,12 @@ Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uin
     float ratio = (float)devices[i].VulkanDevice.Score / (float)maxDevicesScore;
     data.devicesViewportSize[i] = ratio * width;
 
-    data.VulkanSwapchain[i].Offset.x = swapchainOffset;
+    data.VulkanSwapchain[i].OffsetX = swapchainOffset;
     data.VulkanSwapchain[i] = VulkanAPI::CreateSwapchain(
         devices[i].VulkanDevice,
         data.VulkanWindow.Surface[i].Surface,
-        data.devicesViewportSize[i],
-        height);
+        swapchainOffset, 0,
+        data.devicesViewportSize[i], height);
 
     swapchainOffset += data.devicesViewportSize[i];
   }

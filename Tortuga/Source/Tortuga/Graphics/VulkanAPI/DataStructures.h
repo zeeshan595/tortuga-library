@@ -65,7 +65,10 @@ struct SwapChainSupportDetails
 
 struct SwapchainData
 {
-  glm::vec2 Offset = {0, 0};
+  uint32_t OffsetX;
+  uint32_t OffsetY;
+  uint32_t RenderWidth;
+  uint32_t RenderHeight;
   VkDevice Device = VK_NULL_HANDLE;
   SwapChainSupportDetails SupportDetails;
   VkSurfaceFormatKHR SurfaceFormat;
@@ -123,6 +126,10 @@ struct RendererData
   FrameBufferData FrameBuffers;
   RenderPassData RenderPass;
 
+  uint32_t OffsetX;
+  uint32_t OffsetY;
+  uint32_t Width;
+  uint32_t Height;
   CommandPoolData CommandPool;
   CommandBufferData CommandBuffer;
 

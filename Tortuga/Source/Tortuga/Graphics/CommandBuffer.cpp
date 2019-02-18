@@ -37,9 +37,9 @@ void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass render
 
     auto scissor = VkRect2D();
     {
-      scissor.offset.x = offset;
+      scissor.offset.x = 0;
       scissor.offset.y = 0;
-      scissor.extent.width = command.DevicesViewportSize[i];
+      scissor.extent.width = command.WindowWidth;
       scissor.extent.height = command.WindowHeight;
     }
 

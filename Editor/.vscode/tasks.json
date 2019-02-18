@@ -5,18 +5,18 @@
             "label": "debug",
             "type": "shell",
             "command": "cd ../Tortuga/ && make && cd ${workspaceFolder} && make",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher":"$gcc"
+            "group": "build",
+            "problemMatcher": "$gcc"
         },
         {
             "label": "build",
             "type": "shell",
             "command": "cd ../Tortuga/ && make build && cd ${workspaceFolder} && make build",
-            "group": "none",
-            "problemMatcher":"$gcc"
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
         }
     ]
 }

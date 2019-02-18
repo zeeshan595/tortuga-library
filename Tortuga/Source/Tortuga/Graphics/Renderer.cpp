@@ -20,6 +20,9 @@ void DrawFrame(Renderer data)
   for (uint32_t i = 0; i < data.VulkanRenderers.size(); i++)
   {
     VulkanAPI::DrawFrame(data.VulkanRenderers[i]);
+  }
+  for (uint32_t i = 0; i < data.VulkanRenderers.size(); i++)
+  {
     vkDeviceWaitIdle(data.VulkanDevices[i].Device);
   }
 }
