@@ -29,8 +29,8 @@ void SubmitCommands(RendererData data, std::vector<CommandBufferData> commandBuf
         data.CommandBuffer, i,
         data.FrameBuffers.FrameBuffers[i],
         data.RenderPass.RenderPass,
-        {data.OffsetX, data.OffsetY},
-        {data.Width, data.Height});
+        {0, 0},
+        data.Swapchain.Extent);
 
     for (uint32_t j = 0; j < commandBuffers.size(); j++)
     {
