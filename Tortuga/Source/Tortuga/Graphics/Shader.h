@@ -4,7 +4,7 @@
 #include "VulkanAPI/DataStructures.h"
 #include "VulkanAPI/Shader.h"
 
-#include "RenderingEngine.h"
+#include "HardwareController.h"
 #include "Window.h"
 
 namespace Tortuga
@@ -23,8 +23,8 @@ struct Shader
   std::vector<VulkanAPI::ShaderData> VulkanShader;
 };
 
-Shader CreateShaderFromFile(Window window, std::string filePath, ShaderType type);
-Shader CreateShader(Window window, std::vector<char> code, ShaderType type);
+Shader CreateShaderFromFile(HardwareController hardware, std::string filePath, ShaderType type);
+Shader CreateShader(HardwareController hardware, std::vector<char> code, ShaderType type);
 void DestroyShader(Shader data);
 }; // namespace Graphics
 }; // namespace Tortuga

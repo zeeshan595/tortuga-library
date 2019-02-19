@@ -4,7 +4,7 @@ namespace Tortuga
 {
 namespace Graphics
 {
-Shader CreateShaderFromFile(Window window, std::string filePath, ShaderType type)
+Shader CreateShaderFromFile(HardwareController hardware, std::string filePath, ShaderType type)
 {
   std::ifstream file(filePath, std::ios::ate | std::ios::binary);
   if (!file.is_open())
@@ -19,10 +19,10 @@ Shader CreateShaderFromFile(Window window, std::string filePath, ShaderType type
   file.read(buffer.data(), fileSize);
   file.close();
 
-  return CreateShader(window, buffer, type);
+  return CreateShader(hardware, buffer, type);
 }
 
-Shader CreateShader(Window window, std::vector<char> code, ShaderType type)
+Shader CreateShader(HardwareController hardware, std::vector<char> code, ShaderType type)
 {
   auto data = Shader();
 
@@ -46,10 +46,10 @@ Shader CreateShader(Window window, std::vector<char> code, ShaderType type)
     break;
   }
 
-  data.VulkanShader.resize(window.VulkanDevicesInUse.size());
-  for (uint32_t i = 0; i < window.VulkanDevicesInUse.size(); i++)
+  data.VulkanShader.resize(hardware.Devices.size());
+  for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
-    data.VulkanShader[i] = VulkanAPI::CreateShader(window.VulkanDevicesInUse[i], code, shaderFlags);
+    data.VulkanShader[i] = VulkanAPI::CreateShader(hardware.Devices[i].VulkanDevice, code, shaderFlags);
   }
 
   return data;

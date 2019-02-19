@@ -3,7 +3,7 @@
 
 #include "VulkanAPI/CommandBuffer.h"
 
-#include "Window.h"
+#include "HardwareController.h"
 #include "CommandPool.h"
 #include "RenderPass.h"
 #include "Pipeline.h"
@@ -17,11 +17,16 @@ enum CommandBufferLevel
   CommandBufferPrimary,
   CommandBufferSecondary
 };
+struct CommandBufferRect
+{
+  uint32_t OffsetX;
+  uint32_t OffsetY;
+  uint32_t Width;
+  uint32_t Height;
+};
 struct CommandBuffer
 {
-  uint32_t WindowWidth;
-  uint32_t WindowHeight;
-  std::vector<uint32_t> DevicesViewportSize;
+  HardwareController Hardware;
   std::vector<VulkanAPI::CommandBufferData> CommandBuffers;
 };
 
@@ -30,7 +35,7 @@ void BindCommandBufferPipeline(CommandBuffer command, uint32_t index, Pipeline p
 void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass renderPass, uint32_t subPass);
 void BeginCommandBuffer(CommandBuffer command, uint32_t index);
 void EndCommandBuffer(CommandBuffer command, uint32_t index);
-CommandBuffer CreateCommandBuffer(Window window, CommandPool pool, CommandBufferLevel level, uint32_t size);
+CommandBuffer CreateCommandBuffer(HardwareController hardware, CommandPool pool, CommandBufferLevel level, uint32_t size);
 }; // namespace Graphics
 }; // namespace Tortuga
 

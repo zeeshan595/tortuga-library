@@ -5,7 +5,7 @@
 #include "VulkanAPI/RenderPass.h"
 #include "VulkanAPI/Pipeline.h"
 
-#include "Window.h"
+#include "HardwareController.h"
 #include "RenderPass.h"
 #include "Shader.h"
 
@@ -18,7 +18,7 @@ struct Pipeline
   std::vector<VulkanAPI::PipelineData> VulkanPipeline;
 };
 
-Pipeline CreatePipeline(Window window, RenderPass renderPass, std::vector<Shader> shaders);
+Pipeline CreatePipeline(HardwareController hardware, RenderPass renderPass, std::vector<Shader> shaders);
 void DestroyPipeline(Pipeline data);
 
 }; // namespace Graphics

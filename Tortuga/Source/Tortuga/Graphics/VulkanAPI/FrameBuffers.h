@@ -9,7 +9,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-FrameBufferData CreateFrameBuffers(DeviceData device, SwapchainData swapchain, RenderPassData renderPass);
+FrameBufferData CreateFrameBuffers(DeviceData device, RenderPassData renderPass, std::vector<VkImageView> imageViews, uint32_t width, uint32_t height);
 void DestroyFrameBuffers(FrameBufferData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics

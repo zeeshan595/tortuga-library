@@ -3,7 +3,7 @@
 
 #include "VulkanAPI/FrameBuffers.h"
 
-#include "Window.h"
+#include "HardwareController.h"
 #include "RenderPass.h"
 
 namespace Tortuga
@@ -14,7 +14,7 @@ struct FrameBuffer
 {
   std::vector<VulkanAPI::FrameBufferData> VulkanFrameBuffers;
 };
-FrameBuffer CreateFrameBuffers(Window window, RenderPass renderPass);
+FrameBuffer CreateFrameBuffers(HardwareController hardware, RenderPass renderPass);
 void DestroyFrameBuffers(FrameBuffer data);
 }; // namespace Graphics
 }; // namespace Tortuga

@@ -6,7 +6,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-PipelineData CreatePipeline(DeviceData device, SwapchainData swapchain, RenderPassData renderPass, std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos)
+PipelineData CreatePipeline(DeviceData device, RenderPassData renderPass, VkExtent2D viewSize, std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos)
 {
   auto data = PipelineData();
   data.Device = device.Device;
@@ -31,16 +31,16 @@ PipelineData CreatePipeline(DeviceData device, SwapchainData swapchain, RenderPa
   {
     viewport.x = 0;
     viewport.y = 0;
-    viewport.width = (float)swapchain.Extent.width;
-    viewport.height = (float)swapchain.Extent.height;
+    viewport.width = (float)viewSize.width;
+    viewport.height = (float)viewSize.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
   }
 
   auto scissor = VkRect2D();
   {
-    scissor.offset = {swapchain.OffsetX, swapchain.OffsetY};
-    scissor.extent = {swapchain.RenderWidth, swapchain.RenderHeight};
+    scissor.offset = {0, 0};
+    scissor.extent = viewSize;
   }
 
   auto viewportState = VkPipelineViewportStateCreateInfo();

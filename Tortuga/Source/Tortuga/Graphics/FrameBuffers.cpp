@@ -4,17 +4,19 @@ namespace Tortuga
 {
 namespace Graphics
 {
-FrameBuffer CreateFrameBuffers(Window window, RenderPass renderPass)
+FrameBuffer CreateFrameBuffers(HardwareController hardware, RenderPass renderPass)
 {
   auto data = FrameBuffer();
 
-  data.VulkanFrameBuffers.resize(window.VulkanDevicesInUse.size());
-  for (uint32_t i = 0; i < window.VulkanDevicesInUse.size(); i++)
+  data.VulkanFrameBuffers.resize(hardware.Devices.size());
+  for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
     data.VulkanFrameBuffers[i] = VulkanAPI::CreateFrameBuffers(
-        window.VulkanDevicesInUse[i],
-        window.VulkanSwapchain[i],
-        renderPass.VulkanRenderPass[i]);
+        hardware.Devices[i].VulkanDevice,
+        renderPass.VulkanRenderPass[i],
+        {/* TODO: FRAME BUFFER IMAGES! */},
+        hardware.Devices[i].Viewport.Width,
+        hardware.Devices[i].Viewport.Height);
   }
 
   return data;

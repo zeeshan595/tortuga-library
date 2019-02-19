@@ -23,13 +23,11 @@ struct Window
 {
   uint32_t Width;
   uint32_t Height;
-  std::vector<uint32_t> devicesViewportSize;
   VulkanAPI::WindowData VulkanWindow;
-  std::vector<VulkanAPI::SwapchainData> VulkanSwapchain;
-  std::vector<VulkanAPI::DeviceData> VulkanDevicesInUse;
+  VulkanAPI::SwapchainData VulkanSwapchain;
 };
 
-Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uint32_t width, uint32_t height, WindowType type);
+Window CreateWindow(RenderingDevice devices, std::string title, uint32_t width, uint32_t height, WindowType type);
 void DestroyWindow(Window data);
 }; // namespace Graphics
 }; // namespace Tortuga

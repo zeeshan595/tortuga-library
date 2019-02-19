@@ -4,7 +4,7 @@
 #include "VulkanAPI/DataStructures.h"
 #include "VulkanAPI/CommandPool.h"
 
-#include "Window.h"
+#include "HardwareController.h"
 
 namespace Tortuga
 {
@@ -14,7 +14,7 @@ struct CommandPool
 {
   std::vector<VulkanAPI::CommandPoolData> VulkanCommandPool;
 };
-CommandPool CreateCommandPool(Window window);
+CommandPool CreateCommandPool(HardwareController hardware);
 void DestroyCommandPool(CommandPool pool);
 }; // namespace Graphics
 }; // namespace Tortuga

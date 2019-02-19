@@ -4,7 +4,7 @@
 #include "VulkanAPI/DataStructures.h"
 #include "VulkanAPI/RenderPass.h"
 
-#include "Window.h"
+#include "HardwareController.h"
 
 namespace Tortuga
 {
@@ -15,7 +15,7 @@ struct RenderPass
   std::vector<VulkanAPI::RenderPassData> VulkanRenderPass;
 };
 
-RenderPass CreateRenderPass(Window window);
+RenderPass CreateRenderPass(HardwareController hardware);
 void DestroyRenderPass(RenderPass data);
 }; // namespace Graphics
 }; // namespace Tortuga

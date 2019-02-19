@@ -18,29 +18,31 @@ int main(int argc, char **argv)
 
     auto renderingEngine = Graphics::CreateRenderingEngine();
     auto window = Graphics::CreateWindow(
-        {renderingEngine.Devices[0], renderingEngine.Devices[0]},
+        renderingEngine.Devices[renderingEngine.MainDeviceIndex],
         "Hello World",
         1024, 768,
         Graphics::WindowType::ResizeableWindowed);
 
-    auto renderpass = Graphics::CreateRenderPass(window);
-    auto framebuffers = Graphics::CreateFrameBuffers(window, renderpass);
+    auto hardware = Graphics::CreateHardwareController(renderingEngine, window);
+
+    auto renderpass = Graphics::CreateRenderPass(hardware);
+    auto framebuffers = Graphics::CreateFrameBuffers(hardware, renderpass);
 
     auto vertexShader = Graphics::CreateShaderFromFile(
-        window,
+        hardware,
         workingDirectory + "/Shaders/simple.vert.spv",
         Graphics::ShaderType::Vertex);
 
     auto fragmentShader = Graphics::CreateShaderFromFile(
-        window,
+        hardware,
         workingDirectory + "/Shaders/simple.frag.spv",
         Graphics::ShaderType::Fragment);
-    auto pipeline = Graphics::CreatePipeline(window, renderpass, {vertexShader, fragmentShader});
+    auto pipeline = Graphics::CreatePipeline(hardware, renderpass, {vertexShader, fragmentShader});
 
-    auto commandPool = Graphics::CreateCommandPool(window);
-    auto commandBuffer = Graphics::CreateCommandBuffer(window, commandPool, Graphics::CommandBufferLevel::CommandBufferSecondary, 1);
+    auto commandPool = Graphics::CreateCommandPool(hardware);
+    auto commandBuffer = Graphics::CreateCommandBuffer(hardware, commandPool, Graphics::CommandBufferLevel::CommandBufferSecondary, 1);
 
-    auto renderer = Graphics::CreateRenderer(window, framebuffers, renderpass);
+    auto renderer = Graphics::CreateRenderer(hardware, framebuffers, renderpass);
 
     Graphics::BeginCommandBuffer(commandBuffer, 0, renderpass, 0);
     Graphics::BindCommandBufferPipeline(commandBuffer, 0, pipeline);

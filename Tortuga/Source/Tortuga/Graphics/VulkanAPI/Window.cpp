@@ -6,13 +6,8 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-WindowData CreateWindow(std::vector<VulkanAPI::DeviceData> devices, std::string title, uint32_t width, uint32_t height, Uint32 windowFlags)
+WindowData CreateWindow(VulkanAPI::DeviceData device, std::string title, uint32_t width, uint32_t height, Uint32 windowFlags)
 {
-  if (devices.size() <= 0)
-  {
-    Console::Fatal("Cannot create window without a GPU!");
-  }
-
   auto data = WindowData();
 
   data.Window = SDL_CreateWindow(
@@ -21,26 +16,17 @@ WindowData CreateWindow(std::vector<VulkanAPI::DeviceData> devices, std::string 
       width, height,
       windowFlags);
 
-  data.Surface.resize(devices.size());
-  for (uint32_t i = 0; i < devices.size(); i++)
+  if (SDL_Vulkan_CreateSurface(data.Window, device.Instance, &data.Surface.Surface) == false)
   {
-    data.Surface[i].Device = devices[i].Device;
-    data.Surface[i].Instance = devices[i].Instance;
-    if (SDL_Vulkan_CreateSurface(data.Window, devices[i].Instance, &data.Surface[i].Surface) == false)
-    {
-      Console::Fatal("Failed to create vulkan surface for a window");
-    }
+    Console::Fatal("Failed to create vulkan surface for a window");
   }
 
   return data;
-}
+} // namespace VulkanAPI
 
 void DestroyWindow(WindowData data)
 {
-  for (uint32_t i = 0; i < data.Surface.size(); i++)
-  {
-    vkDestroySurfaceKHR(data.Surface[i].Instance, data.Surface[i].Surface, nullptr);
-  }
+  vkDestroySurfaceKHR(data.Surface.Instance, data.Surface.Surface, nullptr);
   SDL_DestroyWindow(data.Window);
 }
 }; // namespace VulkanAPI

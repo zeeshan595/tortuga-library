@@ -4,24 +4,12 @@ namespace Tortuga
 {
 namespace Graphics
 {
-Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uint32_t width, uint32_t height, WindowType type)
+Window CreateWindow(RenderingDevice device, std::string title, uint32_t width, uint32_t height, WindowType type)
 {
-  if (devices.size() <= 0)
-  {
-    Console::Fatal("Cannot create a window without a device!");
-  }
 
   auto data = Window();
   data.Width = width;
   data.Height = height;
-
-  uint32_t maxDevicesScore = 0;
-  data.VulkanDevicesInUse.resize(devices.size());
-  for (uint32_t i = 0; i < data.VulkanDevicesInUse.size(); i++)
-  {
-    data.VulkanDevicesInUse[i] = devices[i].VulkanDevice;
-    maxDevicesScore += devices[i].VulkanDevice.Score;
-  }
 
   Uint32 windowFlags = SDL_WINDOW_VULKAN;
   switch (type)
@@ -39,33 +27,19 @@ Window CreateWindow(std::vector<RenderingDevice> devices, std::string title, uin
     windowFlags |= SDL_WINDOW_FULLSCREEN;
     break;
   }
-  data.VulkanWindow = VulkanAPI::CreateWindow(data.VulkanDevicesInUse, title, width, height, windowFlags);
-  data.VulkanSwapchain.resize(data.VulkanDevicesInUse.size());
-  data.devicesViewportSize.resize(data.VulkanDevicesInUse.size());
-  float swapchainOffset = 0.0f;
-  for (uint32_t i = 0; i < data.VulkanDevicesInUse.size(); i++)
-  {
-    float ratio = (float)devices[i].VulkanDevice.Score / (float)maxDevicesScore;
-    data.devicesViewportSize[i] = ratio * width;
+  data.VulkanWindow = VulkanAPI::CreateWindow(device.VulkanDevice, title, width, height, windowFlags);
+  data.VulkanSwapchain = VulkanAPI::CreateSwapchain(
+      device.VulkanDevice,
+      data.VulkanWindow.Surface.Surface,
+      0, 0,
+      width, height);
 
-    data.VulkanSwapchain[i].OffsetX = swapchainOffset;
-    data.VulkanSwapchain[i] = VulkanAPI::CreateSwapchain(
-        devices[i].VulkanDevice,
-        data.VulkanWindow.Surface[i].Surface,
-        swapchainOffset, 0,
-        data.devicesViewportSize[i], height);
-
-    swapchainOffset += data.devicesViewportSize[i];
-  }
   return data;
 }
 
 void DestroyWindow(Window data)
 {
-  for (uint32_t i = 0; i < data.VulkanSwapchain.size(); i++)
-  {
-    VulkanAPI::DestroySwapchain(data.VulkanSwapchain[i]);
-  }
+  VulkanAPI::DestroySwapchain(data.VulkanSwapchain);
   VulkanAPI::DestroyWindow(data.VulkanWindow);
 }
 }; // namespace Graphics

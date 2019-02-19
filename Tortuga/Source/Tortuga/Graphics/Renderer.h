@@ -4,7 +4,7 @@
 #include "VulkanAPI/Device.h"
 #include "VulkanAPI/Renderer.h"
 
-#include "Window.h"
+#include "HardwareController.h"
 #include "FrameBuffers.h"
 #include "RenderPass.h"
 #include "CommandBuffer.h"
@@ -15,12 +15,12 @@ namespace Graphics
 {
 struct Renderer
 {
-  std::vector<VulkanAPI::DeviceData> VulkanDevices;
+  HardwareController Hardware;
   std::vector<VulkanAPI::RendererData> VulkanRenderers;
 };
 void SubmitCommands(Renderer data, std::vector<CommandBuffer> commands);
 void DrawFrame(Renderer data);
-Renderer CreateRenderer(Window window, FrameBuffer frameBuffer, RenderPass renderPass);
+Renderer CreateRenderer(HardwareController hardware, FrameBuffer frameBuffer, RenderPass renderPass);
 void DestroyRenderer(Renderer data);
 }; // namespace Graphics
 }; // namespace Tortuga

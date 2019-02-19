@@ -6,14 +6,14 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-RenderPassData CreateRenderPass(DeviceData device, SwapchainData swapchain)
+RenderPassData CreateRenderPass(DeviceData device, VkFormat surfaceFormat)
 {
   auto data = RenderPassData();
   data.Device = device.Device;
 
   auto colorAttachment = VkAttachmentDescription();
   {
-    colorAttachment.format = swapchain.SurfaceFormat.format;
+    colorAttachment.format = surfaceFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;

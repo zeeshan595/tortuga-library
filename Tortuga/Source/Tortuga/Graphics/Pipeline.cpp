@@ -4,12 +4,12 @@ namespace Tortuga
 {
 namespace Graphics
 {
-Pipeline CreatePipeline(Window window, RenderPass renderPass, std::vector<Shader> shaders)
+Pipeline CreatePipeline(HardwareController hardware, RenderPass renderPass, std::vector<Shader> shaders)
 {
   auto data = Pipeline();
 
-  data.VulkanPipeline.resize(window.VulkanDevicesInUse.size());
-  for (uint32_t i = 0; i < window.VulkanDevicesInUse.size(); i++)
+  data.VulkanPipeline.resize(hardware.Devices.size());
+  for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
     std::vector<VkPipelineShaderStageCreateInfo> shaderInfos(shaders.size());
     for (uint32_t j = 0; j < shaders.size(); j++)
@@ -18,9 +18,10 @@ Pipeline CreatePipeline(Window window, RenderPass renderPass, std::vector<Shader
     }
 
     data.VulkanPipeline[i] = VulkanAPI::CreatePipeline(
-        window.VulkanDevicesInUse[i],
-        window.VulkanSwapchain[i],
+        hardware.Devices[i].VulkanDevice,
         renderPass.VulkanRenderPass[i],
+        {hardware.Devices[i].Viewport.Width,
+         hardware.Devices[i].Viewport.Height},
         shaderInfos);
   }
 

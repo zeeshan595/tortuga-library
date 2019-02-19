@@ -4,14 +4,14 @@ namespace Tortuga
 {
 namespace Graphics
 {
-CommandPool CreateCommandPool(Window window)
+CommandPool CreateCommandPool(HardwareController hardware)
 {
   auto data = CommandPool();
 
-  data.VulkanCommandPool.resize(window.VulkanDevicesInUse.size());
-  for (uint32_t i = 0; i < window.VulkanDevicesInUse.size(); i++)
+  data.VulkanCommandPool.resize(hardware.Devices.size());
+  for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
-    data.VulkanCommandPool[i] = VulkanAPI::CreateCommandPool(window.VulkanDevicesInUse[i]);
+    data.VulkanCommandPool[i] = VulkanAPI::CreateCommandPool(hardware.Devices[i].VulkanDevice);
   }
 
   return data;

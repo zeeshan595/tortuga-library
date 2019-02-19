@@ -53,7 +53,7 @@ struct SurfaceData
 struct WindowData
 {
   SDL_Window *Window;
-  std::vector<SurfaceData> Surface;
+  SurfaceData Surface;
 };
 
 struct SwapChainSupportDetails
@@ -65,10 +65,6 @@ struct SwapChainSupportDetails
 
 struct SwapchainData
 {
-  uint32_t OffsetX;
-  uint32_t OffsetY;
-  uint32_t RenderWidth;
-  uint32_t RenderHeight;
   VkDevice Device = VK_NULL_HANDLE;
   SwapChainSupportDetails SupportDetails;
   VkSurfaceFormatKHR SurfaceFormat;
@@ -104,7 +100,7 @@ struct RenderPassData
 struct FrameBufferData
 {
   VkDevice Device;
-  std::vector<VkFramebuffer> FrameBuffers;
+  VkFramebuffer FrameBuffers;
 };
 
 struct CommandPoolData
@@ -126,10 +122,6 @@ struct RendererData
   FrameBufferData FrameBuffers;
   RenderPassData RenderPass;
 
-  uint32_t OffsetX;
-  uint32_t OffsetY;
-  uint32_t Width;
-  uint32_t Height;
   CommandPoolData CommandPool;
   CommandBufferData CommandBuffer;
 

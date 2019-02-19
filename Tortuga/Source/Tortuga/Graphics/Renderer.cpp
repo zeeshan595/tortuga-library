@@ -26,16 +26,16 @@ void DrawFrame(Renderer data)
     vkDeviceWaitIdle(data.VulkanDevices[i].Device);
   }
 }
-Renderer CreateRenderer(Window window, FrameBuffer frameBuffer, RenderPass renderPass)
+Renderer CreateRenderer(HardwareController hardware, FrameBuffer frameBuffer, RenderPass renderPass)
 {
   auto data = Renderer();
-  data.VulkanDevices = window.VulkanDevicesInUse;
+  data.Hardware = hardware;
 
-  data.VulkanRenderers.resize(window.VulkanDevicesInUse.size());
-  for (uint32_t i = 0; i < window.VulkanDevicesInUse.size(); i++)
+  data.VulkanRenderers.resize(hardware.Devices.size());
+  for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
     data.VulkanRenderers[i] = VulkanAPI::CreateRenderer(
-        window.VulkanDevicesInUse[i],
+        hardware.Devices[i].VulkanDevice,
         window.VulkanSwapchain[i],
         frameBuffer.VulkanFrameBuffers[i],
         renderPass.VulkanRenderPass[i]);

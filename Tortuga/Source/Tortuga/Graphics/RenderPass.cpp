@@ -4,16 +4,16 @@ namespace Tortuga
 {
 namespace Graphics
 {
-RenderPass CreateRenderPass(Window window)
+RenderPass CreateRenderPass(HardwareController hardware)
 {
   auto data = RenderPass();
 
-  data.VulkanRenderPass.resize(window.VulkanDevicesInUse.size());
-  for (uint32_t i = 0; i < window.VulkanDevicesInUse.size(); i++)
+  data.VulkanRenderPass.resize(hardware.Devices.size());
+  for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
     data.VulkanRenderPass[i] = VulkanAPI::CreateRenderPass(
-        window.VulkanDevicesInUse[i],
-        window.VulkanSwapchain[i]);
+        hardware.Devices[i].VulkanDevice,
+        hardware.VulkanSurfaceFormat);
   }
 
   return data;

@@ -9,7 +9,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-RenderPassData CreateRenderPass(DeviceData device, SwapchainData swapchain);
+RenderPassData CreateRenderPass(DeviceData device, VkFormat surfaceFormat);
 void DestroyRenderPass(RenderPassData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics
