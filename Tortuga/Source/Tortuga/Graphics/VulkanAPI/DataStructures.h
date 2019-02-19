@@ -118,9 +118,6 @@ struct CommandBufferData
 struct RendererData
 {
   DeviceData Device;
-  SwapchainData Swapchain;
-  FrameBufferData FrameBuffers;
-  RenderPassData RenderPass;
 
   CommandPoolData CommandPool;
   CommandBufferData CommandBuffer;

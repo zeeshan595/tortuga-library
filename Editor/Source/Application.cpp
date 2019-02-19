@@ -1,5 +1,13 @@
 #include <Tortuga.h>
 
+/*
+TODO: 
+* Create Images for framebuffers
+* Use fake frame buffers to render the scene `renderer`
+* Use `Blit` to push frame bufer data to a single swapchain
+* Use present queue to display swapchain
+*/
+
 using namespace Tortuga;
 
 std::string GetWorkingDirectory(std::string executablePath)

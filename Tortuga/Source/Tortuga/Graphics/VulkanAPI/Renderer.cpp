@@ -85,16 +85,9 @@ RendererData CreateRenderer(DeviceData device, SwapchainData swapchain, FrameBuf
 {
   auto data = RendererData();
   data.Device = device;
-  data.Swapchain = swapchain;
-  data.FrameBuffers = frameBuffers;
-  data.RenderPass = renderPass;
-  data.OffsetX = swapchain.OffsetX;
-  data.OffsetY = swapchain.OffsetY;
-  data.Width = swapchain.RenderWidth;
-  data.Height = swapchain.RenderHeight;
 
   data.CommandPool = CreateCommandPool(device);
-  data.CommandBuffer = CreateCommandBuffer(device, data.CommandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, swapchain.ImageCount);
+  data.CommandBuffer = CreateCommandBuffer(device, data.CommandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
 
   data.ImageAvailableSemaphore = CreateSemaphire(device);
   data.RenderFinishedSemaphore = CreateSemaphire(device);
