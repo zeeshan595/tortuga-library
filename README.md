@@ -13,7 +13,7 @@ Before building Tortuga, you must install the required dependencies. Below is a 
 
 You can follow the instructions to install these dependencies in Ubuntu
 
-1. `sudo apt install libvulkan1 libvulkan-dev libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libglm-dev`
+1. `sudo apt install libvulkan1 libvulkan-dev libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libglm-dev vulkan-utils`
 2. SDL2 might not come with vulkan support. But you can compile SDL2 yourself from `https://www.libsdl.org/download-2.0.php` Replace the compiled SDL2 with the system SDL2. `/usr/include/SDL2/` & `/usr/lib/x86_64-linux-gnu/`
 3. Download glslang Validator for compiling shaders from `https://github.com/KhronosGroup/glslang/releases`
 
