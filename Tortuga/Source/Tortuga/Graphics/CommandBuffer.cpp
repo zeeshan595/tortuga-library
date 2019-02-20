@@ -25,10 +25,10 @@ void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass render
     VulkanAPI::BeginCommandBufferRecording(command.CommandBuffers[i], index, renderPass.VulkanRenderPass[i], subPass);
     auto viewport = VkViewport();
     {
-      viewport.x = command.Hardware.Devices[i].Viewport.Y;
-      viewport.y = command.Hardware.Devices[i].Viewport.Y;
-      viewport.width = command.Hardware.Devices[i].Viewport.Width;
-      viewport.height = command.Hardware.Devices[i].Viewport.Height;
+      viewport.x = 0;
+      viewport.y = 0;
+      viewport.width = command.Hardware.FullWidth;
+      viewport.height = command.Hardware.FullHeight;
       viewport.minDepth = 0;
       viewport.maxDepth = 1;
     }
@@ -36,7 +36,7 @@ void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass render
 
     auto scissor = VkRect2D();
     {
-      scissor.offset.x = command.Hardware.Devices[i].Viewport.Y;
+      scissor.offset.x = command.Hardware.Devices[i].Viewport.X;
       scissor.offset.y = command.Hardware.Devices[i].Viewport.Y;
       scissor.extent.width = command.Hardware.Devices[i].Viewport.Width;
       scissor.extent.height = command.Hardware.Devices[i].Viewport.Height;

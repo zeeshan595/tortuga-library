@@ -71,7 +71,7 @@ void DrawFrame(Renderer data)
     VulkanAPI::DrawFrame(data.VulkanRenderers[i]);
 
   for (uint32_t i = 0; i < data.Hardware.Devices.size(); i++)
-    vkDeviceWaitIdle(data.Hardware.Devices[0].VulkanDevice.Device);
+    vkDeviceWaitIdle(data.Hardware.Devices[i].VulkanDevice.Device);
 
   uint32_t imageIndex;
   vkAcquireNextImageKHR(
@@ -95,7 +95,10 @@ void DrawFrame(Renderer data)
     queueInfo.pSignalSemaphores = &data.PresentImageSemaphore;
     queueInfo.pWaitDstStageMask = waitStages.data();
   }
-  vkQueueSubmit(data.Hardware.VulkanMainDevice.GraphicQueue, 1, &queueInfo, VK_NULL_HANDLE);
+  if (vkQueueSubmit(data.Hardware.VulkanMainDevice.GraphicQueue, 1, &queueInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+  {
+    Console::Fatal("Failed to submit command to device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+  }
 
   //Present image on the screen
   std::vector<VkSemaphore> waitSemaphores = {data.PresentImageSemaphore};
@@ -109,7 +112,10 @@ void DrawFrame(Renderer data)
     presentInfo.pSwapchains = swapChains.data();
     presentInfo.pImageIndices = &imageIndex;
   }
-  vkQueuePresentKHR(data.Hardware.VulkanMainDevice.PresentQueue, &presentInfo);
+  if (vkQueuePresentKHR(data.Hardware.VulkanMainDevice.PresentQueue, &presentInfo) != VK_SUCCESS)
+  {
+    Console::Fatal("Failed to present image from device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+  }
 }
 Renderer CreateRenderer(HardwareController hardware, Window window, FrameBuffer frameBuffer, RenderPass renderPass)
 {
