@@ -9,6 +9,8 @@ namespace VulkanAPI
 WindowData CreateWindow(VulkanAPI::DeviceData device, std::string title, uint32_t width, uint32_t height, Uint32 windowFlags)
 {
   auto data = WindowData();
+  data.Surface.Instance = device.Instance;
+  data.Surface.Device = device.Device;
 
   data.Window = SDL_CreateWindow(
       title.c_str(),

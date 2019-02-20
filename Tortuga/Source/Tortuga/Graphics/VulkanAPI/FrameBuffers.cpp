@@ -6,10 +6,17 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-FrameBufferData CreateFrameBuffers(DeviceData device, RenderPassData renderPass, std::vector<VkImageView> imageViews, uint32_t width, uint32_t height)
+FrameBufferData CreateFrameBuffers(DeviceData device, RenderPassData renderPass, std::vector<VulkanImageData> images, uint32_t width, uint32_t height)
 {
   auto data = FrameBufferData();
   data.Device = device.Device;
+  data.Images = images;
+  data.Width = width;
+  data.Height = height;
+
+  std::vector<VkImageView> imageViews(images.size());
+  for (uint32_t i = 0; i < images.size(); i++)
+    imageViews[i] = images[i].ImageView;
 
   auto frameBufferInfo = VkFramebufferCreateInfo();
   {

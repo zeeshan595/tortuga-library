@@ -27,16 +27,15 @@ void SubmitCommands(RendererData data, std::vector<CommandBufferData> commandBuf
     BeginCommandBufferRecording(data.CommandBuffer, i);
     BeginCommandBufferRenderPass(
         data.CommandBuffer, i,
-        data.FrameBuffers.FrameBuffers[i],
+        data.FrameBuffers.FrameBuffers,
         data.RenderPass.RenderPass,
         {0, 0},
-        data.Swapchain.Extent);
+        {data.FrameBuffers.Width, data.FrameBuffers.Height});
 
     for (uint32_t j = 0; j < commandBuffers.size(); j++)
     {
       vkCmdExecuteCommands(data.CommandBuffer.Buffer[i], commandBuffers[j].Buffer.size(), commandBuffers[j].Buffer.data());
     }
-
     EndCommandBufferRenderPass(data.CommandBuffer, i);
     EndCommandBufferRecording(data.CommandBuffer, i);
   }
@@ -44,9 +43,6 @@ void SubmitCommands(RendererData data, std::vector<CommandBufferData> commandBuf
 
 void DrawFrame(RendererData data)
 {
-  uint32_t imageIndex;
-  vkAcquireNextImageKHR(data.Device.Device, data.Swapchain.Swapchain, std::numeric_limits<uint64_t>::max(), data.ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
-
   std::vector<VkSemaphore> waitSemaphores = {data.ImageAvailableSemaphore};
   std::vector<VkPipelineStageFlags> waitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
   std::vector<VkSemaphore> signalSemaphores = {data.RenderFinishedSemaphore};
@@ -54,36 +50,25 @@ void DrawFrame(RendererData data)
   auto submitInfo = VkSubmitInfo();
   {
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.waitSemaphoreCount = waitSemaphores.size();
-    submitInfo.pWaitSemaphores = waitSemaphores.data();
+    submitInfo.waitSemaphoreCount = 0;
+    submitInfo.pWaitSemaphores = nullptr;
     submitInfo.signalSemaphoreCount = signalSemaphores.size();
     submitInfo.pSignalSemaphores = signalSemaphores.data();
     submitInfo.pWaitDstStageMask = waitStages.data();
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &data.CommandBuffer.Buffer[imageIndex];
+    submitInfo.commandBufferCount = data.CommandBuffer.Buffer.size();
+    submitInfo.pCommandBuffers = data.CommandBuffer.Buffer.data();
   }
   if (vkQueueSubmit(data.Device.GraphicQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
   {
     Console::Fatal("Failed to submit draw command buffer on device: {0}", Console::Arguments() << data.Device.Properties.deviceName);
   }
-
-  std::vector<VkSwapchainKHR> swapChains = {data.Swapchain.Swapchain};
-  auto presentInfo = VkPresentInfoKHR();
-  {
-    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.waitSemaphoreCount = signalSemaphores.size();
-    presentInfo.pWaitSemaphores = signalSemaphores.data();
-    presentInfo.swapchainCount = swapChains.size();
-    presentInfo.pSwapchains = swapChains.data();
-    presentInfo.pImageIndices = &imageIndex;
-    presentInfo.pResults = nullptr; // Optional
-  }
-  vkQueuePresentKHR(data.Device.PresentQueue, &presentInfo);
 }
 
-RendererData CreateRenderer(DeviceData device, SwapchainData swapchain, FrameBufferData frameBuffers, RenderPassData renderPass)
+RendererData CreateRenderer(DeviceData device, FrameBufferData frameBuffers, RenderPassData renderPass)
 {
   auto data = RendererData();
+  data.FrameBuffers = frameBuffers;
+  data.RenderPass = renderPass;
   data.Device = device;
 
   data.CommandPool = CreateCommandPool(device);

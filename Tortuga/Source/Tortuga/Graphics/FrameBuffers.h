@@ -5,6 +5,7 @@
 
 #include "HardwareController.h"
 #include "RenderPass.h"
+#include "VulkanAPI/VulkanImage.h"
 
 namespace Tortuga
 {
@@ -12,6 +13,7 @@ namespace Graphics
 {
 struct FrameBuffer
 {
+  std::vector<VulkanAPI::VulkanImageData> Images;
   std::vector<VulkanAPI::FrameBufferData> VulkanFrameBuffers;
 };
 FrameBuffer CreateFrameBuffers(HardwareController hardware, RenderPass renderPass);

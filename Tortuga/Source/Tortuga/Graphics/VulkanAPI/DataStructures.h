@@ -56,6 +56,14 @@ struct WindowData
   SurfaceData Surface;
 };
 
+struct VulkanImageData
+{
+  VkDevice Device;
+  VkImage Image;
+  VkDeviceMemory Memory;
+  VkImageView ImageView;
+};
+
 struct SwapChainSupportDetails
 {
   VkSurfaceCapabilitiesKHR Capabilities;
@@ -100,7 +108,10 @@ struct RenderPassData
 struct FrameBufferData
 {
   VkDevice Device;
+  std::vector<VulkanImageData> Images;
   VkFramebuffer FrameBuffers;
+  uint32_t Width;
+  uint32_t Height;
 };
 
 struct CommandPoolData
@@ -118,6 +129,8 @@ struct CommandBufferData
 struct RendererData
 {
   DeviceData Device;
+  FrameBufferData FrameBuffers;
+  RenderPassData RenderPass;
 
   CommandPoolData CommandPool;
   CommandBufferData CommandBuffer;

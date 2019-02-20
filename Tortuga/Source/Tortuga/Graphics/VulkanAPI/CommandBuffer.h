@@ -9,6 +9,8 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+void CommandBufferSubmit(CommandBufferData data, VkQueue queue, bool waitUntilComplete = false);
+void CommandBufferImageLayoutTransfer(CommandBufferData data, uint32_t index, VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
 void SetScissors(CommandBufferData data, uint32_t index, VkRect2D rect);
 void SetViewport(CommandBufferData data, uint32_t index, VkViewport viewport);
 void CommandBufferDrawExample(CommandBufferData data, uint32_t index);

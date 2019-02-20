@@ -6,6 +6,22 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+uint32_t FindMemoryType(DeviceData device, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+  VkPhysicalDeviceMemoryProperties memoryProperties;
+  vkGetPhysicalDeviceMemoryProperties(device.PhysicalDevice, &memoryProperties);
+
+  for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
+  {
+    if ((typeFilter & (1 << i)) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+    {
+      return i;
+    }
+  }
+
+  Console::Fatal("Failed to find suitable memory type on device: {0}", device.Properties.deviceName);
+  return 0;
+}
 bool CheckDeviceExtensionSupport(VkPhysicalDevice physicalDevice, std::vector<const char *> extensions)
 {
   uint32_t extensionCount;

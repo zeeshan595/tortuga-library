@@ -20,8 +20,7 @@ Pipeline CreatePipeline(HardwareController hardware, RenderPass renderPass, std:
     data.VulkanPipeline[i] = VulkanAPI::CreatePipeline(
         hardware.Devices[i].VulkanDevice,
         renderPass.VulkanRenderPass[i],
-        {hardware.Devices[i].Viewport.Width,
-         hardware.Devices[i].Viewport.Height},
+        {hardware.FullWidth, hardware.FullHeight},
         shaderInfos);
   }
 

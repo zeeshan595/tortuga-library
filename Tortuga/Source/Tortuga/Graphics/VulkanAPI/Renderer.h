@@ -13,7 +13,7 @@ namespace VulkanAPI
 {
 void SubmitCommands(RendererData data, std::vector<CommandBufferData> commandBuffers);
 void DrawFrame(RendererData data);
-RendererData CreateRenderer(DeviceData device, SwapchainData swapchain, FrameBufferData frameBuffers, RenderPassData renderPass);
+RendererData CreateRenderer(DeviceData device, FrameBufferData frameBuffers, RenderPassData renderPass);
 void DestroyRenderer(RendererData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics

@@ -111,10 +111,6 @@ SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t 
   }
 
   auto data = SwapchainData();
-  data.OffsetX = offsetX;
-  data.OffsetY = offsetY;
-  data.RenderWidth = width;
-  data.RenderHeight = height;
 
   data.Device = device.Device;
   data.SupportDetails = QuerySwapChainSupport(device, surface);
@@ -138,7 +134,7 @@ SwapchainData CreateSwapchain(DeviceData device, VkSurfaceKHR surface, uint32_t 
     createInfo.imageColorSpace = data.SurfaceFormat.colorSpace;
     createInfo.imageExtent = data.Extent;
     createInfo.imageArrayLayers = 1;
-    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     uint32_t queueFamilyIndices[] = {
         device.QueueFamilies.GraphicsFamily.value(),

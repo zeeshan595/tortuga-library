@@ -1,13 +1,5 @@
 #include <Tortuga.h>
 
-/*
-TODO: 
-* Create Images for framebuffers
-* Use fake frame buffers to render the scene `renderer`
-* Use `Blit` to push frame bufer data to a single swapchain
-* Use present queue to display swapchain
-*/
-
 using namespace Tortuga;
 
 std::string GetWorkingDirectory(std::string executablePath)
@@ -31,7 +23,10 @@ int main(int argc, char **argv)
         1024, 768,
         Graphics::WindowType::ResizeableWindowed);
 
-    auto hardware = Graphics::CreateHardwareController(renderingEngine, window);
+    auto hardware = Graphics::CreateHardwareController(
+        renderingEngine,
+        window,
+        {renderingEngine.Devices[0], renderingEngine.Devices[0]});
 
     auto renderpass = Graphics::CreateRenderPass(hardware);
     auto framebuffers = Graphics::CreateFrameBuffers(hardware, renderpass);
@@ -50,7 +45,7 @@ int main(int argc, char **argv)
     auto commandPool = Graphics::CreateCommandPool(hardware);
     auto commandBuffer = Graphics::CreateCommandBuffer(hardware, commandPool, Graphics::CommandBufferLevel::CommandBufferSecondary, 1);
 
-    auto renderer = Graphics::CreateRenderer(hardware, framebuffers, renderpass);
+    auto renderer = Graphics::CreateRenderer(hardware, window, framebuffers, renderpass);
 
     Graphics::BeginCommandBuffer(commandBuffer, 0, renderpass, 0);
     Graphics::BindCommandBufferPipeline(commandBuffer, 0, pipeline);

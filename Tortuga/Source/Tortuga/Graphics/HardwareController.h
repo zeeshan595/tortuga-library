@@ -27,11 +27,14 @@ struct DeviceController
 };
 struct HardwareController
 {
+  uint32_t FullWidth;
+  uint32_t FullHeight;
   VkFormat VulkanSurfaceFormat;
   std::vector<DeviceController> Devices;
+  VulkanAPI::DeviceData VulkanMainDevice;
 };
 
-HardwareController CreateHardwareController(RenderingEngine engine, Window window);
+HardwareController CreateHardwareController(RenderingEngine engine, Window window, std::vector<RenderingDevice> devices);
 }; // namespace Graphics
 }; // namespace Tortuga
 

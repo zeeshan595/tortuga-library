@@ -18,17 +18,17 @@ void BindCommandBufferPipeline(CommandBuffer command, uint32_t index, Pipeline p
     VulkanAPI::BindCommandBufferPipeline(command.CommandBuffers[i], index, pipeline.VulkanPipeline[i]);
   }
 }
-void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass renderPass, uint32_t subPass, CommandBufferRect renderRect)
+void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass renderPass, uint32_t subPass)
 {
   for (uint32_t i = 0; i < command.CommandBuffers.size(); i++)
   {
     VulkanAPI::BeginCommandBufferRecording(command.CommandBuffers[i], index, renderPass.VulkanRenderPass[i], subPass);
     auto viewport = VkViewport();
     {
-      viewport.x = renderRect.OffsetX;
-      viewport.y = renderRect.OffsetY;
-      viewport.width = renderRect.Width;
-      viewport.height = renderRect.Height;
+      viewport.x = command.Hardware.Devices[i].Viewport.Y;
+      viewport.y = command.Hardware.Devices[i].Viewport.Y;
+      viewport.width = command.Hardware.Devices[i].Viewport.Width;
+      viewport.height = command.Hardware.Devices[i].Viewport.Height;
       viewport.minDepth = 0;
       viewport.maxDepth = 1;
     }
@@ -36,10 +36,10 @@ void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass render
 
     auto scissor = VkRect2D();
     {
-      scissor.offset.x = renderRect.Width;
-      scissor.offset.y = renderRect.OffsetY;
-      scissor.extent.width = renderRect.Width;
-      scissor.extent.height = renderRect.Height;
+      scissor.offset.x = command.Hardware.Devices[i].Viewport.Y;
+      scissor.offset.y = command.Hardware.Devices[i].Viewport.Y;
+      scissor.extent.width = command.Hardware.Devices[i].Viewport.Width;
+      scissor.extent.height = command.Hardware.Devices[i].Viewport.Height;
     }
     VulkanAPI::SetScissors(command.CommandBuffers[i], index, scissor);
   }

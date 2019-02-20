@@ -9,6 +9,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+uint32_t FindMemoryType(DeviceData device, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 std::vector<DeviceData> CreateDevices(VulkanData data);
 void DestroyDevices(std::vector<DeviceData> data);
 }; // namespace VulkanAPI

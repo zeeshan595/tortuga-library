@@ -6,6 +6,49 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+void CommandBufferSubmit(CommandBufferData data, VkQueue queue, bool waitUntilComplete)
+{
+  auto queueInfo = VkSubmitInfo();
+  {
+    queueInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    queueInfo.commandBufferCount = data.Buffer.size();
+    queueInfo.pCommandBuffers = data.Buffer.data();
+  }
+  vkQueueSubmit(queue, 1, &queueInfo, VK_NULL_HANDLE);
+  if (waitUntilComplete)
+    vkQueueWaitIdle(queue);
+}
+void CommandBufferImageLayoutTransfer(CommandBufferData data, uint32_t index, VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout)
+{
+  auto barrier = VkImageMemoryBarrier();
+  {
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = oldLayout;
+    barrier.newLayout = newLayout;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+    barrier.srcAccessMask = 0;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+  }
+
+  VkPipelineStageFlags sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+  VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+
+  vkCmdPipelineBarrier(
+      data.Buffer[index],
+      VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+      VK_PIPELINE_STAGE_TRANSFER_BIT,
+      0,
+      0, nullptr,
+      0, nullptr,
+      1, &barrier);
+}
 void SetScissors(CommandBufferData data, uint32_t index, VkRect2D rect)
 {
   vkCmdSetScissor(data.Buffer[index], 0, 1, &rect);

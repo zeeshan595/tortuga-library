@@ -2,6 +2,8 @@
 #define _VULKAN_API_SWAPCHAIN
 
 #include "DataStructures.h"
+#include "CommandPool.h"
+#include "CommandBuffer.h"
 
 namespace Tortuga
 {
