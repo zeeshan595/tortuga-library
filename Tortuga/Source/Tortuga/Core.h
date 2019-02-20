@@ -21,7 +21,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 //3rd Party
-#include <vulkan.h>
+#include <vulkan/vulkan.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 #include <SDL2/SDL_image.h>
