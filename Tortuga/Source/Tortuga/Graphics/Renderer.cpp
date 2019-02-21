@@ -74,14 +74,19 @@ void DrawFrame(Renderer data)
     vkDeviceWaitIdle(data.Hardware.Devices[i].VulkanDevice.Device);
 
   uint32_t imageIndex;
-  vkAcquireNextImageKHR(
-      data.Hardware.VulkanMainDevice.Device,
-      data.window.VulkanSwapchain.Swapchain,
-      std::numeric_limits<uint64_t>::max(),
-      data.ImageAvaliableSemaphore,
-      VK_NULL_HANDLE,
-      &imageIndex);
+  if (vkAcquireNextImageKHR(
+          data.Hardware.VulkanMainDevice.Device,
+          data.window.VulkanSwapchain.Swapchain,
+          std::numeric_limits<uint64_t>::max(),
+          data.ImageAvaliableSemaphore,
+          VK_NULL_HANDLE,
+          &imageIndex) != VK_SUCCESS)
+  {
+    Console::Fatal("'AcquireNextImageKHR' failed on device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+  }
 
+  std::vector<VkSemaphore> imageAvaliable = {data.ImageAvaliableSemaphore};
+  std::vector<VkSemaphore> presentImage = {data.PresentImageSemaphore};
   std::vector<VkPipelineStageFlags> waitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
   //Combine multiple devices image into a single image (Blit Image)
   auto queueInfo = VkSubmitInfo();
@@ -89,10 +94,10 @@ void DrawFrame(Renderer data)
     queueInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     queueInfo.commandBufferCount = data.VulkanCommandBuffer.Buffer.size();
     queueInfo.pCommandBuffers = data.VulkanCommandBuffer.Buffer.data();
-    queueInfo.waitSemaphoreCount = 1;
-    queueInfo.pWaitSemaphores = &data.ImageAvaliableSemaphore;
-    queueInfo.signalSemaphoreCount = 1;
-    queueInfo.pSignalSemaphores = &data.PresentImageSemaphore;
+    queueInfo.waitSemaphoreCount = 0;
+    queueInfo.pWaitSemaphores = nullptr;
+    queueInfo.signalSemaphoreCount = presentImage.size();
+    queueInfo.pSignalSemaphores = presentImage.data();
     queueInfo.pWaitDstStageMask = waitStages.data();
   }
   if (vkQueueSubmit(data.Hardware.VulkanMainDevice.GraphicQueue, 1, &queueInfo, VK_NULL_HANDLE) != VK_SUCCESS)
@@ -101,13 +106,12 @@ void DrawFrame(Renderer data)
   }
 
   //Present image on the screen
-  std::vector<VkSemaphore> waitSemaphores = {data.PresentImageSemaphore};
   std::vector<VkSwapchainKHR> swapChains = {data.window.VulkanSwapchain.Swapchain};
   auto presentInfo = VkPresentInfoKHR();
   {
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.waitSemaphoreCount = waitSemaphores.size();
-    presentInfo.pWaitSemaphores = waitSemaphores.data();
+    presentInfo.waitSemaphoreCount = 0;
+    presentInfo.pWaitSemaphores = nullptr;
     presentInfo.swapchainCount = swapChains.size();
     presentInfo.pSwapchains = swapChains.data();
     presentInfo.pImageIndices = &imageIndex;
@@ -116,6 +120,7 @@ void DrawFrame(Renderer data)
   {
     Console::Fatal("Failed to present image from device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
   }
+  WaitForDevices(data.Hardware);
 }
 Renderer CreateRenderer(HardwareController hardware, Window window, FrameBuffer frameBuffer, RenderPass renderPass)
 {

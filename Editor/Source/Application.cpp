@@ -53,6 +53,7 @@ int main(int argc, char **argv)
     Graphics::EndCommandBuffer(commandBuffer, 0);
 
     Graphics::SubmitCommands(renderer, {commandBuffer});
+
     Graphics::DrawFrame(renderer);
 
     //Main loop
