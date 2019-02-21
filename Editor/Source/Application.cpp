@@ -26,7 +26,8 @@ int main(int argc, char **argv)
     auto hardware = Graphics::CreateHardwareController(
         renderingEngine,
         window,
-        {renderingEngine.Devices[0], renderingEngine.Devices[0]});
+        {renderingEngine.Devices[0],
+         renderingEngine.Devices[0]});
 
     auto renderpass = Graphics::CreateRenderPass(hardware);
     auto framebuffers = Graphics::CreateFrameBuffers(hardware, renderpass);

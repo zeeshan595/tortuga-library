@@ -25,8 +25,9 @@ If using `vs code` open the `Project.code-workspace` and you can debug The proje
 
 **Key Features**
 
-* Multi GPU Support
+* Multi GPU Support (Split Screen)
 * Multi-Threaded Rendering
+* Ray Marching
 * Data Oriented Design
 
 **Supported Formats**
