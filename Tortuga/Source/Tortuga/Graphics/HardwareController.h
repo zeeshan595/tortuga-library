@@ -34,6 +34,7 @@ struct HardwareController
   VulkanAPI::DeviceData VulkanMainDevice;
 };
 
+void UpdateDeviceRenderRatios(HardwareController data, std::vector<float> ratios);
 HardwareController CreateHardwareController(RenderingEngine engine, Window window, std::vector<RenderingDevice> devices);
 }; // namespace Graphics
 }; // namespace Tortuga
