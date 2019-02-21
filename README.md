@@ -9,7 +9,7 @@ Before building Tortuga, you must install the required dependencies. Below is a 
 * vulkan (1.1.92)
 * SDL2 (with vulkan compatibility)
 * SDL_Image
-* sndio
+* GLM
 
 You can follow the instructions to install these dependencies in Ubuntu
 
