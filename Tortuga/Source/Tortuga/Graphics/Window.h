@@ -27,7 +27,7 @@ struct Window
   VulkanAPI::SwapchainData VulkanSwapchain;
 };
 
-Window CreateWindow(RenderingDevice devices, std::string title, uint32_t width, uint32_t height, WindowType type);
+Window CreateWindow(RenderingEngine engine, std::string title, uint32_t width, uint32_t height, WindowType type);
 void DestroyWindow(Window data);
 }; // namespace Graphics
 }; // namespace Tortuga

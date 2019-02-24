@@ -1,5 +1,8 @@
 #include "Renderer.h"
 
+const uint32_t MAX_IN_FLIGHT_FRAMES = 2;
+uint32_t _currentFrame;
+
 namespace Tortuga
 {
 namespace Graphics
@@ -58,7 +61,9 @@ void SetupPresentation(Renderer data)
 void WaitForDevices(HardwareController hardware)
 {
   for (uint32_t i = 0; i < hardware.Devices.size(); i++)
+  {
     vkDeviceWaitIdle(hardware.Devices[i].VulkanDevice.Device);
+  }
 }
 void SubmitCommands(Renderer data, std::vector<CommandBuffer> commands)
 {
@@ -73,40 +78,57 @@ void SubmitCommands(Renderer data, std::vector<CommandBuffer> commands)
 }
 void DrawFrame(Renderer data)
 {
+  vkWaitForFences(
+      data.Hardware.VulkanMainDevice.Device,
+      1, &data.InFlightFences[_currentFrame],
+      VK_TRUE,
+      std::numeric_limits<uint64_t>::max());
+  vkResetFences(
+      data.Hardware.VulkanMainDevice.Device,
+      1, &data.InFlightFences[_currentFrame]);
+
   for (uint32_t i = 0; i < data.VulkanRenderers.size(); i++)
     VulkanAPI::DrawFrame(data.VulkanRenderers[i]);
 
   for (uint32_t i = 0; i < data.Hardware.Devices.size(); i++)
-    vkDeviceWaitIdle(data.Hardware.Devices[i].VulkanDevice.Device);
+  {
+    vkWaitForFences(
+        data.Hardware.Devices[i].VulkanDevice.Device,
+        1, &data.VulkanRenderers[i].OnCompleteFence,
+        true,
+        std::numeric_limits<uint64_t>::max());
+    vkResetFences(
+        data.Hardware.Devices[i].VulkanDevice.Device,
+        1, &data.VulkanRenderers[i].OnCompleteFence);
+  }
 
   uint32_t imageIndex;
   if (vkAcquireNextImageKHR(
           data.Hardware.VulkanMainDevice.Device,
           data.window.VulkanSwapchain.Swapchain,
           std::numeric_limits<uint64_t>::max(),
-          data.ImageAvaliableSemaphore,
+          data.ImageAvaliableSemaphore[_currentFrame],
           VK_NULL_HANDLE,
           &imageIndex) != VK_SUCCESS)
   {
     Console::Fatal("'AcquireNextImageKHR' failed on device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
   }
 
-  std::vector<VkSemaphore> imageAvaliable = {data.ImageAvaliableSemaphore};
-  std::vector<VkSemaphore> presentImage = {data.PresentImageSemaphore};
-  std::vector<VkPipelineStageFlags> waitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+  std::vector<VkSemaphore> imageAvaliable = {data.ImageAvaliableSemaphore[_currentFrame]};
+  std::vector<VkSemaphore> presentImage = {data.RenderFinishedSemaphore[_currentFrame]};
   //Combine multiple devices image into a single image (Blit Image)
   auto queueInfo = VkSubmitInfo();
   {
     queueInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     queueInfo.commandBufferCount = data.VulkanCommandBuffer.Buffer.size();
     queueInfo.pCommandBuffers = data.VulkanCommandBuffer.Buffer.data();
-    queueInfo.waitSemaphoreCount = 0;
-    queueInfo.pWaitSemaphores = nullptr;
+    queueInfo.waitSemaphoreCount = imageAvaliable.size();
+    queueInfo.pWaitSemaphores = imageAvaliable.data();
     queueInfo.signalSemaphoreCount = presentImage.size();
     queueInfo.pSignalSemaphores = presentImage.data();
-    queueInfo.pWaitDstStageMask = waitStages.data();
+    queueInfo.pWaitDstStageMask = data.WaitStages.data();
   }
-  if (vkQueueSubmit(data.Hardware.VulkanMainDevice.GraphicQueue, 1, &queueInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+  if (vkQueueSubmit(data.Hardware.VulkanMainDevice.GraphicQueue, 1, &queueInfo, data.InFlightFences[_currentFrame]) != VK_SUCCESS)
   {
     Console::Fatal("Failed to submit command to device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
   }
@@ -116,8 +138,8 @@ void DrawFrame(Renderer data)
   auto presentInfo = VkPresentInfoKHR();
   {
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.waitSemaphoreCount = 0;
-    presentInfo.pWaitSemaphores = nullptr;
+    presentInfo.waitSemaphoreCount = presentImage.size();
+    presentInfo.pWaitSemaphores = presentImage.data();
     presentInfo.swapchainCount = swapChains.size();
     presentInfo.pSwapchains = swapChains.data();
     presentInfo.pImageIndices = &imageIndex;
@@ -126,7 +148,8 @@ void DrawFrame(Renderer data)
   {
     Console::Fatal("Failed to present image from device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
   }
-  WaitForDevices(data.Hardware);
+
+  _currentFrame = (_currentFrame + 1) % MAX_IN_FLIGHT_FRAMES;
 }
 Renderer CreateRenderer(HardwareController hardware, Window window, FrameBuffer frameBuffer, RenderPass renderPass)
 {
@@ -134,6 +157,7 @@ Renderer CreateRenderer(HardwareController hardware, Window window, FrameBuffer 
   data.VulkanFrameBuffer = frameBuffer;
   data.window = window;
   data.Hardware = hardware;
+  data.WaitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 
   data.VulkanRenderers.resize(hardware.Devices.size());
   for (uint32_t i = 0; i < hardware.Devices.size(); i++)
@@ -149,13 +173,29 @@ Renderer CreateRenderer(HardwareController hardware, Window window, FrameBuffer 
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
   }
 
-  if (vkCreateSemaphore(data.Hardware.VulkanMainDevice.Device, &semaphoreInfo, nullptr, &data.PresentImageSemaphore) != VK_SUCCESS)
+  auto fenceInfo = VkFenceCreateInfo();
   {
-    Console::Fatal("Failed to create semaphore for presentation on device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
   }
-  if (vkCreateSemaphore(data.Hardware.VulkanMainDevice.Device, &semaphoreInfo, nullptr, &data.ImageAvaliableSemaphore) != VK_SUCCESS)
+
+  data.ImageAvaliableSemaphore.resize(MAX_IN_FLIGHT_FRAMES);
+  data.RenderFinishedSemaphore.resize(MAX_IN_FLIGHT_FRAMES);
+  data.InFlightFences.resize(MAX_IN_FLIGHT_FRAMES);
+  for (uint32_t i = 0; i < MAX_IN_FLIGHT_FRAMES; i++)
   {
-    Console::Fatal("Failed to create semaphore for presentation on device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+    if (vkCreateSemaphore(data.Hardware.VulkanMainDevice.Device, &semaphoreInfo, nullptr, &data.RenderFinishedSemaphore[i]) != VK_SUCCESS)
+    {
+      Console::Fatal("Failed to create semaphore for presentation on device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+    }
+    if (vkCreateSemaphore(data.Hardware.VulkanMainDevice.Device, &semaphoreInfo, nullptr, &data.ImageAvaliableSemaphore[i]) != VK_SUCCESS)
+    {
+      Console::Fatal("Failed to create semaphore for presentation on device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+    }
+    if (vkCreateFence(data.Hardware.VulkanMainDevice.Device, &fenceInfo, nullptr, &data.InFlightFences[i]) != VK_SUCCESS)
+    {
+      Console::Fatal("Failed to create fence for presentation on device: {0}", data.Hardware.VulkanMainDevice.Properties.deviceName);
+    }
   }
 
   data.VulkanCommandPool = VulkanAPI::CreateCommandPool(
@@ -176,8 +216,12 @@ void DestroyRenderer(Renderer data)
   {
     VulkanAPI::DestroyRenderer(data.VulkanRenderers[i]);
   }
-  vkDestroySemaphore(data.Hardware.VulkanMainDevice.Device, data.PresentImageSemaphore, nullptr);
-  vkDestroySemaphore(data.Hardware.VulkanMainDevice.Device, data.ImageAvaliableSemaphore, nullptr);
+  for (uint32_t i = 0; i < MAX_IN_FLIGHT_FRAMES; i++)
+  {
+    vkDestroySemaphore(data.Hardware.VulkanMainDevice.Device, data.RenderFinishedSemaphore[i], nullptr);
+    vkDestroySemaphore(data.Hardware.VulkanMainDevice.Device, data.ImageAvaliableSemaphore[i], nullptr);
+    vkDestroyFence(data.Hardware.VulkanMainDevice.Device, data.InFlightFences[i], nullptr);
+  }
 }
 }; // namespace Graphics
 }; // namespace Tortuga

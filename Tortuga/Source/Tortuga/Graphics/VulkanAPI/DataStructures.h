@@ -134,9 +134,8 @@ struct RendererData
 
   CommandPoolData CommandPool;
   CommandBufferData CommandBuffer;
-
-  VkSemaphore ImageAvailableSemaphore;
-  VkSemaphore RenderFinishedSemaphore;
+  std::vector<VkPipelineStageFlags> WaitStages;
+  VkFence OnCompleteFence;
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

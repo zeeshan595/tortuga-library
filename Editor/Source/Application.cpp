@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
     auto renderingEngine = Graphics::CreateRenderingEngine();
     auto window = Graphics::CreateWindow(
-        renderingEngine.Devices[renderingEngine.MainDeviceIndex],
+        renderingEngine,
         "Hello World",
         1024, 768,
         Graphics::WindowType::ResizeableWindowed);

@@ -4,8 +4,9 @@ namespace Tortuga
 {
 namespace Graphics
 {
-Window CreateWindow(RenderingDevice device, std::string title, uint32_t width, uint32_t height, WindowType type)
+Window CreateWindow(RenderingEngine engine, std::string title, uint32_t width, uint32_t height, WindowType type)
 {
+  auto mainDevice = engine.Devices[engine.MainDeviceIndex].VulkanDevice;
 
   auto data = Window();
   data.Width = width;
@@ -27,9 +28,9 @@ Window CreateWindow(RenderingDevice device, std::string title, uint32_t width, u
     windowFlags |= SDL_WINDOW_FULLSCREEN;
     break;
   }
-  data.VulkanWindow = VulkanAPI::CreateWindow(device.VulkanDevice, title, width, height, windowFlags);
+  data.VulkanWindow = VulkanAPI::CreateWindow(mainDevice, title, width, height, windowFlags);
   data.VulkanSwapchain = VulkanAPI::CreateSwapchain(
-      device.VulkanDevice,
+      mainDevice,
       data.VulkanWindow.Surface.Surface,
       0, 0,
       width, height);

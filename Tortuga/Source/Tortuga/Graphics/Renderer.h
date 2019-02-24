@@ -24,8 +24,10 @@ struct Renderer
   std::vector<VulkanAPI::RendererData> VulkanRenderers;
   VulkanAPI::CommandPoolData VulkanCommandPool;
   VulkanAPI::CommandBufferData VulkanCommandBuffer;
-  VkSemaphore ImageAvaliableSemaphore;
-  VkSemaphore PresentImageSemaphore;
+  std::vector<VkSemaphore> ImageAvaliableSemaphore;
+  std::vector<VkSemaphore> RenderFinishedSemaphore;
+  std::vector<VkFence> InFlightFences;
+  std::vector<VkPipelineStageFlags> WaitStages;
 };
 void SubmitCommands(Renderer data, std::vector<CommandBuffer> commands);
 void WaitForDevices(HardwareController hardware);
