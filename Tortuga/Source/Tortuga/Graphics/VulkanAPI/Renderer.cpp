@@ -71,6 +71,7 @@ RendererData CreateRenderer(DeviceData device, FrameBufferData frameBuffers, Ren
 void DestroyRenderer(RendererData data)
 {
   DestroyCommandPool(data.CommandPool);
+  vkDestroyFence(data.Device.Device, data.OnCompleteFence, nullptr);
 }
 }; // namespace VulkanAPI
 }; // namespace Graphics
