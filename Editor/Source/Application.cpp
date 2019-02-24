@@ -31,7 +31,9 @@ int main(int argc, char **argv)
 
     auto renderpass = Graphics::CreateRenderPass(hardware);
     auto framebuffers = Graphics::CreateFrameBuffers(hardware, renderpass);
+    auto renderer = Graphics::CreateRenderer(hardware, window, framebuffers, renderpass);
 
+    //SCENE RENDERING START
     auto vertexShader = Graphics::CreateShaderFromFile(
         hardware,
         workingDirectory + "/Shaders/simple.vert.spv",
@@ -46,16 +48,14 @@ int main(int argc, char **argv)
     auto commandPool = Graphics::CreateCommandPool(hardware);
     auto commandBuffer = Graphics::CreateCommandBuffer(hardware, commandPool, Graphics::CommandBufferLevel::CommandBufferSecondary, 1);
 
-    auto renderer = Graphics::CreateRenderer(hardware, window, framebuffers, renderpass);
-
     Graphics::BeginCommandBuffer(commandBuffer, 0, renderpass, 0);
     Graphics::BindCommandBufferPipeline(commandBuffer, 0, pipeline);
     Graphics::CommandBufferDrawExample(commandBuffer, 0);
     Graphics::EndCommandBuffer(commandBuffer, 0);
 
+    //Record all Scene Info
     Graphics::SubmitCommands(renderer, {commandBuffer});
-
-    Graphics::DrawFrame(renderer);
+    //SCENE RENDERING END
 
     //Main loop
     bool isRunning = true;
@@ -70,13 +70,9 @@ int main(int argc, char **argv)
                 isRunning = false;
                 break;
             }
-            switch (event.type)
-            {
-            case SDL_KEYDOWN:
-                Graphics::DrawFrame(renderer);
-                break;
-            }
         }
+
+        Graphics::DrawFrame(renderer);
     }
 
     Graphics::DestroyRenderer(renderer);
