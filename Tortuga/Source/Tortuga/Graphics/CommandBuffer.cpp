@@ -4,11 +4,25 @@ namespace Tortuga
 {
 namespace Graphics
 {
-void CommandBufferDrawExample(CommandBuffer command, uint32_t index)
+void CommandBufferSubmitCommands(CommandBuffer command)
 {
   for (uint32_t i = 0; i < command.CommandBuffers.size(); i++)
   {
-    VulkanAPI::CommandBufferDrawExample(command.CommandBuffers[i], index);
+    VulkanAPI::CommandBufferSubmit(command.CommandBuffers[i], command.Hardware.Devices[i].VulkanDevice.GraphicQueue, true);
+  }
+}
+void CommandBufferUpdateBuffer(CommandBuffer command, uint32_t index, Buffer buffer)
+{
+  for (uint32_t i = 0; i < command.CommandBuffers.size(); i++)
+  {
+    VulkanAPI::CommandBufferCopyBuffer(command.CommandBuffers[i], index, buffer.StagingVulkanBuffer[i], buffer.VulkanBuffer[i]);
+  }
+}
+void CommandBufferDraw(CommandBuffer command, uint32_t index, Buffer vertexBuffer, Buffer indexBuffer, uint8_t indicesSize)
+{
+  for (uint32_t i = 0; i < command.CommandBuffers.size(); i++)
+  {
+    VulkanAPI::CommandBufferDraw(command.CommandBuffers[i], index, vertexBuffer.VulkanBuffer[i], indexBuffer.VulkanBuffer[i], indicesSize);
   }
 }
 void BindCommandBufferPipeline(CommandBuffer command, uint32_t index, Pipeline pipeline)
@@ -67,11 +81,11 @@ CommandBuffer CreateCommandBuffer(HardwareController hardware, CommandPool pool,
   VkCommandBufferLevel bufferLevel;
   switch (level)
   {
-  case CommandBufferLevel::CommandBufferPrimary:
+  case CommandBufferLevel::COMMAND_BUFFER_PRIMARY:
     bufferLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     break;
   default:
-  case CommandBufferLevel::CommandBufferSecondary:
+  case CommandBufferLevel::COMMAND_BUFFER_SECONDARY:
     bufferLevel = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
     break;
   }

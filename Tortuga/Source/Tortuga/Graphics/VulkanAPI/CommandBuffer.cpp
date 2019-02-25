@@ -6,6 +6,20 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+void CommandBufferCopyBuffer(CommandBufferData data, uint32_t index, BufferData src, BufferData dst)
+{
+  uint32_t bufferSize = src.BufferSize;
+  if (bufferSize > dst.BufferSize)
+    bufferSize = dst.BufferSize;
+
+  auto copyInfo = VkBufferCopy();
+  {
+    copyInfo.srcOffset = 0;
+    copyInfo.dstOffset = 0;
+    copyInfo.size = bufferSize;
+  }
+  vkCmdCopyBuffer(data.Buffer[index], src.Buffer, dst.Buffer, 1, &copyInfo);
+}
 void CommandBufferSubmit(CommandBufferData data, VkQueue queue, bool waitUntilComplete)
 {
   auto queueInfo = VkSubmitInfo();
@@ -57,9 +71,12 @@ void SetViewport(CommandBufferData data, uint32_t index, VkViewport viewport)
 {
   vkCmdSetViewport(data.Buffer[index], 0, 1, &viewport);
 }
-void CommandBufferDrawExample(CommandBufferData data, uint32_t index)
+void CommandBufferDraw(CommandBufferData data, uint32_t index, BufferData vertices, BufferData indices, uint16_t indexSize)
 {
-  vkCmdDraw(data.Buffer[index], 3, 1, 0, 0);
+  std::vector<VkDeviceSize> offsets = {0};
+  vkCmdBindVertexBuffers(data.Buffer[index], 0, 1, &vertices.Buffer, offsets.data());
+  vkCmdBindIndexBuffer(data.Buffer[index], indices.Buffer, 0, VK_INDEX_TYPE_UINT16);
+  vkCmdDrawIndexed(data.Buffer[index], indexSize, 1, 0, 0, 0);
 }
 void BindCommandBufferPipeline(CommandBufferData data, uint32_t index, PipelineData pipeline)
 {

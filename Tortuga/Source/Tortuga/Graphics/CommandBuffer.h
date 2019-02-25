@@ -7,6 +7,7 @@
 #include "CommandPool.h"
 #include "RenderPass.h"
 #include "Pipeline.h"
+#include "Buffer.h"
 
 namespace Tortuga
 {
@@ -14,8 +15,8 @@ namespace Graphics
 {
 enum CommandBufferLevel
 {
-  CommandBufferPrimary,
-  CommandBufferSecondary
+  COMMAND_BUFFER_PRIMARY,
+  COMMAND_BUFFER_SECONDARY
 };
 struct CommandBufferRect
 {
@@ -30,7 +31,9 @@ struct CommandBuffer
   std::vector<VulkanAPI::CommandBufferData> CommandBuffers;
 };
 
-void CommandBufferDrawExample(CommandBuffer command, uint32_t index);
+void CommandBufferSubmitCommands(CommandBuffer command);
+void CommandBufferUpdateBuffer(CommandBuffer command, uint32_t index, Buffer buffer);
+void CommandBufferDraw(CommandBuffer command, uint32_t index, Buffer vertexBuffer, Buffer indexBuffer, uint8_t indicesSize);
 void BindCommandBufferPipeline(CommandBuffer command, uint32_t index, Pipeline pipeline);
 void BeginCommandBuffer(CommandBuffer command, uint32_t index, RenderPass renderPass, uint32_t subPass);
 void BeginCommandBuffer(CommandBuffer command, uint32_t index);

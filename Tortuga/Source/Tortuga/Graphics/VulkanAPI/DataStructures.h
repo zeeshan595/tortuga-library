@@ -137,6 +137,14 @@ struct RendererData
   std::vector<VkPipelineStageFlags> WaitStages;
   VkFence OnCompleteFence;
 };
+
+struct BufferData
+{
+  VkDevice Device;
+  uint32_t BufferSize;
+  VkBuffer Buffer;
+  VkDeviceMemory Memory;
+};
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

@@ -13,10 +13,10 @@ namespace Graphics
 {
 enum ShaderType
 {
-  Vertex,
-  Fragment,
-  Geometry,
-  Compute
+  SHADER_TYPE_VERTEX,
+  SHADER_TYPE_FRAGMENT,
+  SHADER_TYPE_GEOMETRY,
+  SHADER_TYPE_COMPUTE
 };
 struct Shader
 {

@@ -6,7 +6,13 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-PipelineData CreatePipeline(DeviceData device, RenderPassData renderPass, VkExtent2D viewSize, std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos)
+PipelineData CreatePipeline(
+    DeviceData device,
+    RenderPassData renderPass,
+    VkExtent2D viewSize,
+    std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos,
+    VkVertexInputBindingDescription inputBindingDescription,
+    std::vector<VkVertexInputAttributeDescription> inputAttributeDescription)
 {
   auto data = PipelineData();
   data.Device = device.Device;
@@ -14,10 +20,10 @@ PipelineData CreatePipeline(DeviceData device, RenderPassData renderPass, VkExte
   auto vertexInputInfo = VkPipelineVertexInputStateCreateInfo();
   {
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.pVertexBindingDescriptions = &inputBindingDescription; // Optional
+    vertexInputInfo.vertexAttributeDescriptionCount = inputAttributeDescription.size();
+    vertexInputInfo.pVertexAttributeDescriptions = inputAttributeDescription.data(); // Optional
   }
 
   auto inputAssembly = VkPipelineInputAssemblyStateCreateInfo();

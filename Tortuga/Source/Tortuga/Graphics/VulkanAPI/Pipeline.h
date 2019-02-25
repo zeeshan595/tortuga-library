@@ -9,7 +9,13 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-PipelineData CreatePipeline(DeviceData device, RenderPassData renderPass, VkExtent2D viewSize, std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos);
+PipelineData CreatePipeline(
+    DeviceData device,
+    RenderPassData renderPass,
+    VkExtent2D viewSize,
+    std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos,
+    VkVertexInputBindingDescription inputBindingDescription,
+    std::vector<VkVertexInputAttributeDescription> inputAttributeDescription);
 void DestroyPipeline(PipelineData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics

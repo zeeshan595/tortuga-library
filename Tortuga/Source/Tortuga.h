@@ -15,5 +15,8 @@
 #include "Tortuga/Graphics/CommandPool.h"
 #include "Tortuga/Graphics/CommandBuffer.h"
 #include "Tortuga/Graphics/Renderer.h"
+#include "Tortuga/Graphics/Buffer.h"
+#include "Tortuga/Graphics/Vertex.h"
+#include "Tortuga/Graphics/RenderingHelper.h"
 
 #endif

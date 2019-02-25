@@ -29,16 +29,16 @@ Shader CreateShader(HardwareController hardware, std::vector<char> code, ShaderT
   VkShaderStageFlagBits shaderFlags;
   switch (type)
   {
-  case ShaderType::Vertex:
+  case ShaderType::SHADER_TYPE_VERTEX:
     shaderFlags = VK_SHADER_STAGE_VERTEX_BIT;
     break;
-  case ShaderType::Fragment:
+  case ShaderType::SHADER_TYPE_FRAGMENT:
     shaderFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     break;
-  case ShaderType::Geometry:
+  case ShaderType::SHADER_TYPE_GEOMETRY:
     shaderFlags = VK_SHADER_STAGE_GEOMETRY_BIT;
     break;
-  case ShaderType::Compute:
+  case ShaderType::SHADER_TYPE_COMPUTE:
     shaderFlags = VK_SHADER_STAGE_COMPUTE_BIT;
     break;
   default:

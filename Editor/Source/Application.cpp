@@ -2,6 +2,15 @@
 
 using namespace Tortuga;
 
+const std::vector<Graphics::Vertex> vertices = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+    {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0};
+
 std::string GetWorkingDirectory(std::string executablePath)
 {
     uint32_t i = executablePath.find_last_of('/');
@@ -37,20 +46,41 @@ int main(int argc, char **argv)
     auto vertexShader = Graphics::CreateShaderFromFile(
         hardware,
         workingDirectory + "/Shaders/simple.vert.spv",
-        Graphics::ShaderType::Vertex);
+        Graphics::SHADER_TYPE_VERTEX);
 
     auto fragmentShader = Graphics::CreateShaderFromFile(
         hardware,
         workingDirectory + "/Shaders/simple.frag.spv",
-        Graphics::ShaderType::Fragment);
+        Graphics::SHADER_TYPE_FRAGMENT);
     auto pipeline = Graphics::CreatePipeline(hardware, renderpass, {vertexShader, fragmentShader});
 
     auto commandPool = Graphics::CreateCommandPool(hardware);
-    auto commandBuffer = Graphics::CreateCommandBuffer(hardware, commandPool, Graphics::CommandBufferLevel::CommandBufferSecondary, 1);
+    auto commandBuffer = Graphics::CreateCommandBuffer(hardware, commandPool, Graphics::COMMAND_BUFFER_SECONDARY, 1);
+
+    auto vertexBuffer = Graphics::CreateBuffer(
+        hardware,
+        Graphics::BUFFER_TYPE_VERTEX,
+        sizeof(vertices[0]) * vertices.size());
+    Graphics::UpdateBufferData(vertexBuffer, vertices);
+
+    auto indexBuffer = Graphics::CreateBuffer(
+        hardware,
+        Graphics::BUFFER_TYPE_INDEX,
+        sizeof(indices[0]) * indices.size());
+    Graphics::UpdateBufferData(indexBuffer, indices);
+
+    auto tempPool = Graphics::CreateCommandPool(hardware);
+    auto tempBuffer = Graphics::CreateCommandBuffer(hardware, tempPool, Graphics::COMMAND_BUFFER_PRIMARY, 1);
+    Graphics::BeginCommandBuffer(tempBuffer, 0);
+    Graphics::CommandBufferUpdateBuffer(tempBuffer, 0, vertexBuffer);
+    Graphics::CommandBufferUpdateBuffer(tempBuffer, 0, indexBuffer);
+    Graphics::EndCommandBuffer(tempBuffer, 0);
+    Graphics::CommandBufferSubmitCommands(tempBuffer);
+    Graphics::DestroyCommandPool(tempPool);
 
     Graphics::BeginCommandBuffer(commandBuffer, 0, renderpass, 0);
     Graphics::BindCommandBufferPipeline(commandBuffer, 0, pipeline);
-    Graphics::CommandBufferDrawExample(commandBuffer, 0);
+    Graphics::CommandBufferDraw(commandBuffer, 0, vertexBuffer, indexBuffer, indices.size());
     Graphics::EndCommandBuffer(commandBuffer, 0);
 
     //Record all Scene Info
@@ -77,6 +107,8 @@ int main(int argc, char **argv)
 
     Graphics::DestroyRenderer(renderer);
 
+    Graphics::DestroyBuffer(vertexBuffer);
+    Graphics::DestroyBuffer(indexBuffer);
     Graphics::DestroyCommandPool(commandPool);
 
     Graphics::DestroyPipeline(pipeline);

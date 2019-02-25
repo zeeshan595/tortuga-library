@@ -1,4 +1,5 @@
 #include "Pipeline.h"
+#include "Vertex.h"
 
 namespace Tortuga
 {
@@ -21,7 +22,8 @@ Pipeline CreatePipeline(HardwareController hardware, RenderPass renderPass, std:
         hardware.Devices[i].VulkanDevice,
         renderPass.VulkanRenderPass[i],
         {hardware.FullWidth, hardware.FullHeight},
-        shaderInfos);
+        shaderInfos,
+        Vertex::GetBindingDescription(), Vertex::GetAttributeDescriptions());
   }
 
   return data;
