@@ -4,6 +4,7 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 
 //General
+#include <typeinfo>
 #include <array>
 #include <vector>
 #include <map>
