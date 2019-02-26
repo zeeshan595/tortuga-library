@@ -15,12 +15,17 @@ public:
   bool IsSystemActive;
   Environment *Scene;
 
+  System() {}
+  ~System() {}
+
   //Calls once when initialized
-  virtual void OnStart();
+  virtual void OnStart() {}
   //Calls repeatedly
-  virtual void OnUpdate();
+  virtual void OnUpdate() {}
   //Calls before system is destroyed
-  virtual void OnEnd();
+  virtual void OnEnd() {}
+  //Calls every frame on main thread
+  virtual void OnMainThreadUpdate(){};
 };
 struct SystemController
 {
@@ -32,6 +37,7 @@ void DestroySystemController(SystemController controller);
 int SystemThread(void *ptr);
 void RemoveSystemAtPosition(SystemController &controller, uint32_t o);
 void ClearSystems(SystemController &controller);
+void ProcessSystemUpdate(SystemController &controller);
 
 template <typename T>
 void AddSystem(SystemController &controller)
@@ -40,12 +46,11 @@ void AddSystem(SystemController &controller)
   System *data = dynamic_cast<System *>(temp);
   if (data == nullptr)
   {
-    if (temp != nullptr)
-      delete temp;
     Console::Error("All systems must inherit from the 'System' class!");
     return;
   }
 
+  data->IsSystemActive = true;
   data->Scene = controller.Scene;
   data->SystemMutex = SDL_CreateMutex();
   data->SystemThread = SDL_CreateThread(SystemThread, "System Thread", (void *)data);

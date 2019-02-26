@@ -14,11 +14,16 @@
 #include "Tortuga/Graphics/Renderer.h"
 #include "Tortuga/Graphics/Buffer.h"
 #include "Tortuga/Graphics/Vertex.h"
-#include "Tortuga/Graphics/RenderingHelper.h"
 
 #include "Tortuga/Core.h"
 #include "Tortuga/Console.h"
 #include "Tortuga/Environment.h"
 #include "Tortuga/SystemController.h"
+
+//Common Entity Data Structures
+#include "Tortuga/EntityData/MesRenderer.h"
+
+//Common Systems
+#include "Tortuga/Systems/RenderingSystem.h"
 
 #endif

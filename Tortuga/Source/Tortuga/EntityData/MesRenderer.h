@@ -7,14 +7,11 @@
 
 namespace Tortuga
 {
-namespace EntityData
-{
-struct MeshRenderer : protected EntityData
+struct MeshRenderer : public EntityData
 {
   std::vector<Graphics::Vertex> vertices;
   std::vector<uint16_t> indices;
 };
-}; // namespace EntityData
 }; // namespace Tortuga
 
 #endif

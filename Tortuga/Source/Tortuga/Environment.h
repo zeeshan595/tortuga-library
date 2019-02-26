@@ -18,10 +18,12 @@ struct Entity
 };
 struct Environment
 {
-  std::vector<Entity> entities;
+  std::string Name;
+  std::vector<Entity *> Entities;
 };
-Entity CreateEntity(
-    std::string name,
+Entity *CreateEntity(
+    Environment &environment,
+    const char *name = "New Entity",
     glm::vec3 position = glm::vec3(0, 0, 0),
     glm::vec4 rotation = glm::vec4(0, 0, 0, 0),
     glm::vec3 scale = glm::vec3(1, 1, 1));

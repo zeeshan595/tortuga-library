@@ -14,7 +14,7 @@ int SystemThread(void *ptr)
 
     if (SDL_LockMutex(ref->SystemMutex) == 0)
     {
-      isThreadActive = ref->IsSystemActive == false;
+      isThreadActive = ref->IsSystemActive;
       SDL_UnlockMutex(ref->SystemMutex);
     }
   }
@@ -53,6 +53,13 @@ void ClearSystems(SystemController &controller)
   for (uint32_t i = 0; i < controller.Systems.size(); i++)
   {
     RemoveSystemAtPosition(controller, i);
+  }
+}
+void ProcessSystemUpdate(SystemController &controller)
+{
+  for (uint32_t i = 0; i < controller.Systems.size(); i++)
+  {
+    controller.Systems[i]->OnMainThreadUpdate();
   }
 }
 }; // namespace Tortuga
