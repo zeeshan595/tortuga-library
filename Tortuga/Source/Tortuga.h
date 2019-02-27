@@ -13,7 +13,6 @@
 #include "Tortuga/Graphics/CommandBuffer.h"
 #include "Tortuga/Graphics/Renderer.h"
 #include "Tortuga/Graphics/Buffer.h"
-#include "Tortuga/Graphics/Vertex.h"
 
 #include "Tortuga/Core.h"
 #include "Tortuga/Console.h"

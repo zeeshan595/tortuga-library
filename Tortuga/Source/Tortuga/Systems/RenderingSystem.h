@@ -16,6 +16,8 @@ private:
   Graphics::RenderPass RenderPass;
   Graphics::FrameBuffer FrameBuffer;
   Graphics::Renderer Renderer;
+  Graphics::Shader VertexShader;
+  Graphics::Shader FragmentShader;
   Graphics::Pipeline Pipeline;
   Graphics::CommandPool Pool;
   Graphics::CommandBuffer Buffer;
@@ -23,11 +25,11 @@ private:
   //Screen
   Graphics::Buffer VertexBuffer;
   Graphics::Buffer IndexBuffer;
-  std::vector<Graphics::Vertex> vertices = {
-      {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-      {{-1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-      {{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-      {{1.0f, -1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
+  std::vector<glm::vec3> vertices = {
+      {-1.0f, -1.0f, 0.0f},
+      {-1.0f, 1.0f, 0.0f},
+      {1.0f, 1.0f, 0.0f},
+      {1.0f, -1.0f, 0.0f}};
   const std::vector<uint16_t> indices = {
       0, 1, 2, 2, 3, 0};
 
@@ -52,16 +54,16 @@ public:
     FrameBuffer = Graphics::CreateFrameBuffers(Hardware, RenderPass);
     Renderer = Graphics::CreateRenderer(Hardware, Window, FrameBuffer, RenderPass);
 
-    auto vertexShader = Graphics::CreateShaderFromFile(
+    VertexShader = Graphics::CreateShaderFromFile(
         Hardware,
         ApplicationDir + "/Shaders/simple.vert.spv",
         Graphics::SHADER_TYPE_VERTEX);
 
-    auto fragmentShader = Graphics::CreateShaderFromFile(
+    FragmentShader = Graphics::CreateShaderFromFile(
         Hardware,
         ApplicationDir + "/Shaders/simple.frag.spv",
         Graphics::SHADER_TYPE_FRAGMENT);
-    Pipeline = Graphics::CreatePipeline(Hardware, RenderPass, {vertexShader, fragmentShader});
+    Pipeline = Graphics::CreatePipeline(Hardware, RenderPass, {VertexShader, FragmentShader});
 
     Pool = Graphics::CreateCommandPool(Hardware);
     Buffer = Graphics::CreateCommandBuffer(Hardware, Pool, Graphics::COMMAND_BUFFER_SECONDARY, 1);
@@ -110,6 +112,8 @@ public:
     Graphics::DestroyBuffer(IndexBuffer);
     Graphics::DestroyCommandPool(Pool);
     Graphics::DestroyPipeline(Pipeline);
+    Graphics::DestroyShader(VertexShader);
+    Graphics::DestroyShader(FragmentShader);
     Graphics::DestroyFrameBuffers(FrameBuffer);
     Graphics::DestroyRenderPass(RenderPass);
     Graphics::DestroyWindow(Window);
@@ -118,6 +122,7 @@ public:
 
   void OnMainThreadUpdate()
   {
+    //Check 10 closest objects to the camera for min distance
   }
 };
 }; // namespace Tortuga
