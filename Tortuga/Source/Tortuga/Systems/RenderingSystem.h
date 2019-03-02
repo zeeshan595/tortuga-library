@@ -6,6 +6,10 @@
 
 namespace Tortuga
 {
+struct Temp
+{
+  glm::vec3 color = {1.0, 0.0, 0.0};
+};
 class RenderingSystem : public System
 {
 private:
@@ -21,6 +25,10 @@ private:
   Graphics::Pipeline Pipeline;
   Graphics::CommandPool Pool;
   Graphics::CommandBuffer Buffer;
+  Graphics::DescriptorPool DescriptorPool;
+  Graphics::DescriptorSet DescriptorSet;
+
+  Graphics::Buffer TempBuffer;
 
   //Screen
   Graphics::Buffer VertexBuffer;
@@ -90,9 +98,16 @@ public:
       Graphics::CommandBufferSubmitCommands(tempBuffer);
       Graphics::DestroyCommandPool(tempPool);
     }
+
+    TempBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, sizeof(Temp));
+    Graphics::UpdateBufferData(TempBuffer, (Temp){{1.0, 1.0, 1.0}});
+    DescriptorPool = Graphics::CreateDescriptorPool(Hardware, Graphics::DESCRIPTOR_TYPE_UNIFORM, 1);
+    DescriptorSet = Graphics::CreateDescriptorSet(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, DescriptorPool, TempBuffer);
+
     {
       Graphics::BeginCommandBuffer(Buffer, 0, RenderPass, 0);
       Graphics::BindCommandBufferPipeline(Buffer, 0, Pipeline);
+      Graphics::CommandBufferBindDescriptor(Buffer, 0, Pipeline, {DescriptorSet});
       Graphics::CommandBufferDraw(Buffer, 0, VertexBuffer, IndexBuffer, indices.size());
       Graphics::EndCommandBuffer(Buffer, 0);
     }
@@ -108,6 +123,8 @@ public:
   void OnEnd()
   {
     Graphics::DestroyRenderer(Renderer);
+    Graphics::DestroyDescriptorPool(DescriptorPool);
+    Graphics::DestroyBuffer(TempBuffer);
     Graphics::DestroyBuffer(VertexBuffer);
     Graphics::DestroyBuffer(IndexBuffer);
     Graphics::DestroyCommandPool(Pool);

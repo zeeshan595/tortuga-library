@@ -9,7 +9,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-DescriptorLayoutData CreateDescriptorSetLayout(DeviceData device);
+DescriptorLayoutData CreateDescriptorSetLayout(DeviceData device, std::vector<VkDescriptorSetLayoutBinding> bindingInfos);
 void DestroyDescriptorSetLayout(DescriptorLayoutData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics

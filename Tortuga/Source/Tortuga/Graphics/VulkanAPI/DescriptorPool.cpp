@@ -9,12 +9,13 @@ namespace VulkanAPI
 DescriptorPoolData CreateDescriptorPool(DeviceData device, VkDescriptorType type, uint32_t size)
 {
   auto data = DescriptorPoolData();
+  data.Device = device.Device;
   data.Type = type;
   data.PoolSize = size;
 
   auto poolSize = VkDescriptorPoolSize();
   {
-    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSize.type = type;
     poolSize.descriptorCount = size;
   }
 

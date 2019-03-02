@@ -8,6 +8,7 @@
 #include "HardwareController.h"
 #include "RenderPass.h"
 #include "Shader.h"
+#include "DescriptorLayout.h"
 
 namespace Tortuga
 {
@@ -15,6 +16,7 @@ namespace Graphics
 {
 struct Pipeline
 {
+  DescriptorLayout Layout;
   std::vector<VulkanAPI::PipelineData> VulkanPipeline;
 };
 

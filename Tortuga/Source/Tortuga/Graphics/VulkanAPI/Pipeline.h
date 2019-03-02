@@ -15,7 +15,7 @@ PipelineData CreatePipeline(
     VkExtent2D viewSize,
     std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos,
     VkVertexInputBindingDescription inputBindingDescription,
-    std::vector<VkVertexInputAttributeDescription> inputAttributeDescription);
+    std::vector<VkVertexInputAttributeDescription> inputAttributeDescription, std::vector<VkDescriptorSetLayout> descriptorLayouts);
 void DestroyPipeline(PipelineData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics

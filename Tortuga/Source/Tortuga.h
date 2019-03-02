@@ -8,16 +8,20 @@
 #include "Tortuga/Graphics/Shader.h"
 #include "Tortuga/Graphics/RenderPass.h"
 #include "Tortuga/Graphics/Pipeline.h"
+#include "Tortuga/Graphics/DescriptorLayout.h"
+#include "Tortuga/Graphics/DescriptorSet.h"
 #include "Tortuga/Graphics/FrameBuffers.h"
 #include "Tortuga/Graphics/CommandPool.h"
 #include "Tortuga/Graphics/CommandBuffer.h"
 #include "Tortuga/Graphics/Renderer.h"
 #include "Tortuga/Graphics/Buffer.h"
 
+//Core Features
 #include "Tortuga/Core.h"
 #include "Tortuga/Console.h"
 #include "Tortuga/Environment.h"
 #include "Tortuga/SystemController.h"
+#include "Tortuga/Primitive.h"
 
 //Common Entity Data Structures
 #include "Tortuga/EntityData/MesRenderer.h"

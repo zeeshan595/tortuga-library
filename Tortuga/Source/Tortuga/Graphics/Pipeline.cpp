@@ -30,6 +30,7 @@ Pipeline CreatePipeline(HardwareController hardware, RenderPass renderPass, std:
 {
   auto data = Pipeline();
 
+  data.Layout = CreateDescriptorLayouts(hardware);
   data.VulkanPipeline.resize(hardware.Devices.size());
   for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
@@ -38,13 +39,19 @@ Pipeline CreatePipeline(HardwareController hardware, RenderPass renderPass, std:
     {
       shaderInfos[j] = shaders[j].VulkanShader[i].StageInfo;
     }
+    std::vector<VkDescriptorSetLayout> layouts(2);
+    {
+      layouts[0] = data.Layout.UniformLayouts[i].Layout;
+      layouts[1] = data.Layout.ImageLayouts[i].Layout;
+    }
 
     data.VulkanPipeline[i] = VulkanAPI::CreatePipeline(
         hardware.Devices[i].VulkanDevice,
         renderPass.VulkanRenderPass[i],
         {hardware.FullWidth, hardware.FullHeight},
         shaderInfos,
-        GetBindingDescription(), GetAttributeDescriptions());
+        GetBindingDescription(), GetAttributeDescriptions(),
+        layouts);
   }
 
   return data;
@@ -55,6 +62,7 @@ void DestroyPipeline(Pipeline data)
   {
     VulkanAPI::DestroyPipeline(data.VulkanPipeline[i]);
   }
+  DestroyDescriptorLayouts(data.Layout);
 }
 }; // namespace Graphics
 }; // namespace Tortuga

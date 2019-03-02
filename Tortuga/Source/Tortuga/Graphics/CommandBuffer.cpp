@@ -4,6 +4,19 @@ namespace Tortuga
 {
 namespace Graphics
 {
+void CommandBufferBindDescriptor(CommandBuffer command, uint32_t index, Pipeline pipeline, std::vector<DescriptorSet> descriptorSets)
+{
+  for (uint32_t i = 0; i < command.CommandBuffers.size(); i++)
+  {
+    std::vector<VulkanAPI::DescriptorSetData> descriptors(descriptorSets.size());
+    for (uint32_t j = 0; j < descriptorSets.size(); j++)
+    {
+      descriptors[j] = descriptorSets[j].VulkanDescriptorSets[i];
+    }
+
+    VulkanAPI::CommandBufferBindDescriptorSet(command.CommandBuffers[i], index, pipeline.VulkanPipeline[i].Layout, descriptors);
+  }
+}
 void CommandBufferSubmitCommands(CommandBuffer command)
 {
   for (uint32_t i = 0; i < command.CommandBuffers.size(); i++)
