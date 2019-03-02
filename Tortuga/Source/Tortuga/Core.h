@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <fstream>
 #include <chrono>
+#include <atomic>
+#include <thread>
 
 //3rd Party
 #include <vulkan/vulkan.h>

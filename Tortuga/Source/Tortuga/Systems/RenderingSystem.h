@@ -34,7 +34,7 @@ private:
       0, 1, 2, 2, 3, 0};
 
 public:
-  void OnStart()
+  void OnAwake()
   {
     ApplicationDir = GetExecutablePath();
 
@@ -118,11 +118,6 @@ public:
     Graphics::DestroyRenderPass(RenderPass);
     Graphics::DestroyWindow(Window);
     Graphics::DestroyRenderingEngine(Engine);
-  }
-
-  void OnMainThreadUpdate()
-  {
-    //Check 10 closest objects to the camera for min distance
   }
 };
 }; // namespace Tortuga

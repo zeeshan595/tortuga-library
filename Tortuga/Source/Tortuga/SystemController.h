@@ -10,22 +10,24 @@ namespace Tortuga
 class System
 {
 public:
-  SDL_mutex *SystemMutex;
-  SDL_Thread *SystemThread;
-  bool IsSystemActive;
+  std::thread SystemThread;
+  std::atomic<bool> IsSystemActive;
   Environment *Scene;
 
   System() {}
   ~System() {}
 
-  //Calls once when initialized
+  //Calls on main thread before OnStart
+  virtual void OnAwake() {}
+  //Calls every frame on main thread
+  virtual void OnMainThreadUpdate(){};
+
+  //Calls when system is initialized
   virtual void OnStart() {}
   //Calls repeatedly
   virtual void OnUpdate() {}
-  //Calls before system is destroyed
+  //Calls when system is removed/destroyed
   virtual void OnEnd() {}
-  //Calls every frame on main thread
-  virtual void OnMainThreadUpdate(){};
 };
 struct SystemController
 {
@@ -34,7 +36,7 @@ struct SystemController
 };
 SystemController CreateSystemController(Environment *environment);
 void DestroySystemController(SystemController controller);
-int SystemThread(void *ptr);
+void SystemThread(System *ref);
 void RemoveSystemAtPosition(SystemController &controller, uint32_t o);
 void ClearSystems(SystemController &controller);
 void ProcessSystemUpdate(SystemController &controller);
@@ -49,16 +51,13 @@ void AddSystem(SystemController &controller)
     Console::Error("All systems must inherit from the 'System' class!");
     return;
   }
-
-  data->IsSystemActive = true;
+  
+  //Setup important variables
   data->Scene = controller.Scene;
-  data->SystemMutex = SDL_CreateMutex();
-  data->SystemThread = SDL_CreateThread(SystemThread, "System Thread", (void *)data);
-  if (data->SystemThread == nullptr)
-  {
-    Console::Error("Failed to create system thread!");
-    return;
-  }
+  data->IsSystemActive = true;
+  
+  data->OnAwake();
+  data->SystemThread = std::thread(&SystemThread, data);
   controller.Systems.push_back(data);
 }
 template <typename T>

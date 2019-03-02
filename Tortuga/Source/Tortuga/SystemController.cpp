@@ -2,25 +2,14 @@
 
 namespace Tortuga
 {
-int SystemThread(void *ptr)
+void SystemThread(System *ref)
 {
-  System *ref = (System *)ptr;
-
   ref->OnStart();
-  bool isThreadActive = true;
-  while (isThreadActive)
+  while (ref->IsSystemActive)
   {
     ref->OnUpdate();
-
-    if (SDL_LockMutex(ref->SystemMutex) == 0)
-    {
-      isThreadActive = ref->IsSystemActive;
-      SDL_UnlockMutex(ref->SystemMutex);
-    }
   }
   ref->OnEnd();
-
-  return 0;
 }
 
 SystemController CreateSystemController(Environment *environment)
@@ -38,13 +27,8 @@ void DestroySystemController(SystemController controller)
 
 void RemoveSystemAtPosition(SystemController &controller, uint32_t i)
 {
-  if (SDL_LockMutex(controller.Systems[i]->SystemMutex) == 0)
-  {
-    controller.Systems[i]->IsSystemActive = false;
-    SDL_UnlockMutex(controller.Systems[i]->SystemMutex);
-  }
-  int threadReturnValue;
-  SDL_WaitThread(controller.Systems[i]->SystemThread, &threadReturnValue);
+  controller.Systems[i]->IsSystemActive = false;
+  controller.Systems[i]->SystemThread.join();
   controller.Systems.erase(controller.Systems.begin() + i);
 }
 

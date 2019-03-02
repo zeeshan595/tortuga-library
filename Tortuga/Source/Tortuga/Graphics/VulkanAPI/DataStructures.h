@@ -145,6 +145,24 @@ struct BufferData
   VkBuffer Buffer;
   VkDeviceMemory Memory;
 };
+
+struct DescriptorLayoutData
+{
+  VkDevice Device;
+  VkDescriptorSetLayout Layout;
+};
+struct DescriptorPoolData
+{
+  VkDevice Device;
+  VkDescriptorPool Pool;
+  VkDescriptorType Type;
+  uint32_t PoolSize;
+};
+struct DescriptorSetData
+{
+  VkDevice Device;
+  VkDescriptorSet DescriptorSet;
+};
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga
