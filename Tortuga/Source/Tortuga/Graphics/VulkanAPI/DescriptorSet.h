@@ -11,7 +11,7 @@ namespace VulkanAPI
 {
 DescriptorSetData CreateDescriptorSet(DeviceData device, DescriptorLayoutData layout, DescriptorPoolData pool);
 void DestroyDescriptorSet(DescriptorSetData data);
-void UpdateDescriptorSetBuffer(DescriptorSetData data, BufferData buffer);
+void ConfigureDescriptorSetBuffer(DescriptorSetData data, BufferData buffer, uint32_t binding);
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

@@ -30,7 +30,8 @@ struct DescriptorPool
   DescriptorType Type;
   std::vector<VulkanAPI::DescriptorPoolData> VulkanDescriptorPools;
 };
-DescriptorSet CreateDescriptorSet(HardwareController hardware, DescriptorLayout layout, DescriptorType type, DescriptorPool pool, Buffer buffer);
+void ConfigureDescriptorSet(DescriptorSet data, Buffer buffer, uint32_t binding);
+DescriptorSet CreateDescriptorSet(HardwareController hardware, DescriptorLayout layout, DescriptorType type, DescriptorPool pool);
 DescriptorPool CreateDescriptorPool(HardwareController hardware, DescriptorType type, uint32_t descriptorsAmount);
 void DestroyDescriptorPool(DescriptorPool data);
 }; // namespace Graphics

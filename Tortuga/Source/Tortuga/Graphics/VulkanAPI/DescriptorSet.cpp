@@ -6,7 +6,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-void UpdateDescriptorSetBuffer(DescriptorSetData data, BufferData buffer)
+void ConfigureDescriptorSetBuffer(DescriptorSetData data, BufferData buffer, uint32_t binding)
 {
   auto bufferInfo = VkDescriptorBufferInfo();
   {
@@ -19,7 +19,7 @@ void UpdateDescriptorSetBuffer(DescriptorSetData data, BufferData buffer)
   {
     descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     descriptorWrite.dstSet = data.DescriptorSet;
-    descriptorWrite.dstBinding = 0;
+    descriptorWrite.dstBinding = binding;
     descriptorWrite.dstArrayElement = 0;
     descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     descriptorWrite.descriptorCount = 1;

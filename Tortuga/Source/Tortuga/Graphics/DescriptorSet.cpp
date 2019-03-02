@@ -4,7 +4,14 @@ namespace Tortuga
 {
 namespace Graphics
 {
-DescriptorSet CreateDescriptorSet(HardwareController hardware, DescriptorLayout layout, DescriptorType type, DescriptorPool pool, Buffer buffer)
+void ConfigureDescriptorSet(DescriptorSet data, Buffer buffer, uint32_t binding)
+{
+  for (uint32_t i = 0; i < data.VulkanDescriptorSets.size(); i++)
+  {
+    VulkanAPI::ConfigureDescriptorSetBuffer(data.VulkanDescriptorSets[i], buffer.VulkanBuffer[i], binding);
+  }
+}
+DescriptorSet CreateDescriptorSet(HardwareController hardware, DescriptorLayout layout, DescriptorType type, DescriptorPool pool)
 {
   auto data = DescriptorSet();
   data.Hardware = hardware;
@@ -29,8 +36,6 @@ DescriptorSet CreateDescriptorSet(HardwareController hardware, DescriptorLayout 
           pool.VulkanDescriptorPools[i]);
       break;
     }
-
-    VulkanAPI::UpdateDescriptorSetBuffer(data.VulkanDescriptorSets[i], buffer.VulkanBuffer[i]);
   }
 
   return data;

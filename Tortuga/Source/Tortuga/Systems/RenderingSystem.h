@@ -26,9 +26,9 @@ private:
   Graphics::CommandPool Pool;
   Graphics::CommandBuffer Buffer;
   Graphics::DescriptorPool DescriptorPool;
-  Graphics::DescriptorSet DescriptorSet;
 
   Graphics::Buffer TempBuffer;
+  Graphics::Buffer TempBuffer2;
 
   //Screen
   Graphics::Buffer VertexBuffer;
@@ -79,13 +79,15 @@ public:
     VertexBuffer = Graphics::CreateBuffer(
         Hardware,
         Graphics::BUFFER_TYPE_VERTEX,
-        sizeof(vertices[0]) * vertices.size());
+        sizeof(vertices[0]) * vertices.size(),
+        Graphics::BUFFER_STORAGE_FAST);
     Graphics::UpdateBufferData(VertexBuffer, vertices);
 
     IndexBuffer = Graphics::CreateBuffer(
         Hardware,
         Graphics::BUFFER_TYPE_INDEX,
-        sizeof(indices[0]) * indices.size());
+        sizeof(indices[0]) * indices.size(),
+        Graphics::BUFFER_STORAGE_FAST);
     Graphics::UpdateBufferData(IndexBuffer, indices);
 
     {
@@ -99,10 +101,11 @@ public:
       Graphics::DestroyCommandPool(tempPool);
     }
 
-    TempBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, sizeof(Temp));
-    Graphics::UpdateBufferData(TempBuffer, (Temp){{1.0, 1.0, 1.0}});
-    DescriptorPool = Graphics::CreateDescriptorPool(Hardware, Graphics::DESCRIPTOR_TYPE_UNIFORM, 1);
-    DescriptorSet = Graphics::CreateDescriptorSet(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, DescriptorPool, TempBuffer);
+    TempBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, sizeof(Temp), Graphics::BUFFER_STORAGE_ACCESSIBLE);
+    Graphics::UpdateBufferData(TempBuffer, (Temp){{1.0, 0.0, 0.0}});
+    DescriptorPool = Graphics::CreateDescriptorPool(Hardware, Graphics::DESCRIPTOR_TYPE_UNIFORM, 2);
+    auto DescriptorSet = Graphics::CreateDescriptorSet(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, DescriptorPool);
+    Graphics::ConfigureDescriptorSet(DescriptorSet, TempBuffer, 0);
 
     {
       Graphics::BeginCommandBuffer(Buffer, 0, RenderPass, 0);
