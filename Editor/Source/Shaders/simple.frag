@@ -6,6 +6,11 @@
 #define MAX_DIST 100.
 #define SURF_DIST .01
 
+layout(binding = 0) uniform Temp
+{
+    vec3 color;
+} ubo;
+
 layout(location = 0) out vec4 outColor;
 
 float SphereDist(vec3 p, float s)
