@@ -161,7 +161,7 @@ struct DescriptorPoolData
 struct DescriptorSetData
 {
   VkDevice Device;
-  VkDescriptorSet DescriptorSet;
+  std::vector<VkDescriptorSet> DescriptorSet;
 };
 }; // namespace VulkanAPI
 }; // namespace Graphics

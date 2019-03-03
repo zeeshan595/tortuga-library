@@ -9,9 +9,8 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-DescriptorSetData CreateDescriptorSet(DeviceData device, DescriptorLayoutData layout, DescriptorPoolData pool);
-void DestroyDescriptorSet(DescriptorSetData data);
-void ConfigureDescriptorSetBuffer(DescriptorSetData data, BufferData buffer, uint32_t binding);
+DescriptorSetData ConfigureDescriptorSets(DeviceData device, DescriptorLayoutData layout, DescriptorPoolData pool);
+void ConfigureDescriptorSetBuffer(DescriptorSetData data, BufferData buffer, uint32_t binding, uint32_t setIndex);
 }; // namespace VulkanAPI
 }; // namespace Graphics
 }; // namespace Tortuga

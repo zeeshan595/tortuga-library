@@ -4,15 +4,20 @@ namespace Tortuga
 {
 namespace Graphics
 {
-void ConfigureDescriptorSet(DescriptorSet data, Buffer buffer, uint32_t binding)
+void ConfigureDescriptorSet(DescriptorSet data, Buffer buffer, uint32_t binding, uint32_t setIndex)
 {
   for (uint32_t i = 0; i < data.VulkanDescriptorSets.size(); i++)
   {
-    VulkanAPI::ConfigureDescriptorSetBuffer(data.VulkanDescriptorSets[i], buffer.VulkanBuffer[i], binding);
+    VulkanAPI::ConfigureDescriptorSetBuffer(data.VulkanDescriptorSets[i], buffer.VulkanBuffer[i], binding, setIndex);
   }
 }
-DescriptorSet CreateDescriptorSet(HardwareController hardware, DescriptorLayout layout, DescriptorType type, DescriptorPool pool)
+DescriptorSet ConfigureDescriptorPool(HardwareController hardware, DescriptorLayout layout, DescriptorType type, DescriptorPool pool)
 {
+  if (pool.Type != type)
+  {
+    Console::Fatal("This pool does not accept the type of descriptor you provided!");
+  }
+
   auto data = DescriptorSet();
   data.Hardware = hardware;
   data.Type = type;
@@ -20,22 +25,10 @@ DescriptorSet CreateDescriptorSet(HardwareController hardware, DescriptorLayout 
   data.VulkanDescriptorSets.resize(hardware.Devices.size());
   for (uint32_t i = 0; i < hardware.Devices.size(); i++)
   {
-    switch (type)
-    {
-    default:
-    case DESCRIPTOR_TYPE_UNIFORM:
-      data.VulkanDescriptorSets[i] = VulkanAPI::CreateDescriptorSet(
-          hardware.Devices[i].VulkanDevice,
-          layout.UniformLayouts[i],
-          pool.VulkanDescriptorPools[i]);
-      break;
-    case DESCRIPTOR_TYPE_IMAGE:
-      data.VulkanDescriptorSets[i] = VulkanAPI::CreateDescriptorSet(
-          hardware.Devices[i].VulkanDevice,
-          layout.ImageLayouts[i],
-          pool.VulkanDescriptorPools[i]);
-      break;
-    }
+    data.VulkanDescriptorSets[i] = VulkanAPI::ConfigureDescriptorSets(
+        hardware.Devices[i].VulkanDevice,
+        layout.Layouts[i],
+        pool.VulkanDescriptorPools[i]);
   }
 
   return data;
