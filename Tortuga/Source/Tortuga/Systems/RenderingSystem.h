@@ -6,10 +6,6 @@
 
 namespace Tortuga
 {
-struct Temp
-{
-  glm::vec3 color = {1.0, 0.0, 0.0};
-};
 class RenderingSystem : public System
 {
 private:

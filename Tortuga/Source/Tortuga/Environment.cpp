@@ -2,6 +2,10 @@
 
 namespace Tortuga
 {
+Environment CreateEnvironment(std::string name)
+{
+  return {name, {}};
+}
 Entity *CreateEntity(
     Environment &environment,
     const char *name,
@@ -19,12 +23,18 @@ Entity *CreateEntity(
   environment.Entities.push_back(data);
   return data;
 }
-glm::mat4 GetEntityTransformationMatrix(const Entity *data)
+
+void DestroyEntity(Environment &e, Entity *data)
 {
-  glm::mat4 model = glm::mat4(1.0f);
-  model = glm::scale(model, data->Transform.Scale);
-  model = glm::rotate(model, data->Transform.Rotation.w, glm::vec3(data->Transform.Rotation.x, data->Transform.Rotation.y, data->Transform.Rotation.z));
-  model = glm::translate(model, data->Transform.Position);
-  return model;
+  auto i = std::find(e.Entities.begin(), e.Entities.end(), data);
+  e.Entities.erase(i);
+  delete data;
+}
+void DestroyEnvironment(Environment data)
+{
+  for (uint32_t i = 0; i < data.Entities.size(); i++)
+  {
+    delete data.Entities[i];
+  }
 }
 }; // namespace Tortuga

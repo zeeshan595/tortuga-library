@@ -7,9 +7,12 @@ int main(int argc, char **argv)
     SDL_Init(SDL_INIT_EVERYTHING);
     Console::Info("Tortuga Engine Started!");
 
-    auto scene = Environment();
-    auto e = CreateEntity(scene);
-    AddEntityData<MeshRenderer>(e);
+    auto scene = CreateEnvironment("Default");
+    auto sphereObject = CreateEntity(scene);
+    AddEntityData<MeshRenderer>(sphereObject);
+    MeshRenderer r;
+    r.IsEnabled = false;
+    UpdateEntityData<MeshRenderer>(sphereObject, r);
 
     auto systemController = CreateSystemController(&scene);
     AddSystem<RenderingSystem>(systemController);
@@ -33,6 +36,7 @@ int main(int argc, char **argv)
     }
 
     DestroySystemController(systemController);
+    DestroyEnvironment(scene);
 
     Console::Info("Shutting Down!");
     SDL_Quit();

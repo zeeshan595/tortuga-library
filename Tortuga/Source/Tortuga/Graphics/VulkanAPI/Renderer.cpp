@@ -29,7 +29,6 @@ void SubmitCommands(RendererData data, std::vector<CommandBufferData> commandBuf
 
 void DrawFrame(RendererData data)
 {
-
   auto submitInfo = VkSubmitInfo();
   {
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
