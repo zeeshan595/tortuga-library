@@ -5,7 +5,7 @@ namespace Tortuga
 void SystemThread(System *ref)
 {
   ref->OnStart();
-  while (ref->IsSystemActive)
+  while (ref->IsSystemActive.load())
   {
     ref->OnUpdate();
   }

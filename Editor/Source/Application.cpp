@@ -8,8 +8,8 @@ int main(int argc, char **argv)
     Console::Info("Tortuga Engine Started!");
 
     auto scene = Environment();
-    //auto plane = CreateEntity(scene, "Plane");
-    //auto mesh = MeshRenderer();
+    auto e = CreateEntity(scene);
+    AddEntityData<MeshRenderer>(e);
 
     auto systemController = CreateSystemController(&scene);
     AddSystem<RenderingSystem>(systemController);

@@ -40,13 +40,19 @@ Pipeline CreatePipeline(HardwareController hardware, RenderPass renderPass, std:
       shaderInfos[j] = shaders[j].VulkanShader[i].StageInfo;
     }
 
+    std::vector<VkDescriptorSetLayout> layouts(2);
+    {
+      layouts[0] = data.Layout.UniformLayouts[i].Layout;
+      layouts[1] = data.Layout.ImageLayouts[i].Layout;
+    }
+
     data.VulkanPipeline[i] = VulkanAPI::CreatePipeline(
         hardware.Devices[i].VulkanDevice,
         renderPass.VulkanRenderPass[i],
         {hardware.FullWidth, hardware.FullHeight},
         shaderInfos,
         GetBindingDescription(), GetAttributeDescriptions(),
-        {data.Layout.Layouts[i].Layout});
+        layouts);
   }
 
   return data;

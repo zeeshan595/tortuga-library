@@ -12,9 +12,9 @@ Entity *CreateEntity(
   auto data = new Entity();
   {
     data->Name = name;
-    data->Position = position;
-    data->Rotation = rotation;
-    data->Scale = scale;
+    data->Transform.Position = position;
+    data->Transform.Rotation = rotation;
+    data->Transform.Scale = scale;
   }
   environment.Entities.push_back(data);
   return data;
@@ -22,9 +22,9 @@ Entity *CreateEntity(
 glm::mat4 GetEntityTransformationMatrix(const Entity *data)
 {
   glm::mat4 model = glm::mat4(1.0f);
-  model = glm::scale(model, data->Scale);
-  model = glm::rotate(model, data->Rotation.w, glm::vec3(data->Rotation.x, data->Rotation.y, data->Rotation.z));
-  model = glm::translate(model, data->Position);
+  model = glm::scale(model, data->Transform.Scale);
+  model = glm::rotate(model, data->Transform.Rotation.w, glm::vec3(data->Transform.Rotation.x, data->Transform.Rotation.y, data->Transform.Rotation.z));
+  model = glm::translate(model, data->Transform.Position);
   return model;
 }
 }; // namespace Tortuga

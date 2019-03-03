@@ -25,10 +25,8 @@ private:
   Graphics::Pipeline Pipeline;
   Graphics::CommandPool Pool;
   Graphics::CommandBuffer Buffer;
-  Graphics::DescriptorPool DescriptorPool;
-
-  Graphics::Buffer TempBuffer;
-  Graphics::Buffer TempBuffer2;
+  Graphics::DescriptorPool UniformDescriptorPool;
+  Graphics::DescriptorPool ImageDescriptorPool;
 
   //Screen
   Graphics::Buffer VertexBuffer;
@@ -101,18 +99,19 @@ public:
       Graphics::DestroyCommandPool(tempPool);
     }
 
-    TempBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, sizeof(Temp), Graphics::BUFFER_STORAGE_ACCESSIBLE);
-    Graphics::UpdateBufferData(TempBuffer, (Temp){{1.0, 0.0, 0.0}});
-    DescriptorPool = Graphics::CreateDescriptorPool(Hardware, Graphics::DESCRIPTOR_TYPE_UNIFORM, 2);
-    auto DescriptorSets = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, DescriptorPool);
+    UniformDescriptorPool = Graphics::CreateDescriptorPool(Hardware, Graphics::DESCRIPTOR_TYPE_UNIFORM, 1, 1);
+    ImageDescriptorPool = Graphics::CreateDescriptorPool(Hardware, Graphics::DESCRIPTOR_TYPE_IMAGE, 1, 1);
 
-    Graphics::ConfigureDescriptorSet(DescriptorSets, TempBuffer, 0, 0);
-    Graphics::ConfigureDescriptorSet(DescriptorSets, TempBuffer, 0, 1);
+    auto uniformDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, UniformDescriptorPool);
+    auto imageDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_IMAGE, ImageDescriptorPool);
+
+    //Graphics::ConfigureDescriptorSet(uniformDescriptors, TempBuffer, 0, 0);
+    //Graphics::ConfigureDescriptorSet(imageDescriptors, TempBuffer, 0, 0);
 
     {
       Graphics::BeginCommandBuffer(Buffer, 0, RenderPass, 0);
       Graphics::BindCommandBufferPipeline(Buffer, 0, Pipeline);
-      Graphics::CommandBufferBindDescriptor(Buffer, 0, Pipeline, {DescriptorSets});
+      Graphics::CommandBufferBindDescriptor(Buffer, 0, Pipeline, {uniformDescriptors, imageDescriptors});
       Graphics::CommandBufferDraw(Buffer, 0, VertexBuffer, IndexBuffer, indices.size());
       Graphics::EndCommandBuffer(Buffer, 0);
     }
@@ -128,8 +127,8 @@ public:
   void OnEnd()
   {
     Graphics::DestroyRenderer(Renderer);
-    Graphics::DestroyDescriptorPool(DescriptorPool);
-    Graphics::DestroyBuffer(TempBuffer);
+    Graphics::DestroyDescriptorPool(UniformDescriptorPool);
+    Graphics::DestroyDescriptorPool(ImageDescriptorPool);
     Graphics::DestroyBuffer(VertexBuffer);
     Graphics::DestroyBuffer(IndexBuffer);
     Graphics::DestroyCommandPool(Pool);

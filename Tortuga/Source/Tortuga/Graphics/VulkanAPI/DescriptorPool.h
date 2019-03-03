@@ -9,7 +9,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-DescriptorPoolData CreateDescriptorPool(DeviceData device, VkDescriptorType type, uint32_t size);
+DescriptorPoolData CreateDescriptorPool(DeviceData device, VkDescriptorType type, uint32_t setSize, uint32_t descriptorSize);
 void DestroyDescriptorPool(DescriptorPoolData data);
 }; // namespace VulkanAPI
 }; // namespace Graphics

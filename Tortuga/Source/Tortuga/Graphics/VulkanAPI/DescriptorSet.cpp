@@ -6,7 +6,28 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-void ConfigureDescriptorSetBuffer(DescriptorSetData data, BufferData buffer, uint32_t binding, uint32_t setIndex)
+void ConfigureDescriptorSetSampledImage(DescriptorSetData data, VkImageLayout imageLayout, VkImageView imageView, VkSampler imageSampler, uint32_t setIndex, uint32_t binding)
+{
+  auto imageInfo = VkDescriptorImageInfo();
+  {
+    imageInfo.imageLayout = imageLayout;
+    imageInfo.imageView = imageView;
+    imageInfo.sampler = imageSampler;
+  }
+
+  auto descriptorWrite = VkWriteDescriptorSet();
+  {
+    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrite.dstSet = data.DescriptorSet[setIndex];
+    descriptorWrite.dstBinding = binding;
+    descriptorWrite.dstArrayElement = 0;
+    descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    descriptorWrite.descriptorCount = data.DescriptorSize;
+    descriptorWrite.pImageInfo = &imageInfo;
+  }
+  vkUpdateDescriptorSets(data.Device, 1, &descriptorWrite, 0, nullptr);
+}
+void ConfigureDescriptorSetBuffer(DescriptorSetData data, BufferData buffer, uint32_t setIndex, uint32_t binding)
 {
   auto bufferInfo = VkDescriptorBufferInfo();
   {
@@ -22,10 +43,8 @@ void ConfigureDescriptorSetBuffer(DescriptorSetData data, BufferData buffer, uin
     descriptorWrite.dstBinding = binding;
     descriptorWrite.dstArrayElement = 0;
     descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    descriptorWrite.descriptorCount = 1;
+    descriptorWrite.descriptorCount = data.DescriptorSize;
     descriptorWrite.pBufferInfo = &bufferInfo;
-    descriptorWrite.pImageInfo = nullptr;       // Optional
-    descriptorWrite.pTexelBufferView = nullptr; // Optional
   }
   vkUpdateDescriptorSets(data.Device, 1, &descriptorWrite, 0, nullptr);
 }
@@ -33,16 +52,19 @@ DescriptorSetData ConfigureDescriptorSets(DeviceData device, DescriptorLayoutDat
 {
   auto data = DescriptorSetData();
   data.Device = device.Device;
+  data.DescriptorSize = pool.DescriptorSize;
 
+  std::vector<VkDescriptorSetLayout> layouts(pool.DescriptorSetSize, layout.Layout);
   auto allocInfo = VkDescriptorSetAllocateInfo();
   {
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = pool.Pool;
-    allocInfo.descriptorSetCount = pool.PoolSize;
-    allocInfo.pSetLayouts = &layout.Layout;
+    allocInfo.descriptorSetCount = pool.DescriptorSetSize;
+    allocInfo.pSetLayouts = layouts.data();
   }
-  data.DescriptorSet.resize(pool.PoolSize);
-  if (vkAllocateDescriptorSets(data.Device, &allocInfo, data.DescriptorSet.data()) != VK_SUCCESS)
+  data.DescriptorSet.resize(pool.DescriptorSetSize);
+  VkResult temp = vkAllocateDescriptorSets(data.Device, &allocInfo, data.DescriptorSet.data());
+  if (temp != VK_SUCCESS)
   {
     Console::Fatal("Failed to allocate descriptor sets on device: {0}", device.Properties.deviceName);
   }

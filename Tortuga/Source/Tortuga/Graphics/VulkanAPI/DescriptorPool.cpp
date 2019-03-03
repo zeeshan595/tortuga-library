@@ -6,17 +6,18 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-DescriptorPoolData CreateDescriptorPool(DeviceData device, VkDescriptorType type, uint32_t size)
+DescriptorPoolData CreateDescriptorPool(DeviceData device, VkDescriptorType type, uint32_t setSize, uint32_t descriptorSize)
 {
   auto data = DescriptorPoolData();
   data.Device = device.Device;
   data.Type = type;
-  data.PoolSize = size;
+  data.DescriptorSetSize = setSize;
+  data.DescriptorSize = descriptorSize;
 
   auto poolSize = VkDescriptorPoolSize();
   {
     poolSize.type = type;
-    poolSize.descriptorCount = size;
+    poolSize.descriptorCount = data.DescriptorSize * data.DescriptorSetSize;
   }
 
   auto poolInfo = VkDescriptorPoolCreateInfo();
@@ -24,7 +25,7 @@ DescriptorPoolData CreateDescriptorPool(DeviceData device, VkDescriptorType type
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = 1;
     poolInfo.pPoolSizes = &poolSize;
-    poolInfo.maxSets = size;
+    poolInfo.maxSets = data.DescriptorSetSize;
   }
   if (vkCreateDescriptorPool(device.Device, &poolInfo, nullptr, &data.Pool) != VK_SUCCESS)
   {

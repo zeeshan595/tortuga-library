@@ -23,12 +23,12 @@ void SetupPresentation(Renderer data)
       auto imageRegion = VkImageBlit();
       {
         VkOffset3D offset = {
-            data.Hardware.Devices[j].Viewport.X,
-            data.Hardware.Devices[j].Viewport.Y,
+            (int32_t)data.Hardware.Devices[j].Viewport.X,
+            (int32_t)data.Hardware.Devices[j].Viewport.Y,
             0};
         VkOffset3D size = {
-            data.Hardware.Devices[j].Viewport.Width + offset.x,
-            data.Hardware.Devices[j].Viewport.Height + offset.y,
+            (int32_t)data.Hardware.Devices[j].Viewport.Width + offset.x,
+            (int32_t)data.Hardware.Devices[j].Viewport.Height + offset.y,
             1};
 
         imageRegion.srcOffsets[0] = offset;

@@ -2,7 +2,10 @@
 #define _TORTUGA_PRIMITIVE
 
 #include "Core.h"
+#include "Transformation.h"
 
+namespace Tortuga
+{
 enum PrimitiveType
 {
   PRIMITIVE_SPHERE,
@@ -92,15 +95,11 @@ struct PrimitiveAlterations
 };
 struct Primitive
 {
-  //Transformation
-  glm::vec3 Position = {0, 0, 0};
-  glm::vec4 Rotation = {0, 0, 0, 0};
-  glm::vec3 Scale = {1, 1, 1};
-
-  //Properties
+  Transformation Transform;
   PrimitiveType Type = PRIMITIVE_SPHERE;
   PrimitiveMethod Method = PRIMITIVE_METHOD_UNION;
   PrimitiveAlterations Alterations = PrimitiveAlterations();
 };
+}; // namespace Tortuga
 
 #endif

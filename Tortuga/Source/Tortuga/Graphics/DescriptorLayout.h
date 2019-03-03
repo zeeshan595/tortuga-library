@@ -13,7 +13,8 @@ namespace Graphics
 struct DescriptorLayout
 {
   HardwareController hardware;
-  std::vector<VulkanAPI::DescriptorLayoutData> Layouts;
+  std::vector<VulkanAPI::DescriptorLayoutData> UniformLayouts;
+  std::vector<VulkanAPI::DescriptorLayoutData> ImageLayouts;
 };
 DescriptorLayout CreateDescriptorLayouts(HardwareController hardware);
 void DestroyDescriptorLayouts(DescriptorLayout data);

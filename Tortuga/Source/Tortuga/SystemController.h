@@ -51,11 +51,11 @@ void AddSystem(SystemController &controller)
     Console::Error("All systems must inherit from the 'System' class!");
     return;
   }
-  
+
   //Setup important variables
   data->Scene = controller.Scene;
-  data->IsSystemActive = true;
-  
+  data->IsSystemActive.store(true);
+
   data->OnAwake();
   data->SystemThread = std::thread(&SystemThread, data);
   controller.Systems.push_back(data);
