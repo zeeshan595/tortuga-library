@@ -6,15 +6,16 @@
 #define MAX_DIST 100.
 #define SURF_DIST.01
 
-layout(set=0,binding=0)uniform Temp
+struct MeshRenderer
 {
-    vec3 color;
-}ubo;
+    bool IsEnabled;
+};
 
-layout(set=1,binding=0)uniform Stuff
+layout(set=0,binding=0)uniform RenderObjects
 {
-    vec3 color;
-}some;
+    mat4 transformation;
+    MeshRenderer mesh;
+}scene[];
 
 layout(location=0)out vec4 outColor;
 
@@ -52,6 +53,8 @@ void main()
     float d=RayMarch(rayOrigin,rayDirection);
     d/=6.;
     vec3 col=vec3(d);
+    if (scene[0].mesh.IsEnabled == false)
+        col = vec3(0.0);
     
     outColor=vec4(col,1.);
 }

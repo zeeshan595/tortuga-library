@@ -10,8 +10,9 @@ int main(int argc, char **argv)
     auto scene = CreateEnvironment("Default");
     auto sphereObject = CreateEntity(scene);
     AddEntityData<MeshRenderer>(sphereObject);
+    auto temp = GetEntityData<MeshRenderer>(sphereObject);
 
-    auto systemController = CreateSystemController(&scene);
+    auto systemController = CreateSystemController(scene);
     AddSystem<RenderingSystem>(systemController);
 
     //Main loop
