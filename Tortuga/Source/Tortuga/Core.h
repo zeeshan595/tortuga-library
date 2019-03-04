@@ -22,6 +22,7 @@
 #include <chrono>
 #include <atomic>
 #include <thread>
+#include <mutex>
 
 //3rd Party
 #include <vulkan/vulkan.h>

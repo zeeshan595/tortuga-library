@@ -10,9 +10,6 @@ int main(int argc, char **argv)
     auto scene = CreateEnvironment("Default");
     auto sphereObject = CreateEntity(scene);
     AddEntityData<MeshRenderer>(sphereObject);
-    MeshRenderer r;
-    r.IsEnabled = false;
-    UpdateEntityData<MeshRenderer>(sphereObject, r);
 
     auto systemController = CreateSystemController(&scene);
     AddSystem<RenderingSystem>(systemController);

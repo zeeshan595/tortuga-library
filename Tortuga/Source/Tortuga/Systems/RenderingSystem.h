@@ -3,6 +3,8 @@
 
 #include "../Core.h"
 #include "../SystemController.h"
+#include "../EntityData/MesRenderer.h"
+#include "../Transformation.h"
 
 namespace Tortuga
 {

@@ -7,12 +7,11 @@
 namespace Tortuga
 {
 
-struct MeshRenderer : public EntityData
+struct MeshRenderer : public DataStructure
 {
   bool IsEnabled = true;
   std::vector<Primitive> Primitives = {
-    Primitive()
-  };
+      Primitive()};
 };
 }; // namespace Tortuga
 

@@ -7,14 +7,15 @@
 
 namespace Tortuga
 {
-struct EntityData
+struct DataStructure
 {
 };
 struct Entity
 {
   std::string Name;
   Transformation Transform;
-  std::vector<EntityData> Data;
+  std::vector<DataStructure> Data;
+  std::mutex Lock;
 };
 struct Environment
 {
@@ -33,24 +34,26 @@ void DestroyEntity(Environment &e, Entity *data);
 void DestroyEnvironment(Environment data);
 
 template <typename T>
-void AddEntityData(Entity *e)
+void AddEntityData(Entity *e, T data = T())
 {
-  auto temp = dynamic_cast<EntityData *>(new T());
-  if (temp == nullptr)
+  for (uint32_t i = 0; i < e->Data.size(); i++)
   {
-    Console::Error("Failed to add data structure to entity, All data structures must inherit from `EntityData`");
-    return;
+    T *temp = (T *)&e->Data[i];
+    if (temp != nullptr)
+    {
+      Console::Error("Failed to add data structure to entity because this entity already has that data structure!");
+      return;
+    }
   }
-
-  e->Data.push_back(*temp);
-  delete temp;
+  e->Data.push_back(data);
 }
 template <typename T>
 void RemoveEntityData(Entity *e)
 {
   for (uint32_t i = 0; i < e->Data.size(); i++)
   {
-    if (typeid(T) == typeid(e->Data[i]))
+    T *temp = (T *)&e->Data[i];
+    if (temp != nullptr)
     {
       e->Data.erase(e->Data.begin() + i);
       break;
@@ -62,15 +65,27 @@ void UpdateEntityData(Entity *e, T data)
 {
   for (uint32_t i = 0; i < e->Data.size(); i++)
   {
-    if (typeid(T) == typeid(e->Data[i]))
+    T *temp = (T *)&e->Data[i];
+    if (temp != nullptr)
     {
-      auto temp = dynamic_cast<EntityData *>(&data);
-      e->Data[i] = *temp;
-      delete temp;
+      e->Data[i] = data;
       break;
     }
   }
 }
+template <typename T>
+T GetEntityData(Entity *e)
+{
+  for (uint32_t i = 0; i < e->Data.size(); i++)
+  {
+    T *temp = (T *)&e->Data[i];
+    if (temp != nullptr)
+    {
+      return e->Data[i];
+    }
+  }
+}
+
 }; // namespace Tortuga
 
 #endif
