@@ -18,6 +18,13 @@ struct Entity
   std::vector<DataStructure *> Data;
   std::mutex MutexLock;
 };
+template <typename T>
+struct EntityData
+{
+  std::string Name;
+  Transformation Transform;
+  T Data;
+};
 //Please use thread safe functions for this class
 struct Environment
 {
@@ -37,9 +44,9 @@ void DestroyEntity(Environment *e, Entity *data);
 void DestroyEnvironment(Environment *data);
 
 template <typename T>
-std::vector<T> GetEntitiesDataStructures(Environment *e)
+std::vector<EntityData<T>> GetEntitiesDataStructures(Environment *e)
 {
-  std::vector<T> data;
+  std::vector<EntityData<T>> data;
   e->MutexLock.lock();
   for (uint32_t i = 0; i < e->Entities.size(); i++)
   {
@@ -49,7 +56,10 @@ std::vector<T> GetEntitiesDataStructures(Environment *e)
       T *temp = static_cast<T *>(e->Entities[i]->Data[i]);
       if (temp != nullptr)
       {
-        T d = *temp;
+        EntityData<T> d;
+        d.Name = e->Entities[i]->Name;
+        d.Transform = e->Entities[i]->Transform;
+        d.Data = *temp;
         data.push_back(d);
         break;
       }
@@ -61,7 +71,7 @@ std::vector<T> GetEntitiesDataStructures(Environment *e)
 }
 
 template <typename T>
-void AddEntityData(Entity *e, T *data = new T())
+void AddEntityData(Entity *e, T data = T())
 {
   e->MutexLock.lock();
   for (uint32_t i = 0; i < e->Data.size(); i++)
@@ -74,7 +84,9 @@ void AddEntityData(Entity *e, T *data = new T())
       return;
     }
   }
-  e->Data.push_back(data);
+  T *temp = new T();
+  *temp = data;
+  e->Data.push_back(temp);
   e->MutexLock.unlock();
 }
 template <typename T>

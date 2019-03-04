@@ -8,11 +8,6 @@
 
 namespace Tortuga
 {
-struct RenderObject
-{
-  glm::mat4 Transform;
-  MeshRenderer Mesh;
-};
 class RenderingSystem : public System
 {
 private:
@@ -109,8 +104,8 @@ public:
     auto uniformDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, UniformDescriptorPool);
     auto imageDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_IMAGE, ImageDescriptorPool);
 
-    RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, sizeof(RenderObject) * 100, Graphics::BUFFER_STORAGE_ACCESSIBLE);
-    Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
+    //RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, 1, Graphics::BUFFER_STORAGE_ACCESSIBLE);
+    //Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
     //Graphics::ConfigureDescriptorSet(imageDescriptors, TempBuffer, 0, 0);
 
     {
@@ -126,30 +121,8 @@ public:
 
   void OnUpdate()
   {
-    std::vector<RenderObject> data;
-    Scene->MutexLock.lock();
-    for (uint32_t i = 0; i < Scene->Entities.size(); i++)
-    {
-      Scene->Entities[i]->MutexLock.lock();
-      for (uint32_t j = 0; j < Scene->Entities[i]->Data.size(); j++)
-      {
-        auto *temp = static_cast<MeshRenderer *>(Scene->Entities[i]->Data[i]);
-        if (temp != nullptr && temp->IsEnabled)
-        {
-          MeshRenderer d = *temp;
-          auto rend = RenderObject();
-          {
-            rend.Transform = Transformation::GetEntityTransformationMatrix(Scene->Entities[i]->Transform);
-            rend.Mesh = d;
-          }
-          data.push_back(rend);
-          break;
-        }
-      }
-      Scene->Entities[i]->MutexLock.unlock();
-    }
-    Scene->MutexLock.unlock();
-    Graphics::UpdateBufferData(RenderObjectBuffer, data);
+    auto data = GetEntitiesDataStructures<MeshRenderer>(Scene);
+    //Graphics::UpdateBufferData(RenderObjectBuffer, data);
     Graphics::DrawFrame(Renderer);
   }
 

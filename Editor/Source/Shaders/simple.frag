@@ -6,28 +6,16 @@
 #define MAX_DIST 100.
 #define SURF_DIST.01
 
-struct MeshRenderer
-{
-    bool IsEnabled;
-};
-
-layout(set=0,binding=0)uniform RenderObjects
-{
-    mat4 transformation;
-    MeshRenderer mesh;
-}scene[];
-
 layout(location=0)out vec4 outColor;
 
-float SphereDist(vec3 p,float s)
+float SphereDist(vec3 position, float radius, vec3 point)
 {
-    vec3 position=vec3(0,1,5.5);
-    return length(p-position.xyz)-s;
+    return length(point-position.xyz)-radius;
 }
 
 float GetMinDistance(vec3 point)
 {
-    return SphereDist(point,1.);
+    return SphereDist(vec3(0., 1., 5.5), 2., point);
 }
 
 float RayMarch(vec3 rayOrigin,vec3 rayDirection)
@@ -51,11 +39,8 @@ void main()
     vec3 rayDirection=normalize(vec3(uv,1.));
     
     float d=RayMarch(rayOrigin,rayDirection);
-    d/=6.;
+    d/=5.;
     vec3 col=vec3(d);
-    if (scene[0].mesh.IsEnabled == false)
-        col = vec3(0.0);
-    
     outColor=vec4(col,1.);
 }
 
