@@ -12,7 +12,8 @@ PipelineData CreatePipeline(
     VkExtent2D viewSize,
     std::vector<VkPipelineShaderStageCreateInfo> shaderStageInfos,
     VkVertexInputBindingDescription inputBindingDescription,
-    std::vector<VkVertexInputAttributeDescription> inputAttributeDescription)
+    std::vector<VkVertexInputAttributeDescription> inputAttributeDescription,
+    std::vector<VkDescriptorSetLayout> descriptorLayouts)
 {
   auto data = PipelineData();
   data.Device = device.Device;
@@ -122,12 +123,14 @@ PipelineData CreatePipeline(
   }
 
   auto pipelineLayoutInfo = VkPipelineLayoutCreateInfo();
-  pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipelineLayoutInfo.setLayoutCount = 0;            // Optional
-  pipelineLayoutInfo.pSetLayouts = nullptr;         // Optional
-  pipelineLayoutInfo.pushConstantRangeCount = 0;    // Optional
-  pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
-
+  {
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = descriptorLayouts.size();
+    pipelineLayoutInfo.pSetLayouts = descriptorLayouts.data();
+    pipelineLayoutInfo.pushConstantRangeCount = 0;    // Optional
+    pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+  }
+  
   if (vkCreatePipelineLayout(device.Device, &pipelineLayoutInfo, nullptr, &data.Layout) != VK_SUCCESS)
   {
     Console::Fatal("Failed to create pipeline layout on device: {0}", Console::Arguments() << device.Properties.deviceName);

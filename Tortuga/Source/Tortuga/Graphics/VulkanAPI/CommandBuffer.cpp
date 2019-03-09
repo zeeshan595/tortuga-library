@@ -6,6 +6,10 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+void CommandBufferBindDescriptorSet(CommandBufferData data, uint32_t index, VkPipelineLayout pipelineLayout, std::vector<VkDescriptorSet> descriptorSets)
+{
+  vkCmdBindDescriptorSets(data.Buffer[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, descriptorSets.size(), descriptorSets.data(), 0, nullptr);
+}
 void CommandBufferCopyBuffer(CommandBufferData data, uint32_t index, BufferData src, BufferData dst)
 {
   uint32_t bufferSize = src.BufferSize;
@@ -50,9 +54,6 @@ void CommandBufferImageLayoutTransfer(CommandBufferData data, uint32_t index, Vk
     barrier.srcAccessMask = 0;
     barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
   }
-
-  VkPipelineStageFlags sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-  VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 
   vkCmdPipelineBarrier(
       data.Buffer[index],

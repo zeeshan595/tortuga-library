@@ -9,6 +9,7 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+void CommandBufferBindDescriptorSet(CommandBufferData data, uint32_t index, VkPipelineLayout pipelineLayout, std::vector<VkDescriptorSet> descriptorSets);
 void CommandBufferCopyBuffer(CommandBufferData data, uint32_t index, BufferData src, BufferData dst);
 void CommandBufferSubmit(CommandBufferData data, VkQueue queue, bool waitUntilComplete = false);
 void CommandBufferImageLayoutTransfer(CommandBufferData data, uint32_t index, VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
