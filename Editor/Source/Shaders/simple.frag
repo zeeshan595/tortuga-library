@@ -4,7 +4,7 @@
 #define ResolutionY 768
 #define MAX_STEPS 100
 #define MAX_DIST 100.
-#define SURF_DIST.01
+#define SURF_DIST .01
 
 layout(location=0)out vec4 outColor;
 
