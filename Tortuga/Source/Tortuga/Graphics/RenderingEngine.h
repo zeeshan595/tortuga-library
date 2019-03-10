@@ -1,8 +1,10 @@
 #ifndef _RENDERING_ENGINE
 #define _RENDERING_ENGINE
 
-#include "VulkanAPI/Vulkan.h"
 #include "VulkanAPI/Device.h"
+#include "VulkanAPI/Vulkan.h"
+
+#include "../Core.h"
 
 namespace Tortuga
 {

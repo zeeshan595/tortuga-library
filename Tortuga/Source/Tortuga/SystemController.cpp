@@ -2,48 +2,27 @@
 
 namespace Tortuga
 {
-void SystemThread(System *ref)
+SystemController *CreateSystemController()
 {
-  ref->OnStart();
-  while (ref->IsSystemActive.load())
-  {
-    ref->OnUpdate();
-  }
-  ref->OnEnd();
-}
-
-SystemController CreateSystemController(Environment *environment)
-{
-  auto data = SystemController();
-  {
-    data.Scene = environment;
-  }
+  auto data = new SystemController();
   return data;
 }
-void DestroySystemController(SystemController controller)
+void DestroySystemController(SystemController *controller)
 {
-  ClearSystems(controller);
-}
-
-void RemoveSystemAtPosition(SystemController &controller, uint32_t i)
-{
-  controller.Systems[i]->IsSystemActive = false;
-  controller.Systems[i]->SystemThread.join();
-  controller.Systems.erase(controller.Systems.begin() + i);
-}
-
-void ClearSystems(SystemController &controller)
-{
-  for (uint32_t i = 0; i < controller.Systems.size(); i++)
+  for (uint32_t i = 0; i < controller->AttachedSystems.size(); i++)
   {
-    RemoveSystemAtPosition(controller, i);
+    controller->AttachedSystems[i]->OnEnd();
+    delete controller->AttachedSystems[i];
   }
+
+  controller->AttachedSystems.clear();
+  delete controller;
 }
-void ProcessSystemUpdate(SystemController &controller)
+void ProcessSystemController(SystemController *controller)
 {
-  for (uint32_t i = 0; i < controller.Systems.size(); i++)
+  for (uint32_t i = 0; i < controller->AttachedSystems.size(); i++)
   {
-    controller.Systems[i]->OnMainThreadUpdate();
+    controller->AttachedSystems[i]->OnUpdate();
   }
 }
 }; // namespace Tortuga

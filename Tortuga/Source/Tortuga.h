@@ -19,12 +19,13 @@
 //Core Features
 #include "Tortuga/Core.h"
 #include "Tortuga/Console.h"
+#include "Tortuga/Entity.h"
 #include "Tortuga/Environment.h"
 #include "Tortuga/SystemController.h"
 #include "Tortuga/Primitive.h"
 
 //Common Entity Data Structures
-#include "Tortuga/EntityData/MesRenderer.h"
+#include "Tortuga/EntityData/MeshRenderer.h"
 
 //Common Systems
 #include "Tortuga/Systems/RenderingSystem.h"

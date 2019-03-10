@@ -2,56 +2,43 @@
 
 namespace Tortuga
 {
-Environment *CreateEnvironment(std::string name)
+Environment *CreateEnvironment()
 {
-  auto env = new Environment();
-  env->Name = name;
-  return env;
-}
-Entity *CreateEntity(
-    Environment *environment,
-    const char *name,
-    glm::vec3 position,
-    glm::vec4 rotation,
-    glm::vec3 scale)
-{
-  environment->MutexLock.lock();
-  auto data = new Entity();
-  {
-    data->Name = name;
-    data->Transform.Position = position;
-    data->Transform.Rotation = rotation;
-    data->Transform.Scale = scale;
-  }
-  environment->Entities.push_back(data);
-  environment->MutexLock.unlock();
+  auto data = new Environment();
   return data;
 }
+void DestroyEnvironment(Environment *env)
+{
+  for (uint32_t i = 0; i < env->Entities.size(); i++)
+    delete env->Entities[i];
 
-void DestroyEntity(Environment *e, Entity *data)
-{
-  e->MutexLock.lock();
-  data->MutexLock.lock();
-  auto i = std::find(e->Entities.begin(), e->Entities.end(), data);
-  for (uint32_t i = 0; i < data->Data.size(); i++)
-    delete data->Data[i];
-  e->Entities.erase(i);
-  data->MutexLock.unlock();
-  delete data;
-  e->MutexLock.unlock();
+  delete env;
 }
-void DestroyEnvironment(Environment *data)
+
+int32_t FindEntity(Environment *env, Entity *entity)
 {
-  data->MutexLock.lock();
-  for (uint32_t i = 0; i < data->Entities.size(); i++)
+  for (uint32_t i = 0; i < env->Entities.size(); i++)
   {
-    data->Entities[i]->MutexLock.lock();
-    for (uint32_t j = 0; j < data->Entities[i]->Data.size(); j++)
-      delete data->Entities[i]->Data[j];
-    data->Entities[i]->MutexLock.unlock();
-    delete data->Entities[i];
+    if (env->Entities[i] == entity)
+    {
+      return i;
+    }
   }
-  data->MutexLock.unlock();
-  delete data;
+  return -1;
+}
+Entity *CreateEntity(Environment *env)
+{
+  auto data = new Entity();
+  env->Entities.push_back(data);
+  return data;
+}
+void DestroyEntity(Environment *env, Entity *entity)
+{
+  auto index = FindEntity(env, entity);
+  if (index == -1)
+    return;
+
+  env->Entities.erase(env->Entities.begin() + index);
+  delete entity;
 }
 }; // namespace Tortuga

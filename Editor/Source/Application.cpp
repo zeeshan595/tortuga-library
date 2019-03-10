@@ -7,13 +7,12 @@ int main(int argc, char **argv)
     SDL_Init(SDL_INIT_EVERYTHING);
     Console::Info("Tortuga Engine Started!");
 
-    auto scene = CreateEnvironment("Default");
+    auto scene = CreateEnvironment();
     auto sphereObject = CreateEntity(scene);
-    AddEntityData<MeshRenderer>(sphereObject);
-    auto temp = GetEntityData<MeshRenderer>(sphereObject);
+    AddEntityDataStructure<MeshRenderer>(sphereObject);
 
-    auto systemController = CreateSystemController(scene);
-    AddSystem<RenderingSystem>(systemController);
+    auto controller = CreateSystemController();
+    AddSystem<RenderingSystem>(controller);
 
     //Main loop
     bool isRunning = true;
@@ -30,10 +29,10 @@ int main(int argc, char **argv)
             }
         }
 
-        ProcessSystemUpdate(systemController);
+        ProcessSystemController(controller);
     }
 
-    DestroySystemController(systemController);
+    DestroySystemController(controller);
     DestroyEnvironment(scene);
 
     Console::Info("Shutting Down!");

@@ -2,75 +2,64 @@
 #define _SYSTEM_CONTROLLER
 
 #include "Core.h"
-#include "Console.h"
 #include "Environment.h"
 
 namespace Tortuga
 {
-class System
+template <typename T>
+struct System
 {
-public:
-  std::thread SystemThread;
-  std::atomic<bool> IsSystemActive;
-  Environment *Scene;
+  static_assert(std::is_base_of<EntityDataStructure, T>::value, "T must inherit from Key");
 
-  System() {}
-  ~System() {}
+  std::vector<EntityExtractedData<T>> SceneData;
 
-  //Calls on main thread before OnStart
-  virtual void OnAwake() {}
-  //Calls every frame on main thread
-  virtual void OnMainThreadUpdate(){};
-
-  //Calls when system is initialized
   virtual void OnStart() {}
-  //Calls repeatedly
   virtual void OnUpdate() {}
-  //Calls when system is removed/destroyed
   virtual void OnEnd() {}
 };
 struct SystemController
 {
-  Environment *Scene;
-  std::vector<System *> Systems;
+  std::vector<System<EntityDataStructure> *> AttachedSystems;
 };
-SystemController CreateSystemController(Environment *environment);
-void DestroySystemController(SystemController controller);
-void SystemThread(System *ref);
-void RemoveSystemAtPosition(SystemController &controller, uint32_t o);
-void ClearSystems(SystemController &controller);
-void ProcessSystemUpdate(SystemController &controller);
+
+SystemController *CreateSystemController();
+void DestroySystemController(SystemController *controller);
+void ProcessSystemController(SystemController *controller);
 
 template <typename T>
-void AddSystem(SystemController &controller)
+int32_t FindSystem(SystemController *controller)
 {
-  T *temp = new T();
-  System *data = dynamic_cast<System *>(temp);
-  if (data == nullptr)
+  for (uint32_t i = 0; i < controller->AttachedSystems.size(); i++)
   {
-    Console::Error("All systems must inherit from the 'System' class!");
-    return;
+    auto data = (System<T>)controller->AttachedSystems[i];
+    if (data != nullptr)
+      return i;
   }
-
-  //Setup important variables
-  data->Scene = controller.Scene;
-  data->IsSystemActive.store(true);
-
-  data->OnAwake();
-  data->SystemThread = std::thread(&SystemThread, data);
-  controller.Systems.push_back(data);
+  return -1;
 }
+
 template <typename T>
-void RemoveSystem(SystemController &controller)
+void AddSystem(SystemController *controller)
 {
-  for (uint32_t i = 0; i < controller.Systems.size(); i++)
-  {
-    if (dynamic_cast<T *>(controller.Systems[i]) != nullptr)
-    {
-      RemoveSystemAtPosition(controller, i);
-      break;
-    }
-  }
+  auto temp = new T();
+  auto data = (System<EntityDataStructure> *)(temp);
+  if (data == nullptr)
+    return;
+
+  temp->OnStart();
+  controller->AttachedSystems.push_back(data);
+}
+
+template <typename T>
+void RemoveSystem(SystemController *controller)
+{
+  auto index = FindSystem<T>(controller);
+  if (index == -1)
+    return;
+
+  controller->AttachedSystems[index]->OnEnd();
+  delete controller->AttachedSystems[index];
+  controller->AttachedSystems.erase(controller->AttachedSystems.begin() + index);
 }
 }; // namespace Tortuga
 

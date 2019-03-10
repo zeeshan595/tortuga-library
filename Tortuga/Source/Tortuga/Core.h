@@ -7,6 +7,8 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 
 //General
+#include <math.h>
+#include <stdlib.h>
 #include <array>
 #include <vector>
 #include <map>

@@ -4,11 +4,11 @@
 #include "../Core.h"
 #include "../Environment.h"
 #include "../SystemController.h"
-#include "../EntityData/MesRenderer.h"
+#include "../EntityData/MeshRenderer.h"
 
 namespace Tortuga
 {
-class RenderingSystem : public System
+class RenderingSystem : public System<MeshRenderer>
 {
 private:
   std::string ApplicationDir;
@@ -39,7 +39,7 @@ private:
       0, 1, 2, 2, 3, 0};
 
 public:
-  void OnAwake()
+  void OnStart()
   {
     ApplicationDir = GetExecutablePath();
 
@@ -121,7 +121,7 @@ public:
 
   void OnUpdate()
   {
-    auto data = GetEntitiesDataStructures<MeshRenderer>(Scene);
+    //auto data = GetEntitiesDataStructures<MeshRenderer>(Scene);
     //Graphics::UpdateBufferData(RenderObjectBuffer, data);
     Graphics::DrawFrame(Renderer);
   }
