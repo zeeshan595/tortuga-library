@@ -8,6 +8,7 @@ namespace Tortuga
 {
 struct EntityDataStructure
 {
+  virtual void Temp() {}
 };
 struct Entity
 {

@@ -12,6 +12,14 @@ struct System
   static_assert(std::is_base_of<EntityDataStructure, T>::value, "T must inherit from Key");
 
   std::vector<EntityExtractedData<T>> SceneData;
+  void UpdateData(std::vector<EntityExtractedData<EntityDataStructure>> data)
+  {
+    SceneData.resize(data.size());
+    for (uint32_t i = 0; i < data.size(); i++)
+    {
+      SceneData[i] = data[i];
+    }
+  }
 
   virtual void OnStart() {}
   virtual void OnUpdate() {}
@@ -22,11 +30,13 @@ struct System
 struct SystemController
 {
   std::vector<System<EntityDataStructure> *> AttachedSystems;
+  std::vector<std::type_info> DataTypes;
 };
 
 SystemController *CreateSystemController();
 void DestroySystemController(SystemController *controller);
-void ProcessSystemController(SystemController *controller);
+void ProcessSystemController(SystemController *controller, Environment *env);
+int32_t FindDataType(SystemController *controller, std::type_info typeInfo);
 
 template <typename T>
 int32_t FindSystem(SystemController *controller)
@@ -48,6 +58,7 @@ void AddSystem(SystemController *controller)
     return;
 
   data->OnStart();
+  //controller->DataTypes.push_back(typeid(T));
   controller->AttachedSystems.push_back(data);
 }
 
@@ -61,6 +72,10 @@ void RemoveSystem(SystemController *controller)
   controller->AttachedSystems[index]->OnEnd();
   delete controller->AttachedSystems[index];
   controller->AttachedSystems.erase(controller->AttachedSystems.begin() + index);
+
+  //auto dataTypeIndex = FindDataType(controller, typeid(&T()));
+  //if (dataTypeIndex != -1)
+  //  controller->DataTypes.erase(controller->DataTypes.begin() + dataTypeIndex);
 }
 }; // namespace Tortuga
 
