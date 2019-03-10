@@ -16,6 +16,8 @@ struct System
   virtual void OnStart() {}
   virtual void OnUpdate() {}
   virtual void OnEnd() {}
+
+  virtual ~System() {}
 };
 struct SystemController
 {
@@ -41,12 +43,11 @@ int32_t FindSystem(SystemController *controller)
 template <typename T>
 void AddSystem(SystemController *controller)
 {
-  auto temp = new T();
-  auto data = (System<EntityDataStructure> *)(temp);
+  auto data = (System<EntityDataStructure> *)(new T());
   if (data == nullptr)
     return;
 
-  temp->OnStart();
+  data->OnStart();
   controller->AttachedSystems.push_back(data);
 }
 
