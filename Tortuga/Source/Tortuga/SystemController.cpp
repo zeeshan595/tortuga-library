@@ -41,8 +41,9 @@ void ProcessSystemController(SystemController *controller, Environment *env)
           {ExtractEntitiesDataStructures(env, data[0])});
       break;
     case SYSTEM_STRUCTURE_TYPE_B:
-      controller->AttachedSystems[i]->PullData({ExtractEntitiesDataStructures(env, data[0]),
-                                                ExtractEntitiesDataStructures(env, data[1])});
+      controller->AttachedSystems[i]->PullData(
+          {ExtractEntitiesDataStructures(env, data[0]),
+           ExtractEntitiesDataStructures(env, data[1])});
       break;
     case SYSTEM_STRUCTURE_TYPE_C:
       controller->AttachedSystems[i]->PullData(

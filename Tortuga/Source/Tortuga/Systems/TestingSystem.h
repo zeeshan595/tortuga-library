@@ -3,11 +3,12 @@
 
 #include "../Console.h"
 #include "../EntityData/MeshRenderer.h"
+#include "../EntityData/RigidBody.h"
 #include "../System.h"
 
 namespace Tortuga
 {
-class TestingSystem : public System<MeshRenderer>
+class TestingSystem : public System<MeshRenderer, RigidBody>
 {
   void OnUpdate()
   {
