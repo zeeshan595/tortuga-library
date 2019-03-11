@@ -3,43 +3,10 @@
 
 #include "Core.h"
 #include "Environment.h"
+#include "System.h"
 
 namespace Tortuga
 {
-template <typename T>
-struct System
-{
-  static_assert(std::is_base_of<EntityDataStructure, T>::value, "T must inherit from Key");
-
-private:
-  std::string TypeInfo;
-
-public:
-  std::vector<EntityExtractedData<T>> SceneData;
-  void UpdateData(std::vector<EntityExtractedData<EntityDataStructure>> data)
-  {
-    SceneData.resize(data.size());
-    for (uint32_t i = 0; i < data.size(); i++)
-    {
-      SceneData[i] = data[i];
-    }
-  }
-
-  std::string GetTypeInfo()
-  {
-    return TypeInfo;
-  }
-  System()
-  {
-    TypeInfo = typeid(T).name();
-  }
-
-  virtual void OnStart() {}
-  virtual void OnUpdate() {}
-  virtual void OnEnd() {}
-
-  virtual ~System() {}
-};
 struct SystemController
 {
   std::vector<System<EntityDataStructure> *> AttachedSystems;
@@ -71,7 +38,10 @@ void AddSystem(SystemController *controller)
     return;
 
   data->OnStart();
-  controller->DataTypes.push_back(data->GetTypeInfo());
+  auto newTypes = data->GetTypeInfos();
+  for (uint32_t i = 0; i < newTypes.size(); i++)
+    controller->DataTypes.push_back(newTypes[i]);
+    
   controller->AttachedSystems.push_back(data);
 }
 

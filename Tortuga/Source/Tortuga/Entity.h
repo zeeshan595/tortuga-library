@@ -32,6 +32,7 @@ struct EntityExtractedData
 {
   static_assert(std::is_base_of<EntityDataStructure, T>::value, "T must inherit from Key");
 
+  Entity *Reference;
   std::string Name;
   Transformation Transform;
   T Data;

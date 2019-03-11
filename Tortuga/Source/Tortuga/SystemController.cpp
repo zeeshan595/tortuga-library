@@ -33,8 +33,27 @@ void ProcessSystemController(SystemController *controller, Environment *env)
 {
   for (uint32_t i = 0; i < controller->AttachedSystems.size(); i++)
   {
-    auto data = ExtractEntitiesDataStructures(env, controller->AttachedSystems[i]->GetTypeInfo());
-    controller->AttachedSystems[i]->UpdateData(data);
+    auto data = controller->AttachedSystems[i]->GetTypeInfos();
+    switch (controller->AttachedSystems[i]->GetStructureType())
+    {
+    case SYSTEM_STRUCTURE_TYPE_A:
+      controller->AttachedSystems[i]->PullData(
+          {ExtractEntitiesDataStructures(env, data[0])});
+      break;
+    case SYSTEM_STRUCTURE_TYPE_B:
+      controller->AttachedSystems[i]->PullData({ExtractEntitiesDataStructures(env, data[0]),
+                                                ExtractEntitiesDataStructures(env, data[1])});
+      break;
+    case SYSTEM_STRUCTURE_TYPE_C:
+      controller->AttachedSystems[i]->PullData(
+          {ExtractEntitiesDataStructures(env, data[0]),
+           ExtractEntitiesDataStructures(env, data[1]),
+           ExtractEntitiesDataStructures(env, data[2])});
+      break;
+    default:
+      break;
+    }
+
     controller->AttachedSystems[i]->OnUpdate();
   }
 }

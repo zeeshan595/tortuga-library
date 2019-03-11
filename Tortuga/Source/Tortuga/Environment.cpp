@@ -53,6 +53,7 @@ std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructu
       {
         auto extraction = EntityExtractedData<EntityDataStructure>();
         {
+          extraction.Reference = env->Entities[i];
           extraction.Name = env->Entities[i]->Name;
           extraction.Transform = env->Entities[i]->Transform;
           extraction.Data = env->Entities[i]->DataStructures[j];

@@ -3,7 +3,7 @@
 
 #include "../Core.h"
 #include "../Environment.h"
-#include "../SystemController.h"
+#include "../System.h"
 #include "../EntityData/MeshRenderer.h"
 
 namespace Tortuga
