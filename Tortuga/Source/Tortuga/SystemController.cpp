@@ -9,13 +9,25 @@ SystemController *CreateSystemController()
 }
 void DestroySystemController(SystemController *controller)
 {
-  for (uint32_t i = 0; i < controller->AttachedSystems.size(); i++)
+  for (uint32_t i = 0; i < controller->AttachedSystemsA.size(); i++)
   {
-    controller->AttachedSystems[i]->OnEnd();
-    delete controller->AttachedSystems[i];
+    controller->AttachedSystemsA[i]->OnEnd();
+    delete controller->AttachedSystemsA[i];
+  }
+  for (uint32_t i = 0; i < controller->AttachedSystemsB.size(); i++)
+  {
+    controller->AttachedSystemsB[i]->OnEnd();
+    delete controller->AttachedSystemsB[i];
+  }
+  for (uint32_t i = 0; i < controller->AttachedSystemsC.size(); i++)
+  {
+    controller->AttachedSystemsC[i]->OnEnd();
+    delete controller->AttachedSystemsC[i];
   }
 
-  controller->AttachedSystems.clear();
+  controller->AttachedSystemsA.clear();
+  controller->AttachedSystemsB.clear();
+  controller->AttachedSystemsC.clear();
   controller->DataTypes.clear();
   delete controller;
 }
@@ -31,31 +43,34 @@ int32_t FindDataType(SystemController *controller, std::string typeInfo)
 }
 void ProcessSystemController(SystemController *controller, Environment *env)
 {
-  for (uint32_t i = 0; i < controller->AttachedSystems.size(); i++)
+  for (uint32_t i = 0; i < controller->AttachedSystemsA.size(); i++)
   {
-    auto data = controller->AttachedSystems[i]->GetTypeInfos();
-    switch (controller->AttachedSystems[i]->GetStructureType())
-    {
-    case SYSTEM_STRUCTURE_TYPE_A:
-      controller->AttachedSystems[i]->PullData(
-          {ExtractEntitiesDataStructures(env, data[0])});
-      break;
-    case SYSTEM_STRUCTURE_TYPE_B:
-      controller->AttachedSystems[i]->PullData(
-          {ExtractEntitiesDataStructures(env, data[0]),
-           ExtractEntitiesDataStructures(env, data[1])});
-      break;
-    case SYSTEM_STRUCTURE_TYPE_C:
-      controller->AttachedSystems[i]->PullData(
-          {ExtractEntitiesDataStructures(env, data[0]),
-           ExtractEntitiesDataStructures(env, data[1]),
-           ExtractEntitiesDataStructures(env, data[2])});
-      break;
-    default:
-      break;
-    }
+    auto data = controller->AttachedSystemsA[i]->GetTypeInfos();
+    controller->AttachedSystemsA[i]->PullData(
+        {ExtractEntitiesDataStructures(env, data[0])});
 
-    controller->AttachedSystems[i]->OnUpdate();
+    controller->AttachedSystemsA[i]->OnUpdate();
+  }
+
+  for (uint32_t i = 0; i < controller->AttachedSystemsB.size(); i++)
+  {
+    auto data = controller->AttachedSystemsB[i]->GetTypeInfos();
+    controller->AttachedSystemsB[i]->PullData(
+        {ExtractEntitiesDataStructures(env, data[0]),
+         ExtractEntitiesDataStructures(env, data[1])});
+
+    controller->AttachedSystemsB[i]->OnUpdate();
+  }
+
+  for (uint32_t i = 0; i < controller->AttachedSystemsC.size(); i++)
+  {
+    auto data = controller->AttachedSystemsC[i]->GetTypeInfos();
+    controller->AttachedSystemsC[i]->PullData(
+        {ExtractEntitiesDataStructures(env, data[0]),
+         ExtractEntitiesDataStructures(env, data[1]),
+         ExtractEntitiesDataStructures(env, data[2])});
+
+    controller->AttachedSystemsC[i]->OnUpdate();
   }
 }
 }; // namespace Tortuga

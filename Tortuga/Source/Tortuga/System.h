@@ -37,6 +37,18 @@ public:
       SceneDataA[i] = data[0][i];
     }
   }
+  template <typename T>
+  std::vector<EntityExtractedData<T>> GetData()
+  {
+    if (typeid(T) == typeid(A))
+    {
+      auto dataA = reinterpret_cast<std::vector<EntityExtractedData<T>> *>(&SceneDataA);
+      if (dataA != nullptr)
+        return *dataA;
+    }
+
+    return {};
+  }
 
   SystemStructureType GetStructureType() { return Type; }
   std::vector<std::string> GetTypeInfos() { return {TypeInfoA}; }
@@ -69,6 +81,7 @@ private:
 public:
   std::vector<EntityExtractedData<A>> SceneDataA;
   std::vector<EntityExtractedData<B>> SceneDataB;
+
   void PullData(std::vector<std::vector<EntityExtractedData<EntityDataStructure>>> data)
   {
     SceneDataA.resize(data[0].size());
@@ -82,6 +95,23 @@ public:
     {
       SceneDataB[i] = data[1][i];
     }
+  }
+  template <typename T>
+  std::vector<EntityExtractedData<T>> GetData()
+  {
+    if (typeid(T) == typeid(A))
+    {
+      auto dataA = reinterpret_cast<std::vector<EntityExtractedData<T>> *>(&SceneDataA);
+      if (dataA != nullptr)
+        return *dataA;
+    }
+    else if (typeid(T) == typeid(B))
+    {
+      auto dataB = reinterpret_cast<std::vector<EntityExtractedData<T>> *>(&SceneDataB);
+      if (dataB != nullptr)
+        return *dataB;
+    }
+    return {};
   }
 
   SystemStructureType GetStructureType() { return Type; }
@@ -138,6 +168,30 @@ public:
     {
       SceneDataC[i] = data[2][i];
     }
+  }
+  template <typename T>
+  std::vector<EntityExtractedData<T>> GetData()
+  {
+    if (typeid(T) == typeid(A))
+    {
+      auto dataA = (std::vector<EntityExtractedData<T>> *)(&SceneDataA);
+      if (dataA != nullptr)
+        return *dataA;
+    }
+    else if (typeid(T) == typeid(B))
+    {
+      auto dataB = (std::vector<EntityExtractedData<T>> *)(&SceneDataB);
+      if (dataB != nullptr)
+        return *dataB;
+    }
+    else if (typeid(T) == typeid(C))
+    {
+      auto dataC = (std::vector<EntityExtractedData<T>> *)(&SceneDataC);
+      if (dataC != nullptr)
+        return *dataC;
+    }
+
+    return {};
   }
 
   SystemStructureType GetStructureType() { return Type; }
