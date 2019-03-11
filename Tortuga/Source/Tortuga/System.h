@@ -28,6 +28,9 @@ private:
   const SystemStructureType Type = SYSTEM_STRUCTURE_TYPE_A;
 
 public:
+  std::atomic<bool> SignalStop;
+  std::thread ThreadHandle;
+  std::mutex DataTransferLock;
   std::vector<EntityExtractedData<A>> SceneDataA;
   void PullData(std::vector<std::vector<EntityExtractedData<EntityDataStructure>>> data)
   {
@@ -79,6 +82,9 @@ private:
   const SystemStructureType Type = SYSTEM_STRUCTURE_TYPE_B;
 
 public:
+  std::atomic<bool> SignalStop;
+  std::thread ThreadHandle;
+  std::mutex DataTransferLock;
   std::vector<EntityExtractedData<A>> SceneDataA;
   std::vector<EntityExtractedData<B>> SceneDataB;
 
@@ -146,6 +152,9 @@ private:
   const SystemStructureType Type = SYSTEM_STRUCTURE_TYPE_C;
 
 public:
+  std::atomic<bool> SignalStop;
+  std::thread ThreadHandle;
+  std::mutex DataTransferLock;
   std::vector<EntityExtractedData<A>> SceneDataA;
   std::vector<EntityExtractedData<B>> SceneDataB;
   std::vector<EntityExtractedData<C>> SceneDataC;

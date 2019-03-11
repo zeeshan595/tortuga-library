@@ -27,6 +27,7 @@
 
 //Common Entity Data Structures
 #include "Tortuga/EntityData/MeshRenderer.h"
+#include "Tortuga/EntityData/RigidBody.h"
 
 //Common Systems
 #include "Tortuga/Systems/RenderingSystem.h"

@@ -12,6 +12,7 @@ int main(int argc, char **argv)
     AddEntityDataStructure<MeshRenderer>(sphereObject);
 
     auto controller = CreateSystemController();
+    AddSystem<RenderingSystem>(controller);
     AddSystem<TestingSystem>(controller);
 
     //Main loop
@@ -19,12 +20,18 @@ int main(int argc, char **argv)
     while (isRunning)
     {
         SDL_Event event;
-        if (SDL_PollEvent(&event) != 0)
+        if (SDL_PollEvent(&event))
         {
             switch (event.window.event)
             {
             case SDL_WINDOWEVENT_CLOSE:
                 isRunning = false;
+                break;
+            }
+            switch (event.type)
+            {
+            case SDL_KEYDOWN:
+                Console::Info("Pressed!");
                 break;
             }
         }

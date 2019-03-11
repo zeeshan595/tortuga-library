@@ -12,13 +12,14 @@ struct SystemController
   std::vector<System<EntityDataStructure> *> AttachedSystemsA;
   std::vector<System<EntityDataStructure, EntityDataStructure> *> AttachedSystemsB;
   std::vector<System<EntityDataStructure, EntityDataStructure, EntityDataStructure> *> AttachedSystemsC;
-  std::vector<std::string> DataTypes;
 };
 
 SystemController *CreateSystemController();
 void DestroySystemController(SystemController *controller);
 void ProcessSystemController(SystemController *controller, Environment *env);
-int32_t FindDataType(SystemController *controller, std::string typeInfo);
+void SystemThreadA(System<EntityDataStructure> *sys);
+void SystemThreadB(System<EntityDataStructure, EntityDataStructure> *sys);
+void SystemThreadC(System<EntityDataStructure, EntityDataStructure, EntityDataStructure> *sys);
 
 template <typename T>
 int32_t FindSystem(SystemController *controller, SystemStructureType &StructureType)
@@ -58,10 +59,8 @@ void AddSystem(SystemController *controller)
     if (data == nullptr)
       return;
 
-    data->OnStart();
-    auto newTypes = data->GetTypeInfos();
-    for (uint32_t i = 0; i < newTypes.size(); i++)
-      controller->DataTypes.push_back(newTypes[i]);
+    data->SignalStop.store(false);
+    data->ThreadHandle = std::thread(SystemThreadA, data);
     controller->AttachedSystemsA.push_back(data);
   }
   break;
@@ -71,10 +70,8 @@ void AddSystem(SystemController *controller)
     if (data == nullptr)
       return;
 
-    data->OnStart();
-    auto newTypes = data->GetTypeInfos();
-    for (uint32_t i = 0; i < newTypes.size(); i++)
-      controller->DataTypes.push_back(newTypes[i]);
+    data->SignalStop.store(false);
+    data->ThreadHandle = std::thread(SystemThreadB, data);
     controller->AttachedSystemsB.push_back(data);
   }
   break;
@@ -84,10 +81,8 @@ void AddSystem(SystemController *controller)
     if (data == nullptr)
       return;
 
-    data->OnStart();
-    auto newTypes = data->GetTypeInfos();
-    for (uint32_t i = 0; i < newTypes.size(); i++)
-      controller->DataTypes.push_back(newTypes[i]);
+    data->SignalStop.store(false);
+    data->ThreadHandle = std::thread(SystemThreadC, data);
     controller->AttachedSystemsC.push_back(data);
   }
   break;
@@ -109,35 +104,26 @@ void RemoveSystem(SystemController *controller)
   {
   case SYSTEM_STRUCTURE_TYPE_A:
   {
-    controller->AttachedSystemsA[index]->OnEnd();
+    controller->AttachedSystemsA[index]->SignalStop.store(true);
+    controller->AttachedSystemsA[index]->ThreadHandle.join();
     delete controller->AttachedSystemsA[index];
     controller->AttachedSystemsA.erase(controller->AttachedSystemsA.begin() + index);
-
-    auto dataTypeIndex = FindDataType(controller, typeid(T).name());
-    if (dataTypeIndex != -1)
-      controller->DataTypes.erase(controller->DataTypes.begin() + dataTypeIndex);
   }
   break;
   case SYSTEM_STRUCTURE_TYPE_B:
   {
-    controller->AttachedSystemsB[index]->OnEnd();
+    controller->AttachedSystemsB[index]->SignalStop.store(true);
+    controller->AttachedSystemsB[index]->ThreadHandle.join();
     delete controller->AttachedSystemsB[index];
     controller->AttachedSystemsB.erase(controller->AttachedSystemsB.begin() + index);
-
-    auto dataTypeIndex = FindDataType(controller, typeid(T).name());
-    if (dataTypeIndex != -1)
-      controller->DataTypes.erase(controller->DataTypes.begin() + dataTypeIndex);
   }
   break;
   case SYSTEM_STRUCTURE_TYPE_C:
   {
-    controller->AttachedSystemsC[index]->OnEnd();
+    controller->AttachedSystemsC[index]->SignalStop.store(true);
+    controller->AttachedSystemsC[index]->ThreadHandle.join();
     delete controller->AttachedSystemsC[index];
     controller->AttachedSystemsC.erase(controller->AttachedSystemsC.begin() + index);
-
-    auto dataTypeIndex = FindDataType(controller, typeid(T).name());
-    if (dataTypeIndex != -1)
-      controller->DataTypes.erase(controller->DataTypes.begin() + dataTypeIndex);
   }
   break;
   }
