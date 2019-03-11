@@ -2,6 +2,7 @@
 #define _ENVIRONMENT
 
 #include "Core.h"
+#include "Console.h"
 #include "Entity.h"
 
 namespace Tortuga
@@ -17,7 +18,7 @@ int32_t FindEntity(Environment *env, Entity *entity);
 Entity *CreateEntity(Environment *env);
 void DestroyEntity(Environment *env, Entity *entity);
 
-std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::type_info &typeInfo);
+std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::string typeInfo);
 }; // namespace Tortuga
 
 #endif

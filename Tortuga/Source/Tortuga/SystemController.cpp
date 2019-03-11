@@ -19,7 +19,7 @@ void DestroySystemController(SystemController *controller)
   controller->DataTypes.clear();
   delete controller;
 }
-int32_t FindDataType(SystemController *controller, std::type_info typeInfo)
+int32_t FindDataType(SystemController *controller, std::string typeInfo)
 {
   for (uint32_t i = 0; i < controller->DataTypes.size(); i++)
   {
@@ -33,8 +33,8 @@ void ProcessSystemController(SystemController *controller, Environment *env)
 {
   for (uint32_t i = 0; i < controller->AttachedSystems.size(); i++)
   {
-    //auto data = ExtractEntitiesDataStructures(env, controller->AttachedSystems[i]->TypeInfo);
-    //controller->AttachedSystems[i]->UpdateData(data);
+    auto data = ExtractEntitiesDataStructures(env, controller->AttachedSystems[i]->GetTypeInfo());
+    controller->AttachedSystems[i]->UpdateData(data);
     controller->AttachedSystems[i]->OnUpdate();
   }
 }

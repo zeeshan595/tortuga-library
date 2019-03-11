@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     AddEntityDataStructure<MeshRenderer>(sphereObject);
 
     auto controller = CreateSystemController();
-    AddSystem<RenderingSystem>(controller);
+    AddSystem<TestingSystem>(controller);
 
     //Main loop
     bool isRunning = true;

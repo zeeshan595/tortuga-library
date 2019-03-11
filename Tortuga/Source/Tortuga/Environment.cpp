@@ -42,20 +42,20 @@ void DestroyEntity(Environment *env, Entity *entity)
   delete entity;
 }
 
-std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::type_info &typeInfo)
+std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::string typeInfo)
 {
   std::vector<EntityExtractedData<EntityDataStructure>> data;
   for (uint32_t i = 0; i < env->Entities.size(); i++)
   {
-    for (uint32_t j = 0; j < env->Entities[i]->DataStructures.size(); i++)
+    for (uint32_t j = 0; j < env->Entities[i]->DataStructures.size(); j++)
     {
-      if (typeid(env->Entities[i]->DataStructures[j]) == typeInfo)
+      if (typeInfo == env->Entities[i]->DataStructures[j].GetTypeInfo())
       {
         auto extraction = EntityExtractedData<EntityDataStructure>();
         {
           extraction.Name = env->Entities[i]->Name;
           extraction.Transform = env->Entities[i]->Transform;
-          extraction.DataStructure = env->Entities[i]->DataStructures[j];
+          extraction.Data = env->Entities[i]->DataStructures[j];
         }
         data.push_back(extraction);
         break;

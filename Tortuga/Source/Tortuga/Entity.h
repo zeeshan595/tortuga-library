@@ -8,7 +8,18 @@ namespace Tortuga
 {
 struct EntityDataStructure
 {
-  virtual void Temp() {}
+protected:
+  std::string TypeInfo;
+
+public:
+  bool IsEnabled = true;
+
+  std::string GetTypeInfo() { return TypeInfo; }
+  EntityDataStructure() : TypeInfo(std::string(typeid(EntityDataStructure).name())) {}
+  EntityDataStructure(std::string typeInfo)
+  {
+    this->TypeInfo = typeInfo;
+  }
 };
 struct Entity
 {
@@ -23,14 +34,13 @@ struct EntityExtractedData
 
   std::string Name;
   Transformation Transform;
-  T DataStructure;
+  T Data;
 };
 
 template <typename T>
 void AddEntityDataStructure(Entity *entity)
 {
-  EntityDataStructure data = (EntityDataStructure)T();
-  entity->DataStructures.push_back(data);
+  entity->DataStructures.push_back(T());
 }
 
 template <typename T>

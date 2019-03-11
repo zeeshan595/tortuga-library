@@ -29,5 +29,6 @@
 
 //Common Systems
 #include "Tortuga/Systems/RenderingSystem.h"
+#include "Tortuga/Systems/TestingSystem.h"
 
 #endif
