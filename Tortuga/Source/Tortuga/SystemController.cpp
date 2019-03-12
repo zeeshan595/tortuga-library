@@ -91,22 +91,22 @@ void ProcessSystemController(SystemController *controller, Environment *env)
   }
   for (uint32_t i = 0; i < controller->AttachedSystemsB.size(); i++)
   {
-    controller->AttachedSystemsA[i]->DataTransferLock.lock();
+    controller->AttachedSystemsB[i]->DataTransferLock.lock();
     auto data = controller->AttachedSystemsB[i]->GetTypeInfos();
     controller->AttachedSystemsB[i]->PullData(
         {ExtractEntitiesDataStructures(env, data[0]),
          ExtractEntitiesDataStructures(env, data[1])});
-    controller->AttachedSystemsA[i]->DataTransferLock.unlock();
+    controller->AttachedSystemsB[i]->DataTransferLock.unlock();
   }
   for (uint32_t i = 0; i < controller->AttachedSystemsC.size(); i++)
   {
-    controller->AttachedSystemsA[i]->DataTransferLock.lock();
+    controller->AttachedSystemsC[i]->DataTransferLock.lock();
     auto data = controller->AttachedSystemsC[i]->GetTypeInfos();
     controller->AttachedSystemsC[i]->PullData(
         {ExtractEntitiesDataStructures(env, data[0]),
          ExtractEntitiesDataStructures(env, data[1]),
          ExtractEntitiesDataStructures(env, data[2])});
-    controller->AttachedSystemsA[i]->DataTransferLock.unlock();
+    controller->AttachedSystemsC[i]->DataTransferLock.unlock();
   }
 }
 }; // namespace Tortuga
