@@ -76,14 +76,14 @@ public:
     VertexBuffer = Graphics::CreateBuffer(
         Hardware,
         Graphics::BUFFER_TYPE_VERTEX,
-        sizeof(vertices[0]) * vertices.size(),
+        sizeof(glm::vec3) * vertices.size(),
         Graphics::BUFFER_STORAGE_FAST);
     Graphics::UpdateBufferData(VertexBuffer, vertices);
 
     IndexBuffer = Graphics::CreateBuffer(
         Hardware,
         Graphics::BUFFER_TYPE_INDEX,
-        sizeof(indices[0]) * indices.size(),
+        sizeof(uint32_t) * indices.size(),
         Graphics::BUFFER_STORAGE_FAST);
     Graphics::UpdateBufferData(IndexBuffer, indices);
 
@@ -104,8 +104,8 @@ public:
     auto uniformDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, UniformDescriptorPool);
     auto imageDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_IMAGE, ImageDescriptorPool);
 
-    //RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, 1, Graphics::BUFFER_STORAGE_ACCESSIBLE);
-    //Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
+    RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, 1, Graphics::BUFFER_STORAGE_ACCESSIBLE);
+    Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
     //Graphics::ConfigureDescriptorSet(imageDescriptors, TempBuffer, 0, 0);
 
     {
@@ -121,7 +121,7 @@ public:
 
   void OnUpdate()
   {
-    //auto data = GetEntitiesDataStructures<MeshRenderer>(Scene);
+    auto data = GetData<MeshRenderer>();
     //Graphics::UpdateBufferData(RenderObjectBuffer, data);
     Graphics::DrawFrame(Renderer);
   }
