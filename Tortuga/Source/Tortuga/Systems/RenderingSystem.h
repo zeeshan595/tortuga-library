@@ -122,6 +122,7 @@ public:
   void OnUpdate()
   {
     auto data = GetData<MeshRenderer>();
+
     //Graphics::UpdateBufferData(RenderObjectBuffer, data);
     Graphics::DrawFrame(Renderer);
   }
