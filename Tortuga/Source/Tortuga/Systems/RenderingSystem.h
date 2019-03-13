@@ -8,7 +8,7 @@
 
 namespace Tortuga
 {
-class RenderingSystem : public System<MeshRenderer>
+class RenderingSystem : public System
 {
 private:
   std::string ApplicationDir;
@@ -41,6 +41,7 @@ private:
 public:
   void OnStart()
   {
+    RegisterDataStructure<MeshRenderer>();
     ApplicationDir = GetExecutablePath();
 
     Engine = Graphics::CreateRenderingEngine();
@@ -104,8 +105,8 @@ public:
     auto uniformDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, UniformDescriptorPool);
     auto imageDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_IMAGE, ImageDescriptorPool);
 
-    RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, 1, Graphics::BUFFER_STORAGE_ACCESSIBLE);
-    Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
+    //RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, 1, Graphics::BUFFER_STORAGE_ACCESSIBLE);
+    //Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
     //Graphics::ConfigureDescriptorSet(imageDescriptors, TempBuffer, 0, 0);
 
     {

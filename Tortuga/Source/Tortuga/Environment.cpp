@@ -42,27 +42,33 @@ void DestroyEntity(Environment *env, Entity *entity)
   delete entity;
 }
 
-std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::string typeInfo)
+std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::type_index typeInfo)
 {
-  std::vector<EntityExtractedData<EntityDataStructure>> data;
+  std::vector<EntityExtractedData<EntityDataStructure>> data = {};
   for (uint32_t i = 0; i < env->Entities.size(); i++)
   {
-    for (uint32_t j = 0; j < env->Entities[i]->DataStructures.size(); j++)
+    auto dataFound = env->Entities[i]->DataStructures.find(typeInfo);
+    if (dataFound != env->Entities[i]->DataStructures.end())
     {
-      if (typeInfo == env->Entities[i]->DataStructures[j].GetTypeInfo())
-      {
-        auto extraction = EntityExtractedData<EntityDataStructure>();
-        {
-          extraction.Reference = env->Entities[i];
-          extraction.Name = env->Entities[i]->Name;
-          extraction.Transform = env->Entities[i]->Transform;
-          extraction.Data = env->Entities[i]->DataStructures[j];
-        }
-        data.push_back(extraction);
-        break;
-      }
+      auto extraction = EntityExtractedData<EntityDataStructure>(env->Entities[i]);
+      extraction.Data = dataFound->second;
+      data.push_back(extraction);
+      break;
     }
   }
   return data;
+}
+void PackEntityDataStructures(Environment *env, std::vector<EntityExtractedData<EntityDataStructure>> dataToUpdate)
+{
+  for (uint32_t i = 0; i < dataToUpdate.size(); i++)
+  {
+    auto entity = dataToUpdate[i].GetEntityReference();
+    auto dataType = std::type_index(typeid(dataToUpdate[i].Data));
+    auto itr = entity->DataStructures.find(dataType);
+    if (itr == entity->DataStructures.end())
+      return;
+
+    entity->DataStructures[dataType] = dataToUpdate[i].Data;
+  }
 }
 }; // namespace Tortuga

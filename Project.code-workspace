@@ -56,7 +56,8 @@
 			"typeinfo": "cpp",
 			"utility": "cpp",
 			"numeric": "cpp",
-			"algorithm": "cpp"
+			"algorithm": "cpp",
+			"typeindex": "cpp"
 		},
 		"search.usePCRE2": true,
 		"C_Cpp.default.cppStandard": "c++17",

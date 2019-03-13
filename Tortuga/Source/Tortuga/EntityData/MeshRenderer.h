@@ -7,11 +7,6 @@ namespace Tortuga
 {
 struct MeshRenderer : public EntityDataStructure
 {
-  MeshRenderer() : 
-  EntityDataStructure(std::string(typeid(MeshRenderer).name()))
-  {
- 
-  }
 };
 }; // namespace Tortuga
 

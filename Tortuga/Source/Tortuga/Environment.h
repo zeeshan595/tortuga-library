@@ -18,7 +18,8 @@ int32_t FindEntity(Environment *env, Entity *entity);
 Entity *CreateEntity(Environment *env);
 void DestroyEntity(Environment *env, Entity *entity);
 
-std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::string typeInfo);
+std::vector<EntityExtractedData<EntityDataStructure>> ExtractEntitiesDataStructures(Environment *env, std::type_index typeInfo);
+void PackEntityDataStructures(Environment *env, std::vector<EntityExtractedData<EntityDataStructure>> dataToUpdate);
 }; // namespace Tortuga
 
 #endif

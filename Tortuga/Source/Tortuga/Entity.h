@@ -8,49 +8,45 @@ namespace Tortuga
 {
 struct EntityDataStructure
 {
-protected:
-  std::string TypeInfo;
-
-public:
-  bool IsEnabled = true;
-
-  std::string GetTypeInfo() { return TypeInfo; }
-  EntityDataStructure() : TypeInfo(std::string(typeid(EntityDataStructure).name())) {}
-  EntityDataStructure(std::string typeInfo)
-  {
-    this->TypeInfo = typeInfo;
-  }
 };
 struct Entity
 {
   std::string Name;
   Transformation Transform;
-  std::vector<EntityDataStructure> DataStructures;
+  std::unordered_map<std::type_index, EntityDataStructure> DataStructures;
 };
 template <typename T>
 struct EntityExtractedData
 {
   static_assert(std::is_base_of<EntityDataStructure, T>::value, "T must inherit from Key");
 
-  Entity *Reference;
-  std::string Name;
-  Transformation Transform;
+private:
+  Entity *_entityRef;
+
+public:
   T Data;
+
+  EntityExtractedData(Entity *entityRef)
+  {
+    _entityRef = entityRef;
+  }
+  Entity *GetEntityReference()
+  {
+    return _entityRef;
+  }
 };
 
 template <typename T>
 void AddEntityDataStructure(Entity *entity)
 {
-  entity->DataStructures.push_back(T());
+  EntityDataStructure data = T();
+  entity->DataStructures[std::type_index(typeid(T))] = data;
 }
 
 template <typename T>
 void RemoveEntityDataStructure(Entity *entity)
 {
-  for (uint32_t i = 0; i < entity->DataStructures.size(); i++)
-  {
-    auto d = entity->DataStructures[i];
-  }
+  entity->DataStructures.erase(std::type_index(typeid(T)));
 }
 }; // namespace Tortuga
 

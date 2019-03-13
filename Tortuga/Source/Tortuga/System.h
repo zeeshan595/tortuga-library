@@ -5,218 +5,75 @@
 
 namespace Tortuga
 {
-template <typename...>
-struct System;
-
-enum SystemStructureType
+struct System
 {
-  SYSTEM_STRUCTURE_TYPE_A,
-  SYSTEM_STRUCTURE_TYPE_B,
-  SYSTEM_STRUCTURE_TYPE_C
-};
-
-//===
-//ONE
-//===
-template <typename A>
-struct System<A>
-{
-  static_assert(std::is_base_of<EntityDataStructure, A>::value, "A must inherit from Key");
-
 private:
-  std::string TypeInfoA;
-  const SystemStructureType Type = SYSTEM_STRUCTURE_TYPE_A;
+  std::unordered_map<std::type_index, std::vector<EntityExtractedData<EntityDataStructure>>> SceneData;
+  std::vector<std::type_index> TypeInfos;
 
-public:
-  std::atomic<bool> SignalStop;
-  std::thread ThreadHandle;
-  std::mutex DataTransferLock;
-  std::vector<EntityExtractedData<A>> SceneDataA;
-  void PullData(std::vector<std::vector<EntityExtractedData<EntityDataStructure>>> data)
+  template <typename T>
+  int32_t FindTypeInfo()
   {
-    SceneDataA.resize(data[0].size());
-    for (uint32_t i = 0; i < data[0].size(); i++)
+    for (uint32_t i = 0; i < TypeInfos.size(); i++)
     {
-      SceneDataA[i] = data[0][i];
+      if (TypeInfos[i] == std::type_index(typeid(T)))
+        return i;
     }
+
+    return -1;
+  }
+
+protected:
+  template <typename T>
+  void RegisterDataStructure()
+  {
+    if (FindTypeInfo<T>() != -1)
+    {
+      Console::Error("This Data structure has already been registered!");
+      return;
+    }
+
+    auto info = std::type_index(typeid(T));
+    TypeInfos.push_back(info);
+  }
+  template <typename T>
+  void UnRegisterDataStructure()
+  {
+    auto index = FindTypeInfo<T>();
+    if (index == -1)
+      return;
+    TypeInfos.erase(TypeInfos.begin() + index);
   }
   template <typename T>
   std::vector<EntityExtractedData<T>> GetData()
   {
-    if (typeid(T) == typeid(A))
-    {
-      auto dataA = reinterpret_cast<std::vector<EntityExtractedData<T>> *>(&SceneDataA);
-      if (dataA != nullptr)
-        return *dataA;
-    }
-
-    return {};
-  }
-
-  SystemStructureType GetStructureType() { return Type; }
-  std::vector<std::string> GetTypeInfos() { return {TypeInfoA}; }
-
-  virtual void OnStart() {}
-  virtual void OnUpdate() {}
-  virtual void OnEnd() {}
-
-  System()
-  {
-    TypeInfoA = typeid(A).name();
-  }
-  virtual ~System() {}
-};
-
-//===
-//TWO
-//===
-template <typename A, typename B>
-struct System<A, B>
-{
-  static_assert(std::is_base_of<EntityDataStructure, A>::value, "A must inherit from Key");
-  static_assert(std::is_base_of<EntityDataStructure, B>::value, "B must inherit from Key");
-
-private:
-  std::string TypeInfoA;
-  std::string TypeInfoB;
-  const SystemStructureType Type = SYSTEM_STRUCTURE_TYPE_B;
-
-public:
-  std::atomic<bool> SignalStop;
-  std::thread ThreadHandle;
-  std::mutex DataTransferLock;
-  std::vector<EntityExtractedData<A>> SceneDataA;
-  std::vector<EntityExtractedData<B>> SceneDataB;
-
-  void PullData(std::vector<std::vector<EntityExtractedData<EntityDataStructure>>> data)
-  {
-    SceneDataA.resize(data[0].size());
-    for (uint32_t i = 0; i < data[0].size(); i++)
-    {
-      SceneDataA[i] = data[0][i];
-    }
-
-    SceneDataB.resize(data[1].size());
-    for (uint32_t i = 0; i < data[1].size(); i++)
-    {
-      SceneDataB[i] = data[1][i];
-    }
+    auto baseData = SceneData[std::type_index(typeid(T))];
+    auto convertedData = reinterpret_cast<std::vector<EntityExtractedData<T>> *>(&baseData);
+    return (*convertedData);
   }
   template <typename T>
-  std::vector<EntityExtractedData<T>> GetData()
+  void SetData(std::vector<EntityExtractedData<T>> data)
   {
-    if (typeid(T) == typeid(A))
-    {
-      auto dataA = reinterpret_cast<std::vector<EntityExtractedData<T>> *>(&SceneDataA);
-      if (dataA != nullptr)
-        return *dataA;
-    }
-    else if (typeid(T) == typeid(B))
-    {
-      auto dataB = reinterpret_cast<std::vector<EntityExtractedData<T>> *>(&SceneDataB);
-      if (dataB != nullptr)
-        return *dataB;
-    }
-    return {};
+    SceneData[std::type_index(typeid(T))] = data;
   }
-
-  SystemStructureType GetStructureType() { return Type; }
-  std::vector<std::string> GetTypeInfos() { return {TypeInfoA, TypeInfoB}; }
-
-  virtual void OnStart() {}
-  virtual void OnUpdate() {}
-  virtual void OnEnd() {}
-
-  System()
-  {
-    TypeInfoA = typeid(A).name();
-    TypeInfoB = typeid(B).name();
-  }
-  virtual ~System() {}
-};
-
-//=====
-//THREE
-//=====
-template <typename A, typename B, typename C>
-struct System<A, B, C>
-{
-  static_assert(std::is_base_of<EntityDataStructure, A>::value, "A must inherit from Key");
-  static_assert(std::is_base_of<EntityDataStructure, B>::value, "B must inherit from Key");
-  static_assert(std::is_base_of<EntityDataStructure, C>::value, "C must inherit from Key");
-
-private:
-  std::string TypeInfoA;
-  std::string TypeInfoB;
-  std::string TypeInfoC;
-  const SystemStructureType Type = SYSTEM_STRUCTURE_TYPE_C;
 
 public:
-  std::atomic<bool> SignalStop;
-  std::thread ThreadHandle;
-  std::mutex DataTransferLock;
-  std::vector<EntityExtractedData<A>> SceneDataA;
-  std::vector<EntityExtractedData<B>> SceneDataB;
-  std::vector<EntityExtractedData<C>> SceneDataC;
-  void PullData(std::vector<std::vector<EntityExtractedData<EntityDataStructure>>> data)
+  std::vector<std::type_index> GetTypeInfo()
   {
-    SceneDataA.resize(data[0].size());
-    for (uint32_t i = 0; i < data[0].size(); i++)
-    {
-      SceneDataA[i] = data[0][i];
-    }
-
-    SceneDataB.resize(data[1].size());
-    for (uint32_t i = 0; i < data[1].size(); i++)
-    {
-      SceneDataB[i] = data[1][i];
-    }
-
-    SceneDataC.resize(data[2].size());
-    for (uint32_t i = 0; i < data[2].size(); i++)
-    {
-      SceneDataC[i] = data[2][i];
-    }
+    return TypeInfos;
   }
-  template <typename T>
-  std::vector<EntityExtractedData<T>> GetData()
+  void PushSceneData(std::type_index info, std::vector<EntityExtractedData<EntityDataStructure>> data)
   {
-    if (typeid(T) == typeid(A))
-    {
-      auto dataA = (std::vector<EntityExtractedData<T>> *)(&SceneDataA);
-      if (dataA != nullptr)
-        return *dataA;
-    }
-    else if (typeid(T) == typeid(B))
-    {
-      auto dataB = (std::vector<EntityExtractedData<T>> *)(&SceneDataB);
-      if (dataB != nullptr)
-        return *dataB;
-    }
-    else if (typeid(T) == typeid(C))
-    {
-      auto dataC = (std::vector<EntityExtractedData<T>> *)(&SceneDataC);
-      if (dataC != nullptr)
-        return *dataC;
-    }
-
-    return {};
+    SceneData[info] = data;
   }
-
-  SystemStructureType GetStructureType() { return Type; }
-  std::vector<std::string> GetTypeInfos() { return {TypeInfoA, TypeInfoB, TypeInfoC}; }
+  std::vector<EntityExtractedData<EntityDataStructure>> PollData(std::type_index info)
+  {
+    return SceneData[info];
+  }
 
   virtual void OnStart() {}
   virtual void OnUpdate() {}
   virtual void OnEnd() {}
-
-  System()
-  {
-    TypeInfoA = typeid(A).name();
-    TypeInfoB = typeid(B).name();
-    TypeInfoC = typeid(C).name();
-  }
-  virtual ~System() {}
 };
 }; // namespace Tortuga
 

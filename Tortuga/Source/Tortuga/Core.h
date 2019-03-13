@@ -25,6 +25,8 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
+#include <typeindex>
+#include <unordered_map>
 
 //3rd Party
 #include <vulkan/vulkan.h>

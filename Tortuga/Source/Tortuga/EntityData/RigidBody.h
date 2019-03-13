@@ -7,12 +7,7 @@ namespace Tortuga
 {
 struct RigidBody : public EntityDataStructure
 {
-  RigidBody() : 
-  EntityDataStructure(std::string(typeid(RigidBody).name()))
-  {
- 
-  }
 };
-};
+}; // namespace Tortuga
 
 #endif
