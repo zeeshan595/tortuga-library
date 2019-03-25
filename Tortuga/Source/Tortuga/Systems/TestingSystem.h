@@ -3,12 +3,23 @@
 
 #include "../Core.h"
 #include "../Console.h"
+#include "../System.h"
 
 namespace Tortuga
 {
-class TestingSystem
+class TestingSystem : public System
 {
+    void OnStart()
+    {
+        RegisterComponent<MeshRenderer>();
+    }
 
+    void OnUpdate()
+    {
+        Console::Info("Hello World");
+        auto temp = GetData<MeshRenderer>();
+        Console::Info(temp[0].Data.message);
+    }
 };
 }; // namespace Tortuga
 

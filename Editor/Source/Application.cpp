@@ -2,7 +2,8 @@
 
 using namespace Tortuga;
 
-struct Temporary {
+struct Temporary
+{
     std::string message;
 };
 
@@ -10,14 +11,19 @@ int main(int argc, char **argv)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
     Console::Info("Tortuga Engine Started!");
-
+ 
     auto env = CreateEnvironment();
     auto ent = CreateEntity(env);
-    
-    ent->AddComponent<Temporary>();
-    auto data = ent->GetComponent<Temporary>();
-    ent->RemoveComponent<Temporary>();
 
+    auto m = MeshRenderer();
+    m.message = "Hello World";
+    ent->AddComponent<MeshRenderer>(m);
+    auto data = ent->GetComponent<MeshRenderer>();
+
+    auto sysController = CreateSystemController();
+    AddSystem<TestingSystem>(sysController);
+    ProcessSystems(sysController, env);
+    DestroySystemController(sysController);
     DestroyEntity(env, ent);
     DestroyEnvironment(env);
 

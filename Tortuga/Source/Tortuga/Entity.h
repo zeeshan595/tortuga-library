@@ -23,6 +23,16 @@ class Entity
         return std::any_cast<T>(_components[std::type_index(typeid(T))]);
     }
 
+    std::any GetComponent(std::type_index typeInfo)
+    {
+        if (_components.find(typeInfo) == _components.end())
+        {
+            Console::Warning("Trying to get a component that does not exist");
+            return std::any();
+        }
+        return _components[typeInfo];
+    }
+
     template <typename T>
     void AddComponent(T data = T())
     {
