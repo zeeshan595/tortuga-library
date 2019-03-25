@@ -13,19 +13,8 @@ int main(int argc, char **argv)
     Console::Info("Tortuga Engine Started!");
  
     auto env = CreateEnvironment();
-    auto ent = CreateEntity(env);
-
-    auto m = MeshRenderer();
-    m.message = "Hello World";
-    ent->AddComponent<MeshRenderer>(m);
-    auto data = ent->GetComponent<MeshRenderer>();
-
-    auto sysController = CreateSystemController();
-    AddSystem<TestingSystem>(sysController);
-    ProcessSystems(sysController, env);
-    DestroySystemController(sysController);
-    DestroyEntity(env, ent);
-    DestroyEnvironment(env);
+    auto controller = CreateSystemController();
+    AddSystem<RenderingSystem>(controller);
 
     //Main loop
     bool isRunning = true;
@@ -47,7 +36,11 @@ int main(int argc, char **argv)
                 break;
             }
         }
+
+        ProcessSystems(controller, env);
     }
+    DestroySystemController(controller);
+    DestroyEnvironment(env);
 
     Console::Info("Shutting Down!");
     SDL_Quit();

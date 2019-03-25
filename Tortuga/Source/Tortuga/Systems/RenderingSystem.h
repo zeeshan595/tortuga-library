@@ -1,11 +1,10 @@
-/*
 #ifndef _SYSTEMS_RENDERING
 #define _SYSTEMS_RENDERING
 
 #include "../Core.h"
 #include "../Environment.h"
 #include "../System.h"
-#include "../EntityData/MeshRenderer.h"
+#include "../Components/MeshRenderer.h"
 
 namespace Tortuga
 {
@@ -42,7 +41,6 @@ private:
 public:
   void OnStart()
   {
-    RegisterDataStructure<MeshRenderer>();
     ApplicationDir = GetExecutablePath();
 
     Engine = Graphics::CreateRenderingEngine();
@@ -150,4 +148,3 @@ public:
 }; // namespace Tortuga
 
 #endif
-*/
