@@ -2,18 +2,14 @@
 
 using namespace Tortuga;
 
+struct Temporary {
+    std::string message;
+};
+
 int main(int argc, char **argv)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
     Console::Info("Tortuga Engine Started!");
-
-    auto scene = CreateEnvironment();
-    auto sphereObject = CreateEntity(scene);
-    AddEntityDataStructure<MeshRenderer>(sphereObject);
-
-    auto controller = CreateSystemController();
-    AddSystem<RenderingSystem>(controller);
-    AddSystem<TestingSystem>(controller);
 
     //Main loop
     bool isRunning = true;
@@ -35,12 +31,7 @@ int main(int argc, char **argv)
                 break;
             }
         }
-
-        ProcessSystemController(controller, scene);
     }
-
-    DestroySystemController(controller);
-    DestroyEnvironment(scene);
 
     Console::Info("Shutting Down!");
     SDL_Quit();

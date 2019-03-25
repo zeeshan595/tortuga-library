@@ -20,17 +20,17 @@
 #include "Tortuga/Core.h"
 #include "Tortuga/Console.h"
 #include "Tortuga/Entity.h"
-#include "Tortuga/Environment.h"
-#include "Tortuga/System.h"
-#include "Tortuga/SystemController.h"
+//#include "Tortuga/Environment.h"
+//#include "Tortuga/System.h"
+//#include "Tortuga/SystemController.h"
 #include "Tortuga/Primitive.h"
 
 //Common Entity Data Structures
-#include "Tortuga/EntityData/MeshRenderer.h"
-#include "Tortuga/EntityData/RigidBody.h"
+//#include "Tortuga/EntityData/MeshRenderer.h"
+//#include "Tortuga/EntityData/RigidBody.h"
 
 //Common Systems
-#include "Tortuga/Systems/RenderingSystem.h"
+//#include "Tortuga/Systems/RenderingSystem.h"
 #include "Tortuga/Systems/TestingSystem.h"
 
 #endif

@@ -1,3 +1,4 @@
+/*
 #ifndef _SYSTEMS_RENDERING
 #define _SYSTEMS_RENDERING
 
@@ -149,3 +150,4 @@ public:
 }; // namespace Tortuga
 
 #endif
+*/
