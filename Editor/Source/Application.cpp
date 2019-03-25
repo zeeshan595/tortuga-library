@@ -11,6 +11,16 @@ int main(int argc, char **argv)
     SDL_Init(SDL_INIT_EVERYTHING);
     Console::Info("Tortuga Engine Started!");
 
+    auto env = CreateEnvironment();
+    auto ent = CreateEntity(env);
+    
+    ent->AddComponent<Temporary>();
+    auto data = ent->GetComponent<Temporary>();
+    ent->RemoveComponent<Temporary>();
+
+    DestroyEntity(env, ent);
+    DestroyEnvironment(env);
+
     //Main loop
     bool isRunning = true;
     while (isRunning)
