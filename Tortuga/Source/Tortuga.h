@@ -25,6 +25,7 @@
 #include "Tortuga/Primitive.h"
 
 //Common Entity Data Structures
+#include "Tortuga/Components/Transform.h"
 #include "Tortuga/Components/MeshRenderer.h"
 #include "Tortuga/Components/RigidBody.h"
 
