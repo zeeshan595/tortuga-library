@@ -8,6 +8,11 @@
 
 namespace Tortuga
 {
+struct GPUMeshData
+{
+  MeshRenderer Renderer;
+};
+
 class RenderingSystem : public System
 {
 private:
@@ -102,28 +107,31 @@ public:
     ImageDescriptorPool = Graphics::CreateDescriptorPool(Hardware, Graphics::DESCRIPTOR_TYPE_IMAGE, 1, 1);
 
     auto uniformDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_UNIFORM, UniformDescriptorPool);
-    auto imageDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_IMAGE, ImageDescriptorPool);
+    //auto imageDescriptors = Graphics::ConfigureDescriptorPool(Hardware, Pipeline.Layout, Graphics::DESCRIPTOR_TYPE_IMAGE, ImageDescriptorPool);
 
-    //RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, 1, Graphics::BUFFER_STORAGE_ACCESSIBLE);
-    //Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
+    RenderObjectBuffer = Graphics::CreateBuffer(Hardware, Graphics::BUFFER_TYPE_UNIFORM, sizeof(GPUMeshData), Graphics::BUFFER_STORAGE_ACCESSIBLE);
+    Graphics::ConfigureDescriptorSet(uniformDescriptors, RenderObjectBuffer, 0, 0);
     //Graphics::ConfigureDescriptorSet(imageDescriptors, TempBuffer, 0, 0);
 
     {
       Graphics::BeginCommandBuffer(Buffer, 0, RenderPass, 0);
       Graphics::BindCommandBufferPipeline(Buffer, 0, Pipeline);
-      Graphics::CommandBufferBindDescriptor(Buffer, 0, Pipeline, {uniformDescriptors, imageDescriptors});
+      Graphics::CommandBufferBindDescriptor(Buffer, 0, Pipeline, {uniformDescriptors});
       Graphics::CommandBufferDraw(Buffer, 0, VertexBuffer, IndexBuffer, indices.size());
       Graphics::EndCommandBuffer(Buffer, 0);
     }
 
     Graphics::SubmitCommands(Renderer, {Buffer});
+
+    RegisterComponent<MeshRenderer>();
   }
 
   void OnUpdate()
   {
     auto data = GetData<MeshRenderer>();
-
-    //Graphics::UpdateBufferData(RenderObjectBuffer, data);
+    GPUMeshData d = {
+        data[0].Data};
+    Graphics::UpdateBufferData(RenderObjectBuffer, d);
     Graphics::DrawFrame(Renderer);
   }
 

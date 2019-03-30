@@ -18,7 +18,7 @@ class TestingSystem : public System
     {
         Console::Info("Hello World");
         auto temp = GetData<MeshRenderer>();
-        Console::Info(temp[0].Data.message);
+        //Console::Info(temp[0].Data.message);
     }
 };
 }; // namespace Tortuga

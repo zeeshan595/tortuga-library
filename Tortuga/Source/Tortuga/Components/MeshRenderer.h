@@ -5,7 +5,7 @@ namespace Tortuga
 {
 struct MeshRenderer
 {
-    std::string message = "Not Working :c";
+    float Radius;
 };
 }; // namespace Tortuga
 

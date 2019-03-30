@@ -13,6 +13,9 @@ int main(int argc, char **argv)
     Console::Info("Tortuga Engine Started!");
  
     auto env = CreateEnvironment();
+    auto sphere = CreateEntity(env);
+    sphere->AddComponent<MeshRenderer>({2.0f});
+
     auto controller = CreateSystemController();
     AddSystem<RenderingSystem>(controller);
 

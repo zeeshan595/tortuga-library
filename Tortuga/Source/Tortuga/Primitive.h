@@ -2,7 +2,6 @@
 #define _TORTUGA_PRIMITIVE
 
 #include "Core.h"
-#include "Transformation.h"
 
 namespace Tortuga
 {
@@ -95,7 +94,6 @@ struct PrimitiveAlterations
 };
 struct Primitive
 {
-  Transformation Transform;
   PrimitiveType Type = PRIMITIVE_SPHERE;
   PrimitiveMethod Method = PRIMITIVE_METHOD_UNION;
   PrimitiveAlterations Alterations = PrimitiveAlterations();
