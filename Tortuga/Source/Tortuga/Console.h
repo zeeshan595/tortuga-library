@@ -45,6 +45,9 @@ public:
   {
     *this << i;
   }
+  Arguments(float i) {
+    *this << i;
+  }
   Arguments(std::size_t i)
   {
     *this << i;
@@ -95,6 +98,12 @@ public:
   }
   Arguments &operator<<(uint32_t i)
   {
+    std::ostringstream stream;
+    stream << i;
+    _args.push_back(stream.str());
+    return *this;
+  }
+  Arguments &operator<<(float i) {
     std::ostringstream stream;
     stream << i;
     _args.push_back(stream.str());
