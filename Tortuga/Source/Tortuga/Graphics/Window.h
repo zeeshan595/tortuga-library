@@ -1,35 +1,25 @@
 #ifndef _WINDOW
 #define _WINDOW
 
-#include "VulkanAPI/DataStructures.h"
-#include "VulkanAPI/Window.h"
-#include "VulkanAPI/Swapchain.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_vulkan.h>
+#include <iostream>
+#include <vulkan/vulkan.h>
 
-#include "RenderingEngine.h"
+#include "../Console.h"
 
-namespace Tortuga
-{
-namespace Graphics
-{
-enum WindowType
-{
-  FullScreen,
-  Windowed,
-  ResizeableWindowed,
-  BorderlessWindowed
+namespace Tortuga {
+namespace Graphics {
+struct Window {
+  SDL_Window *SDLWindow;
+  VkSurfaceKHR WindowSurface;
+  VkInstance VulkanInstance;
+  std::vector<const char *> RequiredExtensions;
 };
 
-struct Window
-{
-  uint32_t Width;
-  uint32_t Height;
-  VulkanAPI::WindowData VulkanWindow;
-  VulkanAPI::SwapchainData VulkanSwapchain;
-};
-
-Window CreateWindow(RenderingEngine engine, std::string title, uint32_t width, uint32_t height, WindowType type);
-void DestroyWindow(Window data);
-}; // namespace Graphics
-}; // namespace Tortuga
+Window CreateWindow(VkInstance instance, std::string title);
+void DestroyWindow(Window window);
+} // namespace Graphics
+} // namespace Tortuga
 
 #endif

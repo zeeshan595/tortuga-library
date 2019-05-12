@@ -1,7 +1,10 @@
 #ifndef _TORTUGA_CONSOLE
 #define _TORTUGA_CONSOLE
 
-#include "Core.h"
+#include <iostream>
+#include <sstream>
+#include <ostream>
+#include <vector>
 
 namespace Tortuga
 {

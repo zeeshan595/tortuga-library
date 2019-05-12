@@ -1,47 +1,28 @@
 #include "Window.h"
 
-namespace Tortuga
-{
-namespace Graphics
-{
-Window CreateWindow(RenderingEngine engine, std::string title, uint32_t width, uint32_t height, WindowType type)
-{
-  auto mainDevice = engine.Devices[engine.MainDeviceIndex].VulkanDevice;
-
+namespace Tortuga {
+namespace Graphics {
+Window CreateWindow(VkInstance instance, std::string title) {
   auto data = Window();
-  data.Width = width;
-  data.Height = height;
+  data.VulkanInstance = instance;
+  
+  data.SDLWindow = SDL_CreateWindow(title.c_str(), 800, 600, SDL_WINDOWPOS_CENTERED,
+                   SDL_WINDOWPOS_CENTERED, SDL_WINDOW_VULKAN);
 
-  Uint32 windowFlags = SDL_WINDOW_VULKAN;
-  switch (type)
-  {
-  default:
-  case WindowType::Windowed:
-    break;
-  case WindowType::ResizeableWindowed:
-    windowFlags |= SDL_WINDOW_RESIZABLE;
-    break;
-  case WindowType::BorderlessWindowed:
-    windowFlags |= SDL_WINDOW_BORDERLESS;
-    break;
-  case WindowType::FullScreen:
-    windowFlags |= SDL_WINDOW_FULLSCREEN;
-    break;
+  if (SDL_Vulkan_CreateSurface(data.SDLWindow, instance, &data.WindowSurface) == false) {
+    Console::Fatal("Failed to get window surface");
   }
-  data.VulkanWindow = VulkanAPI::CreateWindow(mainDevice, title, width, height, windowFlags);
-  data.VulkanSwapchain = VulkanAPI::CreateSwapchain(
-      mainDevice,
-      data.VulkanWindow.Surface.Surface,
-      0, 0,
-      width, height);
+
+  uint32_t extensionsCount;
+  SDL_Vulkan_GetInstanceExtensions(data.SDLWindow, &extensionsCount, nullptr);
+  data.RequiredExtensions.resize(extensionsCount);
+  SDL_Vulkan_GetInstanceExtensions(data.SDLWindow, &extensionsCount, data.RequiredExtensions.data());
 
   return data;
 }
-
-void DestroyWindow(Window data)
-{
-  VulkanAPI::DestroySwapchain(data.VulkanSwapchain);
-  VulkanAPI::DestroyWindow(data.VulkanWindow);
+void DestroyWindow(Window window) {
+  vkDestroySurfaceKHR(window.VulkanInstance, window.WindowSurface, nullptr);
+  SDL_DestroyWindow(window.SDLWindow);
 }
-}; // namespace Graphics
-}; // namespace Tortuga
+} // namespace Graphics
+} // namespace Tortuga
