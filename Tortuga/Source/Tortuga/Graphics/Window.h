@@ -11,15 +11,17 @@
 namespace Tortuga {
 namespace Graphics {
 struct Window {
+  uint32_t Width;
+  uint32_t Height;
   SDL_Window *SDLWindow;
-  VkSurfaceKHR WindowSurface;
-  VkInstance VulkanInstance;
+  VkSurfaceKHR WindowSurface = VK_NULL_HANDLE;
+  VkInstance VulkanInstance = VK_NULL_HANDLE;
   std::vector<const char *> RequiredExtensions;
 };
 
-Window CreateWindow(std::string title);
+Window CreateWindow(std::string title, uint32_t width, uint32_t height);
 void DestroyWindow(Window window);
-Window CreateSurface(Window window, VkInstance instance);
+void CreateSurface(Window &window, VkInstance instance);
 } // namespace Graphics
 } // namespace Tortuga
 

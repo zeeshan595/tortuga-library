@@ -92,8 +92,8 @@ uint32_t GetDeviceScore(VkPhysicalDeviceProperties properties,
 }
 
 VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
-                    VkInstance vulkanInstance,
-                    std::vector<const char *> validationLayers) {
+                          VkInstance vulkanInstance,
+                          std::vector<const char *> validationLayers) {
   auto data = VulkanDevice();
   data.PhysicalDevice = physicalDevice;
   if (physicalDevice == VK_NULL_HANDLE || physicalDevice == nullptr ||
@@ -156,11 +156,27 @@ VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
   ErrorCheck(vkCreateDevice(physicalDevice, &deviceInfo, nullptr,
                             &data.VirtualDevice));
 
+  //Make sure these queues are supported by the device
+  VkBool32 isSupported = false;
+  ErrorCheck(vkGetPhysicalDeviceSurfaceSupportKHR(
+      physicalDevice, data.QueueFamilies.GraphicsFamily.value(), surface,
+      &isSupported));
+  if (!isSupported) {
+    return data;
+  }
+  ErrorCheck(vkGetPhysicalDeviceSurfaceSupportKHR(
+      physicalDevice, data.QueueFamilies.PresentFamily.value(), surface,
+      &isSupported));
+  if (!isSupported) {
+    return data;
+  }
+
   vkGetDeviceQueue(data.VirtualDevice,
                    data.QueueFamilies.GraphicsFamily.value(), 0,
                    &data.GraphicQueue);
   vkGetDeviceQueue(data.VirtualDevice, data.QueueFamilies.PresentFamily.value(),
                    0, &data.PresentQueue);
+
   data.IsReady = true;
   return data;
 }

@@ -10,5 +10,6 @@
 #include "Tortuga/Graphics/Window.h"
 #include "Tortuga/Graphics/VulkanInstance.h"
 #include "Tortuga/Graphics/VulkanDevice.h"
+#include "Tortuga/Graphics/Swapchain.h"
 
 #endif
