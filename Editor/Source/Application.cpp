@@ -2,20 +2,13 @@
 
 using namespace Tortuga;
 
-struct Temporary
-{
-    std::string message;
-};
+int main(int argc, char **argv) {
+  SDL_Init(SDL_INIT_VIDEO);
 
-int main(int argc, char **argv)
-{
-    SDL_Init(SDL_INIT_EVERYTHING);
-    Console::Info("Tortuga Engine Started!");
+  auto vulkan = Graphics::CreateVulkanInstance();
+  
+  Graphics::DestroyVulkanInstance(vulkan);
 
-    
-
-    Console::Info("Shutting Down!");
-    SDL_Quit();
-
-    return 0;
+  SDL_Quit();
+  return 0;
 }

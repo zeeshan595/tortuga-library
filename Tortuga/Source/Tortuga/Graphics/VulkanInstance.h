@@ -7,12 +7,14 @@
 #include "../Console.h"
 #include "VulkanErrorHandler.h"
 #include "Window.h"
+#include "VulkanDevice.h"
 
 namespace Tortuga {
 namespace Graphics {
 struct VulkanInstance {
-  VkInstance Instance;
-  std::vector<VkPhysicalDevice> PhysicalDevices;
+  VkInstance Instance = VK_NULL_HANDLE;
+  std::vector<VulkanDevice> Devices;
+  VkDebugUtilsMessengerEXT Debugger = VK_NULL_HANDLE;
 };
 
 VulkanInstance CreateVulkanInstance();

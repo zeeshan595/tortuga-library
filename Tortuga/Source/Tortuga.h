@@ -1,15 +1,14 @@
 #ifndef _TORTUGA
 #define _TORTUGA
 
-#define DEBUG_MODE 1
-
 //External Libraries
 #include <SDL2/SDL.h>
-
-#include "Tortuga/Console.h"
+#include <SDL2/SDL_vulkan.h>
 
 //Internal Graphics API
-#include "Tortuga/Graphics/VulkanErrorHandler.h"
+#include "Tortuga/Console.h"
+#include "Tortuga/Graphics/Window.h"
 #include "Tortuga/Graphics/VulkanInstance.h"
+#include "Tortuga/Graphics/VulkanDevice.h"
 
 #endif
