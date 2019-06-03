@@ -13,11 +13,11 @@
 namespace Tortuga {
 namespace Graphics {
 struct QueueFamilyIndices {
-  std::optional<uint32_t> GraphicsFamily;
+  std::optional<uint32_t> ComputeFamily;
   std::optional<uint32_t> PresentFamily;
 
   static bool IsComplete(QueueFamilyIndices indices) {
-    return indices.GraphicsFamily.has_value() &&
+    return indices.ComputeFamily.has_value() &&
            indices.PresentFamily.has_value();
   }
 };

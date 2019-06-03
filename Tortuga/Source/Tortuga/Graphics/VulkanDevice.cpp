@@ -54,8 +54,8 @@ QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice physicalDevice,
     if (queueFamily.queueCount <= 0)
       continue;
 
-    if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      indices.GraphicsFamily = i;
+    if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+      indices.ComputeFamily = i;
     }
 
     VkBool32 presentSupport = false;
@@ -122,7 +122,7 @@ VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
   float queuePriority = 1.0f;
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
   std::set<uint32_t> uniqueQueueFamilies = {
-      data.QueueFamilies.GraphicsFamily.value(),
+      data.QueueFamilies.ComputeFamily.value(),
       data.QueueFamilies.PresentFamily.value()};
 
   for (uint32_t queueFamily : uniqueQueueFamilies) {
@@ -156,10 +156,10 @@ VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
   ErrorCheck(vkCreateDevice(physicalDevice, &deviceInfo, nullptr,
                             &data.VirtualDevice));
 
-  //Make sure these queues are supported by the device
+  // Make sure these queues are supported by the device
   VkBool32 isSupported = false;
   ErrorCheck(vkGetPhysicalDeviceSurfaceSupportKHR(
-      physicalDevice, data.QueueFamilies.GraphicsFamily.value(), surface,
+      physicalDevice, data.QueueFamilies.ComputeFamily.value(), surface,
       &isSupported));
   if (!isSupported) {
     return data;
@@ -171,9 +171,8 @@ VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
     return data;
   }
 
-  vkGetDeviceQueue(data.VirtualDevice,
-                   data.QueueFamilies.GraphicsFamily.value(), 0,
-                   &data.GraphicQueue);
+  vkGetDeviceQueue(data.VirtualDevice, data.QueueFamilies.ComputeFamily.value(),
+                   0, &data.GraphicQueue);
   vkGetDeviceQueue(data.VirtualDevice, data.QueueFamilies.PresentFamily.value(),
                    0, &data.PresentQueue);
 

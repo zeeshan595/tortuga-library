@@ -109,19 +109,19 @@ VulkanSwapchain CreateSwapchain(VulkanDevice device, Window window) {
   data.SupportDetails = QuerySwapChainSupport(device, window.WindowSurface);
   data.SurfaceFormat = ChooseSwapSurfaceFormat(data.SupportDetails.Formats);
   data.PresentMode = ChooseSwapPresentMode(data.SupportDetails.PresentModes);
-  data.Extent =
-      ChooseSwapExtent(data.SupportDetails.Capabilities, window.Width, window.Height);
+  data.Extent = ChooseSwapExtent(data.SupportDetails.Capabilities, window.Width,
+                                 window.Height);
 
   VkBool32 isSupported = false;
   ErrorCheck(vkGetPhysicalDeviceSurfaceSupportKHR(
-      device.PhysicalDevice, device.QueueFamilies.GraphicsFamily.value(), window.WindowSurface,
-      &isSupported));
+      device.PhysicalDevice, device.QueueFamilies.ComputeFamily.value(),
+      window.WindowSurface, &isSupported));
   if (!isSupported) {
     Console::Fatal("Graphics queue not found when creating swapchain?");
   }
   ErrorCheck(vkGetPhysicalDeviceSurfaceSupportKHR(
-      device.PhysicalDevice, device.QueueFamilies.PresentFamily.value(), window.WindowSurface,
-      &isSupported));
+      device.PhysicalDevice, device.QueueFamilies.PresentFamily.value(),
+      window.WindowSurface, &isSupported));
   if (!isSupported) {
     Console::Fatal("Present queue not found when creating swapchain?");
   }
@@ -145,10 +145,10 @@ VulkanSwapchain CreateSwapchain(VulkanDevice device, Window window) {
         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     uint32_t queueFamilyIndices[] = {
-        device.QueueFamilies.GraphicsFamily.value(),
+        device.QueueFamilies.ComputeFamily.value(),
         device.QueueFamilies.PresentFamily.value()};
 
-    if (device.QueueFamilies.GraphicsFamily !=
+    if (device.QueueFamilies.ComputeFamily !=
         device.QueueFamilies.PresentFamily) {
       swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
       swapchainInfo.queueFamilyIndexCount = 2;
