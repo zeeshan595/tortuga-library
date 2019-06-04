@@ -172,7 +172,7 @@ VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
   }
 
   vkGetDeviceQueue(data.VirtualDevice, data.QueueFamilies.ComputeFamily.value(),
-                   0, &data.GraphicQueue);
+                   0, &data.ComputeQueue);
   vkGetDeviceQueue(data.VirtualDevice, data.QueueFamilies.PresentFamily.value(),
                    0, &data.PresentQueue);
 

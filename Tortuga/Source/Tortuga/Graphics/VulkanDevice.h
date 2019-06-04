@@ -16,6 +16,9 @@ struct QueueFamilyIndices {
   std::optional<uint32_t> ComputeFamily;
   std::optional<uint32_t> PresentFamily;
 
+  std::vector<uint32_t> Values() {
+    return {ComputeFamily.value(), PresentFamily.value()};
+  }
   static bool IsComplete(QueueFamilyIndices indices) {
     return indices.ComputeFamily.has_value() &&
            indices.PresentFamily.has_value();
@@ -28,13 +31,14 @@ struct VulkanDevice {
   VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;
   VkDevice VirtualDevice = VK_NULL_HANDLE;
   VkQueue PresentQueue = VK_NULL_HANDLE;
-  VkQueue GraphicQueue = VK_NULL_HANDLE;
+  VkQueue ComputeQueue = VK_NULL_HANDLE;
   uint32_t Score;
   bool IsReady = false;
 };
 
 VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
-                    VkInstance vulkanInstance, std::vector<const char*> validationLayers);
+                          VkInstance vulkanInstance,
+                          std::vector<const char *> validationLayers);
 void DestroyDevice(VulkanDevice device);
 
 } // namespace Graphics
