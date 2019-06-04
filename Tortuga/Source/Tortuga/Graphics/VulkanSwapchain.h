@@ -1,5 +1,5 @@
-#ifndef _SWAPCHAIN
-#define _SWAPCHAIN
+#ifndef _VULKAN_SWAPCHAIN
+#define _VULKAN_SWAPCHAIN
 
 #include "./VulkanDevice.h"
 #include "./Window.h"

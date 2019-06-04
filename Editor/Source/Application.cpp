@@ -9,13 +9,16 @@ int main(int argc, char **argv) {
   auto window = Graphics::CreateWindow("Test", 800, 600);
   Graphics::CreateSurface(window, vulkan.Instance);
   auto swapchain = Graphics::CreateSwapchain(vulkan.Devices[0], window);
-  auto buffer = Graphics::CreateVulkanBuffer(
-      vulkan.Devices[0], sizeof(uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-  Graphics::UpdateVulkanBuffer(buffer, 25);
+  auto pipeline = Graphics::CreatePipeline(vulkan.Devices[0], VK_NULL_HANDLE, {
+    {
+      VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+      VK_SHADER_STAGE_COMPUTE_BIT
+    }
+  });
 
-  Graphics::DestroyVulkanBuffer(buffer);
+
+  Graphics::DestroyPipeline(pipeline);
   Graphics::DestroySwapchain(swapchain);
   Graphics::DestroyWindow(window);
   Graphics::DestroyVulkanInstance(vulkan);
