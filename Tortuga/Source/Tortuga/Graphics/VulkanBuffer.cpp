@@ -6,7 +6,6 @@ uint32_t FindMemoryType(VulkanDevice device, uint32_t typeFilter,
                         VkMemoryPropertyFlags properties);
                         
 VulkanBuffer CreateVulkanBuffer(VulkanDevice device, uint32_t bufferSize,
-                                VkBufferUsageFlags bufferUsage,
                                 VkMemoryPropertyFlags memoryProperties) {
   auto data = VulkanBuffer();
   data.VirtualDevice = device.VirtualDevice;
@@ -15,7 +14,7 @@ VulkanBuffer CreateVulkanBuffer(VulkanDevice device, uint32_t bufferSize,
   {
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = bufferSize;
-    bufferInfo.usage = bufferUsage;
+    bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     auto queueFamilies = device.QueueFamilies.Values();

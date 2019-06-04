@@ -1,27 +1,30 @@
 #ifndef _VULKAN_PIPELINE
 #define _VULKAN_PIPELINE
 
+#include "./VulkanBuffer.h"
 #include "./VulkanDevice.h"
+#include "../Console.h"
 
 #include <vulkan/vulkan.h>
 
 namespace Tortuga {
 namespace Graphics {
-struct VulkanPipelineBindingInfo {
-  VkDescriptorType DescriptorType;
-  VkShaderStageFlagBits ShaderStage;
-};
 struct VulkanPipeline {
   VkDevice VirtualDevice = VK_NULL_HANDLE;
   VkPipeline Pipeline = VK_NULL_HANDLE;
   VkPipelineLayout PipelineLayout = VK_NULL_HANDLE;
-  VkDescriptorSetLayout PipelineSetsLayout = VK_NULL_HANDLE;
+  VkDescriptorSetLayout DescriptorSetsLayout = VK_NULL_HANDLE;
+  VkDescriptorPool DescriptorPool;
+  VkDescriptorSet DescriptorSets;
+  uint32_t BindingSize;
   VkPipelineCache PipelineCache = VK_NULL_HANDLE; // todo
 };
 
 VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
-                              std::vector<VulkanPipelineBindingInfo> bindings);
+                              uint32_t bindings);
 void DestroyPipeline(VulkanPipeline pipeline);
+void UpdateDescriptors(VulkanPipeline &pipeline,
+                       std::vector<VulkanBuffer> buffers);
 } // namespace Graphics
 } // namespace Tortuga
 

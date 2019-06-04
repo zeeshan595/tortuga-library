@@ -3,17 +3,18 @@
 namespace Tortuga {
 namespace Graphics {
 VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
-                              std::vector<VulkanPipelineBindingInfo> bindings) {
+                              uint32_t bindingsSize) {
   auto data = VulkanPipeline();
+  data.BindingSize = bindingsSize;
   data.VirtualDevice = device.VirtualDevice;
 
-  std::vector<VkDescriptorSetLayoutBinding> setsBinding(bindings.size());
-  for (uint32_t i = 0; i < bindings.size(); i++) {
+  std::vector<VkDescriptorSetLayoutBinding> setsBinding(bindingsSize);
+  for (uint32_t i = 0; i < bindingsSize; i++) {
     setsBinding[i] = VkDescriptorSetLayoutBinding();
     setsBinding[i].binding = i;
-    setsBinding[i].descriptorType = bindings[i].DescriptorType;
+    setsBinding[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     setsBinding[i].descriptorCount = 1;
-    setsBinding[i].stageFlags = bindings[i].ShaderStage;
+    setsBinding[i].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
     setsBinding[i].pImmutableSamplers = 0;
   }
 
@@ -26,7 +27,7 @@ VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
     setsInfo.pBindings = setsBinding.data();
   }
   ErrorCheck(vkCreateDescriptorSetLayout(device.VirtualDevice, &setsInfo,
-                                         nullptr, &data.PipelineSetsLayout));
+                                         nullptr, &data.DescriptorSetsLayout));
 
   auto layoutInfo = VkPipelineLayoutCreateInfo();
   {
@@ -34,7 +35,7 @@ VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
     layoutInfo.pNext = 0;
     layoutInfo.flags = 0;
     layoutInfo.setLayoutCount = 1;
-    layoutInfo.pSetLayouts = &data.PipelineSetsLayout;
+    layoutInfo.pSetLayouts = &data.DescriptorSetsLayout;
     layoutInfo.pushConstantRangeCount = 0;
     layoutInfo.pPushConstantRanges = 0;
   }
@@ -65,6 +66,32 @@ VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
   ErrorCheck(vkCreateComputePipelines(device.VirtualDevice, 0, 1, &pipelineInfo,
                                       nullptr, &data.Pipeline));
 
+  VkDescriptorPoolSize descriptorPoolSize = {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                                             bindingsSize};
+
+  auto descriptorPoolInfo = VkDescriptorPoolCreateInfo();
+  {
+    descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    descriptorPoolInfo.pNext = 0;
+    descriptorPoolInfo.flags = 0;
+    descriptorPoolInfo.maxSets = 1;
+    descriptorPoolInfo.poolSizeCount = 1;
+    descriptorPoolInfo.pPoolSizes = &descriptorPoolSize;
+  }
+  ErrorCheck(vkCreateDescriptorPool(device.VirtualDevice, &descriptorPoolInfo,
+                                    nullptr, &data.DescriptorPool));
+
+  auto descriptorInfo = VkDescriptorSetAllocateInfo();
+  {
+    descriptorInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    descriptorInfo.pNext = 0;
+    descriptorInfo.descriptorPool = data.DescriptorPool;
+    descriptorInfo.descriptorSetCount = 1;
+    descriptorInfo.pSetLayouts = &data.DescriptorSetsLayout;
+  }
+  ErrorCheck(vkAllocateDescriptorSets(device.VirtualDevice, &descriptorInfo,
+                                      &data.DescriptorSets));
+
   return data;
 }
 void DestroyPipeline(VulkanPipeline pipeline) {
@@ -72,7 +99,44 @@ void DestroyPipeline(VulkanPipeline pipeline) {
   vkDestroyPipelineLayout(pipeline.VirtualDevice, pipeline.PipelineLayout,
                           nullptr);
   vkDestroyDescriptorSetLayout(pipeline.VirtualDevice,
-                               pipeline.PipelineSetsLayout, nullptr);
+                               pipeline.DescriptorSetsLayout, nullptr);
+  vkDestroyDescriptorPool(pipeline.VirtualDevice, pipeline.DescriptorPool,
+                          nullptr);
+}
+
+void UpdateDescriptors(VulkanPipeline &pipeline,
+                       std::vector<VulkanBuffer> buffers) {
+  if (buffers.size() != pipeline.BindingSize) {
+    Console::Error("Pipeline binding size must be equal to the number of "
+                   "buffers provided");
+    return;
+  }
+
+  std::vector<VkDescriptorBufferInfo> descriptorBufferInfos(buffers.size());
+  std::vector<VkWriteDescriptorSet> writeDescriptorSets(buffers.size());
+  for (uint32_t i = 0; i < buffers.size(); i++) {
+    // Descriptor Set Buffer Info
+    descriptorBufferInfos[i] = VkDescriptorBufferInfo();
+    descriptorBufferInfos[i].buffer = buffers[i].Buffer,
+    descriptorBufferInfos[i].offset = 0;
+    descriptorBufferInfos[i].range = VK_WHOLE_SIZE;
+
+    // Descriptor Set Write
+    writeDescriptorSets[i] = VkWriteDescriptorSet();
+    writeDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writeDescriptorSets[i].pNext = 0;
+    writeDescriptorSets[i].dstSet = pipeline.DescriptorSets;
+    writeDescriptorSets[i].dstBinding = i;
+    writeDescriptorSets[i].dstArrayElement = 0;
+    writeDescriptorSets[i].descriptorCount = 1;
+    writeDescriptorSets[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writeDescriptorSets[i].pImageInfo = VK_NULL_HANDLE;
+    writeDescriptorSets[i].pBufferInfo = &descriptorBufferInfos[i];
+    writeDescriptorSets[i].pTexelBufferView = VK_NULL_HANDLE;
+  }
+
+  vkUpdateDescriptorSets(pipeline.VirtualDevice, buffers.size(),
+                         writeDescriptorSets.data(), 0, 0);
 }
 } // namespace Graphics
 } // namespace Tortuga

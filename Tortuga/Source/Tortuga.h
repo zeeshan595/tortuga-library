@@ -11,6 +11,7 @@
 //Internal Graphics API
 #include "Tortuga/Console.h"
 #include "Tortuga/Graphics/Window.h"
+#include "Tortuga/Graphics/VulkanErrorHandler.h"
 #include "Tortuga/Graphics/VulkanInstance.h"
 #include "Tortuga/Graphics/VulkanDevice.h"
 #include "Tortuga/Graphics/VulkanSwapchain.h"

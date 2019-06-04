@@ -15,7 +15,6 @@ struct VulkanBuffer {
   VkDevice VirtualDevice = VK_NULL_HANDLE;
 };
 VulkanBuffer CreateVulkanBuffer(VulkanDevice device, uint32_t bufferSize,
-                                VkBufferUsageFlags bufferUsage,
                                 VkMemoryPropertyFlags memoryProperties);
 void DestroyVulkanBuffer(VulkanBuffer data);
 
