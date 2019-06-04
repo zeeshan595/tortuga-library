@@ -48,7 +48,7 @@ VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
     stageInfo.flags = 0;
     stageInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
     stageInfo.module = shaderModule;
-    stageInfo.pName = "";
+    stageInfo.pName = "main";
     stageInfo.pSpecializationInfo = 0;
   }
 
