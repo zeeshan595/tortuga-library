@@ -9,7 +9,11 @@ int main(int argc, char **argv) {
   auto window = Graphics::CreateWindow("Test", 800, 600);
   Graphics::CreateSurface(window, vulkan.Instance);
   auto swapchain = Graphics::CreateSwapchain(vulkan.Devices[0], window);
-  auto buffer = Graphics::CreateVulkanBuffer(vulkan.Devices[0], 10);
+  auto buffer = Graphics::CreateVulkanBuffer(
+      vulkan.Devices[0], sizeof(uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+  Graphics::UpdateVulkanBuffer(buffer, 25);
 
   Graphics::DestroyVulkanBuffer(buffer);
   Graphics::DestroySwapchain(swapchain);
