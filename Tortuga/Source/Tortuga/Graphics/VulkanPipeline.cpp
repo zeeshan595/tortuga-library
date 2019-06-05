@@ -2,7 +2,7 @@
 
 namespace Tortuga {
 namespace Graphics {
-VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
+VulkanPipeline CreateVulkanPipeline(VulkanDevice device, VkShaderModule shaderModule,
                               uint32_t bindingsSize) {
   auto data = VulkanPipeline();
   data.BindingSize = bindingsSize;
@@ -94,7 +94,7 @@ VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
 
   return data;
 }
-void DestroyPipeline(VulkanPipeline pipeline) {
+void DestroyVulkanPipeline(VulkanPipeline pipeline) {
   vkDestroyPipeline(pipeline.VirtualDevice, pipeline.Pipeline, nullptr);
   vkDestroyPipelineLayout(pipeline.VirtualDevice, pipeline.PipelineLayout,
                           nullptr);

@@ -36,10 +36,10 @@ struct VulkanDevice {
   bool IsReady = false;
 };
 
-VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
+VulkanDevice CreateVulkanDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
                           VkInstance vulkanInstance,
                           std::vector<const char *> validationLayers);
-void DestroyDevice(VulkanDevice device);
+void DestroyVulkanDevice(VulkanDevice device);
 
 } // namespace Graphics
 } // namespace Tortuga

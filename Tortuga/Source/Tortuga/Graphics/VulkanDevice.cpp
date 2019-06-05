@@ -91,7 +91,7 @@ uint32_t GetDeviceScore(VkPhysicalDeviceProperties properties,
   return score;
 }
 
-VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
+VulkanDevice CreateVulkanDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
                           VkInstance vulkanInstance,
                           std::vector<const char *> validationLayers) {
   auto data = VulkanDevice();
@@ -179,7 +179,7 @@ VulkanDevice CreateDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
   data.IsReady = true;
   return data;
 }
-void DestroyDevice(VulkanDevice device) {
+void DestroyVulkanDevice(VulkanDevice device) {
   vkDestroyDevice(device.VirtualDevice, nullptr);
 }
 } // namespace Graphics

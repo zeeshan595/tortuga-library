@@ -103,7 +103,7 @@ VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities,
   }
 }
 
-VulkanSwapchain CreateSwapchain(VulkanDevice device, Window window) {
+VulkanSwapchain CreateVulkanSwapchain(VulkanDevice device, Window window) {
   auto data = VulkanSwapchain();
   data.VirtualDevice = device.VirtualDevice;
   data.SupportDetails = QuerySwapChainSupport(device, window.WindowSurface);
@@ -203,7 +203,7 @@ VulkanSwapchain CreateSwapchain(VulkanDevice device, Window window) {
   }
   return data;
 }
-void DestroySwapchain(VulkanSwapchain data) {
+void DestroyVulkanSwapchain(VulkanSwapchain data) {
   for (uint32_t i = 0; i < data.ImageViews.size(); i++) {
     vkDestroyImageView(data.VirtualDevice, data.ImageViews[i], nullptr);
   }

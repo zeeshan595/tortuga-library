@@ -6,15 +6,15 @@ int main(int argc, char **argv) {
   SDL_Init(SDL_INIT_VIDEO);
 
   auto vulkan = Graphics::CreateVulkanInstance();
-  auto window = Graphics::CreateWindow("Test", 800, 600);
-  Graphics::CreateSurface(window, vulkan.Instance);
-  auto swapchain = Graphics::CreateSwapchain(vulkan.Devices[0], window);
+  auto window = Graphics::CreateVulkanWindow("Test", 800, 600);
+  Graphics::CreateVulkanSurface(window, vulkan.Instance);
+  auto swapchain = Graphics::CreateVulkanSwapchain(vulkan.Devices[0], window);
 
   auto shader = Graphics::CreateVulkanShader(
-      vulkan.Devices[0], Utils::GetFileContents("Build/Shaders/compute.spv"));
+      vulkan.Devices[0], Utils::GetFileContents("Shaders/compute.spv"));
 
   auto pipeline =
-      Graphics::CreatePipeline(vulkan.Devices[0], shader.ShaderModule, 2);
+      Graphics::CreateVulkanPipeline(vulkan.Devices[0], shader.ShaderModule, 2);
 
   auto tempBuffer1 =
       Graphics::CreateVulkanBuffer(vulkan.Devices[0], sizeof(uint32_t),
@@ -70,9 +70,9 @@ int main(int argc, char **argv) {
   Graphics::DestroyVulkanBuffer(tempBuffer1);
   Graphics::DestroyVulkanBuffer(tempBuffer2);
   Graphics::DestroyVulkanShader(shader);
-  Graphics::DestroyPipeline(pipeline);
-  Graphics::DestroySwapchain(swapchain);
-  Graphics::DestroyWindow(window);
+  Graphics::DestroyVulkanPipeline(pipeline);
+  Graphics::DestroyVulkanSwapchain(swapchain);
+  Graphics::DestroyVulkanWindow(window);
   Graphics::DestroyVulkanInstance(vulkan);
 
   SDL_Quit();

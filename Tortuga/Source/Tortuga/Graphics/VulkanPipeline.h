@@ -20,9 +20,9 @@ struct VulkanPipeline {
   VkPipelineCache PipelineCache = VK_NULL_HANDLE; // todo
 };
 
-VulkanPipeline CreatePipeline(VulkanDevice device, VkShaderModule shaderModule,
+VulkanPipeline CreateVulkanPipeline(VulkanDevice device, VkShaderModule shaderModule,
                               uint32_t bindings);
-void DestroyPipeline(VulkanPipeline pipeline);
+void DestroyVulkanPipeline(VulkanPipeline pipeline);
 void UpdateDescriptors(VulkanPipeline &pipeline,
                        std::vector<VulkanBuffer> buffers);
 } // namespace Graphics

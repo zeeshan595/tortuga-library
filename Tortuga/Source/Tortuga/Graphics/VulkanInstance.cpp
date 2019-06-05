@@ -39,7 +39,7 @@ VulkanInstance CreateVulkanInstance() {
   auto data = VulkanInstance();
 
   // Create Temporary window (need to know what to enable)
-  auto tempWindow = CreateWindow("Vulkan Helper", 800, 600);
+  auto tempWindow = CreateVulkanWindow("Vulkan Helper", 800, 600);
 
   std::vector<const char *> extensions = tempWindow.RequiredExtensions;
   std::vector<const char *> validationLayers;
@@ -98,23 +98,23 @@ VulkanInstance CreateVulkanInstance() {
                                         physicalDevices.data()));
 
   // Init Devices
-  CreateSurface(tempWindow, data.Instance);
+  CreateVulkanSurface(tempWindow, data.Instance);
   for (uint32_t i = 0; i < physicalDevices.size(); i++) {
-    auto device = CreateDevice(physicalDevices[i], tempWindow.WindowSurface,
+    auto device = CreateVulkanDevice(physicalDevices[i], tempWindow.WindowSurface,
                                data.Instance, validationLayers);
 
     if (device.IsReady)
       data.Devices.push_back(device);
   }
   // Destroy Window
-  DestroyWindow(tempWindow);
+  DestroyVulkanWindow(tempWindow);
 
   Console::Info("Vulkan is Ready!");
   return data;
 }
 void DestroyVulkanInstance(VulkanInstance instance) {
   for (uint32_t i = 0; i < instance.Devices.size(); i++) {
-    DestroyDevice(instance.Devices[i]);
+    DestroyVulkanDevice(instance.Devices[i]);
   }
 #if DEBUG_MODE
   DestroyDebugUtilsMessengerEXT(instance.Instance, instance.Debugger, nullptr);

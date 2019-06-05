@@ -26,8 +26,8 @@ struct VulkanSwapchain {
   VkDevice VirtualDevice;
 };
 
-VulkanSwapchain CreateSwapchain(VulkanDevice device, Window window);
-void DestroySwapchain(VulkanSwapchain swapchain);
+VulkanSwapchain CreateVulkanSwapchain(VulkanDevice device, Window window);
+void DestroyVulkanSwapchain(VulkanSwapchain swapchain);
 } // namespace Graphics
 } // namespace Tortuga
 

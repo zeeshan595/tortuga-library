@@ -2,7 +2,7 @@
 
 namespace Tortuga {
 namespace Graphics {
-Window CreateWindow(std::string title, uint32_t width, uint32_t height) {
+Window CreateVulkanWindow(std::string title, uint32_t width, uint32_t height) {
   auto data = Window();
   data.Width = width;
   data.Height = height;
@@ -26,14 +26,14 @@ Window CreateWindow(std::string title, uint32_t width, uint32_t height) {
 
   return data;
 }
-void DestroyWindow(Window window) {
+void DestroyVulkanWindow(Window window) {
   if (window.WindowSurface != VK_NULL_HANDLE) {
     vkDestroySurfaceKHR(window.VulkanInstance, window.WindowSurface, nullptr);
   }
   SDL_DestroyWindow(window.SDLWindow);
 }
 
-void CreateSurface(Window &window, VkInstance instance) {
+void CreateVulkanSurface(Window &window, VkInstance instance) {
   window.VulkanInstance = instance;
   //Create surface
   if (SDL_Vulkan_CreateSurface(window.SDLWindow, instance,

@@ -19,9 +19,9 @@ struct Window {
   std::vector<const char *> RequiredExtensions;
 };
 
-Window CreateWindow(std::string title, uint32_t width, uint32_t height);
-void DestroyWindow(Window window);
-void CreateSurface(Window &window, VkInstance instance);
+Window CreateVulkanWindow(std::string title, uint32_t width, uint32_t height);
+void DestroyVulkanWindow(Window window);
+void CreateVulkanSurface(Window &window, VkInstance instance);
 } // namespace Graphics
 } // namespace Tortuga
 
