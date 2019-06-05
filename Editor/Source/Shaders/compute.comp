@@ -1,5 +1,13 @@
 #version 450
 
-void main() {
+layout(set = 0, binding = 0) readonly buffer InputBuffer {
+  uint example;
+} inputBuffer;
 
+layout(set = 0, binding = 1) buffer OutputBuffer {
+  uint example;
+} outputBuffer;
+
+void main() {
+  outputBuffer.example = inputBuffer.example * 2;
 }

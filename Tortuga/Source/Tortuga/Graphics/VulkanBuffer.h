@@ -18,7 +18,29 @@ VulkanBuffer CreateVulkanBuffer(VulkanDevice device, uint32_t bufferSize,
                                 VkMemoryPropertyFlags memoryProperties);
 void DestroyVulkanBuffer(VulkanBuffer data);
 
-template <typename T> void UpdateVulkanBuffer(VulkanBuffer buffer, T data) {
+template <typename T> T GetVulkanBufferData(VulkanBuffer buffer) {
+  T data;
+  void *temp;
+  ErrorCheck(vkMapMemory(buffer.VirtualDevice, buffer.Memory, 0,
+                         buffer.MemoryRequirements.size, VK_NULL_HANDLE,
+                         &temp));
+  memcpy(&data, temp, sizeof(T));
+  vkUnmapMemory(buffer.VirtualDevice, buffer.Memory);
+  return data;
+}
+
+template <typename T> std::vector<T> GetVulkanBufferData(VulkanBuffer buffer, uint32_t arraySize) {
+  std::vector<T> data;
+  void *temp;
+  ErrorCheck(vkMapMemory(buffer.VirtualDevice, buffer.Memory, 0,
+                         buffer.MemoryRequirements.size, VK_NULL_HANDLE,
+                         &temp));
+  memcpy(&data, temp, sizeof(T) * arraySize);
+  vkUnmapMemory(buffer.VirtualDevice, buffer.Memory);
+  return data;
+}
+
+template <typename T> void SetVulkanBufferData(VulkanBuffer buffer, T data) {
   void *temp;
   ErrorCheck(vkMapMemory(buffer.VirtualDevice, buffer.Memory, 0,
                          buffer.MemoryRequirements.size, VK_NULL_HANDLE,
@@ -28,7 +50,7 @@ template <typename T> void UpdateVulkanBuffer(VulkanBuffer buffer, T data) {
 }
 
 template <typename T>
-void UpdateVulkanBuffer(VulkanBuffer buffer, std::vector<T> data) {
+void SetVulkanBufferData(VulkanBuffer buffer, std::vector<T> data) {
   void *temp;
   ErrorCheck(vkMapMemory(buffer.VirtualDevice, buffer.Memory, 0,
                          buffer.MemoryRequirements.size, VK_NULL_HANDLE,

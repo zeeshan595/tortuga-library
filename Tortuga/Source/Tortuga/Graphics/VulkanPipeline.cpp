@@ -104,7 +104,7 @@ void DestroyVulkanPipeline(VulkanPipeline pipeline) {
                           nullptr);
 }
 
-void UpdateDescriptors(VulkanPipeline &pipeline,
+void UpdatePipelineDescriptors(VulkanPipeline &pipeline,
                        std::vector<VulkanBuffer> buffers) {
   if (buffers.size() != pipeline.BindingSize) {
     Console::Error("Pipeline binding size must be equal to the number of "

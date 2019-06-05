@@ -13,62 +13,43 @@ int main(int argc, char **argv) {
   auto shader = Graphics::CreateVulkanShader(
       vulkan.Devices[0], Utils::GetFileContents("Shaders/compute.spv"));
 
+  // Create pipeline and setup data structure (buffers)
   auto pipeline =
       Graphics::CreateVulkanPipeline(vulkan.Devices[0], shader.ShaderModule, 2);
-
-  auto tempBuffer1 =
+  auto inputBuffer =
       Graphics::CreateVulkanBuffer(vulkan.Devices[0], sizeof(uint32_t),
                                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-  auto tempBuffer2 =
+  auto outputBuffer =
       Graphics::CreateVulkanBuffer(vulkan.Devices[0], sizeof(uint32_t),
                                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+  Graphics::UpdatePipelineDescriptors(pipeline, {inputBuffer, outputBuffer});
 
-  Graphics::UpdateDescriptors(pipeline, {tempBuffer1, tempBuffer2});
+  // Insert data into the buffers
+  Graphics::SetVulkanBufferData<uint32_t>(inputBuffer, 50);
+  Graphics::SetVulkanBufferData<uint32_t>(outputBuffer, 0);
 
-  // Example
-  auto commandPoolInfo = VkCommandPoolCreateInfo();
-  {
-    commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    commandPoolInfo.pNext = 0;
-    commandPoolInfo.flags = 0;
-    commandPoolInfo.queueFamilyIndex =
-        vulkan.Devices[0].QueueFamilies.ComputeFamily.value();
-  }
-  VkCommandPool commandPool;
-  Graphics::ErrorCheck(vkCreateCommandPool(vulkan.Devices[0].VirtualDevice,
-                                           &commandPoolInfo, nullptr,
-                                           &commandPool));
+  auto commandPool = Graphics::CreateVulkanCommandPool(vulkan.Devices[0]);
+  auto command = Graphics::CreateVulkanCommand(commandPool);
 
-  auto commandBufferAllocateInfo = VkCommandBufferAllocateInfo();
-  {
-    commandBufferAllocateInfo.sType =
-        VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.pNext = 0;
-    commandBufferAllocateInfo.commandPool = commandPool;
-    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateInfo.commandBufferCount = 1;
-  }
-  VkCommandBuffer commandBuffer;
-  Graphics::ErrorCheck(vkAllocateCommandBuffers(vulkan.Devices[0].VirtualDevice,
-                                                &commandBufferAllocateInfo,
-                                                &commandBuffer));
+  Graphics::VulkanCommandBegin(command);
+  Graphics::VulkanCommandBindPipeline(command, pipeline);
+  Graphics::VulkanCommandDispatch(command, 1, 1, 1);
+  Graphics::VulkanCommandEnd(command);
 
-  auto commandBufferBeginInfo = VkCommandBufferBeginInfo();
-  {
-    commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    commandBufferBeginInfo.pNext = 0;
-    commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    commandBufferBeginInfo.pInheritanceInfo = 0;
-  }
-  vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo);
-  vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
-                    pipeline.Pipeline);
+  Graphics::VulkanCommandSubmit({command}, vulkan.Devices[0].ComputeQueue);
 
-  Graphics::DestroyVulkanBuffer(tempBuffer1);
-  Graphics::DestroyVulkanBuffer(tempBuffer2);
+  //Wait for queue to be idle
+  vkQueueWaitIdle(vulkan.Devices[0].ComputeQueue);
+
+  //Get data from compute shader
+  auto data = Graphics::GetVulkanBufferData<uint32_t>(outputBuffer);
+  Console::Info("Output from compute shader: {0}", data);
+
+  Graphics::DestroyVulkanCommandPool(commandPool);
+  Graphics::DestroyVulkanBuffer(inputBuffer);
+  Graphics::DestroyVulkanBuffer(outputBuffer);
   Graphics::DestroyVulkanShader(shader);
   Graphics::DestroyVulkanPipeline(pipeline);
   Graphics::DestroyVulkanSwapchain(swapchain);

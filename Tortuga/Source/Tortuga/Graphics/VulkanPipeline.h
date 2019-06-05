@@ -23,7 +23,7 @@ struct VulkanPipeline {
 VulkanPipeline CreateVulkanPipeline(VulkanDevice device, VkShaderModule shaderModule,
                               uint32_t bindings);
 void DestroyVulkanPipeline(VulkanPipeline pipeline);
-void UpdateDescriptors(VulkanPipeline &pipeline,
+void UpdatePipelineDescriptors(VulkanPipeline &pipeline,
                        std::vector<VulkanBuffer> buffers);
 } // namespace Graphics
 } // namespace Tortuga

@@ -18,5 +18,6 @@
 #include "Tortuga/Graphics/VulkanShader.h"
 #include "Tortuga/Graphics/VulkanPipeline.h"
 #include "Tortuga/Graphics/VulkanBuffer.h"
+#include "Tortuga/Graphics/VulkanCommand.h"
 
 #endif
