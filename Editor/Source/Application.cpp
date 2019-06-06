@@ -2,6 +2,9 @@
 
 using namespace Tortuga;
 
+const uint32_t WINDOW_WIDTH = 800;
+const uint32_t WINDOW_HEIGHT = 600;
+
 struct InputBuffer {
   uint32_t ResolutionX;
   uint32_t ResolutionY;
@@ -13,7 +16,7 @@ struct Pixel {
   float a;
 };
 struct OutputBuffer {
-  Pixel Pixels[480000];
+  Pixel Pixels[WINDOW_WIDTH * WINDOW_HEIGHT];
 };
 
 int main(int argc, char **argv) {
@@ -22,7 +25,7 @@ int main(int argc, char **argv) {
   auto vulkan = Graphics::CreateVulkanInstance();
 
   // Setup window
-  auto window = Graphics::CreateVulkanWindow("Test", 800, 600);
+  auto window = Graphics::CreateVulkanWindow("Test", WINDOW_WIDTH, WINDOW_HEIGHT);
   Graphics::CreateVulkanSurface(window, vulkan.Instance);
   auto swapchain = Graphics::CreateVulkanSwapchain(vulkan.Devices[0], window);
 
@@ -44,7 +47,7 @@ int main(int argc, char **argv) {
   Graphics::UpdatePipelineDescriptors(pipeline, {inputBuffer, outputBuffer});
 
   // Insert data into the buffers
-  Graphics::SetVulkanBufferData<InputBuffer>(inputBuffer, {800, 600});
+  Graphics::SetVulkanBufferData<InputBuffer>(inputBuffer, {WINDOW_WIDTH, WINDOW_HEIGHT});
 
   auto commandPool = Graphics::CreateVulkanCommandPool(vulkan.Devices[0]);
   auto command = Graphics::CreateVulkanCommand(commandPool);
@@ -52,7 +55,7 @@ int main(int argc, char **argv) {
   // Record command for rendering
   Graphics::VulkanCommandBegin(command);
   Graphics::VulkanCommandBindPipeline(command, pipeline);
-  Graphics::VulkanCommandDispatch(command, 1, 1, 1);
+  Graphics::VulkanCommandDispatch(command, WINDOW_WIDTH, WINDOW_HEIGHT, 1);
   Graphics::VulkanCommandEnd(command);
 
   // Submit command to GPU
@@ -69,7 +72,7 @@ int main(int argc, char **argv) {
   Graphics::FenceWait({fence});
   Graphics::DestroyVulkanFence(fence);
 
-  auto renderImage = Graphics::CreateVulkanImage(vulkan.Devices[0], 800, 600);
+  auto renderImage = Graphics::CreateVulkanImage(vulkan.Devices[0], WINDOW_WIDTH, WINDOW_HEIGHT);
 
   // Record command (buffer -> renderImage)
   command = Graphics::CreateVulkanCommand(commandPool);
@@ -78,7 +81,7 @@ int main(int argc, char **argv) {
       command, renderImage.Image, VK_IMAGE_LAYOUT_UNDEFINED,
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
   Graphics::VulkanCommandCopyBufferToImage(command, outputBuffer, renderImage.Image,
-                                           {0, 0}, {800, 600});
+                                           {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT});
   Graphics::VulkanCommandImageLayoutTransfer(
       command, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
@@ -88,7 +91,7 @@ int main(int argc, char **argv) {
   Graphics::VulkanCommandBlitImage(
       command, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
       swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-      {0, 0}, {800, 600});
+      {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT});
   Graphics::VulkanCommandImageLayoutTransfer(
       command, swapchain.Images[imageIndex],
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);

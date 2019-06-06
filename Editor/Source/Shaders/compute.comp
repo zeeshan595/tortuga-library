@@ -1,5 +1,13 @@
 #version 450
 
+/*
+in uvec3 gl_NumWorkGroups;
+in uvec3 gl_WorkGroupID;
+in uvec3 gl_LocalInvocationID;
+in uvec3 gl_GlobalInvocationID;
+in uint  gl_LocalInvocationIndex;
+*/
+
 layout(set = 0, binding = 0) readonly buffer InputBuffer {
   uint ResolutionX;
   uint ResolutionY;
@@ -16,10 +24,10 @@ layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
 outputBuffer;
 
 void main() {
-  for (uint i = 0; i < outputBuffer.Pixels.length(); i++) {
-    outputBuffer.Pixels[i].r = 255;
-    outputBuffer.Pixels[i].g = 255;
-    outputBuffer.Pixels[i].b = 255;
-    outputBuffer.Pixels[i].a = 1;
-  }
+  const uint workIndex = (gl_WorkGroupID.x * gl_NumWorkGroups.y) + gl_WorkGroupID.y;
+
+  outputBuffer.Pixels[workIndex].r = 255;
+  outputBuffer.Pixels[workIndex].g = 255;
+  outputBuffer.Pixels[workIndex].b = 255;
+  outputBuffer.Pixels[workIndex].a = 1;
 }
