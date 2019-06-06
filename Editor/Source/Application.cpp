@@ -62,31 +62,31 @@ int main(int argc, char **argv) {
   Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
                                    Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
 
-  // Get swapchain image being used
+  // Get swapchain renderImage being used
   auto fence = Graphics::CreateVulkanFence(vulkan.Devices[0]);
   uint32_t imageIndex = 0;
   Graphics::SwapchainAquireImage(swapchain, &imageIndex, VK_NULL_HANDLE, fence);
   Graphics::FenceWait({fence});
   Graphics::DestroyVulkanFence(fence);
 
-  auto image = Graphics::CreateVulkanImage(vulkan.Devices[0], 800, 600);
+  auto renderImage = Graphics::CreateVulkanImage(vulkan.Devices[0], 800, 600);
 
-  // Record command (buffer -> image)
+  // Record command (buffer -> renderImage)
   command = Graphics::CreateVulkanCommand(commandPool);
   Graphics::VulkanCommandBegin(command);
   Graphics::VulkanCommandImageLayoutTransfer(
-      command, image.Image, VK_IMAGE_LAYOUT_UNDEFINED,
+      command, renderImage.Image, VK_IMAGE_LAYOUT_UNDEFINED,
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-  Graphics::VulkanCommandCopyBufferToImage(command, outputBuffer, image.Image,
+  Graphics::VulkanCommandCopyBufferToImage(command, outputBuffer, renderImage.Image,
                                            {0, 0}, {800, 600});
   Graphics::VulkanCommandImageLayoutTransfer(
-      command, image.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+      command, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
   Graphics::VulkanCommandImageLayoutTransfer(
       command, swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED,
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
   Graphics::VulkanCommandBlitImage(
-      command, image.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+      command, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
       swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
       {0, 0}, {800, 600});
   Graphics::VulkanCommandImageLayoutTransfer(
@@ -105,6 +105,16 @@ int main(int argc, char **argv) {
   Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
                                    Graphics::VULKAN_QUEUE_TYPE_PRESENT);
 
+  while (true) {
+    SDL_Event event;
+    if (SDL_PollEvent(&event) != 0) {
+      if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
+        break;
+      }
+    }
+  }
+
+  Graphics::DestroyVulkanImage(renderImage);
   Graphics::DestroyVulkanCommandPool(commandPool);
   Graphics::DestroyVulkanBuffer(inputBuffer);
   Graphics::DestroyVulkanBuffer(outputBuffer);
