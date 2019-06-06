@@ -9,6 +9,9 @@ VulkanImage CreateVulkanImage(VulkanDevice device, uint32_t width,
                               uint32_t height) {
   auto data = VulkanImage();
   data.VirtualDevice = device.VirtualDevice;
+  data.ImageFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
+  data.Width = width;
+  data.Height = height;
 
   auto imageInfo = VkImageCreateInfo();
   {

@@ -8,7 +8,10 @@
 namespace Tortuga {
 namespace Graphics {
 struct VulkanImage {
+  uint32_t Width;
+  uint32_t Height;
   VkImage Image;
+  VkFormat ImageFormat;
   VkDevice VirtualDevice;
   VkDeviceMemory DeviceMemory;
 };

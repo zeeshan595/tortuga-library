@@ -1,7 +1,7 @@
 #CONFIG
 PROJECT_NAME = Editor
 COMPILER = g++
-FLAGS = -Wall -g -std=c++17 -DDEBUG_MODE
+FLAGS = -Wall -g -std=c++17 -Wnarrowing -DDEBUG_MODE
 SOURCE_DIR = Source
 BUILD_DIR = Build
 MAIN_PATH = $(SOURCE_DIR)/Application.cpp

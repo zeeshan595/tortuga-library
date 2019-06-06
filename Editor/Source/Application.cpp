@@ -87,7 +87,8 @@ int main(int argc, char **argv) {
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
   Graphics::VulkanCommandBlitImage(
       command, image.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-      swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+      swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+      {0, 0}, {800, 600});
   Graphics::VulkanCommandImageLayoutTransfer(
       command, swapchain.Images[imageIndex],
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);

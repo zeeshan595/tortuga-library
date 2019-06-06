@@ -4,6 +4,7 @@
 #include "../Console.h"
 #include "./VulkanDevice.h"
 #include "./VulkanErrorHandler.h"
+#include "./VulkanImage.h"
 #include "./VulkanPipeline.h"
 
 #include <glm/glm.hpp>
@@ -39,10 +40,12 @@ void VulkanCommandImageLayoutTransfer(VulkanCommand command, VkImage image,
                                       VkImageLayout newLayout);
 void VulkanCommandCopyImage(VulkanCommand command, VkImage source,
                             VkImageLayout sourceLayout, VkImage destination,
-                            VkImageLayout destinationLayout);
+                            VkImageLayout destinationLayout, glm::vec2 offset,
+                            glm::vec2 size);
 void VulkanCommandBlitImage(VulkanCommand command, VkImage source,
                             VkImageLayout sourceLayout, VkImage destination,
-                            VkImageLayout destinationLayout);
+                            VkImageLayout destinationLayout, glm::vec2 offset,
+                            glm::vec2 size);
 } // namespace Graphics
 } // namespace Tortuga
 

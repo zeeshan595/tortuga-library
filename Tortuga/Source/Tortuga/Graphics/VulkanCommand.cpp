@@ -119,8 +119,10 @@ void VulkanCommandCopyBufferToImage(VulkanCommand command, VulkanBuffer buffer,
     regionInfo.bufferRowLength = 0;
     regionInfo.bufferImageHeight = 0;
     regionInfo.imageSubresource = imageLayers;
-    regionInfo.imageOffset = {imageOffset.x, imageOffset.y, 0};
-    regionInfo.imageExtent = {imageSize.x, imageSize.y, 1};
+    regionInfo.imageOffset = {static_cast<uint32_t>(imageOffset.x),
+                              static_cast<uint32_t>(imageOffset.y), 0};
+    regionInfo.imageExtent = {static_cast<uint32_t>(imageSize.x),
+                              static_cast<uint32_t>(imageSize.y), 1};
   }
   vkCmdCopyBufferToImage(command.CommandBuffer, buffer.Buffer, image,
                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &regionInfo);
@@ -151,7 +153,8 @@ void VulkanCommandImageLayoutTransfer(VulkanCommand command, VkImage image,
 }
 void VulkanCommandCopyImage(VulkanCommand command, VkImage source,
                             VkImageLayout sourceLayout, VkImage destination,
-                            VkImageLayout destinationLayout) {
+                            VkImageLayout destinationLayout, glm::vec2 offset,
+                            glm::vec2 size) {
   auto subResource = VkImageSubresourceLayers();
   {
     subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -164,15 +167,18 @@ void VulkanCommandCopyImage(VulkanCommand command, VkImage source,
     copyInfo.srcSubresource = subResource;
     copyInfo.srcOffset = {0, 0, 0};
     copyInfo.dstSubresource = subResource;
-    copyInfo.dstOffset = {0, 0, 0};
-    copyInfo.extent = {800, 600, 0};
+    copyInfo.dstOffset = {static_cast<uint32_t>(offset.x),
+                          static_cast<uint32_t>(offset.y), 0};
+    copyInfo.extent = {static_cast<uint32_t>(size.x),
+                       static_cast<uint32_t>(size.y), 0};
   }
   vkCmdCopyImage(command.CommandBuffer, source, sourceLayout, destination,
                  destinationLayout, 1, &copyInfo);
 }
 void VulkanCommandBlitImage(VulkanCommand command, VkImage source,
                             VkImageLayout sourceLayout, VkImage destination,
-                            VkImageLayout destinationLayout) {
+                            VkImageLayout destinationLayout, glm::vec2 offset,
+                            glm::vec2 size) {
   auto subResource = VkImageSubresourceLayers();
   {
     subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -185,10 +191,13 @@ void VulkanCommandBlitImage(VulkanCommand command, VkImage source,
   {
     blitInfo.srcSubresource = subResource;
     blitInfo.srcOffsets[0] = {0, 0, 0};
-    blitInfo.srcOffsets[1] = {800, 600, 1};
+    blitInfo.srcOffsets[1] = {static_cast<uint32_t>(size.x),
+                              static_cast<uint32_t>(size.y), 1};
     blitInfo.dstSubresource = subResource;
-    blitInfo.dstOffsets[0] = {0, 0, 0};
-    blitInfo.dstOffsets[1] = {800, 600, 1};
+    blitInfo.dstOffsets[0] = {static_cast<uint32_t>(offset.x),
+                              static_cast<uint32_t>(offset.y), 0};
+    blitInfo.dstOffsets[1] = {static_cast<uint32_t>(size.x),
+                              static_cast<uint32_t>(size.y), 1};
   }
   vkCmdBlitImage(command.CommandBuffer, source, sourceLayout, destination,
                  destinationLayout, 1, &blitInfo, VK_FILTER_LINEAR);

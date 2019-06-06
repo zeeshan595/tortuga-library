@@ -16,7 +16,7 @@ layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
 outputBuffer;
 
 void main() {
-  for (uint i = 0; i < 480000; i++) {
+  for (uint i = 0; i < outputBuffer.Pixels.length(); i++) {
     outputBuffer.Pixels[i].r = 255;
     outputBuffer.Pixels[i].g = 255;
     outputBuffer.Pixels[i].b = 255;
