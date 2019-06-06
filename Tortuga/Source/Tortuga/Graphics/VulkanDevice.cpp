@@ -91,9 +91,9 @@ uint32_t GetDeviceScore(VkPhysicalDeviceProperties properties,
   return score;
 }
 
-VulkanDevice CreateVulkanDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
-                          VkInstance vulkanInstance,
-                          std::vector<const char *> validationLayers) {
+VulkanDevice CreateVulkanDevice(VkPhysicalDevice physicalDevice,
+                                VkSurfaceKHR surface, VkInstance vulkanInstance,
+                                std::vector<const char *> validationLayers) {
   auto data = VulkanDevice();
   data.PhysicalDevice = physicalDevice;
   if (physicalDevice == VK_NULL_HANDLE || physicalDevice == nullptr ||
@@ -181,6 +181,20 @@ VulkanDevice CreateVulkanDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR su
 }
 void DestroyVulkanDevice(VulkanDevice device) {
   vkDestroyDevice(device.VirtualDevice, nullptr);
+}
+void DeviceQueueWaitForIdle(VulkanDevice data, VulkanQueueType queueType) {
+  switch (queueType) {
+  case VULKAN_QUEUE_TYPE_COMPUTE:
+    vkQueueWaitIdle(data.ComputeQueue);
+    break;
+  case VULKAN_QUEUE_TYPE_PRESENT:
+    vkQueueWaitIdle(data.PresentQueue);
+    break;
+  default:
+    Console::Error(
+        "Trying to wait for an unknown queue. This queue is not supported :c");
+    break;
+  }
 }
 } // namespace Graphics
 } // namespace Tortuga

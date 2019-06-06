@@ -2,6 +2,7 @@
 #define _TORTUGA
 
 //External Libraries
+#include <glm/glm.hpp>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 
@@ -19,5 +20,6 @@
 #include "Tortuga/Graphics/VulkanPipeline.h"
 #include "Tortuga/Graphics/VulkanBuffer.h"
 #include "Tortuga/Graphics/VulkanCommand.h"
+#include "Tortuga/Graphics/VulkanFence.h"
 
 #endif

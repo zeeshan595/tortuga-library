@@ -1,13 +1,25 @@
 #version 450
 
 layout(set = 0, binding = 0) readonly buffer InputBuffer {
-  uint example;
-} inputBuffer;
+  uint ResolutionX;
+  uint ResolutionY;
+}
+inputBuffer;
 
-layout(set = 0, binding = 1) buffer OutputBuffer {
-  uint example;
-} outputBuffer;
+struct Pixel {
+  float r;
+  float g;
+  float b;
+  float a;
+};
+layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
+outputBuffer;
 
 void main() {
-  outputBuffer.example = inputBuffer.example * 2;
+  for (uint i = 0; i < outputBuffer.Pixels.length(); i++) {
+    outputBuffer.Pixels[i].r = 0;
+    outputBuffer.Pixels[i].g = 0;
+    outputBuffer.Pixels[i].b = 0;
+    outputBuffer.Pixels[i].a = 1;
+  }
 }

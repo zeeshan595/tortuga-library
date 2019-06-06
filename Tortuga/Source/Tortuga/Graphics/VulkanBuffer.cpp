@@ -4,7 +4,7 @@ namespace Tortuga {
 namespace Graphics {
 uint32_t FindMemoryType(VulkanDevice device, uint32_t typeFilter,
                         VkMemoryPropertyFlags properties);
-                        
+
 VulkanBuffer CreateVulkanBuffer(VulkanDevice device, uint32_t bufferSize,
                                 VkMemoryPropertyFlags memoryProperties) {
   auto data = VulkanBuffer();
@@ -14,7 +14,8 @@ VulkanBuffer CreateVulkanBuffer(VulkanDevice device, uint32_t bufferSize,
   {
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = bufferSize;
-    bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    bufferInfo.usage =
+        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     auto queueFamilies = device.QueueFamilies.Values();

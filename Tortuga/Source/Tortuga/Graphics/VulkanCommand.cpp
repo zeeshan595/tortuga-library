@@ -90,5 +90,58 @@ void VulkanCommandSubmit(std::vector<VulkanCommand> command, VkQueue queue) {
   }
   ErrorCheck(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 }
+
+void VulkanCommandCopyBufferToImage(VulkanCommand command, VulkanBuffer buffer,
+                                    VkImage image, glm::vec2 imageOffset,
+                                    glm::vec2 imageSize) {
+
+  auto imageLayers = VkImageSubresourceLayers();
+  {
+    imageLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageLayers.mipLevel = 0;
+    imageLayers.baseArrayLayer = 0;
+    imageLayers.layerCount = 1;
+  }
+  auto regionInfo = VkBufferImageCopy();
+  {
+    regionInfo.bufferOffset = 0;
+    regionInfo.bufferRowLength = 0;
+    regionInfo.bufferImageHeight = 0;
+    regionInfo.imageSubresource = imageLayers;
+    regionInfo.imageOffset = {imageOffset.x, imageOffset.y, 0};
+    regionInfo.imageExtent = {imageSize.x, imageSize.y, 1};
+  }
+  vkCmdCopyBufferToImage(command.CommandBuffer, buffer.Buffer, image,
+                         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &regionInfo);
+}
+void VulkanCommandImageLayoutTransfer(VulkanCommand command, VkImage image,
+                                      VkImageLayout oldLayout,
+                                      VkImageLayout newLayout) {
+  auto barrier = VkImageMemoryBarrier();
+  {
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = oldLayout;
+    barrier.newLayout = newLayout;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+    barrier.srcAccessMask = 0;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+  }
+
+  vkCmdPipelineBarrier(
+      command.CommandBuffer,
+      VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+      VK_PIPELINE_STAGE_TRANSFER_BIT,
+      0,
+      0, nullptr,
+      0, nullptr,
+      1, &barrier);
+}
 } // namespace Graphics
 } // namespace Tortuga

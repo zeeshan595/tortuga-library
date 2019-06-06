@@ -1,11 +1,12 @@
 #ifndef _VULKAN_COMMAND
 #define _VULKAN_COMMAND
 
+#include "../Console.h"
 #include "./VulkanDevice.h"
 #include "./VulkanErrorHandler.h"
 #include "./VulkanPipeline.h"
-#include "../Console.h"
 
+#include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
 
 namespace Tortuga {
@@ -29,6 +30,12 @@ void VulkanCommandSubmit(std::vector<VulkanCommand> command, VkQueue queue);
 void VulkanCommandBindPipeline(VulkanCommand command, VulkanPipeline pipeline);
 void VulkanCommandDispatch(VulkanCommand command, uint32_t groupCountX,
                            uint32_t groupCountY, uint32_t groupCountZ);
+void VulkanCommandCopyBufferToImage(VulkanCommand command, VulkanBuffer buffer,
+                                    VkImage image, glm::vec2 imageOffset,
+                                    glm::vec2 imageSize);
+void VulkanCommandImageLayoutTransfer(VulkanCommand command, VkImage image,
+                                      VkImageLayout oldLayout,
+                                      VkImageLayout newLayout);
 } // namespace Graphics
 } // namespace Tortuga
 
