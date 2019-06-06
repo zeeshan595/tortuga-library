@@ -26,7 +26,8 @@ void DestroyVulkanCommandPool(VulkanCommandPool data);
 VulkanCommand CreateVulkanCommand(VulkanCommandPool commandPool);
 void VulkanCommandBegin(VulkanCommand command);
 void VulkanCommandEnd(VulkanCommand command);
-void VulkanCommandSubmit(std::vector<VulkanCommand> command, VkQueue queue);
+void VulkanCommandSubmit(std::vector<VulkanCommand> command,
+                         VulkanQueueType queueType);
 void VulkanCommandBindPipeline(VulkanCommand command, VulkanPipeline pipeline);
 void VulkanCommandDispatch(VulkanCommand command, uint32_t groupCountX,
                            uint32_t groupCountY, uint32_t groupCountZ);
@@ -36,6 +37,12 @@ void VulkanCommandCopyBufferToImage(VulkanCommand command, VulkanBuffer buffer,
 void VulkanCommandImageLayoutTransfer(VulkanCommand command, VkImage image,
                                       VkImageLayout oldLayout,
                                       VkImageLayout newLayout);
+void VulkanCommandCopyImage(VulkanCommand command, VkImage source,
+                            VkImageLayout sourceLayout, VkImage destination,
+                            VkImageLayout destinationLayout);
+void VulkanCommandBlitImage(VulkanCommand command, VkImage source,
+                            VkImageLayout sourceLayout, VkImage destination,
+                            VkImageLayout destinationLayout);
 } // namespace Graphics
 } // namespace Tortuga
 

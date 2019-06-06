@@ -66,7 +66,8 @@ void VulkanCommandDispatch(VulkanCommand command, uint32_t groupCountX,
                            uint32_t groupCountY, uint32_t groupCountZ) {
   vkCmdDispatch(command.CommandBuffer, groupCountX, groupCountY, groupCountZ);
 }
-void VulkanCommandSubmit(std::vector<VulkanCommand> command, VkQueue queue) {
+void VulkanCommandSubmit(std::vector<VulkanCommand> command,
+                         VulkanQueueType queueType) {
   if (command.size() == 0) {
     Console::Error("You must provide atleast 1 command to submit");
     return;
@@ -88,13 +89,23 @@ void VulkanCommandSubmit(std::vector<VulkanCommand> command, VkQueue queue) {
     submitInfo.signalSemaphoreCount = 0;
     submitInfo.pSignalSemaphores = nullptr;
   }
-  ErrorCheck(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+  switch (queueType) {
+  case VULKAN_QUEUE_TYPE_COMPUTE:
+    ErrorCheck(vkQueueSubmit(command[0].CommandPool.Device.ComputeQueue, 1,
+                             &submitInfo, VK_NULL_HANDLE));
+    break;
+  case VULKAN_QUEUE_TYPE_PRESENT:
+    ErrorCheck(vkQueueSubmit(command[0].CommandPool.Device.PresentQueue, 1,
+                             &submitInfo, VK_NULL_HANDLE));
+    break;
+  default:
+    Console::Error("This type of queue type is not supported");
+    break;
+  }
 }
-
 void VulkanCommandCopyBufferToImage(VulkanCommand command, VulkanBuffer buffer,
                                     VkImage image, glm::vec2 imageOffset,
                                     glm::vec2 imageSize) {
-
   auto imageLayers = VkImageSubresourceLayers();
   {
     imageLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -134,14 +145,53 @@ void VulkanCommandImageLayoutTransfer(VulkanCommand command, VkImage image,
     barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
   }
 
-  vkCmdPipelineBarrier(
-      command.CommandBuffer,
-      VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-      VK_PIPELINE_STAGE_TRANSFER_BIT,
-      0,
-      0, nullptr,
-      0, nullptr,
-      1, &barrier);
+  vkCmdPipelineBarrier(command.CommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                       VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
+                       nullptr, 1, &barrier);
+}
+void VulkanCommandCopyImage(VulkanCommand command, VkImage source,
+                            VkImageLayout sourceLayout, VkImage destination,
+                            VkImageLayout destinationLayout) {
+  auto subResource = VkImageSubresourceLayers();
+  {
+    subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subResource.mipLevel = 0;
+    subResource.baseArrayLayer = 0;
+    subResource.layerCount = 1;
+  }
+  auto copyInfo = VkImageCopy();
+  {
+    copyInfo.srcSubresource = subResource;
+    copyInfo.srcOffset = {0, 0, 0};
+    copyInfo.dstSubresource = subResource;
+    copyInfo.dstOffset = {0, 0, 0};
+    copyInfo.extent = {800, 600, 0};
+  }
+  vkCmdCopyImage(command.CommandBuffer, source, sourceLayout, destination,
+                 destinationLayout, 1, &copyInfo);
+}
+void VulkanCommandBlitImage(VulkanCommand command, VkImage source,
+                            VkImageLayout sourceLayout, VkImage destination,
+                            VkImageLayout destinationLayout) {
+  auto subResource = VkImageSubresourceLayers();
+  {
+    subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subResource.mipLevel = 0;
+    subResource.baseArrayLayer = 0;
+    subResource.layerCount = 1;
+  }
+
+  auto blitInfo = VkImageBlit();
+  {
+    blitInfo.srcSubresource = subResource;
+    blitInfo.srcOffsets[0] = {0, 0, 0};
+    blitInfo.srcOffsets[1] = {800, 600, 1};
+    blitInfo.dstSubresource = subResource;
+    blitInfo.dstOffsets[0] = {0, 0, 0};
+    blitInfo.dstOffsets[1] = {800, 600, 1};
+  }
+  vkCmdBlitImage(command.CommandBuffer, source, sourceLayout, destination,
+                 destinationLayout, 1, &blitInfo, VK_FILTER_LINEAR);
 }
 } // namespace Graphics
 } // namespace Tortuga

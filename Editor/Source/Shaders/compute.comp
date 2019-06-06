@@ -16,10 +16,10 @@ layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
 outputBuffer;
 
 void main() {
-  for (uint i = 0; i < outputBuffer.Pixels.length(); i++) {
-    outputBuffer.Pixels[i].r = 0;
-    outputBuffer.Pixels[i].g = 0;
-    outputBuffer.Pixels[i].b = 0;
+  for (uint i = 0; i < 480000; i++) {
+    outputBuffer.Pixels[i].r = 255;
+    outputBuffer.Pixels[i].g = 255;
+    outputBuffer.Pixels[i].b = 255;
     outputBuffer.Pixels[i].a = 1;
   }
 }

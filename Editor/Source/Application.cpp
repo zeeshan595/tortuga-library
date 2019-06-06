@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
   Graphics::VulkanCommandEnd(command);
 
   // Submit command to GPU
-  Graphics::VulkanCommandSubmit({command}, vulkan.Devices[0].ComputeQueue);
+  Graphics::VulkanCommandSubmit({command}, Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
 
   // Wait for queue to be idle
   Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
@@ -69,21 +69,32 @@ int main(int argc, char **argv) {
   Graphics::FenceWait({fence});
   Graphics::DestroyVulkanFence(fence);
 
+  auto image = Graphics::CreateVulkanImage(vulkan.Devices[0], 800, 600);
+
   // Record command (buffer -> image)
   command = Graphics::CreateVulkanCommand(commandPool);
   Graphics::VulkanCommandBegin(command);
   Graphics::VulkanCommandImageLayoutTransfer(
+      command, image.Image, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+  Graphics::VulkanCommandCopyBufferToImage(command, outputBuffer, image.Image,
+                                           {0, 0}, {800, 600});
+  Graphics::VulkanCommandImageLayoutTransfer(
+      command, image.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+      VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+  Graphics::VulkanCommandImageLayoutTransfer(
       command, swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED,
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-  Graphics::VulkanCommandCopyBufferToImage(
-      command, outputBuffer, swapchain.Images[imageIndex], {0, 0}, {800, 600});
+  Graphics::VulkanCommandBlitImage(
+      command, image.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+      swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
   Graphics::VulkanCommandImageLayoutTransfer(
       command, swapchain.Images[imageIndex],
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
   Graphics::VulkanCommandEnd(command);
 
   // Submit command to GPU
-  Graphics::VulkanCommandSubmit({command}, vulkan.Devices[0].ComputeQueue);
+  Graphics::VulkanCommandSubmit({command}, Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
 
   // Wait for queue to be idle
   Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],

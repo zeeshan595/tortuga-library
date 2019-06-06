@@ -58,11 +58,11 @@ VkSurfaceFormatKHR ChooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
   if (availableFormats.size() == 1 &&
       availableFormats[0].format == VK_FORMAT_UNDEFINED) {
-    return {VK_FORMAT_R32G32B32A32_SFLOAT, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
+    return {VK_FORMAT_R8G8B8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
   }
 
   for (const auto &availableFormat : availableFormats) {
-    if (availableFormat.format == VK_FORMAT_R32G32B32A32_SFLOAT &&
+    if (availableFormat.format == VK_FORMAT_R8G8B8_UNORM &&
         availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
       return availableFormat;
     }
@@ -201,7 +201,7 @@ void SwapchainAquireImage(VulkanSwapchain swapchain, uint32_t *imageIndex,
                           VulkanFence fence) {
   ErrorCheck(vkAcquireNextImageKHR(swapchain.VirtualDevice, swapchain.Swapchain,
                                    std::numeric_limits<uint64_t>::max(),
-                                   VK_NULL_HANDLE, fence.Fence, imageIndex));
+                                   semaphore, fence.Fence, imageIndex));
 }
 } // namespace Graphics
 } // namespace Tortuga

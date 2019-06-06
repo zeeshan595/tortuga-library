@@ -16,6 +16,7 @@
 #include "Tortuga/Graphics/VulkanInstance.h"
 #include "Tortuga/Graphics/VulkanDevice.h"
 #include "Tortuga/Graphics/VulkanSwapchain.h"
+#include "Tortuga/Graphics/VulkanImage.h"
 #include "Tortuga/Graphics/VulkanShader.h"
 #include "Tortuga/Graphics/VulkanPipeline.h"
 #include "Tortuga/Graphics/VulkanBuffer.h"
