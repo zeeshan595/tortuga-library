@@ -16,6 +16,7 @@ VulkanFence CreateVulkanFence(VulkanDevice device);
 void DestroyVulkanFence(VulkanFence data);
 void FenceWait(std::vector<VulkanFence> data, bool waitAll = true,
                uint32_t timeout = std::numeric_limits<uint32_t>::max());
+void FenceReset(std::vector<VulkanFence> data);
 } // namespace Graphics
 } // namespace Tortuga
 

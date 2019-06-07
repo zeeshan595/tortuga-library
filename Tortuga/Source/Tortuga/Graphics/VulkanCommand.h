@@ -25,7 +25,7 @@ VulkanCommandPool CreateVulkanCommandPool(VulkanDevice device);
 void DestroyVulkanCommandPool(VulkanCommandPool data);
 
 VulkanCommand CreateVulkanCommand(VulkanCommandPool commandPool);
-void VulkanCommandBegin(VulkanCommand command);
+void VulkanCommandBegin(VulkanCommand command, VkCommandBufferUsageFlags usageFlag);
 void VulkanCommandEnd(VulkanCommand command);
 void VulkanCommandSubmit(std::vector<VulkanCommand> command,
                          VulkanQueueType queueType);

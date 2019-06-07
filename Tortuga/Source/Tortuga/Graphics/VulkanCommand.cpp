@@ -10,7 +10,7 @@ VulkanCommandPool CreateVulkanCommandPool(VulkanDevice device) {
   {
     commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     commandPoolInfo.pNext = 0;
-    commandPoolInfo.flags = 0;
+    commandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     commandPoolInfo.queueFamilyIndex =
         device.QueueFamilies.ComputeFamily.value();
   }
@@ -41,12 +41,12 @@ VulkanCommand CreateVulkanCommand(VulkanCommandPool commandPool) {
 
   return data;
 }
-void VulkanCommandBegin(VulkanCommand command) {
+void VulkanCommandBegin(VulkanCommand command, VkCommandBufferUsageFlags usageFlag) {
   auto commandBufferBeginInfo = VkCommandBufferBeginInfo();
   {
     commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     commandBufferBeginInfo.pNext = 0;
-    commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    commandBufferBeginInfo.flags = usageFlag;
     commandBufferBeginInfo.pInheritanceInfo = 0;
   }
   ErrorCheck(

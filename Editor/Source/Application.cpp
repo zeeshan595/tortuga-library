@@ -25,7 +25,8 @@ int main(int argc, char **argv) {
   auto vulkan = Graphics::CreateVulkanInstance();
 
   // Setup window
-  auto window = Graphics::CreateVulkanWindow("Test", WINDOW_WIDTH, WINDOW_HEIGHT);
+  auto window =
+      Graphics::CreateVulkanWindow("Test", WINDOW_WIDTH, WINDOW_HEIGHT);
   Graphics::CreateVulkanSurface(window, vulkan.Instance);
   auto swapchain = Graphics::CreateVulkanSwapchain(vulkan.Devices[0], window);
 
@@ -46,77 +47,104 @@ int main(int argc, char **argv) {
                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
   Graphics::UpdatePipelineDescriptors(pipeline, {inputBuffer, outputBuffer});
 
-  // Insert data into the buffers
-  Graphics::SetVulkanBufferData<InputBuffer>(inputBuffer, {WINDOW_WIDTH, WINDOW_HEIGHT});
+  // Insert data into the input buffer
+  Graphics::SetVulkanBufferData<InputBuffer>(inputBuffer,
+                                             {WINDOW_WIDTH, WINDOW_HEIGHT});
 
   auto commandPool = Graphics::CreateVulkanCommandPool(vulkan.Devices[0]);
-  auto command = Graphics::CreateVulkanCommand(commandPool);
+  auto renderCommand = Graphics::CreateVulkanCommand(commandPool);
 
-  // Record command for rendering
-  Graphics::VulkanCommandBegin(command);
-  Graphics::VulkanCommandBindPipeline(command, pipeline);
-  Graphics::VulkanCommandDispatch(command, WINDOW_WIDTH, WINDOW_HEIGHT, 1);
-  Graphics::VulkanCommandEnd(command);
+  //=================
+  //===GPU=COMMAND===
+  //=================
+  Graphics::VulkanCommandBegin(renderCommand,
+                               VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+  Graphics::VulkanCommandBindPipeline(renderCommand, pipeline);
+  Graphics::VulkanCommandDispatch(renderCommand, WINDOW_WIDTH, WINDOW_HEIGHT,
+                                  1);
+  Graphics::VulkanCommandEnd(renderCommand);
+  //=================
+  //===GPU=COMMAND===
+  //=================
 
-  // Submit command to GPU
-  Graphics::VulkanCommandSubmit({command}, Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-
-  // Wait for queue to be idle
-  Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
-                                   Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-
-  // Get swapchain renderImage being used
+  auto presentCommand = Graphics::CreateVulkanCommand(commandPool);
   auto fence = Graphics::CreateVulkanFence(vulkan.Devices[0]);
-  uint32_t imageIndex = 0;
-  Graphics::SwapchainAquireImage(swapchain, &imageIndex, VK_NULL_HANDLE, fence);
-  Graphics::FenceWait({fence});
-  Graphics::DestroyVulkanFence(fence);
-
-  auto renderImage = Graphics::CreateVulkanImage(vulkan.Devices[0], WINDOW_WIDTH, WINDOW_HEIGHT);
-
-  // Record command (buffer -> renderImage)
-  command = Graphics::CreateVulkanCommand(commandPool);
-  Graphics::VulkanCommandBegin(command);
-  Graphics::VulkanCommandImageLayoutTransfer(
-      command, renderImage.Image, VK_IMAGE_LAYOUT_UNDEFINED,
-      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-  Graphics::VulkanCommandCopyBufferToImage(command, outputBuffer, renderImage.Image,
-                                           {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT});
-  Graphics::VulkanCommandImageLayoutTransfer(
-      command, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-      VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-  Graphics::VulkanCommandImageLayoutTransfer(
-      command, swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED,
-      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-  Graphics::VulkanCommandBlitImage(
-      command, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-      swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-      {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT});
-  Graphics::VulkanCommandImageLayoutTransfer(
-      command, swapchain.Images[imageIndex],
-      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-  Graphics::VulkanCommandEnd(command);
-
-  // Submit command to GPU
-  Graphics::VulkanCommandSubmit({command}, Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-
-  // Wait for queue to be idle
-  Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
-                                   Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-
-  Graphics::SwapchainPresentImage(swapchain, imageIndex);
-  Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
-                                   Graphics::VULKAN_QUEUE_TYPE_PRESENT);
+  auto renderImage = Graphics::CreateVulkanImage(vulkan.Devices[0],
+                                                 WINDOW_WIDTH, WINDOW_HEIGHT);
 
   while (true) {
+
     SDL_Event event;
     if (SDL_PollEvent(&event) != 0) {
       if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
         break;
       }
     }
+
+    //==================
+    //===RENDER START===
+    //==================
+
+    //Execute compute shader
+    Graphics::VulkanCommandSubmit({renderCommand},
+                                  Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
+
+    // Wait for queue to be idle
+    Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
+                                     Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
+
+    // Ask swapchain for current image
+    uint32_t imageIndex = 0;
+    Graphics::FenceReset({fence});
+    Graphics::SwapchainAquireImage(swapchain, &imageIndex, VK_NULL_HANDLE,
+                                   fence);
+    Graphics::FenceWait({fence});
+
+    //Record command for presenting image
+    Graphics::VulkanCommandBegin(presentCommand,
+                                 VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    // Copy compute shader output to renderImage
+    Graphics::VulkanCommandImageLayoutTransfer(
+        presentCommand, renderImage.Image, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    Graphics::VulkanCommandCopyBufferToImage(presentCommand, outputBuffer,
+                                             renderImage.Image, {0, 0},
+                                             {WINDOW_WIDTH, WINDOW_HEIGHT});
+    Graphics::VulkanCommandImageLayoutTransfer(
+        presentCommand, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+    // Copy renderImage to swapchain
+    Graphics::VulkanCommandImageLayoutTransfer(
+        presentCommand, swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    Graphics::VulkanCommandBlitImage(
+        presentCommand, renderImage.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        swapchain.Images[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+    Graphics::VulkanCommandImageLayoutTransfer(
+        presentCommand, swapchain.Images[imageIndex],
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    Graphics::VulkanCommandEnd(presentCommand);
+
+    // Submit command to GPU
+    Graphics::VulkanCommandSubmit({presentCommand},
+                                  Graphics::VULKAN_QUEUE_TYPE_PRESENT);
+
+    // Wait for queue to be idle
+    Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
+                                     Graphics::VULKAN_QUEUE_TYPE_PRESENT);
+
+    // Present swapchain image inside window
+    Graphics::SwapchainPresentImage(swapchain, imageIndex);
+    Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
+                                     Graphics::VULKAN_QUEUE_TYPE_PRESENT);
+
+    //==================
+    //====RENDER END====
+    //==================
   }
 
+  Graphics::DestroyVulkanFence(fence);
   Graphics::DestroyVulkanImage(renderImage);
   Graphics::DestroyVulkanCommandPool(commandPool);
   Graphics::DestroyVulkanBuffer(inputBuffer);
