@@ -1,0 +1,35 @@
+{
+  "name": "tortuga",
+  "version": "1.0.0",
+  "description": "A vulkan based game engine with custom ray marching graphics pipeline for linux",
+  "scripts": {
+    "start": "echo 'Please use vs code to launch the application or run Editor/Build/Application'",
+    "clean": "gulp clean",
+    "build": "gulp build",
+    "install": "sudo apt install libvulkan1 libvulkan-dev libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libglm-dev vulkan-utils"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeeshan595/Tortuga.git"
+  },
+  "keywords": [
+    "C++",
+    "Game",
+    "Engine",
+    "vulkan",
+    "ray",
+    "marching",
+    "compute",
+    "shader"
+  ],
+  "author": "Zeeshan Abid",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zeeshan595/Tortuga/issues"
+  },
+  "homepage": "https://github.com/zeeshan595/Tortuga#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "walk": "^2.3.14"
+  }
+}

@@ -2,8 +2,8 @@
 
 using namespace Tortuga;
 
-const uint32_t WINDOW_WIDTH = 800;
-const uint32_t WINDOW_HEIGHT = 600;
+const uint32_t WINDOW_WIDTH = 1920;
+const uint32_t WINDOW_HEIGHT = 1080;
 
 struct InputBuffer {
   uint32_t ResolutionX;
@@ -138,7 +138,6 @@ int main(int argc, char **argv) {
     Graphics::SwapchainPresentImage(swapchain, imageIndex);
     Graphics::DeviceQueueWaitForIdle(vulkan.Devices[0],
                                      Graphics::VULKAN_QUEUE_TYPE_PRESENT);
-
     //==================
     //====RENDER END====
     //==================

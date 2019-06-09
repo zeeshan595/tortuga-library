@@ -4,12 +4,18 @@
     {
       "label": "Build",
       "type": "shell",
-      "command": "make",
+      "command": "npm",
       "args": ["build"],
       "group": {
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "Clean",
+      "type": "shell",
+      "command": "npm",
+      "args": ["clean"]
     }
   ]
 }
