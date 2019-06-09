@@ -1,2 +1,4 @@
 Build
 ipch/
+node_modules/
+package-lock.json
