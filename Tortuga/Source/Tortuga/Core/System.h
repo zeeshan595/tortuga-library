@@ -10,9 +10,6 @@ namespace Tortuga {
 namespace Core {
 struct System {
 private:
-  std::vector<std::type_index> RegisteredComponents;
-  std::unordered_map<std::type_index, std::vector<std::any>> Components;
-
   int32_t IsComponentRegistered(std::type_index &typeIndex) {
     for (uint32_t i = 0; i < RegisteredComponents.size(); i++) {
       if (RegisteredComponents[i] == typeIndex) {
@@ -42,6 +39,10 @@ protected:
   }
 
 public:
+  std::vector<std::type_index> RegisteredComponents;
+  std::unordered_map<std::type_index, std::vector<EntityData<std::any>>>
+      Components;
+
   System() {
     RegisteredComponents = {};
     Components = {};
@@ -51,7 +52,7 @@ public:
   virtual void Update() {}
   virtual void End() {}
 };
-std::unordered_map<std::type_index, System*> Systems;
+std::unordered_map<std::type_index, System *> Systems;
 
 template <typename T> void CreateSystem() {
   auto typeIndex = std::type_index(typeid(T));

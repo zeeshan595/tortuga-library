@@ -20,8 +20,8 @@ public:
     Components.erase(std::type_index(typeid(T)));
   }
 
-  template <typename T> T GetComponent() {
-    return Components[std::type_index(typeid(T))];
+  std::any GetComponent(std::type_index typeIndex) {
+    return Components[typeIndex];
   }
 };
 } // namespace Core

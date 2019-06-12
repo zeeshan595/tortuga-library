@@ -10,6 +10,7 @@
 #include "../Graphics/VulkanImage.h"
 #include "../Graphics/VulkanPipeline.h"
 #include "../Graphics/VulkanShader.h"
+#include "../Utils/InputOutput.h"
 
 namespace Tortuga {
 namespace Systems {
@@ -41,13 +42,13 @@ public:
     float a;
   };
   struct OutputBuffer {
-    Pixel Pixels[WINDOW_WIDTH * WINDOW_HEIGHT];
+    std::vector<Pixel> Pixels;
   };
   struct RenderSettings {
     uint32_t WindowWidth = 800;
     uint32_t WindowHeight = 600;
   };
-  static RenderSettings Settings;
+  RenderSettings Settings;
 
   void Start() {
     _devices = Core::Vulkan.Devices;
@@ -58,7 +59,7 @@ public:
     _outputBuffers.resize(_devices.size());
     _commandPools.resize(_devices.size());
     _renderCommands.resize(_devices.size());
-    uint32_t totalScore = 0;
+    uint32_t totalScore = 1;
     for (uint32_t i = 0; i < _devices.size(); i++) {
       totalScore += _devices[i].Score;
     }
@@ -78,14 +79,6 @@ public:
           Graphics::CreateVulkanBuffer(_devices[i], sizeof(InputBuffer),
                                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-      _outputBuffers[i] =
-          Graphics::CreateVulkanBuffer(_devices[i], sizeof(OutputBuffer),
-                                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-      Graphics::UpdatePipelineDescriptors(
-          _pipelines[i],
-          {_renderOffsets[i], _inputBuffers[i], _outputBuffers[i]});
 
       _commandPools[i] = Graphics::CreateVulkanCommandPool(_devices[i]);
       _renderCommands[i] = Graphics::CreateVulkanCommand(_commandPools[i]);
@@ -93,13 +86,8 @@ public:
       // Setup Rendering
       Graphics::SetVulkanBufferData<RenderOffsets>(
           _renderOffsets[i], {(_devices[i].Score / totalScore), 0});
-      Graphics::VulkanCommandBegin(
-          _renderCommands[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-      Graphics::VulkanCommandBindPipeline(_renderCommands[i], _pipelines[i]);
-      Graphics::VulkanCommandDispatch(_renderCommands[i], WINDOW_WIDTH,
-                                      WINDOW_HEIGHT, 1);
-      Graphics::VulkanCommandEnd(_renderCommands[i]);
     }
+    Resize();
     Console::Info("Rendering System Started");
   }
 
@@ -118,9 +106,34 @@ public:
     Console::Info("Rendering System Stopped");
   }
 
+  void Resize() {
+    for (uint32_t i = 0; i < _devices.size(); i++) {
+      if (_outputBuffers[i].Buffer != VK_NULL_HANDLE) {
+        Graphics::DestroyVulkanBuffer(_outputBuffers[i]);
+      }
+      _outputBuffers[i] = Graphics::CreateVulkanBuffer(
+          _devices[i], sizeof(Settings.WindowWidth * Settings.WindowHeight),
+          VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+      Graphics::UpdatePipelineDescriptors(
+          _pipelines[i],
+          {_renderOffsets[i], _inputBuffers[i], _outputBuffers[i]});
+
+      Graphics::VulkanCommandBegin(
+          _renderCommands[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+      Graphics::VulkanCommandBindPipeline(_renderCommands[i], _pipelines[i]);
+      Graphics::VulkanCommandDispatch(_renderCommands[i], Settings.WindowWidth,
+                                      Settings.WindowHeight, 1);
+      Graphics::VulkanCommandEnd(_renderCommands[i]);
+    }
+  }
+
   void Update() {
     if (_stopped)
       return;
+
+    
   }
 };
 } // namespace Systems

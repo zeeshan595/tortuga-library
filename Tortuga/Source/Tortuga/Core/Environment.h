@@ -17,11 +17,11 @@ template <typename T> struct EntityData {
   T Component;
 };
 
-template <typename T>
-std::vector<EntityData<T>> GetComponents(Environment env) {
-  std::vector<EntityData<T>> rtn;
+std::vector<EntityData<std::any>> GetComponents(Environment env,
+                                                std::type_index typeIndex) {
+  std::vector<EntityData<std::any>> rtn;
   for (uint32_t i = 0; i < env.Entities.size(); i++) {
-    rtn.push_back({&env.Entities[i], env.Entities[i].GetComponent<T>()});
+    rtn.push_back({&env.Entities[i], env.Entities[i].GetComponent(typeIndex)});
   }
 }
 } // namespace Core
