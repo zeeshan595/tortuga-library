@@ -133,7 +133,10 @@ public:
     if (_stopped)
       return;
 
-    
+    for (uint32_t i = 0; i < _devices.size(); i++) {
+      Graphics::VulkanCommandSubmit({_renderCommands[i]},
+                                    Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
+    }
   }
 };
 } // namespace Systems

@@ -6,6 +6,8 @@
 #include "./VulkanErrorHandler.h"
 #include "./VulkanImage.h"
 #include "./VulkanPipeline.h"
+#include "./VulkanFence.h"
+#include "./VulkanSemaphore.h"
 
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
@@ -28,7 +30,9 @@ VulkanCommand CreateVulkanCommand(VulkanCommandPool commandPool);
 void VulkanCommandBegin(VulkanCommand command, VkCommandBufferUsageFlags usageFlag);
 void VulkanCommandEnd(VulkanCommand command);
 void VulkanCommandSubmit(std::vector<VulkanCommand> command,
-                         VulkanQueueType queueType);
+                         VulkanQueueType queueType,
+                         std::vector<VulkanSemaphore> waitSemaphores = {},
+                         std::vector<VulkanSemaphore> signalSemaphores = {});
 void VulkanCommandBindPipeline(VulkanCommand command, VulkanPipeline pipeline);
 void VulkanCommandDispatch(VulkanCommand command, uint32_t groupCountX,
                            uint32_t groupCountY, uint32_t groupCountZ);

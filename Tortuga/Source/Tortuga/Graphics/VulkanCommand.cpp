@@ -41,7 +41,8 @@ VulkanCommand CreateVulkanCommand(VulkanCommandPool commandPool) {
 
   return data;
 }
-void VulkanCommandBegin(VulkanCommand command, VkCommandBufferUsageFlags usageFlag) {
+void VulkanCommandBegin(VulkanCommand command,
+                        VkCommandBufferUsageFlags usageFlag) {
   auto commandBufferBeginInfo = VkCommandBufferBeginInfo();
   {
     commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -67,7 +68,9 @@ void VulkanCommandDispatch(VulkanCommand command, uint32_t groupCountX,
   vkCmdDispatch(command.CommandBuffer, groupCountX, groupCountY, groupCountZ);
 }
 void VulkanCommandSubmit(std::vector<VulkanCommand> command,
-                         VulkanQueueType queueType) {
+                         VulkanQueueType queueType,
+                         std::vector<VulkanSemaphore> waitSemaphores,
+                         std::vector<VulkanSemaphore> signalSemaphores) {
   if (command.size() == 0) {
     Console::Error("You must provide atleast 1 command to submit");
     return;
@@ -77,17 +80,26 @@ void VulkanCommandSubmit(std::vector<VulkanCommand> command,
     cmdBuffers[i] = command[i].CommandBuffer;
   }
 
+  std::vector<VkSemaphore> waitSems(waitSemaphores.size());
+  for (uint32_t i = 0; i < waitSems.size(); i++) {
+    waitSems[i] = waitSemaphores[i].Seamphore;
+  }
+  std::vector<VkSemaphore> signalSems(signalSemaphores.size());
+  for (uint32_t i = 0; i < signalSemaphores.size(); i++) {
+    signalSems[i] = signalSemaphores[i].Seamphore;
+  }
+
   auto submitInfo = VkSubmitInfo();
   {
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pNext = 0;
-    submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitSemaphores = 0;
+    submitInfo.waitSemaphoreCount = waitSems.size();
+    submitInfo.pWaitSemaphores = waitSems.data();
     submitInfo.pWaitDstStageMask = 0;
     submitInfo.commandBufferCount = cmdBuffers.size();
     submitInfo.pCommandBuffers = cmdBuffers.data();
-    submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores = nullptr;
+    submitInfo.signalSemaphoreCount = signalSems.size();
+    submitInfo.pSignalSemaphores = signalSems.data();
   }
   switch (queueType) {
   case VULKAN_QUEUE_TYPE_COMPUTE:
