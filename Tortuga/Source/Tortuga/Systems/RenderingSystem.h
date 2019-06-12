@@ -17,6 +17,7 @@ namespace Systems {
 struct RenderingSystem : public Core::System {
 private:
   bool _stopped = false;
+  uint32_t _mainDevice = 0;
   std::vector<Graphics::VulkanDevice> _devices;
   std::vector<Graphics::VulkanShader> _shaders;
   std::vector<Graphics::VulkanPipeline> _pipelines;
@@ -26,6 +27,8 @@ private:
   std::vector<Graphics::VulkanCommandPool> _commandPools;
   std::vector<Graphics::VulkanCommand> _renderCommands;
   std::vector<Graphics::VulkanImage> _renderImages;
+  Graphics::VulkanCommand _combineCommand;
+  Graphics::VulkanImage _presentImage;
 
 public:
   struct InputBuffer {
@@ -115,7 +118,6 @@ public:
           _devices[i], sizeof(Settings.WindowWidth * Settings.WindowHeight),
           VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
       Graphics::UpdatePipelineDescriptors(
           _pipelines[i],
           {_renderOffsets[i], _inputBuffers[i], _outputBuffers[i]});
@@ -127,6 +129,20 @@ public:
                                       Settings.WindowHeight, 1);
       Graphics::VulkanCommandEnd(_renderCommands[i]);
     }
+
+    if (_presentImage.Image != VK_NULL_HANDLE) {
+      Graphics::DestroyVulkanImage(_presentImage);
+    }
+    _presentImage = Graphics::CreateVulkanImage(
+        _devices[_mainDevice], Settings.WindowWidth, Settings.WindowHeight);
+
+    if (_combineCommand.CommandBuffer == VK_NULL_HANDLE) {
+      _combineCommand =
+          Graphics::CreateVulkanCommand(_commandPools[_mainDevice]);
+    }
+    Graphics::VulkanCommandBegin(_combineCommand, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+    
+    Graphics::VulkanCommandEnd(_combineCommand);
   }
 
   void Update() {
@@ -136,6 +152,9 @@ public:
     for (uint32_t i = 0; i < _devices.size(); i++) {
       Graphics::VulkanCommandSubmit({_renderCommands[i]},
                                     Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
+
+      Graphics::DeviceQueueWaitForIdle(_devices[i],
+                                       Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
     }
   }
 };
