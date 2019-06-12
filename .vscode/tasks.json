@@ -5,7 +5,7 @@
       "label": "Build",
       "type": "shell",
       "command": "npm",
-      "args": ["build"],
+      "args": ["run", "build"],
       "group": {
         "kind": "build",
         "isDefault": true
@@ -15,7 +15,7 @@
       "label": "Clean",
       "type": "shell",
       "command": "npm",
-      "args": ["clean"]
+      "args": ["run", "clean"]
     }
   ]
 }

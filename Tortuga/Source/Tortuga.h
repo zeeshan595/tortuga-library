@@ -6,7 +6,16 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 
-//Internal Utils
+//Core
+#include "Tortuga/Core/Entity.h"
+#include "Tortuga/Core/Environment.h"
+#include "Tortuga/Core/System.h"
+#include "Tortuga/Core/Engine.h"
+
+//Systems
+#include "Tortuga/Systems/RenderingSystem.h"
+
+//Utils
 #include "Tortuga/Utils/InputOutput.h"
 
 //Internal Graphics API

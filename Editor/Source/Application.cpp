@@ -5,21 +5,12 @@ using namespace Tortuga;
 const uint32_t WINDOW_WIDTH = 1920;
 const uint32_t WINDOW_HEIGHT = 1080;
 
-struct InputBuffer {
-  uint32_t ResolutionX;
-  uint32_t ResolutionY;
-};
-struct Pixel {
-  float r;
-  float g;
-  float b;
-  float a;
-};
-struct OutputBuffer {
-  Pixel Pixels[WINDOW_WIDTH * WINDOW_HEIGHT];
-};
-
 int main(int argc, char **argv) {
+  Core::CreateEngine();
+  Core::CreateSystem<Systems::RenderingSystem>();
+  Core::EngineMainLoop();
+  Core::DestroyEngine();
+  /*
   SDL_Init(SDL_INIT_VIDEO);
 
   auto vulkan = Graphics::CreateVulkanInstance();
@@ -49,7 +40,7 @@ int main(int argc, char **argv) {
 
   // Insert data into the input buffer
   Graphics::SetVulkanBufferData<InputBuffer>(inputBuffer,
-                                             {WINDOW_WIDTH, WINDOW_HEIGHT});
+                                             {400, 0});
 
   auto commandPool = Graphics::CreateVulkanCommandPool(vulkan.Devices[0]);
   auto renderCommand = Graphics::CreateVulkanCommand(commandPool);
@@ -155,5 +146,6 @@ int main(int argc, char **argv) {
   Graphics::DestroyVulkanInstance(vulkan);
 
   SDL_Quit();
+  */
   return 0;
 }

@@ -6,13 +6,18 @@ in uvec3 gl_LocalInvocationID;
 in uvec3 gl_GlobalInvocationID;
 in uint  gl_LocalInvocationIndex;
 */
-#define MAX_STEPS 1000
-#define MAX_DIST 1000.
+#define MAX_STEPS 100
+#define MAX_DIST 100.
 #define SURF_DIST .01
 
-layout(set = 0, binding = 0) readonly buffer InputBuffer {
-  uint ResolutionX;
-  uint ResolutionY;
+layout(set = 0, binding = 0) readonly buffer RenderOffsets {
+  uint OffsetX;
+  uint OffsetY;
+}
+renderOffsets;
+
+layout(set = 0, binding = 1) readonly buffer InputBuffer {
+  uint Debug;
 }
 inputBuffer;
 
@@ -22,7 +27,7 @@ struct Pixel {
   float b;
   float a;
 };
-layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
+layout(set = 0, binding = 2) buffer OutputBuffer { Pixel[] Pixels; }
 outputBuffer;
 
 float SphereDist(vec3 position, float radius, vec3 point) {
@@ -30,7 +35,7 @@ float SphereDist(vec3 position, float radius, vec3 point) {
 }
 
 float GetMinDistance(vec3 point) {
-  return SphereDist(vec3(0., 1., 5.5), 2., point);
+  return SphereDist(vec3(0., 1., 5.), 2., point);
 }
 
 float RayMarch(vec3 rayOrigin, vec3 rayDirection) {
@@ -47,7 +52,10 @@ float RayMarch(vec3 rayOrigin, vec3 rayDirection) {
 
 void main() {
   uint index = (gl_WorkGroupID.y * gl_NumWorkGroups.x) + gl_WorkGroupID.x;
-  vec2 uv = (gl_WorkGroupID.xy - .5 * gl_NumWorkGroups.xy) / gl_NumWorkGroups.y;
+  vec2 uv = ((gl_WorkGroupID.xy +
+              vec2(renderOffsets.OffsetX, renderOffsets.OffsetY)) -
+             .5 * gl_NumWorkGroups.xy) /
+            gl_NumWorkGroups.y;
 
   vec3 rayOrigin = vec3(0, 1, 0);
   vec3 rayDirection = normalize(vec3(uv, 1.));
