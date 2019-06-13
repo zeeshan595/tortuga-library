@@ -10,7 +10,10 @@
 #include "../Graphics/VulkanImage.h"
 #include "../Graphics/VulkanPipeline.h"
 #include "../Graphics/VulkanShader.h"
+#include "../Graphics/VulkanSwapchain.h"
 #include "../Utils/InputOutput.h"
+
+#include <glm/glm.hpp>
 
 namespace Tortuga {
 namespace Systems {
@@ -18,6 +21,7 @@ struct RenderingSystem : public Core::System {
 private:
   bool _stopped = false;
   uint32_t _mainDevice = 0;
+  // per gpu
   std::vector<Graphics::VulkanDevice> _devices;
   std::vector<Graphics::VulkanShader> _shaders;
   std::vector<Graphics::VulkanPipeline> _pipelines;
@@ -27,8 +31,18 @@ private:
   std::vector<Graphics::VulkanCommandPool> _commandPools;
   std::vector<Graphics::VulkanCommand> _renderCommands;
   std::vector<Graphics::VulkanImage> _renderImages;
-  Graphics::VulkanCommand _combineCommand;
-  Graphics::VulkanImage _presentImage;
+  std::vector<glm::vec2> _renderImageOffsets; // x = offset x, y = width x
+
+  // main gpu
+  std::vector<Graphics::VulkanBuffer> _mainDeviceRenderBuffers;
+  std::vector<Graphics::VulkanImage> _mainDeviceRenderImages;
+  std::vector<Graphics::VulkanCommand> _transferToMainDevice;
+  Graphics::VulkanCommand _copyToSwapchain;
+  Graphics::VulkanFence _fence;
+
+  // window
+  Graphics::Window _window;
+  Graphics::VulkanSwapchain _swapchain;
 
 public:
   struct InputBuffer {
@@ -55,6 +69,8 @@ public:
 
   void Start() {
     _devices = Core::Vulkan.Devices;
+
+    _devices.resize(_devices.size());
     _shaders.resize(_devices.size());
     _pipelines.resize(_devices.size());
     _renderOffsets.resize(_devices.size());
@@ -62,35 +78,40 @@ public:
     _outputBuffers.resize(_devices.size());
     _commandPools.resize(_devices.size());
     _renderCommands.resize(_devices.size());
-    uint32_t totalScore = 1;
+    _renderImages.resize(_devices.size());
+    _renderImageOffsets.resize(_devices.size());
+    _mainDeviceRenderBuffers.resize(_devices.size());
+    _mainDeviceRenderImages.resize(_devices.size());
+    _transferToMainDevice.resize(_devices.size());
+
+    // todo: change vector sizes
     for (uint32_t i = 0; i < _devices.size(); i++) {
-      totalScore += _devices[i].Score;
-    }
-    for (uint32_t i = 0; i < _devices.size(); i++) {
+      // shader computation
       _shaders[i] = Graphics::CreateVulkanShader(
           _devices[i], Utils::GetFileContents("Shaders/compute.spv"));
 
+      // compute pipeline
       _pipelines[i] = Graphics::CreateVulkanPipeline(
           _devices[i], _shaders[i].ShaderModule, 3);
 
+      // buffers for shader
       _renderOffsets[i] =
           Graphics::CreateVulkanBuffer(_devices[i], sizeof(RenderOffsets),
                                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
       _inputBuffers[i] =
           Graphics::CreateVulkanBuffer(_devices[i], sizeof(InputBuffer),
                                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
       _commandPools[i] = Graphics::CreateVulkanCommandPool(_devices[i]);
-      _renderCommands[i] = Graphics::CreateVulkanCommand(_commandPools[i]);
-
-      // Setup Rendering
-      Graphics::SetVulkanBufferData<RenderOffsets>(
-          _renderOffsets[i], {(_devices[i].Score / totalScore), 0});
+      _transferToMainDevice[i] =
+          Graphics::CreateVulkanCommand(_commandPools[_mainDevice]);
     }
-    Resize();
+    _copyToSwapchain =
+        Graphics::CreateVulkanCommand(_commandPools[_mainDevice]);
+    _fence = Graphics::CreateVulkanFence(_devices[_mainDevice]);
+    ResizeScreen();
     Console::Info("Rendering System Started");
   }
 
@@ -98,6 +119,7 @@ public:
     if (_stopped)
       return;
 
+    Graphics::DestroyVulkanFence(_fence);
     for (uint32_t i = 0; i < _devices.size(); i++) {
       Graphics::DestroyVulkanImage(_renderImages[i]);
       Graphics::DestroyVulkanCommandPool(_commandPools[i]);
@@ -109,53 +131,158 @@ public:
     Console::Info("Rendering System Stopped");
   }
 
-  void Resize() {
+  void ResizeScreen() {
+    uint32_t totalScore = 0;
     for (uint32_t i = 0; i < _devices.size(); i++) {
+      totalScore += _devices[i].Score;
+    }
+    uint32_t offsetTracker = 0;
+    for (uint32_t i = 0; i < _devices.size(); i++) {
+      // image offset and size's using device score
+      _renderImageOffsets[i].x =
+          (offsetTracker / totalScore) * Settings.WindowWidth;
+      _renderImageOffsets[i].y =
+          (_devices[i].Score / totalScore) * Settings.WindowWidth;
+      offsetTracker += _devices[i].Score;
+
+      // update render image offsets for each gpu
+      Graphics::SetVulkanBufferData<RenderOffsets>(
+          _renderOffsets[i], {_renderImageOffsets[i].x, 0});
+
+      // set render image sizes for each gpu
       if (_outputBuffers[i].Buffer != VK_NULL_HANDLE) {
         Graphics::DestroyVulkanBuffer(_outputBuffers[i]);
       }
       _outputBuffers[i] = Graphics::CreateVulkanBuffer(
-          _devices[i], sizeof(Settings.WindowWidth * Settings.WindowHeight),
+          _devices[i],
+          _renderImageOffsets[i].y * Settings.WindowHeight * sizeof(Pixel),
           VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+      // update pipeline with new buffers
       Graphics::UpdatePipelineDescriptors(
           _pipelines[i],
           {_renderOffsets[i], _inputBuffers[i], _outputBuffers[i]});
 
+      // setup render command for each gpu
+      _renderCommands[i] = Graphics::CreateVulkanCommand(_commandPools[i]);
       Graphics::VulkanCommandBegin(
           _renderCommands[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
       Graphics::VulkanCommandBindPipeline(_renderCommands[i], _pipelines[i]);
-      Graphics::VulkanCommandDispatch(_renderCommands[i], Settings.WindowWidth,
+      Graphics::VulkanCommandDispatch(_renderCommands[i],
+                                      _renderImageOffsets[i].y,
                                       Settings.WindowHeight, 1);
       Graphics::VulkanCommandEnd(_renderCommands[i]);
+
+      // convert buffers to image on main gpu
+      Graphics::VulkanCommandBegin(
+          _transferToMainDevice[i],
+          VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+      Graphics::VulkanCommandImageLayoutTransfer(
+          _transferToMainDevice[i], _mainDeviceRenderImages[i].Image,
+          VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+      Graphics::VulkanCommandCopyBufferToImage(
+          _transferToMainDevice[i], _mainDeviceRenderBuffers[i],
+          _mainDeviceRenderImages[i].Image, {0, 0},
+          {_renderImageOffsets[i].y, 0});
+      Graphics::VulkanCommandImageLayoutTransfer(
+          _transferToMainDevice[i], _mainDeviceRenderImages[i].Image,
+          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+          VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+      Graphics::VulkanCommandEnd(_transferToMainDevice[i]);
+
+      _mainDeviceRenderImages[i] = Graphics::CreateVulkanImage(
+          _devices[_mainDevice], _renderImageOffsets[i].y, 0);
+      _mainDeviceRenderBuffers[i] = Graphics::CreateVulkanBuffer(
+          _devices[_mainDevice],
+          _renderImageOffsets[i].y * Settings.WindowHeight * sizeof(Pixel),
+          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+              VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     }
 
-    if (_presentImage.Image != VK_NULL_HANDLE) {
-      Graphics::DestroyVulkanImage(_presentImage);
+    // Window
+    if (_window.SDLWindow != nullptr) {
+      Graphics::DestroyVulkanWindow(_window);
+      Graphics::DestroyVulkanSwapchain(_swapchain);
     }
-    _presentImage = Graphics::CreateVulkanImage(
-        _devices[_mainDevice], Settings.WindowWidth, Settings.WindowHeight);
-
-    if (_combineCommand.CommandBuffer == VK_NULL_HANDLE) {
-      _combineCommand =
-          Graphics::CreateVulkanCommand(_commandPools[_mainDevice]);
-    }
-    Graphics::VulkanCommandBegin(_combineCommand, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-    
-    Graphics::VulkanCommandEnd(_combineCommand);
+    _window = Graphics::CreateVulkanWindow("Tortuga", Settings.WindowWidth,
+                                           Settings.WindowHeight);
+    Graphics::CreateVulkanSurface(_window, Core::Vulkan.Instance);
+    _swapchain =
+        Graphics::CreateVulkanSwapchain(_devices[_mainDevice], _window);
   }
 
-  void Update() {
+  void Render() {
     if (_stopped)
       return;
 
     for (uint32_t i = 0; i < _devices.size(); i++) {
+      // submit render commands on all gpus
       Graphics::VulkanCommandSubmit({_renderCommands[i]},
                                     Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-
+    }
+    for (uint32_t i = 0; i < _devices.size(); i++) {
+      // Wait for render to finish on all gpus
       Graphics::DeviceQueueWaitForIdle(_devices[i],
                                        Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
+
+      // Copy output buffer to main device
+      auto data =
+          Graphics::GetVulkanBufferData<OutputBuffer>(_outputBuffers[i]);
+      Graphics::SetVulkanBufferData<OutputBuffer>(_mainDeviceRenderBuffers[i],
+                                                  data);
+
+      Graphics::VulkanCommandSubmit({_transferToMainDevice[i]},
+                                    Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
     }
+
+    for (uint32_t i = 0; i < _devices.size(); i++) {
+      // Wait for render to finish on all gpus
+      Graphics::DeviceQueueWaitForIdle(_devices[_mainDevice],
+                                       Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
+    }
+  }
+
+  void Present() {
+    // Get swapchain images
+    uint32_t swapchainImageIndex;
+    Graphics::FenceReset({_fence});
+    Graphics::SwapchainAquireImage(_swapchain, &swapchainImageIndex,
+                                   VK_NULL_HANDLE, _fence);
+    Graphics::FenceWait({_fence});
+
+    // Present command to copy image to swapchain
+    auto copyToPresentImage = CreateVulkanCommand(_commandPools[_mainDevice]);
+    Graphics::VulkanCommandBegin(copyToPresentImage,
+                                 VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    Graphics::VulkanCommandImageLayoutTransfer(
+        copyToPresentImage, _swapchain.Images[swapchainImageIndex],
+        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    for (auto i = 0; i < _devices.size(); i++) {
+      Graphics::VulkanCommandBlitImage(
+          copyToPresentImage, _mainDeviceRenderImages[i].Image,
+          VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+          _swapchain.Images[swapchainImageIndex],
+          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, {_renderImageOffsets[i].x, 0},
+          {_renderImageOffsets[i].y, 0});
+    }
+    Graphics::VulkanCommandImageLayoutTransfer(
+        copyToPresentImage, _swapchain.Images[swapchainImageIndex],
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    Graphics::VulkanCommandEnd(copyToPresentImage);
+
+    // Submit present command
+    Graphics::VulkanCommandSubmit({copyToPresentImage},
+                                  Graphics::VULKAN_QUEUE_TYPE_PRESENT);
+
+    // Wait for queue to be idle
+    Graphics::DeviceQueueWaitForIdle(_devices[_mainDevice],
+                                     Graphics::VULKAN_QUEUE_TYPE_PRESENT);
+  }
+
+  void Update() {
+    Render();
+    Present();
   }
 };
 } // namespace Systems

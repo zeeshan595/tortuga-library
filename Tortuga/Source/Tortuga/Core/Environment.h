@@ -23,6 +23,7 @@ std::vector<EntityData<std::any>> GetComponents(Environment env,
   for (uint32_t i = 0; i < env.Entities.size(); i++) {
     rtn.push_back({&env.Entities[i], env.Entities[i].GetComponent(typeIndex)});
   }
+  return rtn;
 }
 } // namespace Core
 } // namespace Tortuga

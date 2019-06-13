@@ -78,15 +78,12 @@ QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice physicalDevice,
 }
 uint32_t GetDeviceScore(VkPhysicalDeviceProperties properties,
                         VkPhysicalDeviceFeatures features) {
-  uint32_t score = 0;
+  uint32_t score = 1;
 
   if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
     score += 1000;
 
   score += properties.limits.maxImageDimension2D;
-
-  if (features.geometryShader == false)
-    score = 0;
 
   return score;
 }
@@ -115,8 +112,8 @@ VulkanDevice CreateVulkanDevice(VkPhysicalDevice physicalDevice,
   if (CheckDeviceExtensionSupport(physicalDevice, deviceExtensions) == false)
     return data;
 
-  auto score = GetDeviceScore(data.Properties, data.Features);
-  if (score <= 0)
+  data.Score = GetDeviceScore(data.Properties, data.Features);
+  if (data.Score <= 0)
     return data;
 
   float queuePriority = 1.0f;
