@@ -16,18 +16,13 @@ layout(set = 0, binding = 0) readonly buffer RenderOffsets {
 }
 renderOffsets;
 
-layout(set = 0, binding = 1) readonly buffer InputBuffer {
-  uint Debug;
-}
-inputBuffer;
-
 struct Pixel {
   float r;
   float g;
   float b;
   float a;
 };
-layout(set = 0, binding = 2) buffer OutputBuffer { Pixel[] Pixels; }
+layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
 outputBuffer;
 
 float SphereDist(vec3 position, float radius, vec3 point) {
@@ -63,8 +58,8 @@ void main() {
   float d = RayMarch(rayOrigin, rayDirection);
   d /= 5.;
   vec3 col = vec3(d);
-  outputBuffer.Pixels[index].r = d;
-  outputBuffer.Pixels[index].g = d;
-  outputBuffer.Pixels[index].b = d;
+  outputBuffer.Pixels[index].r = 1.;
+  outputBuffer.Pixels[index].g = 1.;
+  outputBuffer.Pixels[index].b = 1.;
   outputBuffer.Pixels[index].a = 1.;
 }
