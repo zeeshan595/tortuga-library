@@ -3,6 +3,7 @@
 
 #include "../Console.h"
 #include "../Graphics/VulkanInstance.h"
+#include "../Graphics/Window.h"
 #include "./Environment.h"
 #include "./System.h"
 #include <SDL2/SDL.h>
@@ -11,6 +12,7 @@ namespace Tortuga {
 namespace Core {
 Environment Env;
 Graphics::VulkanInstance Vulkan;
+Graphics::Window Window;
 void CreateEngine() {
   Env = {{}};
   SDL_Init(SDL_INIT_EVERYTHING);
