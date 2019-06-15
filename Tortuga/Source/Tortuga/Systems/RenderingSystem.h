@@ -39,6 +39,7 @@ private:
   std::vector<Graphics::VulkanCommand> _transferToMainDevice;
   Graphics::VulkanCommand _copyToSwapchain;
   Graphics::VulkanFence _fence;
+  uint32_t _totalOutputBufferSize;
 
   // window
   Graphics::Window _window;
@@ -129,6 +130,8 @@ public:
   }
 
   void ResizeScreen() {
+    _totalOutputBufferSize =
+        Settings.WindowWidth * Settings.WindowHeight * sizeof(Pixel);
     uint32_t totalScore = 0;
     for (uint32_t i = 0; i < _devices.size(); i++) {
       totalScore += _devices[i].Score;
@@ -143,17 +146,17 @@ public:
       offsetTracker += _devices[i].Score;
 
       // update render image offsets for each gpu
+      RenderOffsets imageOffsetData = {_renderImageOffsets[i].x, 0};
       Graphics::SetVulkanBufferData<RenderOffsets>(
-          _renderOffsets[i], {_renderImageOffsets[i].x, 0});
+          _renderOffsets[i], &imageOffsetData, sizeof(RenderOffsets));
 
       // set render image sizes for each gpu
       if (_outputBuffers[i].Buffer != VK_NULL_HANDLE) {
         Graphics::DestroyVulkanBuffer(_outputBuffers[i]);
       }
-      uint32_t outputDataSize =
-          _renderImageOffsets[i].y * Settings.WindowHeight * sizeof(Pixel);
+
       _outputBuffers[i] =
-          Graphics::CreateVulkanBuffer(_devices[i], outputDataSize,
+          Graphics::CreateVulkanBuffer(_devices[i], _totalOutputBufferSize,
                                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
@@ -175,7 +178,7 @@ public:
           _devices[_mainDevice], _renderImageOffsets[i].y,
           Settings.WindowHeight);
       _mainDeviceRenderBuffers[i] = Graphics::CreateVulkanBuffer(
-          _devices[_mainDevice], outputDataSize,
+          _devices[_mainDevice], _totalOutputBufferSize,
           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
               VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
@@ -221,10 +224,12 @@ public:
                                        Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
 
       // Copy output buffer to main device
-      std::vector<Pixel> data(_renderImageOffsets[i].y * Settings.WindowHeight);
-      Graphics::GetVulkanBufferData(_outputBuffers[i], data.data(),
-                                    sizeof(data));
-      Graphics::SetVulkanBufferData(_mainDeviceRenderBuffers[i], data);
+      std::vector<Pixel> pixels(_renderImageOffsets[i].y *
+                                Settings.WindowHeight);
+      Graphics::GetVulkanBufferData(_outputBuffers[i], pixels.data(),
+                                    _totalOutputBufferSize);
+      Graphics::SetVulkanBufferData(_mainDeviceRenderBuffers[i], pixels.data(),
+                                    _totalOutputBufferSize);
 
       Graphics::VulkanCommandSubmit({_transferToMainDevice[i]},
                                     Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
