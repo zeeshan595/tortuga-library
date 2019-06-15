@@ -134,14 +134,20 @@ VulkanDevice CreateVulkanDevice(VkPhysicalDevice physicalDevice,
   }
 
   auto deviceFeatures = VkPhysicalDeviceFeatures();
+  {}
+
+  auto descriptorIndexFeatures =
+      VkPhysicalDeviceDescriptorIndexingFeaturesEXT();
   {
-    // todo: device features
+    descriptorIndexFeatures.sType =
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;
   }
 
   auto deviceInfo = VkDeviceCreateInfo();
   {
     deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceInfo.pEnabledFeatures = nullptr;
+    deviceInfo.pNext = &descriptorIndexFeatures;
+    deviceInfo.pEnabledFeatures = 0; //&deviceFeatures;
     deviceInfo.queueCreateInfoCount = queueCreateInfos.size();
     deviceInfo.pQueueCreateInfos = queueCreateInfos.data();
     deviceInfo.enabledLayerCount = validationLayers.size();

@@ -3,13 +3,21 @@
 namespace Tortuga {
 namespace Graphics {
 
+VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportCallback(
+    VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
+    uint64_t object, size_t location, int32_t messageCode,
+    const char *pLayerPrefix, const char *pMessage, void *pUserData) {
+  Console::Info(pMessage);
+  return VK_TRUE;
+};
+
 VKAPI_ATTR VkBool32 VKAPI_CALL
-DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-              VkDebugUtilsMessageTypeFlagsEXT messageType,
-              const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
-              void *pUserData) {
+DebugUtilCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                  VkDebugUtilsMessageTypeFlagsEXT messageType,
+                  const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+                  void *pUserData) {
   Console::Info(pCallbackData->pMessage);
-  return VK_FALSE;
+  return VK_TRUE;
 }
 
 VkResult CreateDebugUtilsMessengerEXT(
@@ -35,6 +43,30 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
   }
 }
 
+VkResult
+CreateDebugReportCallback(VkInstance instance,
+                          const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
+                          const VkAllocationCallbacks *pAllocator,
+                          VkDebugReportCallbackEXT *pDebugMessenger) {
+  auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(
+      instance, "vkCreateDebugReportCallbackEXT");
+  if (func != nullptr) {
+    return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+  } else {
+    return VK_ERROR_EXTENSION_NOT_PRESENT;
+  }
+}
+
+void DestroyDebugReportCallbackEXT(VkInstance instance,
+                                   VkDebugReportCallbackEXT debugMessenger,
+                                   const VkAllocationCallbacks *pAllocator) {
+  auto func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(
+      instance, "vkDestroyDebugReportCallbackEXT");
+  if (func != nullptr) {
+    func(instance, debugMessenger, pAllocator);
+  }
+}
+
 VulkanInstance CreateVulkanInstance() {
   auto data = VulkanInstance();
 
@@ -46,6 +78,7 @@ VulkanInstance CreateVulkanInstance() {
 
 #if DEBUG_MODE
   extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+  extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
   validationLayers.push_back("VK_LAYER_LUNARG_standard_validation");
 #endif
 
@@ -71,23 +104,42 @@ VulkanInstance CreateVulkanInstance() {
   }
   ErrorCheck(vkCreateInstance(&createInfo, nullptr, &data.Instance));
 
-  //Debugger
+  // Debugger
 #if DEBUG_MODE
-  auto debugInfo = VkDebugUtilsMessengerCreateInfoEXT();
+  auto utilInfo = VkDebugUtilsMessengerCreateInfoEXT();
   {
-    debugInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    debugInfo.messageSeverity =
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    debugInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    debugInfo.pfnUserCallback = DebugCallback;
-    debugInfo.pUserData = nullptr; // Optional
+    utilInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    utilInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    utilInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                           VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                           VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    utilInfo.pfnUserCallback = DebugUtilCallback;
+    utilInfo.pUserData = nullptr; // Optional
   }
-  ErrorCheck(CreateDebugUtilsMessengerEXT(data.Instance, &debugInfo, nullptr,
-                                          &data.Debugger));
+  ErrorCheck(CreateDebugUtilsMessengerEXT(data.Instance, &utilInfo, nullptr,
+                                          &data.DebugUtil));
+
+  auto reportInfo = VkDebugReportCallbackCreateInfoEXT();
+  {
+    reportInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+    reportInfo.pNext = 0;
+#if INTENSE_DEBUG_MODE
+    reportInfo.flags =
+        VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+        VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+        VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+#else
+    reportInfo.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                       VK_DEBUG_REPORT_ERROR_BIT_EXT |
+                       VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+#endif
+    reportInfo.pfnCallback = DebugReportCallback;
+    reportInfo.pUserData = 0;
+  }
+  ErrorCheck(CreateDebugReportCallback(data.Instance, &reportInfo, nullptr,
+                                       &data.DebugReport));
 #endif
 
   // Get Physical Devices
@@ -100,8 +152,9 @@ VulkanInstance CreateVulkanInstance() {
   // Init Devices
   CreateVulkanSurface(tempWindow, data.Instance);
   for (uint32_t i = 0; i < physicalDevices.size(); i++) {
-    auto device = CreateVulkanDevice(physicalDevices[i], tempWindow.WindowSurface,
-                               data.Instance, validationLayers);
+    auto device =
+        CreateVulkanDevice(physicalDevices[i], tempWindow.WindowSurface,
+                           data.Instance, validationLayers);
 
     if (device.IsReady)
       data.Devices.push_back(device);
@@ -117,7 +170,9 @@ void DestroyVulkanInstance(VulkanInstance instance) {
     DestroyVulkanDevice(instance.Devices[i]);
   }
 #if DEBUG_MODE
-  DestroyDebugUtilsMessengerEXT(instance.Instance, instance.Debugger, nullptr);
+  DestroyDebugUtilsMessengerEXT(instance.Instance, instance.DebugUtil, nullptr);
+  DestroyDebugReportCallbackEXT(instance.Instance, instance.DebugReport,
+                                nullptr);
 #endif
   vkDestroyInstance(instance.Instance, nullptr);
 }

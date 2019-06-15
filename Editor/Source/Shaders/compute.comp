@@ -58,8 +58,8 @@ void main() {
   float d = RayMarch(rayOrigin, rayDirection);
   d /= 5.;
   vec3 col = vec3(d);
-  outputBuffer.Pixels[index].r = 1.;
-  outputBuffer.Pixels[index].g = 1.;
-  outputBuffer.Pixels[index].b = 1.;
+  outputBuffer.Pixels[index].r = d;
+  outputBuffer.Pixels[index].g = d;
+  outputBuffer.Pixels[index].b = d;
   outputBuffer.Pixels[index].a = 1.;
 }

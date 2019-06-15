@@ -14,7 +14,8 @@ namespace Graphics {
 struct VulkanInstance {
   VkInstance Instance = VK_NULL_HANDLE;
   std::vector<VulkanDevice> Devices;
-  VkDebugUtilsMessengerEXT Debugger = VK_NULL_HANDLE;
+  VkDebugUtilsMessengerEXT DebugUtil = VK_NULL_HANDLE;
+  VkDebugReportCallbackEXT DebugReport = VK_NULL_HANDLE;
 };
 
 VulkanInstance CreateVulkanInstance();

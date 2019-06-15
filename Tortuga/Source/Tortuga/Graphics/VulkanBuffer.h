@@ -43,22 +43,13 @@ void GetVulkanBufferData(VulkanBuffer buffer, T *data, uint32_t size) {
   vkUnmapMemory(buffer.VirtualDevice, buffer.Memory);
 }
 
-template <typename T> void SetVulkanBufferData(VulkanBuffer buffer, T data) {
-  void *temp;
-  ErrorCheck(vkMapMemory(buffer.VirtualDevice, buffer.Memory, 0,
-                         buffer.MemoryRequirements.size, VK_NULL_HANDLE,
-                         &temp));
-  memcpy(temp, &data, sizeof(T));
-  vkUnmapMemory(buffer.VirtualDevice, buffer.Memory);
-}
-
 template <typename T>
-void SetVulkanBufferData(VulkanBuffer buffer, std::vector<T> data) {
+void SetVulkanBufferData(VulkanBuffer buffer, T data, uint32_t size) {
   void *temp;
   ErrorCheck(vkMapMemory(buffer.VirtualDevice, buffer.Memory, 0,
                          buffer.MemoryRequirements.size, VK_NULL_HANDLE,
                          &temp));
-  memcpy(temp, data.data(), data.size() * sizeof(T));
+  memcpy(temp, &data, size);
   vkUnmapMemory(buffer.VirtualDevice, buffer.Memory);
 }
 } // namespace Graphics
