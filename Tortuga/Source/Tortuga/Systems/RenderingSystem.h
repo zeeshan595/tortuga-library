@@ -1,6 +1,9 @@
 #ifndef _RENDERING_SYSTEM
 #define _RENDERING_SYSTEM
 
+#include <glm/glm.hpp>
+
+#include "../Components/Mesh.h"
 #include "../Console.h"
 #include "../Core/Engine.h"
 #include "../Core/System.h"
@@ -12,8 +15,6 @@
 #include "../Graphics/VulkanShader.h"
 #include "../Graphics/VulkanSwapchain.h"
 #include "../Utils/InputOutput.h"
-
-#include <glm/glm.hpp>
 
 namespace Tortuga {
 namespace Systems {
@@ -67,6 +68,7 @@ public:
   void Start() {
     _devices = Core::Vulkan.Devices;
 
+    RegisterComponent<Components::Mesh>();
     _devices.resize(_devices.size());
     _shaders.resize(_devices.size());
     _pipelines.resize(_devices.size());
@@ -108,7 +110,7 @@ public:
     _copyToSwapchain =
         Graphics::CreateVulkanCommand(_commandPools[_mainDevice]);
     _fence = Graphics::CreateVulkanFence(_devices[_mainDevice]);
-    ResizeScreen(1024, 768);
+    ResizeScreen(1920, 1080);
     Console::Info("Rendering System Started");
   }
 

@@ -8,10 +8,9 @@
 namespace Tortuga {
 namespace Core {
 struct Entity {
-private:
-  std::unordered_map<std::type_index, std::any> Components;
-
 public:
+  std::unordered_map<std::type_index, std::any> Components;
+  
   template <typename T> void AddComponent(T data = T()) {
     Components[std::type_index(typeid(T))] = data;
   }

@@ -21,7 +21,7 @@ private:
   }
 
 protected:
-  template <typename T> void RegisterComponent(T data = T()) {
+  template <typename T> void RegisterComponent() {
     auto typeIndex = std::type_index(typeid(T));
     if (IsComponentRegistered(typeIndex) != -1)
       return;
