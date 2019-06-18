@@ -6,7 +6,7 @@
     "start": "echo 'Please use vs code to launch the application or run Editor/Build/Application'",
     "clean": "gulp clean",
     "build": "gulp build",
-    "install": "sudo apt install libvulkan1 libvulkan-dev libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libglm-dev vulkan-utils"
+    "install": "sudo apt install libvulkan1 libvulkan-dev libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libglm-dev vulkan-utils glslang-dev glslang-tools gdb g++"
   },
   "repository": {
     "type": "git",

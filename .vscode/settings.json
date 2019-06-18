@@ -46,5 +46,8 @@
     "ratio": "cpp",
     "thread": "cpp",
     "typeindex": "cpp"
+  },
+  "files.exclude": {
+    "**/Build": true
   }
 }
