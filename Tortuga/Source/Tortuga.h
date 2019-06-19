@@ -13,7 +13,7 @@
 #include "Tortuga/Core/Engine.h"
 
 //Systems
-#include "Tortuga/Systems/RenderingSystem.h"
+#include "Tortuga/Systems/MultiGPURenderingSystem.h"
 
 //Utils
 #include "Tortuga/Utils/InputOutput.h"

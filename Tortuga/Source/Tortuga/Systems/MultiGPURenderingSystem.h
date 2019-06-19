@@ -1,5 +1,5 @@
-#ifndef _RENDERING_SYSTEM
-#define _RENDERING_SYSTEM
+#ifndef _MULTI_GPU_RENDERING_SYSTEM
+#define _MULTI_GPU_RENDERING_SYSTEM
 
 #include <glm/glm.hpp>
 
@@ -18,7 +18,7 @@
 
 namespace Tortuga {
 namespace Systems {
-struct RenderingSystem : public Core::System {
+struct MultiGPURenderingSystem : public Core::System {
 private:
   struct RenderSettings {
     uint32_t WindowWidth;
