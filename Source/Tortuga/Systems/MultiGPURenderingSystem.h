@@ -2,6 +2,10 @@
 #define _MULTI_GPU_RENDERING_SYSTEM
 
 #include <glm/glm.hpp>
+#include <thread>
+#include <future>
+#include <chrono>
+#include <iostream>
 
 #include "../Components/Mesh.h"
 #include "../Console.h"
@@ -38,6 +42,7 @@ private:
   std::vector<Graphics::VulkanCommand> _renderCommands;
   std::vector<Graphics::VulkanImage> _renderImages;
   std::vector<glm::vec2> _renderImageOffsets; // x = offset x, y = width x
+  std::vector<std::future> _renderThreads;
 
   // main gpu
   std::vector<Graphics::VulkanBuffer> _mainDeviceRenderBuffers;
@@ -46,6 +51,7 @@ private:
   Graphics::VulkanCommand _copyToSwapchain;
   Graphics::VulkanFence _fence;
   uint32_t _totalOutputBufferSize;
+  std::future _presentThread;
 
   // window
   Graphics::VulkanSwapchain _swapchain;
@@ -82,6 +88,7 @@ public:
     _mainDeviceRenderBuffers.resize(_devices.size());
     _mainDeviceRenderImages.resize(_devices.size());
     _transferToMainDevice.resize(_devices.size());
+    _renderThreads.resize(_devices.size());
 
     // todo: change vector sizes
     for (uint32_t i = 0; i < _devices.size(); i++) {
@@ -228,34 +235,27 @@ public:
         Graphics::CreateVulkanSwapchain(_devices[_mainDevice], Core::Window);
   }
 
-  void Render() {
-    for (uint32_t i = 0; i < _devices.size(); i++) {
+  void Render(uint32_t gpuIndex) {
       // submit render commands on all gpus
-      Graphics::VulkanCommandSubmit({_renderCommands[i]},
+      Graphics::VulkanCommandSubmit({_renderCommands[gpuIndex]},
                                     Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-    }
-    for (uint32_t i = 0; i < _devices.size(); i++) {
       // Wait for render to finish on all gpus
-      Graphics::DeviceQueueWaitForIdle(_devices[i],
+      Graphics::DeviceQueueWaitForIdle(_devices[gpuIndex],
                                        Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
 
       // Copy output buffer to main device
-      std::vector<Pixel> pixels(_renderImageOffsets[i].y *
+      std::vector<Pixel> pixels(_renderImageOffsets[gpuIndex].y *
                                 _settings.WindowHeight);
-      Graphics::GetVulkanBufferData(_outputBuffers[i], pixels.data(),
+      Graphics::GetVulkanBufferData(_outputBuffers[gpuIndex], pixels.data(),
                                     _totalOutputBufferSize);
-      Graphics::SetVulkanBufferData(_mainDeviceRenderBuffers[i], pixels.data(),
+      Graphics::SetVulkanBufferData(_mainDeviceRenderBuffers[gpuIndex], pixels.data(),
                                     _totalOutputBufferSize);
 
-      Graphics::VulkanCommandSubmit({_transferToMainDevice[i]},
+      Graphics::VulkanCommandSubmit({_transferToMainDevice[gpuIndex]},
                                     Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-    }
-
-    for (uint32_t i = 0; i < _devices.size(); i++) {
       // Wait for render to finish on all gpus
       Graphics::DeviceQueueWaitForIdle(_devices[_mainDevice],
                                        Graphics::VULKAN_QUEUE_TYPE_COMPUTE);
-    }
   }
 
   void Present() {
@@ -301,8 +301,11 @@ public:
     if (_stopped)
       return;
 
-    Render();
-    Present();
+    for (uint32_t i = 0; i < _devices.size(); i++) {
+      auto temp = std::async(std::launch::async, [&]{
+        Render(*i);
+      });
+    }
   }
 };
 } // namespace Systems
