@@ -42,7 +42,6 @@ private:
   std::vector<Graphics::VulkanCommand> _renderCommands;
   std::vector<Graphics::VulkanImage> _renderImages;
   std::vector<glm::vec2> _renderImageOffsets; // x = offset x, y = width x
-  std::vector<std::future> _renderThreads;
 
   // main gpu
   std::vector<Graphics::VulkanBuffer> _mainDeviceRenderBuffers;
@@ -51,7 +50,6 @@ private:
   Graphics::VulkanCommand _copyToSwapchain;
   Graphics::VulkanFence _fence;
   uint32_t _totalOutputBufferSize;
-  std::future _presentThread;
 
   // window
   Graphics::VulkanSwapchain _swapchain;
@@ -88,7 +86,6 @@ public:
     _mainDeviceRenderBuffers.resize(_devices.size());
     _mainDeviceRenderImages.resize(_devices.size());
     _transferToMainDevice.resize(_devices.size());
-    _renderThreads.resize(_devices.size());
 
     // todo: change vector sizes
     for (uint32_t i = 0; i < _devices.size(); i++) {
@@ -273,7 +270,7 @@ public:
     Graphics::VulkanCommandImageLayoutTransfer(
         copyToPresentImage, _swapchain.Images[swapchainImageIndex],
         VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    for (auto i = 0; i < _devices.size(); i++) {
+    for (uint32_t i = 0; i < _devices.size(); i++) {
       Graphics::VulkanCommandBlitImage(
           copyToPresentImage, _mainDeviceRenderImages[i].Image,
           VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -301,11 +298,7 @@ public:
     if (_stopped)
       return;
 
-    for (uint32_t i = 0; i < _devices.size(); i++) {
-      auto temp = std::async(std::launch::async, [&]{
-        Render(*i);
-      });
-    }
+    //todo: multi-threaded rendering
   }
 };
 } // namespace Systems
