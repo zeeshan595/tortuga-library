@@ -7,6 +7,7 @@
 #include <SDL2/SDL_vulkan.h>
 
 //Core
+#include "Tortuga/Console.h"
 #include "Tortuga/Core/Entity.h"
 #include "Tortuga/Core/Environment.h"
 #include "Tortuga/Core/System.h"
