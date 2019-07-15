@@ -1,6 +1,13 @@
 #include "Tortuga.h"
 
+using namespace Tortuga;
+
 int main() {
-    Tortuga::Console::Info("Hello World");
+    Core::CreateEngine();
+    Core::CreateSystem<Systems::MultiGPURenderingSystem>();
+
+    Core::EngineMainLoop();
+
+    Core::DestroyEngine();
     return 0;
 }

@@ -37,8 +37,7 @@ tortuga_inc = include_directories('Source')
 tortuga_lib = library(
 	'tortuga',
 	sourceCppFiles,
-	dependencies: [thread_dep, vulkan_dep, sdl2_dep],
-	install: true
+	dependencies: [thread_dep, vulkan_dep, sdl2_dep]
 )
 
 tortuga_dep = declare_dependency(
@@ -49,6 +48,7 @@ tortuga_dep = declare_dependency(
 exe = executable(
 	'tortuga',
 	'Source/main.cpp',
-	dependencies: [tortuga_dep, thread_dep, vulkan_dep, sdl2_dep],
-	install: true
+	dependencies: [tortuga_dep, thread_dep, vulkan_dep, sdl2_dep]
 )
+
+subdir('Shaders')

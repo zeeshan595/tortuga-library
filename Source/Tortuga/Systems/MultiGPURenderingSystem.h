@@ -91,7 +91,7 @@ public:
     for (uint32_t i = 0; i < _devices.size(); i++) {
       // shader computation
       _shaders[i] = Graphics::CreateVulkanShader(
-          _devices[i], Utils::GetFileContents("Shaders/compute.spv"));
+          _devices[i], Utils::GetFileContents("Shaders/ray-marching.comp.spv"));
 
       // compute pipeline
       _pipelines[i] = Graphics::CreateVulkanPipeline(
