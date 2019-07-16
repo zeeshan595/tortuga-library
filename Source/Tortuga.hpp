@@ -1,7 +1,7 @@
 #ifndef _TORTUGA
 #define _TORTUGA
 
-#include "Tortuga/Console.hpp";
+#include "Tortuga/Console.hpp"
 
 //Utils
 #include "Tortuga/Utils/InputOutput.hpp"

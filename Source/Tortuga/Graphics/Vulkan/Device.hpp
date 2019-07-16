@@ -16,7 +16,7 @@ namespace Device
 {
 struct DeviceQueueFamilyIndex
 {
-  uint32_t Index = -1;
+  uint32_t Index = 0;
   uint32_t Count = 0;
   bool CanPresent = false;
 };
@@ -89,9 +89,6 @@ DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice, VkSu
       data.Graphics.CanPresent = isSupported;
       data.Graphics.Count = queueFamilies[i].queueCount;
     }
-
-    if (data.Compute.Index != -1 && data.Graphics.Index != -1)
-      break;
   }
 
   return data;

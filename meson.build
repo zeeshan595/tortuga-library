@@ -9,6 +9,7 @@ add_project_arguments(
 	'-Wall',
 	'-std=c++17',
 	'-DDEBUG_MODE',
+	'-Wno-narrowing',
 	language: 'cpp')
 
 thread_dep = dependency('threads')
@@ -16,7 +17,7 @@ vulkan_dep = dependency('vulkan')
 sdl2_dep = dependency('SDL2')
 
 sourceCppFiles = [
-	'Source/Tortuga/Console.cpp'
+	
 ]
 
 tortuga_inc = include_directories('Source')
