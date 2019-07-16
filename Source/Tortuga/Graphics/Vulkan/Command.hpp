@@ -158,7 +158,7 @@ void BufferToImage(Command data, Buffer::Buffer buffer, Image::Image image, glm:
 }
 void CopyImage(Command data, Image::Image source, Image::Image destination)
 {
-  if (soruce.Width != destination.Width || source.Height != destination.Height)
+  if (source.Width != destination.Width || source.Height != destination.Height)
   {
     Console::Warning("Cannot copy images if they are not the same size, please use blit iamge instead");
     return;
@@ -181,7 +181,7 @@ void CopyImage(Command data, Image::Image source, Image::Image destination)
   }
   vkCmdCopyImage(data.Command, source.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
 }
-void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec2 size, glm::vec3 destinationOffset = {0, 0}, glm::vec2 sourceOffset = {0, 0})
+void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec2 size, glm::vec3 destinationOffset, glm::vec2 sourceOffset)
 {
   auto subResource = VkImageSubresourceLayers();
   {

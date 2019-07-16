@@ -57,6 +57,25 @@ void Destroy(Buffer data)
   vkDestroyBuffer(data.Device, data.Buffer, nullptr);
   vkFreeMemory(data.Device, data.Memory, nullptr);
 }
+
+template <typename T>
+void GetData(Buffer buffer, T *data, uint32_t size)
+{
+  void *temp;
+  ErrorCheck::Callback(vkMapMemory(buffer.Device, buffer.Memory, 0, buffer.MemoryRequirements.size, VK_NULL_HANDLE, &temp));
+  memcpy(data, temp, size);
+  vkUnmapMemory(buffer.Device, buffer.Memory);
+}
+
+template <typename T>
+void SetData(Buffer buffer, T *data, uint32_t size)
+{
+  void *temp;
+  ErrorCheck::Callback(vkMapMemory(buffer.Device, buffer.Memory, 0, buffer.MemoryRequirements.size, VK_NULL_HANDLE, &temp));
+  memcpy(temp, data, size);
+  vkUnmapMemory(buffer.Device, buffer.Memory);
+}
+
 } // namespace Buffer
 } // namespace Vulkan
 } // namespace Graphics
