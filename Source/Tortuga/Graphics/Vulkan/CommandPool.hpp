@@ -20,7 +20,7 @@ struct CommandPool
   VkCommandPool CommandPool;
 };
 
-CommandPool Create(Device::Device device, uint32_t familyIndex)
+CommandPool Create(Device::Device device, uint32_t queueFamilyIndex)
 {
   CommandPool data = {};
   data.Device = device.Device;
@@ -29,7 +29,7 @@ CommandPool Create(Device::Device device, uint32_t familyIndex)
   {
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    poolInfo.queueFamilyIndex = familyIndex;
+    poolInfo.queueFamilyIndex = queueFamilyIndex;
   }
   ErrorCheck::Callback(vkCreateCommandPool(device.Device, &poolInfo, nullptr, &data.CommandPool));
 
