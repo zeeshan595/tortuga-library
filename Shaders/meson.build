@@ -12,7 +12,7 @@ foreach shader : shaders_src
 		output: shader + '.spv',
 		input: shader,
 		command: [glslang, '-V', '@INPUT@', '-o', '@OUTPUT@'],
-		install_dir: '../build/Shaders',
+		install_dir: '../Build/Shaders',
 		install: true
 	)
 

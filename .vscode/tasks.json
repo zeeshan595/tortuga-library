@@ -6,7 +6,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "meson build && cd build && ninja",
+            "command": "rm -r Build && meson Build && cd Build && ninja",
         }
     ]
 }

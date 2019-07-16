@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/build/tortuga",
+            "program": "${workspaceFolder}/Build/tortuga",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

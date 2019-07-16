@@ -1,4 +1,4 @@
-#include "./Console.h"
+#include "./Console.hpp"
 
 void Tortuga::Console::ProcessLog(Tortuga::Console::Level level, std::string message, Tortuga::Console::Arguments arguments)
 {

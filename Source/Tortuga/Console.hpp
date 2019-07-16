@@ -5,6 +5,7 @@
 #include <sstream>
 #include <ostream>
 #include <vector>
+#include <glm/glm.hpp>
 
 namespace Tortuga
 {
@@ -74,6 +75,10 @@ public:
   Arguments(std::string str)
   {
     *this << str;
+  }
+  Arguments(glm::vec2 v)
+  {
+    *this << v.x << ", " << v.y;
   }
 
   std::vector<std::string> str()
@@ -151,6 +156,13 @@ public:
   {
     std::ostringstream stream;
     stream << str;
+    _args.push_back(stream.str());
+    return *this;
+  }
+  Arguments &operator<<(glm::vec2 v)
+  {
+    std::ostringstream stream;
+    stream << v.x << ", " << v.y;
     _args.push_back(stream.str());
     return *this;
   }
