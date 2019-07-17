@@ -23,85 +23,8 @@ struct Instance
   std::vector<Device::Device> Devices;
 };
 
-Instance Create()
-{
-  Instance data = {};
-  if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
-  {
-    Console::Fatal("Failed to initialize SDL");
-  }
-  SDL_Window *window = SDL_CreateWindow("Vulkan Helper", 0, 0, 800, 600, SDL_WINDOW_VULKAN);
-  if (window == nullptr)
-  {
-    Console::Fatal("Failed to create SDL Window");
-  }
-
-  uint32_t extensionsCount = 0;
-  if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, nullptr))
-  {
-    Console::Fatal("Failed to get window extensions required for vulkan init");
-  }
-  std::vector<const char *> extensions(extensionsCount);
-  if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, extensions.data()))
-  {
-    Console::Fatal("Failed to get window extensions required for vulkan init");
-  }
-
-  VkApplicationInfo appInfo = {};
-  {
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pNext = nullptr, appInfo.pEngineName = "Tortuga";
-    appInfo.engineVersion = VK_MAKE_VERSION(0, 0, 1);
-    appInfo.pApplicationName = "Tortuga Application";
-    appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 1);
-    appInfo.apiVersion = VK_API_VERSION_1_1;
-  }
-
-  VkInstanceCreateInfo createInfo = {};
-  {
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledLayerCount = 0;
-    createInfo.ppEnabledLayerNames = nullptr;
-    createInfo.enabledExtensionCount = extensions.size();
-    createInfo.ppEnabledExtensionNames = extensions.data();
-  }
-
-  ErrorCheck::Callback(vkCreateInstance(&createInfo, nullptr, &data.Instance));
-
-  VkSurfaceKHR surface = VK_NULL_HANDLE;
-  if (!SDL_Vulkan_CreateSurface(window, data.Instance, &surface))
-  {
-    Console::Fatal("Failed to create vulkan surface for a window");
-  }
-
-  uint32_t deviceCount = 0;
-  ErrorCheck::Callback(vkEnumeratePhysicalDevices(data.Instance, &deviceCount, nullptr));
-  std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-  ErrorCheck::Callback(vkEnumeratePhysicalDevices(data.Instance, &deviceCount, physicalDevices.data()));
-  if (deviceCount <= 0)
-    Console::Fatal("Failed to locate any graphics device");
-
-  for (uint32_t i = 0; i < deviceCount; i++)
-  {
-    auto device = Device::Create(physicalDevices[i], surface);
-    if (device.IsDeviceCompatible)
-      data.Devices.push_back(device);
-  }
-
-  vkDestroySurfaceKHR(data.Instance, surface, nullptr);
-  SDL_DestroyWindow(window);
-
-  return data;
-}
-void Destroy(Instance data)
-{
-  for (uint32_t i = 0; i < data.Devices.size(); i++)
-  {
-    Device::Destroy(data.Devices[i]);
-  }
-  vkDestroyInstance(data.Instance, nullptr);
-}
+Instance Create();
+void Destroy(Instance data);
 } // namespace Instance
 } // namespace Vulkan
 } // namespace Graphics

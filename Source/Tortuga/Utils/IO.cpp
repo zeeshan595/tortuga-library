@@ -1,18 +1,16 @@
-#ifndef _UTILS_INPUT_OUTPUT
-#define _UTILS_INPUT_OUTPUT
+#include "./IO.hpp"
 
-#include "../Console.hpp"
-
-#include <fstream>
-#include <string>
-#include <vector>
-
-namespace Tortuga {
-namespace Utils {
-namespace IO {
-std::vector<char> GetFileContents(std::string filePath) {
+namespace Tortuga
+{
+namespace Utils
+{
+namespace IO
+{
+std::vector<char> GetFileContents(std::string filePath)
+{
   std::ifstream file(filePath, std::ios::ate | std::ios::binary);
-  if (!file.is_open()) {
+  if (!file.is_open())
+  {
     Console::Error("Failed to open file: {0}", Console::Arguments()
                                                    << filePath);
     return {};
@@ -29,5 +27,3 @@ std::vector<char> GetFileContents(std::string filePath) {
 } // namespace IO
 } // namespace Utils
 } // namespace Tortuga
-
-#endif

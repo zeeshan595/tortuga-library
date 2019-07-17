@@ -17,7 +17,19 @@ vulkan_dep = dependency('vulkan')
 sdl2_dep = dependency('SDL2')
 
 sourceCppFiles = [
-	
+		'Source/Tortuga/Console.cpp',
+		'Source/Tortuga/Utils/IO.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Buffer.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Command.cpp',
+		'Source/Tortuga/Graphics/Vulkan/CommandPool.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Device.cpp',
+		'Source/Tortuga/Graphics/Vulkan/ErrorCheck.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Fence.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Image.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Instance.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Shader.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Swapchain.cpp',
+		'Source/Tortuga/Graphics/Vulkan/Window.cpp',
 ]
 
 tortuga_inc = include_directories('Source')
