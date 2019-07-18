@@ -24,14 +24,15 @@ struct DeviceQueueFamilies
 {
   DeviceQueueFamilyIndex Compute;
   DeviceQueueFamilyIndex Graphics;
+  DeviceQueueFamilyIndex Transfer;
 
-  static const uint8_t SIZE = 2;
   static std::vector<DeviceQueueFamilyIndex> GetIndices(DeviceQueueFamilies queueFamilies);
 };
 struct DeviceQueues
 {
   std::vector<VkQueue> Compute;
   std::vector<VkQueue> Graphics;
+  std::vector<VkQueue> Transfer;
 };
 struct Device
 {

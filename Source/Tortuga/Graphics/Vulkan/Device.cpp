@@ -10,7 +10,7 @@ namespace Device
 {
 std::vector<DeviceQueueFamilyIndex> DeviceQueueFamilies::GetIndices(DeviceQueueFamilies queueFamilies)
 {
-  return {queueFamilies.Compute, queueFamilies.Graphics};
+  return {queueFamilies.Compute, queueFamilies.Graphics, queueFamilies.Transfer};
 }
 
 float GetDeviceScore(VkPhysicalDeviceProperties properties, VkPhysicalDeviceFeatures features)
@@ -30,8 +30,15 @@ DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice, VkSu
   std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
   vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
 
-  DeviceQueueFamilies data = {};
+  int32_t bestCompute = -1;
+  int32_t bestGraphics = -1;
+  int32_t bestTransfer = -1;
 
+  int32_t compute = -1;
+  int32_t graphics = -1;
+  int32_t transfer = -1;
+
+  DeviceQueueFamilies data = {};
   for (uint32_t i = 0; i < queueFamilies.size(); i++)
   {
     auto queueFamily = queueFamilies[i];
@@ -39,21 +46,55 @@ DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice, VkSu
       continue;
 
     VkBool32 isSupported = false;
-    ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &isSupported));
+    if (surface != VK_NULL_HANDLE)
+      ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &isSupported));
 
     if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT)
     {
-      data.Compute.Index = i;
+      if (!(queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) && !(queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT))
+        bestCompute = i;
+      else
+        compute = i;
+
       data.Compute.CanPresent = isSupported;
-      data.Compute.Count = queueFamilies[i].queueCount;
+      data.Compute.Count = queueFamily.queueCount;
     }
     if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
     {
-      data.Graphics.Index = i;
+      if (!(queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) && !(queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT))
+        bestGraphics = i;
+      else
+        graphics = i;
+
       data.Graphics.CanPresent = isSupported;
-      data.Graphics.Count = queueFamilies[i].queueCount;
+      data.Graphics.Count = queueFamily.queueCount;
+    }
+    if (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT)
+    {
+      if (!(queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) && !(queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT))
+        bestTransfer = i;
+      else
+        transfer = i;
+
+      data.Transfer.CanPresent = isSupported;
+      data.Transfer.Count = queueFamily.queueCount;
     }
   }
+
+  if (bestCompute > -1)
+    data.Compute.Index = bestCompute;
+  else if (compute > -1)
+    data.Compute.Index = compute;
+
+  if (bestGraphics > -1)
+    data.Graphics.Index = bestGraphics;
+  else if (graphics > -1)
+    data.Graphics.Index = graphics;
+
+  if (bestTransfer > -1)
+    data.Transfer.Index = bestTransfer;
+  else if (transfer > -1)
+    data.Transfer.Index = transfer;
 
   return data;
 }
@@ -140,6 +181,13 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
     VkQueue queue;
     vkGetDeviceQueue(data.Device, data.QueueFamilies.Graphics.Index, i, &queue);
     data.Queues.Graphics.push_back(queue);
+  }
+
+  for (uint32_t i = 0; i < data.QueueFamilies.Transfer.Count; i++)
+  {
+    VkQueue queue;
+    vkGetDeviceQueue(data.Device, data.QueueFamilies.Transfer.Index, i, &queue);
+    data.Queues.Transfer.push_back(queue);
   }
 
   data.CanPresent = data.QueueFamilies.Compute.CanPresent || data.QueueFamilies.Graphics.CanPresent;

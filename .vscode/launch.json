@@ -8,7 +8,7 @@
             "name": "Launch",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "Build",
             "program": "${workspaceFolder}/Build/tortuga",
             "args": [],
             "stopAtEntry": false,

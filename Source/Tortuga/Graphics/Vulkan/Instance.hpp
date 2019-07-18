@@ -23,7 +23,7 @@ struct Instance
   std::vector<Device::Device> Devices;
 };
 
-Instance Create();
+Instance Create(bool enableWindowSupport = true);
 void Destroy(Instance data);
 } // namespace Instance
 } // namespace Vulkan

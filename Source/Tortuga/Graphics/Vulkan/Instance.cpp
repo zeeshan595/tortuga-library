@@ -8,28 +8,33 @@ namespace Vulkan
 {
 namespace Instance
 {
-Instance Create()
+Instance Create(bool enableWindowSupport)
 {
   Instance data = {};
   if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
   {
     Console::Fatal("Failed to initialize SDL");
   }
-  SDL_Window *window = SDL_CreateWindow("Vulkan Helper", 0, 0, 800, 600, SDL_WINDOW_VULKAN);
-  if (window == nullptr)
-  {
-    Console::Fatal("Failed to create SDL Window");
-  }
 
-  uint32_t extensionsCount = 0;
-  if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, nullptr))
+  std::vector<const char *> extensions(0);
+  SDL_Window *window = nullptr;
+  if (enableWindowSupport)
   {
-    Console::Fatal("Failed to get window extensions required for vulkan init");
-  }
-  std::vector<const char *> extensions(extensionsCount);
-  if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, extensions.data()))
-  {
-    Console::Fatal("Failed to get window extensions required for vulkan init");
+    window = SDL_CreateWindow("Vulkan Helper", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 200, SDL_WINDOW_VULKAN | SDL_WINDOW_BORDERLESS);
+    if (window == nullptr)
+    {
+      Console::Fatal("Failed to create SDL Window");
+    }
+    uint32_t extensionsCount = 0;
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, nullptr))
+    {
+      Console::Fatal("Failed to get window extensions required for vulkan init");
+    }
+    extensions.resize(extensionsCount);
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, extensions.data()))
+    {
+      Console::Fatal("Failed to get window extensions required for vulkan init");
+    }
   }
 
   VkApplicationInfo appInfo = {};
@@ -55,9 +60,12 @@ Instance Create()
   ErrorCheck::Callback(vkCreateInstance(&createInfo, nullptr, &data.Instance));
 
   VkSurfaceKHR surface = VK_NULL_HANDLE;
-  if (!SDL_Vulkan_CreateSurface(window, data.Instance, &surface))
+  if (enableWindowSupport)
   {
-    Console::Fatal("Failed to create vulkan surface for a window");
+    if (!SDL_Vulkan_CreateSurface(window, data.Instance, &surface))
+    {
+      Console::Fatal("Failed to create vulkan surface for a window");
+    }
   }
 
   uint32_t deviceCount = 0;
@@ -74,8 +82,11 @@ Instance Create()
       data.Devices.push_back(device);
   }
 
-  vkDestroySurfaceKHR(data.Instance, surface, nullptr);
-  SDL_DestroyWindow(window);
+  if (enableWindowSupport)
+  {
+    vkDestroySurfaceKHR(data.Instance, surface, nullptr);
+    SDL_DestroyWindow(window);
+  }
 
   return data;
 }
@@ -86,6 +97,7 @@ void Destroy(Instance data)
     Device::Destroy(data.Devices[i]);
   }
   vkDestroyInstance(data.Instance, nullptr);
+  SDL_Quit();
 }
 } // namespace Instance
 } // namespace Vulkan
