@@ -16,8 +16,9 @@ namespace Shader
 {
 struct Shader
 {
-  VkDevice Device;
-  VkShaderModule Shader;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkShaderModule Shader = VK_NULL_HANDLE;
+  VkPipelineCache TempCache = VK_NULL_HANDLE;
 };
 
 Shader Create(Device::Device device, std::vector<char> code);
