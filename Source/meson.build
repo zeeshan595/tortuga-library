@@ -1,0 +1,19 @@
+sourceCppFiles = [
+  './Source/Tortuga/Utils/IO.cpp',
+  './Source/Tortuga/Console.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Window.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Fence.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Swapchain.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Buffer.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Instance.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Pipeline.cpp',
+  './Source/Tortuga/Graphics/Vulkan/DescriptorLayout.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Shader.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Image.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Device.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Command.cpp',
+  './Source/Tortuga/Graphics/Vulkan/DescriptorPool.cpp',
+  './Source/Tortuga/Graphics/Vulkan/DescriptorSet.cpp',
+  './Source/Tortuga/Graphics/Vulkan/CommandPool.cpp',
+  './Source/Tortuga/Graphics/Vulkan/ErrorCheck.cpp'
+]
