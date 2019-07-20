@@ -43,12 +43,17 @@ Pipeline CreateComputePipeline(Device::Device device, std::vector<DescriptorLayo
     pipelineInfo.basePipelineIndex = 0;
     pipelineInfo.basePipelineHandle = 0;
   }
-  ErrorCheck::Callback(vkMergePipelineCaches(device.Device, data.Cache, 1, &shader.TempCache));
+  data.Cache = shader.TempCache;
   ErrorCheck::Callback(vkCreateComputePipelines(device.Device, data.Cache, 1, &pipelineInfo, nullptr, &data.Pipeline));
   return data;
 }
 
-Pipeline GraphicsPipelineHelper(Pipeline &data, Device::Device device, std::vector<VkPipelineCache> shaderCaches, std::vector<VkPipelineShaderStageCreateInfo> shaderStages)
+Pipeline GraphicsPipelineHelper(
+    Pipeline &data,
+    Device::Device device,
+    std::vector<VkPipelineCache> shaderCaches,
+    std::vector<VkPipelineShaderStageCreateInfo> shaderStages,
+    Viewport viewport)
 {
   VkPipelineVertexInputStateCreateInfo vertexInputState = {};
   {
@@ -72,29 +77,23 @@ Pipeline GraphicsPipelineHelper(Pipeline &data, Device::Device device, std::vect
     tessellationState.patchControlPoints = 0;
   }
 
-  VkViewport viewport = {};
+  VkViewport vulkanViewport = {};
   {
-    viewport.x = 0;
-    viewport.y = 0;
-    viewport.width = 800;
-    viewport.height = 600;
-    viewport.maxDepth = 0.01f;
-    viewport.maxDepth = 1000.0f;
-  }
-
-  VkRect2D scissors = {};
-  {
-    scissors.offset = {0, 0};
-    scissors.extent = {800, 600};
+    vulkanViewport.x = viewport.x;
+    vulkanViewport.y = viewport.y;
+    vulkanViewport.width = viewport.width;
+    vulkanViewport.height = viewport.height;
+    vulkanViewport.maxDepth = viewport.minDepth;
+    vulkanViewport.maxDepth = viewport.maxDepth;
   }
 
   VkPipelineViewportStateCreateInfo viewportState = {};
   {
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
-    viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissors;
+    viewportState.pViewports = &vulkanViewport;
+    viewportState.scissorCount = 0;
+    viewportState.pScissors = nullptr;
   }
 
   VkPipelineRasterizationStateCreateInfo rasterizationState = {};
@@ -114,6 +113,20 @@ Pipeline GraphicsPipelineHelper(Pipeline &data, Device::Device device, std::vect
     multiSample.rasterizationSamples = VK_SAMPLE_COUNT_2_BIT;
     multiSample.sampleShadingEnable = true;
     multiSample.minSampleShading = 0.2f;
+  }
+
+  VkPipelineDepthStencilStateCreateInfo depthStencil = {};
+  {
+    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depthStencil.depthTestEnable = true;
+    depthStencil.depthWriteEnable = true;
+    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+    depthStencil.depthBoundsTestEnable = false;
+    depthStencil.minDepthBounds = 0.0f;
+    depthStencil.maxDepthBounds = 1.0f;
+    depthStencil.stencilTestEnable = false;
+    depthStencil.front = {};
+    depthStencil.back = {};
   }
 
   VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
@@ -158,7 +171,7 @@ Pipeline GraphicsPipelineHelper(Pipeline &data, Device::Device device, std::vect
     pipelineInfo.pViewportState = &viewportState;
     pipelineInfo.pRasterizationState = &rasterizationState;
     pipelineInfo.pMultisampleState = &multiSample;
-    pipelineInfo.pDepthStencilState = nullptr;
+    pipelineInfo.pDepthStencilState = &depthStencil;
     pipelineInfo.pColorBlendState = &colorBlend;
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.layout = data.Layout;
@@ -172,7 +185,12 @@ Pipeline GraphicsPipelineHelper(Pipeline &data, Device::Device device, std::vect
   return data;
 }
 
-Pipeline CreateGraphicsPipeline(Device::Device device, std::vector<DescriptorLayout::DescriptorLayout> layouts, Shader::Shader vertex, Shader::Shader fragment)
+Pipeline CreateGraphicsPipeline(
+    Device::Device device,
+    std::vector<DescriptorLayout::DescriptorLayout> layouts,
+    Shader::Shader vertex,
+    Shader::Shader fragment,
+    Viewport viewport)
 {
   Pipeline data = {};
 
@@ -202,10 +220,16 @@ Pipeline CreateGraphicsPipeline(Device::Device device, std::vector<DescriptorLay
     shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
   }
 
-  return GraphicsPipelineHelper(data, device, shaderCaches, shaderStages);
+  return GraphicsPipelineHelper(data, device, shaderCaches, shaderStages, viewport);
 }
 
-Pipeline CreateGraphicsPipeline(Device::Device device, std::vector<DescriptorLayout::DescriptorLayout> layouts, Shader::Shader vertex, Shader::Shader geometry, Shader::Shader fragment)
+Pipeline CreateGraphicsPipeline(
+    Device::Device device,
+    std::vector<DescriptorLayout::DescriptorLayout> layouts,
+    Shader::Shader vertex,
+    Shader::Shader geometry,
+    Shader::Shader fragment,
+    Viewport viewport)
 {
   Pipeline data = {};
 
@@ -241,7 +265,7 @@ Pipeline CreateGraphicsPipeline(Device::Device device, std::vector<DescriptorLay
     shaderStages[2].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
   }
 
-  return GraphicsPipelineHelper(data, device, shaderCaches, shaderStages);
+  return GraphicsPipelineHelper(data, device, shaderCaches, shaderStages, viewport);
 }
 
 void DestroyPipeline(Pipeline data)
