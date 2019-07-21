@@ -16,9 +16,14 @@ std::vector<VkDescriptorSetLayout> GetVulkanDescriptorLayouts(std::vector<Descri
   return setLayouts;
 }
 
-Pipeline CreateComputePipeline(Device::Device device, std::vector<DescriptorLayout::DescriptorLayout> layouts, Shader::Shader shader)
+Pipeline CreateComputePipeline(
+    Device::Device device,
+    std::vector<DescriptorLayout::DescriptorLayout> layouts,
+    Shader::Shader shader,
+    std::vector<char> cache)
 {
   Pipeline data = {};
+  data.Device = device.Device;
 
   auto setLayouts = GetVulkanDescriptorLayouts(layouts);
   VkPipelineLayoutCreateInfo layoutInfo = {};
@@ -28,6 +33,14 @@ Pipeline CreateComputePipeline(Device::Device device, std::vector<DescriptorLayo
     layoutInfo.pSetLayouts = setLayouts.data();
   }
   ErrorCheck::Callback(vkCreatePipelineLayout(device.Device, &layoutInfo, nullptr, &data.Layout));
+
+  VkPipelineCacheCreateInfo cacheInfo = {};
+  {
+    cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+    cacheInfo.initialDataSize = cache.size();
+    cacheInfo.pInitialData = cache.data();
+  }
+  ErrorCheck::Callback(vkCreatePipelineCache(device.Device, &cacheInfo, nullptr, &data.Cache));
 
   VkComputePipelineCreateInfo pipelineInfo = {};
   {
@@ -43,235 +56,22 @@ Pipeline CreateComputePipeline(Device::Device device, std::vector<DescriptorLayo
     pipelineInfo.basePipelineIndex = 0;
     pipelineInfo.basePipelineHandle = 0;
   }
-  data.Cache = shader.TempCache;
   ErrorCheck::Callback(vkCreateComputePipelines(device.Device, data.Cache, 1, &pipelineInfo, nullptr, &data.Pipeline));
   return data;
 }
-
-Pipeline GraphicsPipelineHelper(
-    Pipeline &data,
-    Device::Device device,
-    std::vector<VkPipelineCache> shaderCaches,
-    std::vector<VkPipelineShaderStageCreateInfo> shaderStages,
-    Viewport viewport)
-{
-  VkPipelineVertexInputStateCreateInfo vertexInputState = {};
-  {
-    vertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputState.vertexAttributeDescriptionCount = 0;
-    vertexInputState.pVertexAttributeDescriptions = nullptr;
-    vertexInputState.vertexBindingDescriptionCount = 0;
-    vertexInputState.pVertexBindingDescriptions = nullptr;
-  }
-
-  VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
-  {
-    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.primitiveRestartEnable = false;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-  }
-
-  VkPipelineTessellationStateCreateInfo tessellationState = {};
-  {
-    tessellationState.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
-    tessellationState.patchControlPoints = 0;
-  }
-
-  VkViewport vulkanViewport = {};
-  {
-    vulkanViewport.x = viewport.x;
-    vulkanViewport.y = viewport.y;
-    vulkanViewport.width = viewport.width;
-    vulkanViewport.height = viewport.height;
-    vulkanViewport.maxDepth = viewport.minDepth;
-    vulkanViewport.maxDepth = viewport.maxDepth;
-  }
-
-  VkPipelineViewportStateCreateInfo viewportState = {};
-  {
-    viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewportState.viewportCount = 1;
-    viewportState.pViewports = &vulkanViewport;
-    viewportState.scissorCount = 0;
-    viewportState.pScissors = nullptr;
-  }
-
-  VkPipelineRasterizationStateCreateInfo rasterizationState = {};
-  {
-    rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizationState.depthClampEnable = false;
-    rasterizationState.rasterizerDiscardEnable = false;
-    rasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
-    rasterizationState.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizationState.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    rasterizationState.depthBiasEnable = false;
-  }
-
-  VkPipelineMultisampleStateCreateInfo multiSample = {};
-  {
-    multiSample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    multiSample.rasterizationSamples = VK_SAMPLE_COUNT_2_BIT;
-    multiSample.sampleShadingEnable = true;
-    multiSample.minSampleShading = 0.2f;
-  }
-
-  VkPipelineDepthStencilStateCreateInfo depthStencil = {};
-  {
-    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depthStencil.depthTestEnable = true;
-    depthStencil.depthWriteEnable = true;
-    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
-    depthStencil.depthBoundsTestEnable = false;
-    depthStencil.minDepthBounds = 0.0f;
-    depthStencil.maxDepthBounds = 1.0f;
-    depthStencil.stencilTestEnable = false;
-    depthStencil.front = {};
-    depthStencil.back = {};
-  }
-
-  VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
-  {
-    colorBlendAttachment.blendEnable = true;
-    colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC1_ALPHA;
-    colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-    colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
-  }
-
-  VkPipelineColorBlendStateCreateInfo colorBlend = {};
-  {
-    colorBlend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    colorBlend.logicOpEnable = true;
-    colorBlend.logicOp = VK_LOGIC_OP_COPY;
-    colorBlend.attachmentCount = 1;
-    colorBlend.pAttachments = &colorBlendAttachment;
-    colorBlend.blendConstants[0] = 0.0f;
-    colorBlend.blendConstants[1] = 0.0f;
-    colorBlend.blendConstants[2] = 0.0f;
-    colorBlend.blendConstants[3] = 0.0f;
-  }
-
-  VkPipelineDynamicStateCreateInfo dynamicState = {};
-  {
-    dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-    dynamicState.dynamicStateCount = 0;
-    dynamicState.pDynamicStates = nullptr;
-  }
-
-  VkGraphicsPipelineCreateInfo pipelineInfo = {};
-  {
-    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = shaderStages.size();
-    pipelineInfo.pStages = shaderStages.data();
-    pipelineInfo.pVertexInputState = &vertexInputState;
-    pipelineInfo.pInputAssemblyState = &inputAssembly;
-    pipelineInfo.pTessellationState = &tessellationState;
-    pipelineInfo.pViewportState = &viewportState;
-    pipelineInfo.pRasterizationState = &rasterizationState;
-    pipelineInfo.pMultisampleState = &multiSample;
-    pipelineInfo.pDepthStencilState = &depthStencil;
-    pipelineInfo.pColorBlendState = &colorBlend;
-    pipelineInfo.pDynamicState = &dynamicState;
-    pipelineInfo.layout = data.Layout;
-    pipelineInfo.renderPass = nullptr;
-    pipelineInfo.subpass = 0;
-    pipelineInfo.basePipelineHandle = nullptr;
-    pipelineInfo.basePipelineIndex = 0;
-  }
-  ErrorCheck::Callback(vkMergePipelineCaches(device.Device, data.Cache, shaderCaches.size(), shaderCaches.data()));
-  ErrorCheck::Callback(vkCreateGraphicsPipelines(device.Device, data.Cache, 1, &pipelineInfo, nullptr, &data.Pipeline));
-  return data;
-}
-
-Pipeline CreateGraphicsPipeline(
-    Device::Device device,
-    std::vector<DescriptorLayout::DescriptorLayout> layouts,
-    Shader::Shader vertex,
-    Shader::Shader fragment,
-    Viewport viewport)
-{
-  Pipeline data = {};
-
-  auto setLayouts = GetVulkanDescriptorLayouts(layouts);
-  VkPipelineLayoutCreateInfo layoutInfo = {};
-  {
-    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layoutInfo.setLayoutCount = setLayouts.size();
-    layoutInfo.pSetLayouts = setLayouts.data();
-  }
-  ErrorCheck::Callback(vkCreatePipelineLayout(device.Device, &layoutInfo, nullptr, &data.Layout));
-
-  std::vector<VkPipelineCache> shaderCaches = {vertex.TempCache, fragment.TempCache};
-  std::vector<VkPipelineShaderStageCreateInfo> shaderStages(2);
-  {
-    //vertex shader
-    shaderStages[0] = {};
-    shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStages[0].module = vertex.Shader;
-    shaderStages[0].pName = "main";
-    shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-
-    shaderStages[1] = {};
-    shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStages[1].module = fragment.Shader;
-    shaderStages[1].pName = "main";
-    shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-  }
-
-  return GraphicsPipelineHelper(data, device, shaderCaches, shaderStages, viewport);
-}
-
-Pipeline CreateGraphicsPipeline(
-    Device::Device device,
-    std::vector<DescriptorLayout::DescriptorLayout> layouts,
-    Shader::Shader vertex,
-    Shader::Shader geometry,
-    Shader::Shader fragment,
-    Viewport viewport)
-{
-  Pipeline data = {};
-
-  auto setLayouts = GetVulkanDescriptorLayouts(layouts);
-  VkPipelineLayoutCreateInfo layoutInfo = {};
-  {
-    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layoutInfo.setLayoutCount = setLayouts.size();
-    layoutInfo.pSetLayouts = setLayouts.data();
-  }
-  ErrorCheck::Callback(vkCreatePipelineLayout(device.Device, &layoutInfo, nullptr, &data.Layout));
-
-  std::vector<VkPipelineCache> shaderCaches = {vertex.TempCache, geometry.TempCache, fragment.TempCache};
-  std::vector<VkPipelineShaderStageCreateInfo> shaderStages(3);
-  {
-    //vertex shader
-    shaderStages[0] = {};
-    shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStages[0].module = vertex.Shader;
-    shaderStages[0].pName = "main";
-    shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-
-    shaderStages[1] = {};
-    shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStages[1].module = geometry.Shader;
-    shaderStages[1].pName = "main";
-    shaderStages[1].stage = VK_SHADER_STAGE_GEOMETRY_BIT;
-
-    shaderStages[2] = {};
-    shaderStages[2].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStages[2].module = fragment.Shader;
-    shaderStages[2].pName = "main";
-    shaderStages[2].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-  }
-
-  return GraphicsPipelineHelper(data, device, shaderCaches, shaderStages, viewport);
-}
-
 void DestroyPipeline(Pipeline data)
 {
   vkDestroyPipeline(data.Device, data.Pipeline, nullptr);
   vkDestroyPipelineLayout(data.Device, data.Layout, nullptr);
+  vkDestroyPipelineCache(data.Device, data.Cache, nullptr);
+}
+std::vector<char> GetCacheData(Pipeline data)
+{
+  size_t cacheCount;
+  ErrorCheck::Callback(vkGetPipelineCacheData(data.Device, data.Cache, &cacheCount, nullptr));
+  std::vector<char> cacheData(cacheCount);
+  ErrorCheck::Callback(vkGetPipelineCacheData(data.Device, data.Cache, &cacheCount, cacheData.data()));
+  return cacheData;
 }
 } // namespace Pipeline
 } // namespace Vulkan

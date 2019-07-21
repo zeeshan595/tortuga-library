@@ -11,6 +11,7 @@ namespace DescriptorSet
 DescriptorSet Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, DescriptorPool::DescriptorPool pool)
 {
   DescriptorSet data = {};
+  data.Device = device.Device;
   data.Pool = pool.Pool;
   data.DescriptorSetCount = pool.DescriptorSetCounts;
 

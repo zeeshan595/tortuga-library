@@ -22,20 +22,11 @@ Shader Create(Device::Device device, std::vector<char> code)
   }
   ErrorCheck::Callback(vkCreateShaderModule(device.Device, &createInfo, nullptr, &data.Shader));
 
-  VkPipelineCacheCreateInfo cacheInfo = {};
-  {
-    cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-    cacheInfo.initialDataSize = code.size();
-    cacheInfo.pInitialData = codeData;
-  }
-  ErrorCheck::Callback(vkCreatePipelineCache(device.Device, &cacheInfo, nullptr, &data.TempCache));
-
   return data;
 }
 
 void Destroy(Shader data)
 {
-  vkDestroyPipelineCache(data.Device, data.TempCache, nullptr);
   vkDestroyShaderModule(data.Device, data.Shader, nullptr);
 }
 } // namespace Shader

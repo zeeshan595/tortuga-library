@@ -2,13 +2,6 @@
 
 using namespace Tortuga;
 
-struct Test
-{
-  uint32_t x;
-  uint32_t y;
-  uint32_t z;
-};
-
 int main()
 {
   auto vulkan = Graphics::Vulkan::Instance::Create();
@@ -32,8 +25,7 @@ int main()
   auto descriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, descriptorLayout, descriptorPool);
 
   //Pipeline
-  auto shadeCode = Utils::IO::GetFileContents("Build/Shaders/ray-marching.comp.spv");
-  auto shader = Graphics::Vulkan::Shader::Create(device, shadeCode);
+  auto shader = Graphics::Vulkan::Shader::Create(device, Utils::IO::GetFileContents("Build/Shaders/ray-marching.comp"));
   auto pipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, {descriptorLayout}, shader);
 
   while (!window.SignalClose)

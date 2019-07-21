@@ -11,6 +11,7 @@ namespace DescriptorPool
 DescriptorPool Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, uint32_t maxSets)
 {
   DescriptorPool data = {};
+  data.Device = device.Device;
 
   VkDescriptorPoolCreateInfo createInfo = {};
   {

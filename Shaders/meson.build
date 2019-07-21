@@ -1,6 +1,8 @@
 
 shaders_src = [
-	'ray-marching.comp'
+	'ray-marching.comp',
+	'vertex.vert',
+	'fragment.frag'
 ]
 
 shaders = []

@@ -11,6 +11,7 @@ namespace DescriptorLayout
 DescriptorLayout Create(Device::Device device, std::vector<Binding> bindings)
 {
   DescriptorLayout data = {};
+  data.Device = device.Device;
 
   data.PoolSizes.resize(bindings.size());
   std::vector<VkDescriptorSetLayoutBinding> pBindings(bindings.size());
