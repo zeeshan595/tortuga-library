@@ -20,7 +20,7 @@
 #include "./Tortuga/Graphics/Vulkan/Command.hpp"
 #include "./Tortuga/Graphics/Vulkan/DescriptorLayout.hpp"
 #include "./Tortuga/Graphics/Vulkan/DescriptorPool.hpp"
-#include "./Tortuga/Graphics/Vulkan/DescriptorSet.hpp"
+#include "./Tortuga/Graphics/Vulkan/DescriptorSets.hpp"
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
 
 #endif

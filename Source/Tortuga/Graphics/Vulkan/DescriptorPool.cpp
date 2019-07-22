@@ -8,15 +8,16 @@ namespace Vulkan
 {
 namespace DescriptorPool
 {
-DescriptorPool Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, uint32_t maxSets)
+DescriptorPool Create(Device::Device device, DescriptorLayout::DescriptorLayout layout)
 {
   DescriptorPool data = {};
   data.Device = device.Device;
+  data.DescriptorSetCounts = layout.PoolSizes.size();
 
   VkDescriptorPoolCreateInfo createInfo = {};
   {
     createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    createInfo.maxSets = maxSets;
+    createInfo.maxSets = layout.PoolSizes.size();
     createInfo.poolSizeCount = layout.PoolSizes.size();
     createInfo.pPoolSizes = layout.PoolSizes.data();
   }

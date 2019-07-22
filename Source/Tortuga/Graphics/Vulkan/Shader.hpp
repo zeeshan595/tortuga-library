@@ -2,8 +2,10 @@
 #define _VULKAN_SHADER
 
 #include <vulkan/vulkan.h>
+#include <shaderc/shaderc.h>
 
 #include "./ErrorCheck.hpp"
+#include "./Instance.hpp"
 #include "./Device.hpp"
 
 namespace Tortuga
@@ -14,13 +16,20 @@ namespace Vulkan
 {
 namespace Shader
 {
+enum ShaderType
+{
+  COMPUTE,
+  VERTEX,
+  FRAGMENT
+};
 struct Shader
 {
   VkDevice Device = VK_NULL_HANDLE;
   VkShaderModule Shader = VK_NULL_HANDLE;
 };
 
-Shader Create(Device::Device device, std::vector<char> code);
+std::vector<char> CompileShader(Instance::Instance instance, ShaderType type, std::vector<char> code);
+Shader Create(Device::Device device, std::vector<char> compiled);
 void Destroy(Shader data);
 } // namespace Shader
 } // namespace Vulkan

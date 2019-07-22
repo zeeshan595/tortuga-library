@@ -7,6 +7,7 @@
 #include "./Device.hpp"
 #include "./DescriptorLayout.hpp"
 #include "./DescriptorPool.hpp"
+#include "./Buffer.hpp"
 
 namespace Tortuga
 {
@@ -14,18 +15,20 @@ namespace Graphics
 {
 namespace Vulkan
 {
-namespace DescriptorSet
+namespace DescriptorSets
 {
-struct DescriptorSet
+struct DescriptorSets
 {
   VkDevice Device;
   VkDescriptorSet set;
   VkDescriptorPool Pool;
   uint32_t DescriptorSetCount;
+  std::vector<VkDescriptorPoolSize> PoolSizes;
 };
 
-DescriptorSet Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, DescriptorPool::DescriptorPool pool);
-void Destroy(DescriptorSet data);
+DescriptorSets Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, DescriptorPool::DescriptorPool pool);
+void Destroy(DescriptorSets data);
+void UpdateDescriptorSet(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content);
 } // namespace DescriptorSet
 } // namespace Vulkan
 } // namespace Graphics

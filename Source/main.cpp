@@ -1,6 +1,19 @@
 #include "./Tortuga.hpp"
+#include <shaderc/shaderc.h>
 
 using namespace Tortuga;
+
+struct Pixel
+{
+  float r;
+  float g;
+  float b;
+};
+
+struct Image
+{
+  Pixel Pixels[8];
+};
 
 int main()
 {
@@ -13,20 +26,33 @@ int main()
   auto window = Graphics::Vulkan::Window::Create(vulkan, "Hello World", 1024, 768);
   auto swapchain = Graphics::Vulkan::Swapchain::Create(device, window);
 
+  auto buffer = Graphics::Vulkan::Buffer::Create(device, sizeof(Image), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
   //Descriptors
-  auto descriptorBindings = Graphics::Vulkan::DescriptorLayout::Binding();
+  std::vector<Graphics::Vulkan::DescriptorLayout::Binding> bindings(2);
   {
-    descriptorBindings.DescriptorCount = 1;
-    descriptorBindings.ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
-    descriptorBindings.Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[0] = {};
+    bindings[0].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[0].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
+    bindings[0].DescriptorCount = 1;
+
   }
-  auto descriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, {descriptorBindings});
+  auto descriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, bindings);
   auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayout);
-  auto descriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, descriptorLayout, descriptorPool);
+  auto descriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, descriptorLayout, descriptorPool);
+
+  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 0, {buffer});
+  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 1, {buffer});
 
   //Pipeline
-  auto shader = Graphics::Vulkan::Shader::Create(device, Utils::IO::GetFileContents("Build/Shaders/ray-marching.comp"));
-  auto pipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, {descriptorLayout}, shader);
+  auto shaderCode = Utils::IO::GetFileContents("Shaders/ray-marching.comp");
+  auto compiledShader = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::COMPUTE, shaderCode);
+  auto shader = Graphics::Vulkan::Shader::Create(device, compiledShader);
+  auto pipelineCache = Utils::IO::GetFileContents("Shaders/ray-marching.comp.cache");
+  auto pipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, {descriptorLayout}, shader, pipelineCache);
+  auto newPipelineCache = Graphics::Vulkan::Pipeline::GetCacheData(pipeline);
+  if (pipelineCache != newPipelineCache)
+    Utils::IO::SetFileContents("Shaders/ray-marching.comp.cache", newPipelineCache);
 
   while (!window.SignalClose)
   {
@@ -38,9 +64,11 @@ int main()
   Graphics::Vulkan::Shader::Destroy(shader);
 
   //Descriptors
-  Graphics::Vulkan::DescriptorSet::Destroy(descriptorSet);
+  Graphics::Vulkan::DescriptorSets::Destroy(descriptorSet);
   Graphics::Vulkan::DescriptorPool::Destroy(descriptorPool);
   Graphics::Vulkan::DescriptorLayout::Destroy(descriptorLayout);
+
+  Graphics::Vulkan::Buffer::Destroy(buffer);
 
   Graphics::Vulkan::Swapchain::Destroy(swapchain);
   Graphics::Vulkan::Window::Destroy(window);

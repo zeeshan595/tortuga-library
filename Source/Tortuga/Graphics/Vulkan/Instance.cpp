@@ -11,6 +11,8 @@ namespace Instance
 Instance Create(bool enableWindowSupport)
 {
   Instance data = {};
+  data.ShaderCompiler = shaderc_compiler_initialize();
+
   if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
   {
     Console::Fatal("Failed to initialize SDL");
@@ -93,10 +95,9 @@ Instance Create(bool enableWindowSupport)
 void Destroy(Instance data)
 {
   for (uint32_t i = 0; i < data.Devices.size(); i++)
-  {
     Device::Destroy(data.Devices[i]);
-  }
   vkDestroyInstance(data.Instance, nullptr);
+  shaderc_compiler_release(data.ShaderCompiler);
   SDL_Quit();
 }
 } // namespace Instance

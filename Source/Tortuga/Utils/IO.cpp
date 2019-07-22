@@ -11,8 +11,7 @@ std::vector<char> GetFileContents(std::string filePath)
   std::ifstream file(filePath, std::ios::ate | std::ios::binary);
   if (!file.is_open())
   {
-    Console::Error("Failed to open file: {0}", Console::Arguments()
-                                                   << filePath);
+    Console::Warning("Failed to open file: {0}", Console::Arguments() << filePath);
     return {};
   }
 
@@ -23,6 +22,20 @@ std::vector<char> GetFileContents(std::string filePath)
   file.close();
 
   return buffer;
+}
+void SetFileContents(std::string filePath, std::vector<char> data)
+{
+  SetFileContents(filePath, data.data(), data.size());
+}
+void SetFileContents(std::string filePath, const char *data, uint32_t size)
+{
+  std::ofstream file(filePath, std::ios::ate | std::ios::binary);
+  if (!file.is_open())
+  {
+    Console::Warning("Failed to open file: {0}", Console::Arguments() << filePath);
+  }
+  file.write(data, size);
+  file.close();
 }
 } // namespace IO
 } // namespace Utils

@@ -5,6 +5,7 @@
 #include <SDL2/SDL_vulkan.h>
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <shaderc/shaderc.h>
 
 #include "./ErrorCheck.hpp"
 #include "./Device.hpp"
@@ -21,6 +22,7 @@ struct Instance
 {
   VkInstance Instance = VK_NULL_HANDLE;
   std::vector<Device::Device> Devices;
+  shaderc_compiler_t ShaderCompiler;
 };
 
 Instance Create(bool enableWindowSupport = true);
