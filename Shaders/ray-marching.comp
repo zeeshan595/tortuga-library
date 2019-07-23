@@ -1,38 +1,21 @@
-#version 450
+#version 460
 /*
 in uvec3 gl_NumWorkGroups;
 in uvec3 gl_WorkGroupID;
 in uvec3 gl_LocalInvocationID;
 in uvec3 gl_GlobalInvocationID;
 in uint  gl_LocalInvocationIndex;
-#define MAX_STEPS 100
-#define MAX_DIST 100.
-#define SURF_DIST .01
-
-layout(local_size_x_id = 0) in;               
-layout(local_size_y_id = 1) in;
-layout(local_size_z_id = 2) in;
-
-struct Pixel {
-  float r;
-  float g;
-  float b;
-  float a;
-};
-layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
-outputBuffer;
 */
+layout(local_size_x = 16) in;
+layout(local_size_y = 16) in;
+layout(local_size_z = 1) in;
 
-layout(set = 0, binding = 0) buffer BufferObj{
-  uint test;
-} test;
+layout(set = 0, binding = 0) buffer RenderedImage {
+  vec3[] pixels;
+} render;
 
 void main() {
-  test.test = 1;
-  /*
-  Pixels[gl_LocalInvocationIndex].r = 1.;
-  Pixels[gl_LocalInvocationIndex].b = 1.;
-  Pixels[gl_LocalInvocationIndex].g = 1.;
-  Pixels[gl_LocalInvocationIndex].a = 1.;
-  */
+  render.pixels[gl_LocalInvocationIndex].r = 1.;
+  render.pixels[gl_LocalInvocationIndex].g = 1.;
+  render.pixels[gl_LocalInvocationIndex].b = 1.;
 }

@@ -22,7 +22,7 @@ struct DescriptorPool
   uint32_t DescriptorSetCounts;
 };
 
-DescriptorPool Create(Device::Device device, DescriptorLayout::DescriptorLayout layout);
+DescriptorPool Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, uint32_t descriptorSetsCount = 1);
 void Destroy(DescriptorPool data);
 } // namespace DescriptorPool
 } // namespace Vulkan

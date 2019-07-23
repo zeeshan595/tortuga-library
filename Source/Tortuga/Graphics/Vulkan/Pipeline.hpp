@@ -27,8 +27,9 @@ struct Pipeline
 
 Pipeline CreateComputePipeline(
     Device::Device device,
-    std::vector<DescriptorLayout::DescriptorLayout> layouts,
-    Shader::Shader shader, std::vector<char> cache = {});
+    Shader::Shader shader,
+    std::vector<char> cache = {},
+    std::vector<DescriptorLayout::DescriptorLayout> layouts = {});
 void DestroyPipeline(Pipeline data);
 std::vector<char> GetCacheData(Pipeline data);
 } // namespace Pipeline

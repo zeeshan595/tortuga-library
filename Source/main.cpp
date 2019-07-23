@@ -1,6 +1,16 @@
 #include "./Tortuga.hpp"
 #include <shaderc/shaderc.h>
 
+struct Pixel
+{
+  float r;
+  float g;
+  float b;
+};
+
+const uint32_t WINDOW_WIDTH = 1024;
+const uint32_t WINDOW_HEIGHT = 768;
+
 using namespace Tortuga;
 
 int main()
@@ -11,7 +21,7 @@ int main()
     Console::Info("{0}: {1}: {2}", Console::Arguments() << i << vulkan.Devices[i].Score << vulkan.Devices[i].Properties.deviceName);
 
   auto device = vulkan.Devices[0];
-  auto window = Graphics::Vulkan::Window::Create(vulkan, "Hello World", 1024, 768);
+  auto window = Graphics::Vulkan::Window::Create(vulkan, "Hello World", WINDOW_WIDTH, WINDOW_HEIGHT);
   auto swapchain = Graphics::Vulkan::Swapchain::Create(device, window);
 
   //Descriptors
@@ -24,33 +34,33 @@ int main()
   }
   auto descriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, bindings);
   auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayout);
-  auto descriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, descriptorLayout, descriptorPool);
+  auto descriptorSets = Graphics::Vulkan::DescriptorSets::Create(device, descriptorPool, {descriptorLayout});
 
   //Pipeline
   auto shaderCode = Utils::IO::GetFileContents("Shaders/ray-marching.comp");
   auto compiledShader = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::COMPUTE, shaderCode);
   auto shader = Graphics::Vulkan::Shader::Create(device, compiledShader);
   auto pipelineCache = Utils::IO::GetFileContents("Shaders/ray-marching.comp.cache");
-  auto pipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, {descriptorLayout}, shader, pipelineCache);
+  auto pipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, shader, pipelineCache, {descriptorLayout});
   auto newPipelineCache = Graphics::Vulkan::Pipeline::GetCacheData(pipeline);
   if (pipelineCache != newPipelineCache)
     Utils::IO::SetFileContents("Shaders/ray-marching.comp.cache", newPipelineCache);
 
-  uint32_t temp;
-  auto buffer = Graphics::Vulkan::Buffer::Create(device, sizeof(temp), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 0, {buffer});
+  uint32_t renderImageSize = sizeof(Pixel) * WINDOW_WIDTH * WINDOW_HEIGHT;
+  auto buffer = Graphics::Vulkan::Buffer::Create(device, renderImageSize, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSets, 0, {buffer});
 
   auto commandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Compute.Index);
   auto command = Graphics::Vulkan::Command::Create(device, commandPool, Graphics::Vulkan::Command::PRIMARY);
 
   Graphics::Vulkan::Command::Begin(command, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-  Graphics::Vulkan::Command::BindPipeline(command, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline, {descriptorSet});
-  Graphics::Vulkan::Command::Compute(command, 1, 1, 1);
+  Graphics::Vulkan::Command::BindPipeline(command, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline, {descriptorSets});
+  Graphics::Vulkan::Command::Compute(command, WINDOW_WIDTH / 16, WINDOW_HEIGHT / 16, 1);
   Graphics::Vulkan::Command::End(command);
   Graphics::Vulkan::Command::Submit({command}, device.Queues.Compute[0]);
   vkQueueWaitIdle(device.Queues.Compute[0]);
-  Graphics::Vulkan::Buffer::GetData(buffer, &temp, sizeof(temp));
-  Console::Info("{0}", temp);
+  std::vector<Pixel> render(renderImageSize);
+  Graphics::Vulkan::Buffer::GetData(buffer, render.data(), renderImageSize);
 
   while (!window.SignalClose)
   {

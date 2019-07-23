@@ -8,20 +8,29 @@ namespace Vulkan
 {
 namespace DescriptorSets
 {
-DescriptorSets Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, DescriptorPool::DescriptorPool pool)
+DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool, std::vector<DescriptorLayout::DescriptorLayout> layouts)
 {
   DescriptorSets data = {};
   data.Device = device.Device;
   data.Pool = pool.Pool;
   data.DescriptorSetCount = pool.DescriptorSetCounts;
-  data.PoolSizes = layout.PoolSizes;
+  data.Layouts = layouts;
+
+  if (layouts.size() != pool.DescriptorSetCounts) {
+    Console::Error("You must provide a layout for each descriptor set");
+    return data;
+  }
+
+  std::vector<VkDescriptorSetLayout> descriptorSetsLayouts(layouts.size());
+  for (uint32_t i = 0; i < descriptorSetsLayouts.size(); i++)
+    descriptorSetsLayouts[i] = layouts[i].Layouts;
 
   VkDescriptorSetAllocateInfo info = {};
   {
     info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     info.descriptorPool = pool.Pool,
-    info.descriptorSetCount = pool.DescriptorSetCounts;
-    info.pSetLayouts = &layout.Layouts;
+    info.descriptorSetCount = descriptorSetsLayouts.size();
+    info.pSetLayouts = descriptorSetsLayouts.data();
   }
   ErrorCheck::Callback(vkAllocateDescriptorSets(device.Device, &info, &data.set));
   return data;
@@ -33,15 +42,15 @@ void Destroy(DescriptorSets data)
 
 void UpdateDescriptorSet(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content)
 {
-  if (data.PoolSizes.size() != content.size())
+  if (data.Layouts[descriptorSetIndex].PoolSizes.size() != content.size())
   {
     Console::Error("Provided Content does not match this descriptor set size");
     return;
   }
 
   std::vector<VkDescriptorBufferInfo> bufferInfos(content.size());
-  std::vector<VkWriteDescriptorSet> writeInfos(data.PoolSizes.size());
-  for (uint32_t i = 0; i < data.PoolSizes.size(); i++)
+  std::vector<VkWriteDescriptorSet> writeInfos(data.Layouts[descriptorSetIndex].PoolSizes.size());
+  for (uint32_t i = 0; i < data.Layouts[descriptorSetIndex].PoolSizes.size(); i++)
   {
     {
       bufferInfos[i] = {};
@@ -55,7 +64,7 @@ void UpdateDescriptorSet(DescriptorSets data, uint32_t descriptorSetIndex, std::
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = descriptorSetIndex;
     writeInfos[i].descriptorCount = data.DescriptorSetCount;
-    writeInfos[i].descriptorType = data.PoolSizes[i].type;
+    writeInfos[i].descriptorType = data.Layouts[descriptorSetIndex].PoolSizes[i].type;
 
     writeInfos[i].pBufferInfo = &bufferInfos[i];
     writeInfos[i].pImageInfo = VK_NULL_HANDLE;
