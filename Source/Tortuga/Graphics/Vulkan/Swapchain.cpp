@@ -93,6 +93,7 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
   VkSwapchainCreateInfoKHR swapchainInfo = {};
   {
     swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     swapchainInfo.surface = window.Surface;
     swapchainInfo.minImageCount = data.ImageCount;
     swapchainInfo.imageFormat = data.SurfaceFormat.format;

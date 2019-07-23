@@ -38,6 +38,9 @@ Instance Create(bool enableWindowSupport)
       Console::Fatal("Failed to get window extensions required for vulkan init");
     }
   }
+  std::vector<const char*> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
+  extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+  extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
   VkApplicationInfo appInfo = {};
   {
@@ -53,8 +56,8 @@ Instance Create(bool enableWindowSupport)
   {
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledLayerCount = 0;
-    createInfo.ppEnabledLayerNames = nullptr;
+    createInfo.enabledLayerCount = validationLayers.size();
+    createInfo.ppEnabledLayerNames = validationLayers.data();
     createInfo.enabledExtensionCount = extensions.size();
     createInfo.ppEnabledExtensionNames = extensions.data();
   }
@@ -94,8 +97,10 @@ Instance Create(bool enableWindowSupport)
 }
 void Destroy(Instance data)
 {
+
   for (uint32_t i = 0; i < data.Devices.size(); i++)
     Device::Destroy(data.Devices[i]);
+
   vkDestroyInstance(data.Instance, nullptr);
   shaderc_compiler_release(data.ShaderCompiler);
   SDL_Quit();

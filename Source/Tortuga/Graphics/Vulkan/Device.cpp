@@ -10,7 +10,28 @@ namespace Device
 {
 std::vector<DeviceQueueFamilyIndex> DeviceQueueFamilies::GetIndices(DeviceQueueFamilies queueFamilies)
 {
-  return {queueFamilies.Compute, queueFamilies.Graphics, queueFamilies.Transfer};
+  std::vector<DeviceQueueFamilyIndex> data;
+
+  std::vector<DeviceQueueFamilyIndex> families = {queueFamilies.Compute, queueFamilies.Graphics, queueFamilies.Transfer};
+  for (uint32_t i = 0; i < families.size(); i++)
+  {
+    bool duplicate = false;
+    for (uint32_t j = 0; j < data.size(); j++)
+    {
+      if (families[i].Index == data[j].Index)
+      {
+        duplicate = true;
+        break;
+      }
+    }
+    if (!duplicate)
+      data.push_back(families[i]);
+  }
+
+  if (data.size() == 0)
+    data.push_back(queueFamilies.Compute);
+
+  return data;
 }
 
 float GetDeviceScore(VkPhysicalDeviceProperties properties, VkPhysicalDeviceFeatures features)
@@ -128,7 +149,7 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
   }
 
   //Device extensions required
-  const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+  std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
   if (!IsExtensionsSupported(physicalDevice, deviceExtensions))
   {
     Console::Warning("Device does not support required extensions: {0}", data.Properties.deviceName);
@@ -137,17 +158,22 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
 
   data.QueueFamilies = FindDeviceQueueIndices(physicalDevice, surface);
 
-  float queuePriority = 1.0f;
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
   auto familyIndices = DeviceQueueFamilies::GetIndices(data.QueueFamilies);
+  std::vector<std::vector<float>> queuePriorities(familyIndices.size());
   for (uint32_t i = 0; i < familyIndices.size(); i++)
   {
+    std::vector<float> queuePriority(familyIndices[i].Count);
+    for (uint32_t j = 0; queuePriorities[i].size(); j++)
+      queuePriority[j] = 1.0f / (float)queuePriority.size();
+    queuePriorities[i] = queuePriority;
+
     VkDeviceQueueCreateInfo queueInfo = {};
     {
       queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
       queueInfo.queueFamilyIndex = familyIndices[i].Index;
       queueInfo.queueCount = familyIndices[i].Count;
-      queueInfo.pQueuePriorities = &queuePriority;
+      queueInfo.pQueuePriorities = queuePriorities[i].data();
     }
     queueCreateInfos.push_back(queueInfo);
   }
@@ -179,14 +205,24 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
   for (uint32_t i = 0; i < data.QueueFamilies.Graphics.Count; i++)
   {
     VkQueue queue;
-    vkGetDeviceQueue(data.Device, data.QueueFamilies.Graphics.Index, i, &queue);
+    if (data.QueueFamilies.Graphics.Index == data.QueueFamilies.Compute.Index)
+      queue = data.Queues.Compute[i];
+    else
+      vkGetDeviceQueue(data.Device, data.QueueFamilies.Graphics.Index, i, &queue);
+    
     data.Queues.Graphics.push_back(queue);
   }
 
   for (uint32_t i = 0; i < data.QueueFamilies.Transfer.Count; i++)
   {
     VkQueue queue;
-    vkGetDeviceQueue(data.Device, data.QueueFamilies.Transfer.Index, i, &queue);
+    if (data.QueueFamilies.Transfer.Index == data.QueueFamilies.Compute.Index)
+      queue = data.Queues.Compute[i];
+    else if (data.QueueFamilies.Transfer.Index == data.QueueFamilies.Graphics.Index)
+      queue = data.Queues.Graphics[i];
+    else
+      vkGetDeviceQueue(data.Device, data.QueueFamilies.Transfer.Index, i, &queue);
+
     data.Queues.Transfer.push_back(queue);
   }
 

@@ -23,6 +23,8 @@ struct Instance
   VkInstance Instance = VK_NULL_HANDLE;
   std::vector<Device::Device> Devices;
   shaderc_compiler_t ShaderCompiler;
+  VkDebugUtilsMessengerEXT DebugUtilsMessenger = VK_NULL_HANDLE;
+  VkDebugReportCallbackEXT DebugCallbackReport = VK_NULL_HANDLE;
 };
 
 Instance Create(bool enableWindowSupport = true);

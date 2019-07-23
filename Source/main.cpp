@@ -3,18 +3,6 @@
 
 using namespace Tortuga;
 
-struct Pixel
-{
-  float r;
-  float g;
-  float b;
-};
-
-struct Image
-{
-  Pixel Pixels[8];
-};
-
 int main()
 {
   auto vulkan = Graphics::Vulkan::Instance::Create();
@@ -26,23 +14,19 @@ int main()
   auto window = Graphics::Vulkan::Window::Create(vulkan, "Hello World", 1024, 768);
   auto swapchain = Graphics::Vulkan::Swapchain::Create(device, window);
 
-  auto buffer = Graphics::Vulkan::Buffer::Create(device, sizeof(Image), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
   //Descriptors
-  std::vector<Graphics::Vulkan::DescriptorLayout::Binding> bindings(2);
+  std::vector<Graphics::Vulkan::DescriptorLayout::Binding> bindings(1);
   {
     bindings[0] = {};
     bindings[0].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     bindings[0].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
     bindings[0].DescriptorCount = 1;
-
   }
   auto descriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, bindings);
   auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayout);
   auto descriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, descriptorLayout, descriptorPool);
 
-  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 0, {buffer});
-  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 1, {buffer});
+  //Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 0, {});
 
   //Pipeline
   auto shaderCode = Utils::IO::GetFileContents("Shaders/ray-marching.comp");
@@ -64,11 +48,8 @@ int main()
   Graphics::Vulkan::Shader::Destroy(shader);
 
   //Descriptors
-  Graphics::Vulkan::DescriptorSets::Destroy(descriptorSet);
   Graphics::Vulkan::DescriptorPool::Destroy(descriptorPool);
   Graphics::Vulkan::DescriptorLayout::Destroy(descriptorLayout);
-
-  Graphics::Vulkan::Buffer::Destroy(buffer);
 
   Graphics::Vulkan::Swapchain::Destroy(swapchain);
   Graphics::Vulkan::Window::Destroy(window);

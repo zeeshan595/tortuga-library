@@ -16,6 +16,35 @@ std::vector<VkDescriptorSetLayout> GetVulkanDescriptorLayouts(std::vector<Descri
   return setLayouts;
 }
 
+VkSpecializationInfo GetShaderSpecialization()
+{
+  VkSpecializationInfo data = {};
+  std::vector<VkSpecializationMapEntry> entries(3);
+  {
+    entries[0] = {};
+    entries[0].constantID = 13;
+    entries[0].offset = 0 * sizeof(uint32_t);
+    entries[0].size = sizeof(uint32_t);
+
+    entries[1] = {};
+    entries[1].constantID = 1;
+    entries[1].offset = 1 * sizeof(uint32_t);
+    entries[1].size = sizeof(uint32_t);
+
+    entries[2] = {};
+    entries[2].constantID = 2;
+    entries[2].offset = 2 * sizeof(uint32_t);
+    entries[2].size = sizeof(uint32_t);
+  };
+  std::vector<uint32_t> pData = {256, 1, 1};
+  
+  data.mapEntryCount = entries.size();
+  data.pMapEntries = entries.data();
+  data.dataSize = pData.size() * sizeof(uint32_t);
+  data.pData = pData.data();
+  return data;
+}
+
 Pipeline CreateComputePipeline(
     Device::Device device,
     std::vector<DescriptorLayout::DescriptorLayout> layouts,
@@ -42,6 +71,7 @@ Pipeline CreateComputePipeline(
   }
   ErrorCheck::Callback(vkCreatePipelineCache(device.Device, &cacheInfo, nullptr, &data.Cache));
 
+  VkSpecializationInfo specializationInfo = GetShaderSpecialization();
   VkComputePipelineCreateInfo pipelineInfo = {};
   {
     pipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
@@ -51,6 +81,7 @@ Pipeline CreateComputePipeline(
       pipelineInfo.stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
       pipelineInfo.stage.module = shader.Shader;
       pipelineInfo.stage.pName = "main";
+      pipelineInfo.stage.pSpecializationInfo = VK_NULL_HANDLE;//&specializationInfo;
     }
     pipelineInfo.layout = data.Layout;
     pipelineInfo.basePipelineIndex = 0;
