@@ -113,11 +113,49 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
   data.Images.resize(data.ImageCount);
   ErrorCheck::Callback(vkGetSwapchainImagesKHR(device.Device, data.Swapchain, &data.ImageCount, data.Images.data()));
 
+  VkFenceCreateInfo fenceInfo = {};
+  {
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+  }
+  ErrorCheck::Callback(vkCreateFence(data.Device, &fenceInfo, nullptr, &data.Fence));
+
   return data;
 }
 void Destroy(Swapchain data)
 {
   vkDestroySwapchainKHR(data.Device, data.Swapchain, nullptr);
+}
+uint32_t AquireNextImage(Swapchain &data)
+{
+  vkResetFences(data.Device, 1, &data.Fence);
+  uint32_t imageIndex;
+  ErrorCheck::Callback(vkAcquireNextImageKHR(data.Device, data.Swapchain, std::numeric_limits<uint64_t>::max(), VK_NULL_HANDLE, data.Fence, &imageIndex));
+  ErrorCheck::Callback(vkWaitForFences(data.Device, 1, &data.Fence, VK_TRUE, std::numeric_limits<uint64_t>::max()));
+  return imageIndex;
+}
+Image::Image GetImage(Swapchain data, uint32_t index)
+{
+  Image::Image image = {};
+  image.Device = data.Device;
+  image.Width = data.Extent.width;
+  image.Height = data.Extent.height;
+  image.Image = data.Images[index];
+  image.Memory = VK_NULL_HANDLE;
+  return image;
+}
+void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue)
+{
+  std::vector<VkSwapchainKHR> swapChains = {data.Swapchain};
+  auto presentInfo = VkPresentInfoKHR();
+  {
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 0;
+    presentInfo.pWaitSemaphores = VK_NULL_HANDLE;
+    presentInfo.swapchainCount = swapChains.size();
+    presentInfo.pSwapchains = swapChains.data();
+    presentInfo.pImageIndices = &imageIndex;
+  }
+  ErrorCheck::Callback(vkQueuePresentKHR(Queue, &presentInfo));
 }
 } // namespace Swapchain
 } // namespace Vulkan

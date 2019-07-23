@@ -23,7 +23,7 @@ struct Buffer
   uint32_t Size;
 };
 
-Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties);
+Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties, VkBufferUsageFlags usageFlags);
 void Destroy(Buffer data);
 
 template <typename T>

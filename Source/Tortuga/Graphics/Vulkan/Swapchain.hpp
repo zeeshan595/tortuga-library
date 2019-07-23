@@ -5,6 +5,7 @@
 
 #include "./Device.hpp"
 #include "./Window.hpp"
+#include "./Image.hpp"
 
 namespace Tortuga
 {
@@ -30,10 +31,14 @@ struct Swapchain
   VkExtent2D Extent;
   uint32_t ImageCount;
   std::vector<VkImage> Images;
+  VkFence Fence;
 };
 
 Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR oldSwapchain = VK_NULL_HANDLE);
 void Destroy(Swapchain data);
+uint32_t AquireNextImage(Swapchain &data);
+Image::Image GetImage(Swapchain data, uint32_t index);
+void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue);
 
 SwapChainSupportDetails GetSupportDetails(Device::Device device, Window::Window window);
 VkSurfaceFormatKHR ChooseSurfaceFormat(std::vector<VkSurfaceFormatKHR> formats);

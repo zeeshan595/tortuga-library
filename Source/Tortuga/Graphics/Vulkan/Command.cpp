@@ -68,6 +68,22 @@ void End(Command data)
 {
   ErrorCheck::Callback(vkEndCommandBuffer(data.Command));
 }
+void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination)
+{
+  if (source.Size > destination.Size)
+  {
+    Console::Warning("Failed to copy buffer because source is larger than the destination");
+    return;
+  }
+
+  VkBufferCopy bufferCopy = {};
+  {
+    bufferCopy.srcOffset = 0;
+    bufferCopy.dstOffset = 0;
+    bufferCopy.size = source.Size;
+  }
+  vkCmdCopyBuffer(data.Command, source.Buffer, destination.Buffer, 1, &bufferCopy);
+}
 void BindPipeline(Command data,VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets)
 {
   std::vector<VkDescriptorSet> vulkanDescriptorSets(descriptorSets.size()); 
@@ -122,7 +138,6 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
     barrier.srcAccessMask = 0;
     barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
   }
-
   vkCmdPipelineBarrier(data.Command, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 }
 void BufferToImage(Command data, Buffer::Buffer buffer, Image::Image image, glm::vec2 offset, glm::vec2 size)

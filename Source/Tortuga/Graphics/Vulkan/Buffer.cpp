@@ -8,7 +8,7 @@ namespace Vulkan
 {
 namespace Buffer
 {
-Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties)
+Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties, VkBufferUsageFlags usageFlags)
 {
   Buffer data = {};
   data.Device = device.Device;
@@ -18,7 +18,7 @@ Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags 
   {
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = bufferSize;
-    bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    bufferInfo.usage = usageFlags;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
   }
   ErrorCheck::Callback(vkCreateBuffer(device.Device, &bufferInfo, nullptr, &data.Buffer));
