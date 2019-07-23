@@ -23,7 +23,12 @@ layout(set = 0, binding = 1) buffer OutputBuffer { Pixel[] Pixels; }
 outputBuffer;
 */
 
+layout(set = 0, binding = 0) buffer BufferObj{
+  uint test;
+} test;
+
 void main() {
+  test.test = 1;
   /*
   Pixels[gl_LocalInvocationIndex].r = 1.;
   Pixels[gl_LocalInvocationIndex].b = 1.;

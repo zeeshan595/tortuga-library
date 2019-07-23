@@ -26,8 +26,6 @@ int main()
   auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayout);
   auto descriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, descriptorLayout, descriptorPool);
 
-  //Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 0, {});
-
   //Pipeline
   auto shaderCode = Utils::IO::GetFileContents("Shaders/ray-marching.comp");
   auto compiledShader = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::COMPUTE, shaderCode);
@@ -38,10 +36,29 @@ int main()
   if (pipelineCache != newPipelineCache)
     Utils::IO::SetFileContents("Shaders/ray-marching.comp.cache", newPipelineCache);
 
+  uint32_t temp;
+  auto buffer = Graphics::Vulkan::Buffer::Create(device, sizeof(temp), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSet(descriptorSet, 0, {buffer});
+
+  auto commandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Compute.Index);
+  auto command = Graphics::Vulkan::Command::Create(device, commandPool, Graphics::Vulkan::Command::PRIMARY);
+
+  Graphics::Vulkan::Command::Begin(command, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+  Graphics::Vulkan::Command::BindPipeline(command, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline, {descriptorSet});
+  Graphics::Vulkan::Command::Compute(command, 1, 1, 1);
+  Graphics::Vulkan::Command::End(command);
+  Graphics::Vulkan::Command::Submit({command}, device.Queues.Compute[0]);
+  vkQueueWaitIdle(device.Queues.Compute[0]);
+  Graphics::Vulkan::Buffer::GetData(buffer, &temp, sizeof(temp));
+  Console::Info("{0}", temp);
+
   while (!window.SignalClose)
   {
     Graphics::Vulkan::Window::PollEvents(window);
   }
+  vkQueueWaitIdle(device.Queues.Compute[0]);
+  Graphics::Vulkan::CommandPool::Destroy(commandPool);
+  Graphics::Vulkan::Buffer::Destroy(buffer);
 
   //Pipeline
   Graphics::Vulkan::Pipeline::DestroyPipeline(pipeline);

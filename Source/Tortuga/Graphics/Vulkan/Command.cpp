@@ -68,6 +68,16 @@ void End(Command data)
 {
   ErrorCheck::Callback(vkEndCommandBuffer(data.Command));
 }
+void BindPipeline(Command data,VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets)
+{
+  std::vector<VkDescriptorSet> vulkanDescriptorSets(descriptorSets.size()); 
+  for (uint32_t i = 0; i < vulkanDescriptorSets.size(); i++) {
+    vulkanDescriptorSets[i] = descriptorSets[i].set;
+  }
+
+  vkCmdBindPipeline(data.Command, BindPoint, pipeline.Pipeline);
+  vkCmdBindDescriptorSets(data.Command, BindPoint, pipeline.Layout, 0, vulkanDescriptorSets.size(), vulkanDescriptorSets.data(), 0, VK_NULL_HANDLE);
+}
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {
   vkCmdDispatch(data.Command, x, y, z);

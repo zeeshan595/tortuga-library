@@ -6,7 +6,9 @@
 
 #include "./ErrorCheck.hpp"
 #include "./Device.hpp"
+#include "./Pipeline.hpp"
 #include "./CommandPool.hpp"
+#include "./DescriptorSets.hpp"
 #include "./Buffer.hpp"
 #include "./Image.hpp"
 
@@ -34,6 +36,7 @@ std::vector<Command> Create(Device::Device device, CommandPool::CommandPool pool
 
 void Begin(Command data, VkCommandBufferUsageFlags usage);
 void End(Command data);
+void BindPipeline(Command data,VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets = {});
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z);
 void Submit(std::vector<Command> data, VkQueue queue);
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout);
