@@ -43,7 +43,7 @@ void Submit(std::vector<Command> data, VkQueue queue);
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout);
 void BufferToImage(Command data, Buffer::Buffer buffer, Image::Image image, glm::vec2 offset, glm::vec2 size);
 void CopyImage(Command data, Image::Image source, Image::Image destination);
-void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec2 size, glm::vec3 destinationOffset, glm::vec2 sourceOffset);
+void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec2 size, glm::vec2 destinationOffset, glm::vec2 sourceOffset);
 
 } // namespace Command
 } // namespace Vulkan

@@ -185,7 +185,7 @@ void CopyImage(Command data, Image::Image source, Image::Image destination)
   }
   vkCmdCopyImage(data.Command, source.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
 }
-void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec2 size, glm::vec3 destinationOffset, glm::vec2 sourceOffset)
+void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec2 size, glm::vec2 destinationOffset, glm::vec2 sourceOffset)
 {
   auto subResource = VkImageSubresourceLayers();
   {

@@ -31,9 +31,11 @@ struct Renderer
     Vulkan::DescriptorSets::DescriptorSets DescriptorSet;
     Vulkan::Shader::Shader Shader;
     Vulkan::Pipeline::Pipeline Pipeline;
-    Vulkan::Buffer::Buffer StagingBuffer;
     Vulkan::Buffer::Buffer Buffer;
-    RenderImage::RenderImage Image;
+    Vulkan::Image::Image Image;
+    uint32_t Width;
+    uint32_t Height;
+    uint32_t ImageSizeBytes;
 };
 
 Renderer Create(Vulkan::Instance::Instance vulkan, Vulkan::Device::Device device, uint32_t renderWidth, uint32_t renderHeight, std::vector<Vulkan::DescriptorLayout::DescriptorLayout> layouts = {});

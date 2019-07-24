@@ -123,9 +123,10 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
 }
 void Destroy(Swapchain data)
 {
+  vkDestroyFence(data.Device, data.Fence, nullptr);
   vkDestroySwapchainKHR(data.Device, data.Swapchain, nullptr);
 }
-uint32_t AquireNextImage(Swapchain &data)
+uint32_t AquireNextImage(Swapchain data)
 {
   vkResetFences(data.Device, 1, &data.Fence);
   uint32_t imageIndex;

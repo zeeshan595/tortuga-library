@@ -36,7 +36,7 @@ struct Swapchain
 
 Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR oldSwapchain = VK_NULL_HANDLE);
 void Destroy(Swapchain data);
-uint32_t AquireNextImage(Swapchain &data);
+uint32_t AquireNextImage(Swapchain data);
 Image::Image GetImage(Swapchain data, uint32_t index);
 void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue);
 
