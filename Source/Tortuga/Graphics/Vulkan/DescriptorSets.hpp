@@ -28,7 +28,7 @@ struct DescriptorSets
 
 DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool, std::vector<DescriptorLayout::DescriptorLayout> layouts);
 void Destroy(DescriptorSets data);
-void UpdateDescriptorSet(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content);
+void UpdateDescriptorSets(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content);
 } // namespace DescriptorSet
 } // namespace Vulkan
 } // namespace Graphics

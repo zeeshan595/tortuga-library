@@ -53,7 +53,8 @@ bool IsExtensionsSupported(VkPhysicalDevice physicalDevice, std::vector<const ch
 Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
 void Destroy(Device data);
 uint32_t FindMemoryType(Device device, uint32_t typeFilter, VkMemoryPropertyFlags properties);
-
+void WaitForQueue(VkQueue queue);
+void WaitForDevice(Device data);
 } // namespace Device
 } // namespace Vulkan
 } // namespace Graphics

@@ -40,8 +40,8 @@ struct Renderer
 
 Renderer Create(Vulkan::Instance::Instance vulkan, Vulkan::Device::Device device, uint32_t renderWidth, uint32_t renderHeight, std::vector<Vulkan::DescriptorLayout::DescriptorLayout> layouts = {});
 void Destroy(Renderer data);
-void Render(Renderer &data);
-void BindDescriptorSets(Renderer &data, std::vector<Vulkan::DescriptorSets::DescriptorSets> descriptorSets = {});
+void Render(Renderer data);
+void BindDescriptorSets(Renderer data, std::vector<Vulkan::DescriptorSets::DescriptorSets> descriptorSets = {});
 } // namespace Renderer
 } // namespace Graphics
 } // namespace Tortuga

@@ -40,7 +40,7 @@ void Destroy(DescriptorSets data)
   ErrorCheck::Callback(vkFreeDescriptorSets(data.Device, data.Pool, data.DescriptorSetCount, &data.set));
 }
 
-void UpdateDescriptorSet(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content)
+void UpdateDescriptorSets(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content)
 {
   if (data.Layouts[descriptorSetIndex].PoolSizes.size() != content.size())
   {

@@ -149,7 +149,7 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
   }
 
   //Device extensions required
-  std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+  std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME};
   if (!IsExtensionsSupported(physicalDevice, deviceExtensions))
   {
     Console::Warning("Device does not support required extensions: {0}", data.Properties.deviceName);
@@ -183,7 +183,7 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
   VkDeviceCreateInfo deviceInfo = {};
   {
     deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceInfo.pNext = nullptr;
+    deviceInfo.pNext = VK_NULL_HANDLE;
     deviceInfo.pEnabledFeatures = &deviceFeatures;
     deviceInfo.queueCreateInfoCount = queueCreateInfos.size();
     deviceInfo.pQueueCreateInfos = queueCreateInfos.data();
@@ -209,7 +209,7 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
       queue = data.Queues.Compute[i];
     else
       vkGetDeviceQueue(data.Device, data.QueueFamilies.Graphics.Index, i, &queue);
-    
+
     data.Queues.Graphics.push_back(queue);
   }
 
@@ -249,6 +249,14 @@ uint32_t FindMemoryType(Device device, uint32_t typeFilter, VkMemoryPropertyFlag
 
   Console::Fatal("Failed to find suitable memory type on device: {0}", device.Properties.deviceName);
   return 0;
+}
+void WaitForQueue(VkQueue queue)
+{
+  ErrorCheck::Callback(vkQueueWaitIdle(queue));
+}
+void WaitForDevice(Device data)
+{
+  ErrorCheck::Callback(vkDeviceWaitIdle(data.Device));
 }
 } // namespace Device
 } // namespace Vulkan
