@@ -24,7 +24,6 @@
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
 
 //External Graphics API
-#include "./Tortuga/Graphics/RenderImage.hpp"
 #include "./Tortuga/Graphics/Renderer.hpp"
 
 #endif

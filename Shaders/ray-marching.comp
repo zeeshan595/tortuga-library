@@ -7,15 +7,31 @@ in uvec3 gl_GlobalInvocationID;
 in uint  gl_LocalInvocationIndex;
 */
 
-layout(set = 0, binding = 0) buffer InputData {
-  uint x;
-  uint y;
-} inputData;
+layout(local_size_x = 8) in;
+layout(local_size_y = 8) in;
+layout(local_size_z = 1) in;
 
-layout (set = 0, binding = 1) buffer OutputData {
-  uint z;
-} outputData;
+struct Pixel {
+  float r;
+  float g;
+  float b;
+  float a;
+};
+
+layout(set = 0, binding = 0) buffer RenderData {
+  Pixel pixels[];
+} render;
+
+layout(set = 0, binding = 1) buffer RenderOptions {
+  uint width;
+  uint height;
+} renderInfo;
 
 void main() {
-  outputData.z = inputData.x + inputData.y;
+  uint index = (gl_GlobalInvocationID.y * renderInfo.width) + gl_GlobalInvocationID.x;
+
+  render.pixels[index].r = 1.;
+  render.pixels[index].g = 1.;
+  render.pixels[index].b = 1.;
+  render.pixels[index].a = 1.;
 }

@@ -33,6 +33,8 @@ struct DeviceQueues
   std::vector<VkQueue> Compute;
   std::vector<VkQueue> Graphics;
   std::vector<VkQueue> Transfer;
+  VkQueue Present;
+  uint32_t PresentIndex;
 };
 struct Device
 {

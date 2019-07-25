@@ -13,7 +13,6 @@
 #include "./Vulkan/Buffer.hpp"
 #include "./Vulkan/CommandPool.hpp"
 #include "./Vulkan/Command.hpp"
-#include "./RenderImage.hpp"
 
 namespace Tortuga
 {
@@ -32,6 +31,7 @@ struct Renderer
     Vulkan::Shader::Shader Shader;
     Vulkan::Pipeline::Pipeline Pipeline;
     Vulkan::Buffer::Buffer Buffer;
+    Vulkan::Buffer::Buffer BufferOptions;
     Vulkan::Image::Image Image;
     uint32_t Width;
     uint32_t Height;

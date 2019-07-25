@@ -194,12 +194,19 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
   }
 
   ErrorCheck::Callback(vkCreateDevice(physicalDevice, &deviceInfo, nullptr, &data.Device));
+  bool presentSetup = false;
 
   for (uint32_t i = 0; i < data.QueueFamilies.Compute.Count; i++)
   {
     VkQueue queue;
     vkGetDeviceQueue(data.Device, data.QueueFamilies.Compute.Index, i, &queue);
     data.Queues.Compute.push_back(queue);
+
+    if (!presentSetup && data.QueueFamilies.Compute.CanPresent) {
+      data.Queues.PresentIndex = data.QueueFamilies.Compute.Index;
+      data.Queues.Present = data.Queues.Compute[0];
+      presentSetup = true;
+    }
   }
 
   for (uint32_t i = 0; i < data.QueueFamilies.Graphics.Count; i++)
@@ -211,6 +218,12 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
       vkGetDeviceQueue(data.Device, data.QueueFamilies.Graphics.Index, i, &queue);
 
     data.Queues.Graphics.push_back(queue);
+
+    if (!presentSetup && data.QueueFamilies.Graphics.CanPresent) {
+      data.Queues.PresentIndex = data.QueueFamilies.Graphics.Index;
+      data.Queues.Present = data.Queues.Graphics[0];
+      presentSetup = true;
+    }
   }
 
   for (uint32_t i = 0; i < data.QueueFamilies.Transfer.Count; i++)
@@ -224,6 +237,12 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
       vkGetDeviceQueue(data.Device, data.QueueFamilies.Transfer.Index, i, &queue);
 
     data.Queues.Transfer.push_back(queue);
+
+    if (!presentSetup && data.QueueFamilies.Transfer.CanPresent) {
+      data.Queues.PresentIndex = data.QueueFamilies.Transfer.Index;
+      data.Queues.Present = data.Queues.Transfer[0];
+      presentSetup = true;
+    }
   }
 
   data.CanPresent = data.QueueFamilies.Compute.CanPresent || data.QueueFamilies.Graphics.CanPresent;
