@@ -120,6 +120,34 @@ void BindDescriptorSets(Renderer data, std::vector<Vulkan::DescriptorSets::Descr
     Vulkan::Command::TransferImageLayout(data.Command, data.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
     Vulkan::Command::End(data.Command);
 }
+void RenderThread(
+    Graphics::Vulkan::Device::Device device,
+    Graphics::Renderer::Renderer renderer,
+    Graphics::Vulkan::Swapchain::Swapchain swapchain,
+    Graphics::Vulkan::Command::Command command,
+    std::future<void> cancellation)
+{
+    while (cancellation.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout)
+    {
+        Graphics::Renderer::Render(renderer);
+        const auto swapchainIndex = Graphics::Vulkan::Swapchain::AquireNextImage(swapchain);
+        const auto swapchainImage = Graphics::Vulkan::Swapchain::GetImage(swapchain, swapchainIndex);
+
+        //Record Command
+        {
+            Graphics::Vulkan::Command::Begin(command, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+            Graphics::Vulkan::Command::TransferImageLayout(command, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            Graphics::Vulkan::Command::BlitImage(command, renderer.Image, swapchainImage, {renderer.Width, renderer.Height}, {0, 0}, {0, 0});
+            Graphics::Vulkan::Command::TransferImageLayout(command, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+            Graphics::Vulkan::Command::End(command);
+        }
+
+        //Copy image to swapchain
+        Graphics::Vulkan::Command::Submit({command}, device.Queues.Graphics[0]);
+        Graphics::Vulkan::Device::WaitForQueue(device.Queues.Graphics[0]);
+        Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Present);
+    }
+}
 } // namespace Renderer
 } // namespace Graphics
 } // namespace Tortuga

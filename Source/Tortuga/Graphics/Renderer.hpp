@@ -1,6 +1,8 @@
 #ifndef _RENDERER
 #define _RENDERER
 
+#include <future>
+
 #include "./Vulkan/ErrorCheck.hpp"
 #include "../Utils/IO.hpp"
 #include "./Vulkan/Instance.hpp"
@@ -13,6 +15,7 @@
 #include "./Vulkan/Buffer.hpp"
 #include "./Vulkan/CommandPool.hpp"
 #include "./Vulkan/Command.hpp"
+#include "./Vulkan/Swapchain.hpp"
 
 namespace Tortuga
 {
@@ -42,6 +45,12 @@ Renderer Create(Vulkan::Instance::Instance vulkan, Vulkan::Device::Device device
 void Destroy(Renderer data);
 void Render(Renderer data);
 void BindDescriptorSets(Renderer data, std::vector<Vulkan::DescriptorSets::DescriptorSets> descriptorSets = {});
+void RenderThread(
+    Graphics::Vulkan::Device::Device device,
+    Graphics::Renderer::Renderer renderer,
+    Graphics::Vulkan::Swapchain::Swapchain swapchain,
+    Graphics::Vulkan::Command::Command command,
+    std::future<void> cancellation);
 } // namespace Renderer
 } // namespace Graphics
 } // namespace Tortuga
