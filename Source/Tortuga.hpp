@@ -22,8 +22,7 @@
 #include "./Tortuga/Graphics/Vulkan/DescriptorPool.hpp"
 #include "./Tortuga/Graphics/Vulkan/DescriptorSets.hpp"
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
-
-//External Graphics API
-#include "./Tortuga/Graphics/Renderer.hpp"
+#include "./Tortuga/Graphics/Vulkan/Renderer.hpp"
+#include "./Tortuga/Graphics/Screen.hpp"
 
 #endif

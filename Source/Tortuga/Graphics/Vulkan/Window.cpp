@@ -28,14 +28,11 @@ void Destroy(Window data)
   SDL_DestroyWindow(data.Window);
 }
 
-void PollEvents(Window &window)
+SDL_Event PollEvents(Window window)
 {
   SDL_Event event;
-  if (SDL_PollEvent(&event) > 0)
-  {
-    if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-      window.SignalClose = true;
-  }
+  SDL_PollEvent(&event);
+  return event;
 }
 } // namespace Window
 } // namespace Vulkan
