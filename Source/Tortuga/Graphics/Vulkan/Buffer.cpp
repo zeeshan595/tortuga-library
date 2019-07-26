@@ -8,6 +8,30 @@ namespace Vulkan
 {
 namespace Buffer
 {
+Buffer CreateHost(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+}
+Buffer CreateDeviceOnly(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+}
+Buffer CreateHostSrc(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+}
+Buffer CreateDeviceOnlySrc(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+}
+Buffer CreateHostDest(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+}
+Buffer CreateDeviceOnlyDest(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+}
 Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties, VkBufferUsageFlags usageFlags)
 {
   Buffer data = {};

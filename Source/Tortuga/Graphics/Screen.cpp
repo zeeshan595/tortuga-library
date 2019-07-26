@@ -52,8 +52,8 @@ FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height)
   auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayout);
   auto descriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, descriptorPool, {descriptorLayout});
 
-  auto stagingBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(uint32_t), VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-  auto buffer = Graphics::Vulkan::Buffer::Create(device, sizeof(uint32_t), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+  auto stagingBuffer = Graphics::Vulkan::Buffer::CreateHostSrc(device, sizeof(uint32_t));
+  auto buffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, sizeof(uint32_t));
   Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(descriptorSet, 0, {buffer});
 
   auto renderer = Graphics::Vulkan::Renderer::Create(_renderer.Vulkan, device, width, height, {descriptorLayout});

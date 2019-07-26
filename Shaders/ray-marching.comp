@@ -1,7 +1,5 @@
 #version 450
 #extension GL_GOOGLE_include_directive: enable
-#include "./Partial/RayMarching.comp"
-#include "./Partial/Sphere.comp"
 /*
 in uvec3 gl_NumWorkGroups;
 in uvec3 gl_WorkGroupID;
@@ -14,29 +12,14 @@ layout(local_size_x = LOCAL_INVOCATION) in;
 layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
 
-layout(set = 0, binding = 0) buffer Temp {
-  uint test;
-} test;
+#include "./Partial/Input.comp"
+#include "./Partial/Output.comp"
 
-//OUTPUT
-struct Pixel {
-  float r;
-  float g;
-  float b;
-  float a;
-};
-layout(set = 1, binding = 0) buffer RenderData {
-  Pixel pixels[];
-} render;
-layout(set = 1, binding = 1) buffer RenderOptions {
-  uint offsetX;
-  uint offsetY;
-  uint width;
-  uint height;
-} renderInfo;
+#include "./Partial/RayMarching.comp"
+#include "./Partial/Sphere.comp"
 
 float GetMinDistance(vec3 point) {
-  return SphereDist(vec3(0., 1., 5.), test.test, point);
+  return SphereDist(vec3(0., 1., 5.), 2., point);
 }
 
 void main() {

@@ -1,0 +1,19 @@
+
+#define MAX_VERTICES_LENGTH 65535
+
+struct Vertex {
+  vec3 position;
+  vec3 normal;
+  vec4 color;
+};
+
+struct Mesh {
+  Vertex vertices[MAX_VERTICES_LENGTH];
+  uint indices[MAX_VERTICES_LENGTH];
+  vec3 boundsCenter;
+  vec2 boundsRadius;
+};
+
+layout(set = 0, binding = 0) buffer InputData {
+  uint test;
+} objects;

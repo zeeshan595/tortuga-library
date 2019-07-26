@@ -25,7 +25,7 @@ struct Pixel
 
 void SetupBufferOptions(Device::Device device, Renderer data)
 {
-    const auto bufferOptionsStaging = Buffer::Create(device, sizeof(Options), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+    const auto bufferOptionsStaging = Buffer::CreateHostSrc(device, sizeof(Options));
     const auto commandPool = CommandPool::Create(device, device.QueueFamilies.Transfer.Index);
     const auto command = Command::Create(device, commandPool, Command::PRIMARY);
 
@@ -95,8 +95,8 @@ Renderer Create(
         Utils::IO::SetFileContents("Shaders/ray-marching.comp.cache", newpipelineCache);
 
     data.Image = Image::Create(device, renderWidth, renderHeight);
-    data.Buffer = Buffer::Create(device, data.ImageSizeBytes, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-    data.BufferOptions = Buffer::Create(device, sizeof(Options), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    data.Buffer = Buffer::CreateDeviceOnlySrc(device, data.ImageSizeBytes);
+    data.BufferOptions = Buffer::CreateDeviceOnlyDest(device, sizeof(Options));
     data.CommandPool = CommandPool::Create(device, device.QueueFamilies.Compute.Index);
     data.Command = Command::Create(device, data.CommandPool, Command::PRIMARY);
 
