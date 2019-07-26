@@ -7,6 +7,7 @@
 #include "./ErrorCheck.hpp"
 #include "./Instance.hpp"
 #include "./Device.hpp"
+#include "../../Utils/IO.hpp"
 
 namespace Tortuga
 {

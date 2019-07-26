@@ -1,0 +1,4 @@
+
+float SphereDist(vec3 position, float radius, vec3 point) {
+  return length(point - position) - radius;
+}

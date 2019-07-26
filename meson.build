@@ -35,5 +35,3 @@ exe = executable(
 	'Source/main.cpp',
 	dependencies: [tortuga_dep, thread_dep, vulkan_dep, sdl2_dep, shaderc]
 )
-
-subdir('Shaders')

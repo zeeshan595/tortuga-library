@@ -8,6 +8,8 @@ namespace Renderer
 {
 struct Options
 {
+    uint32_t offsetX;
+    uint32_t offsetY;
     uint32_t width;
     uint32_t height;
 };
@@ -27,6 +29,8 @@ void SetupBufferOptions(Vulkan::Device::Device device, Renderer data)
 
     Options options = {};
     {
+        options.offsetX = 0;
+        options.offsetY = 0;
         options.width = data.Width;
         options.height = data.Height;
     }
@@ -49,6 +53,11 @@ Renderer Create(
     uint32_t renderHeight,
     std::vector<Vulkan::DescriptorLayout::DescriptorLayout> layouts)
 {
+    if (renderWidth % 8 != 0 || renderHeight & 8 != 0) {
+        Console::Error("Failed to create renderer, width and height must be divisible by shader 'LOCAL_INVOCATION'");
+        return {};
+    }
+
     Renderer data = {};
     data.Width = renderWidth;
     data.Height = renderHeight;

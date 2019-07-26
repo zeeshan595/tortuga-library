@@ -32,17 +32,42 @@ std::vector<char> CompileShader(Instance::Instance instance, ShaderType type, st
     Console::Error("Failed to compile shader, this type of shader is not supported");
     return {};
   }
+  auto options = shaderc_compile_options_initialize();
+  shaderc_compile_options_set_include_callbacks(
+      options,
+      [](void *user_data, const char *requested_source, int type, const char *requesting_source, size_t include_depth) {
+        const auto requested = std::string(requested_source);
+        const auto requestedName = requested.substr(requested.find_last_of('/') + 1);
+        const auto contentTemp = Utils::IO::GetFileContents(std::string("Shaders/") + requested);
 
+        uint32_t sourceCountentSize = sizeof(char) * contentTemp.size();
+        const auto sourceContent = malloc(sourceCountentSize);
+        memcpy(sourceContent, contentTemp.data(), sourceCountentSize);
+        shaderc_include_result *result = new shaderc_include_result();
+        {
+          result->content = reinterpret_cast<const char *>(sourceContent);
+          result->content_length = contentTemp.size();
+          result->source_name = requestedName.data();
+          result->source_name_length = requestedName.size();
+          result->user_data = sourceContent;
+        }
+        return result;
+      },
+      [](void *user_data, shaderc_include_result *include_result) {
+        free(include_result->user_data);
+        delete include_result;
+      },
+      nullptr);
   auto result = shaderc_compile_into_spv(
       instance.ShaderCompiler,
       code.data(), code.size(),
       kind,
       filename.c_str(),
-      "main", nullptr);
+      "main", options);
   auto status = shaderc_result_get_compilation_status(result);
   if (status != shaderc_compilation_status_success)
   {
-    Console::Error("failed to compile shader");
+    Console::Error("Failed to compile shader: \n{0}", shaderc_result_get_error_message(result));
     return {};
   }
   auto compiled = shaderc_result_get_bytes(result);

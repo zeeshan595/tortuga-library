@@ -1,4 +1,7 @@
-#version 460
+#version 450
+#extension GL_GOOGLE_include_directive: enable
+#include "./Partial/RayMarching.comp"
+#include "./Partial/Sphere.comp"
 /*
 in uvec3 gl_NumWorkGroups;
 in uvec3 gl_WorkGroupID;
@@ -6,32 +9,48 @@ in uvec3 gl_LocalInvocationID;
 in uvec3 gl_GlobalInvocationID;
 in uint  gl_LocalInvocationIndex;
 */
-
-layout(local_size_x = 8) in;
-layout(local_size_y = 8) in;
+#define LOCAL_INVOCATION 8
+layout(local_size_x = LOCAL_INVOCATION) in;
+layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
 
+layout(set = 0, binding = 0) buffer Temp {
+  uint test;
+} test;
+
+//OUTPUT
 struct Pixel {
   float r;
   float g;
   float b;
   float a;
 };
-
-layout(set = 0, binding = 0) buffer RenderData {
+layout(set = 1, binding = 0) buffer RenderData {
   Pixel pixels[];
 } render;
-
-layout(set = 0, binding = 1) buffer RenderOptions {
+layout(set = 1, binding = 1) buffer RenderOptions {
+  uint offsetX;
+  uint offsetY;
   uint width;
   uint height;
 } renderInfo;
 
+float GetMinDistance(vec3 point) {
+  return SphereDist(vec3(0., 1., 5.), test.test, point);
+}
+
 void main() {
   uint index = (gl_GlobalInvocationID.y * renderInfo.width) + gl_GlobalInvocationID.x;
+  vec2 uv = ((gl_WorkGroupID.xy + vec2(renderInfo.offsetX, renderInfo.offsetY)) - .5 * gl_NumWorkGroups.xy) / gl_NumWorkGroups.y;
+  vec3 rayOrigin = vec3(0, 1, 0);
+  vec3 rayDirection = normalize(vec3(uv, 1.));
 
-  render.pixels[index].r = 1.;
-  render.pixels[index].g = 1.;
-  render.pixels[index].b = 1.;
+  float d = RayMarch(rayOrigin, rayDirection);
+  d /= 5.;
+  vec3 col = vec3(d);
+
+  render.pixels[index].r = d;
+  render.pixels[index].g = d;
+  render.pixels[index].b = d;
   render.pixels[index].a = 1.;
 }
