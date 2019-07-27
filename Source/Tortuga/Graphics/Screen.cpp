@@ -20,7 +20,7 @@ Screen::~Screen()
     window.RenderThread->join();
     delete window.ExitSignal;
     delete window.RenderThread;
-
+    Vulkan::Device::WaitForDevice(window.Device);
     Vulkan::CommandPool::Destroy(window.BufferTransferPool);
     Vulkan::CommandPool::Destroy(window.CommandPool);
     Vulkan::Renderer::Destroy(window.Renderer);
@@ -52,8 +52,8 @@ FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height)
   auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayout);
   auto descriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, descriptorPool, {descriptorLayout});
 
-  auto stagingBuffer = Graphics::Vulkan::Buffer::CreateHostSrc(device, sizeof(uint32_t));
-  auto buffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, sizeof(uint32_t));
+  auto stagingBuffer = Graphics::Vulkan::Buffer::CreateHostSrc(device, MESH_SIZE_IN_BYTES);
+  auto buffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, MESH_SIZE_IN_BYTES);
   Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(descriptorSet, 0, {buffer});
 
   auto renderer = Graphics::Vulkan::Renderer::Create(_renderer.Vulkan, device, width, height, {descriptorLayout});
@@ -87,7 +87,7 @@ void DestroyWindow(FullWindow window)
       window.RenderThread->join();
       delete window.ExitSignal;
       delete window.RenderThread;
-
+      Vulkan::Device::WaitForDevice(window.Device);
       Vulkan::CommandPool::Destroy(window.CommandPool);
       Vulkan::CommandPool::Destroy(window.CommandPool);
       Vulkan::Renderer::Destroy(window.Renderer);
@@ -98,15 +98,15 @@ void DestroyWindow(FullWindow window)
       Vulkan::Swapchain::Destroy(window.Swapchain);
       Vulkan::Window::Destroy(window.Window);
       _renderer.Windows.erase(_renderer.Windows.begin() + i);
-
       break;
     }
   }
 }
-void UpdateRenderData(FullWindow window, uint32_t data)
+void UpdateRenderData(FullWindow window, std::vector<Mesh> data)
 {
-  Vulkan::Buffer::SetData(window.StagingBuffer, &data, sizeof(uint32_t));
+  Vulkan::Buffer::SetData(window.StagingBuffer, data.data(), MESH_SIZE_IN_BYTES);
   Vulkan::Command::Submit({window.BufferTransferCommand}, window.Device.Queues.Transfer[0]);
+  Vulkan::Device::WaitForQueue(window.Device.Queues.Transfer[0]);
 }
 SDL_Event PollEvents(FullWindow window)
 {

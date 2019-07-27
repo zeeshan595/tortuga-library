@@ -1,5 +1,6 @@
 
-#define MAX_VERTICES_LENGTH 65535
+#define MAX_VERTICES_SIZE 65535
+#define MAX_INDICES_SIZE 65535
 
 struct Vertex {
   vec3 position;
@@ -8,12 +9,12 @@ struct Vertex {
 };
 
 struct Mesh {
-  Vertex vertices[MAX_VERTICES_LENGTH];
-  uint indices[MAX_VERTICES_LENGTH];
+  Vertex vertices[MAX_VERTICES_SIZE];
+  uint indices[MAX_INDICES_SIZE];
   vec3 boundsCenter;
   vec2 boundsRadius;
 };
 
 layout(set = 0, binding = 0) buffer InputData {
-  uint test;
-} objects;
+  Mesh meshes[];
+};

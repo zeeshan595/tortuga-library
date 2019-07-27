@@ -24,5 +24,7 @@
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
 #include "./Tortuga/Graphics/Vulkan/Renderer.hpp"
 #include "./Tortuga/Graphics/Screen.hpp"
+#include "./Tortuga/Graphics/Vertex.hpp"
+#include "./Tortuga/Graphics/Mesh.hpp"
 
 #endif

@@ -60,7 +60,6 @@ Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags 
 
   return data;
 }
-
 void Destroy(Buffer data)
 {
   vkDestroyBuffer(data.Device, data.Buffer, nullptr);

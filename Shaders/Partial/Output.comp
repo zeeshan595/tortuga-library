@@ -7,10 +7,10 @@ struct Pixel {
 };
 layout(set = 1, binding = 0) buffer RenderData {
   Pixel pixels[];
-} render;
+};
 layout(set = 1, binding = 1) buffer RenderOptions {
   uint offsetX;
   uint offsetY;
   uint width;
   uint height;
-} renderInfo;
+};

@@ -193,6 +193,12 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
     deviceInfo.ppEnabledExtensionNames = deviceExtensions.data();
   }
 
+  if (data.QueueFamilies.Compute.Count == 0 || data.QueueFamilies.Graphics.Count == 0 || data.QueueFamilies.Transfer.Count == 0)
+  {
+    Console::Warning("Could not create device queues: {0}", data.Properties.deviceName);
+    return data;
+  }
+
   ErrorCheck::Callback(vkCreateDevice(physicalDevice, &deviceInfo, nullptr, &data.Device));
   bool presentSetup = false;
 
@@ -202,7 +208,8 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
     vkGetDeviceQueue(data.Device, data.QueueFamilies.Compute.Index, i, &queue);
     data.Queues.Compute.push_back(queue);
 
-    if (!presentSetup && data.QueueFamilies.Compute.CanPresent) {
+    if (!presentSetup && data.QueueFamilies.Compute.CanPresent)
+    {
       data.Queues.PresentIndex = data.QueueFamilies.Compute.Index;
       data.Queues.Present = data.Queues.Compute[0];
       presentSetup = true;
@@ -219,7 +226,8 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
 
     data.Queues.Graphics.push_back(queue);
 
-    if (!presentSetup && data.QueueFamilies.Graphics.CanPresent) {
+    if (!presentSetup && data.QueueFamilies.Graphics.CanPresent)
+    {
       data.Queues.PresentIndex = data.QueueFamilies.Graphics.Index;
       data.Queues.Present = data.Queues.Graphics[0];
       presentSetup = true;
@@ -238,7 +246,8 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
 
     data.Queues.Transfer.push_back(queue);
 
-    if (!presentSetup && data.QueueFamilies.Transfer.CanPresent) {
+    if (!presentSetup && data.QueueFamilies.Transfer.CanPresent)
+    {
       data.Queues.PresentIndex = data.QueueFamilies.Transfer.Index;
       data.Queues.Present = data.Queues.Transfer[0];
       presentSetup = true;

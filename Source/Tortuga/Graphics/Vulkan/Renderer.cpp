@@ -56,7 +56,7 @@ Renderer Create(
     uint32_t renderHeight,
     std::vector<DescriptorLayout::DescriptorLayout> layouts)
 {
-    if (renderWidth % 8 != 0 || renderHeight & 8 != 0)
+    if (renderWidth % 8 != 0 || renderHeight % 8 != 0)
     {
         Console::Error("Failed to create renderer, width and height must be divisible by shader 'LOCAL_INVOCATION'");
         return {};

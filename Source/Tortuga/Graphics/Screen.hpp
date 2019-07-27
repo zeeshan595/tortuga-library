@@ -12,6 +12,8 @@
 #include "./Vulkan/DescriptorSets.hpp"
 #include "./Vulkan/Renderer.hpp"
 
+#include "./Mesh.hpp"
+
 namespace Tortuga
 {
 namespace Graphics
@@ -44,7 +46,7 @@ struct Screen
 };
 FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height);
 void DestroyWindow(FullWindow window);
-void UpdateRenderData(FullWindow window, uint32_t data);
+void UpdateRenderData(FullWindow window, std::vector<Mesh> data);
 SDL_Event PollEvents(FullWindow window);
 } // namespace Renderer
 } // namespace Graphics

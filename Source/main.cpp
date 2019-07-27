@@ -5,7 +5,8 @@ using namespace Tortuga;
 int main()
 {
   const auto window = Graphics::Screen::CreateWindow("Tortuga", 1920, 1080);
-  Graphics::Screen::UpdateRenderData(window, 2);
+  Graphics::Mesh mesh = {};
+  Graphics::Screen::UpdateRenderData(window, {mesh});
 
   bool signalClose = false;
   while (!signalClose)
