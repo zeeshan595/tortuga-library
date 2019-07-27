@@ -104,7 +104,7 @@ void DestroyWindow(FullWindow window)
 }
 void UpdateRenderData(FullWindow window, std::vector<Mesh> data)
 {
-  Vulkan::Buffer::SetData(window.StagingBuffer, data.data(), MESH_SIZE_IN_BYTES);
+  Vulkan::Buffer::SetData(window.StagingBuffer, data.data(), MESH_SIZE_IN_BYTES * data.size());
   Vulkan::Command::Submit({window.BufferTransferCommand}, window.Device.Queues.Transfer[0]);
   Vulkan::Device::WaitForQueue(window.Device.Queues.Transfer[0]);
 }

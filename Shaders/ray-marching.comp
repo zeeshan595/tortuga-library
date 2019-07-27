@@ -19,6 +19,7 @@ layout(local_size_z = 1) in;
 #include "./Partial/Sphere.comp"
 
 float GetMinDistance(vec3 point) {
+  
   return SphereDist(vec3(0., 1., 5.), 2., point);
 }
 
