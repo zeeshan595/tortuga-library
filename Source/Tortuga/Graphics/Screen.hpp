@@ -36,10 +36,17 @@ struct FullWindow
   std::promise<void> *ExitSignal;
   std::thread *RenderThread;
 };
+struct MeshPreProcessor {
+  Vulkan::Shader::Shader Shader;
+  Vulkan::Pipeline::Pipeline Pipeline;
+  Vulkan::DescriptorLayout::DescriptorLayout DescriptorLayout;
+};
 struct Screen
 {
+  uint32_t DeviceIndex;
   Vulkan::Instance::Instance Vulkan;
   std::vector<FullWindow> Windows;
+  MeshPreProcessor MeshProcessor;
 
   Screen();
   ~Screen();
@@ -48,6 +55,10 @@ FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height);
 void DestroyWindow(FullWindow window);
 void UpdateRenderData(FullWindow window, std::vector<Mesh> data);
 SDL_Event PollEvents(FullWindow window);
+void Initialize(uint32_t deviceIndex = 0);
+Vulkan::Device::Device GetDevice();
+Vulkan::Instance::Instance GetVulkan();
+Vulkan::DescriptorLayout::DescriptorLayout GetMeshPreProcessorDescriptorLayout();
 } // namespace Renderer
 } // namespace Graphics
 } // namespace Tortuga

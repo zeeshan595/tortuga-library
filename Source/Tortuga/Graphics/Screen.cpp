@@ -8,6 +8,7 @@ namespace Screen
 {
 Screen::Screen()
 {
+  this->DeviceIndex = 0;
   this->Vulkan = Vulkan::Instance::Create();
   this->Windows.clear();
 }
@@ -32,14 +33,61 @@ Screen::~Screen()
     Vulkan::Window::Destroy(window.Window);
   }
 
+  Vulkan::Shader::Destroy(MeshProcessor.Shader);
+  Vulkan::Pipeline::DestroyPipeline(MeshProcessor.Pipeline);
+  Vulkan::DescriptorLayout::Destroy(MeshProcessor.DescriptorLayout);
+
   this->Windows.clear();
   Vulkan::Instance::Destroy(this->Vulkan);
 }
 Screen _renderer = Screen();
+void Initialize(uint32_t deviceIndex)
+{
+  _renderer.DeviceIndex = deviceIndex;
+  //Setup Mesh Pre-Processor
+  auto device = _renderer.Vulkan.Devices[_renderer.DeviceIndex];
+
+  Graphics::Screen::MeshPreProcessor meshPreProcessor = {};
+  {
+    std::vector<Vulkan::DescriptorLayout::Binding> bindings(2);
+    {
+      bindings[0].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+      bindings[0].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
+      bindings[0].DescriptorCount = 1;
+
+      bindings[1].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+      bindings[1].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
+      bindings[1].DescriptorCount = 1;
+    }
+    meshPreProcessor.DescriptorLayout = Vulkan::DescriptorLayout::Create(device, bindings);
+
+    auto shaderCode = Utils::IO::GetFileContents("Shaders/MeshPreProcessor.comp");
+    auto compiledCode = Vulkan::Shader::CompileShader(_renderer.Vulkan, Vulkan::Shader::COMPUTE, shaderCode);
+    meshPreProcessor.Shader = Vulkan::Shader::Create(device, compiledCode);
+    auto pipelineCahce = Utils::IO::GetFileContents("Shaders/MeshPreProcessor.comp.cache");
+    meshPreProcessor.Pipeline = Vulkan::Pipeline::CreateComputePipeline(device, meshPreProcessor.Shader, pipelineCahce, {meshPreProcessor.DescriptorLayout});
+    auto newCache = Vulkan::Pipeline::GetCacheData(meshPreProcessor.Pipeline);
+    if (pipelineCahce != newCache)
+      Utils::IO::SetFileContents("Shaders/MeshPreProcessor.comp.cache", newCache);
+  }
+  _renderer.MeshProcessor = meshPreProcessor;
+}
+Vulkan::Instance::Instance GetVulkan()
+{
+  return _renderer.Vulkan;
+}
+Vulkan::Device::Device GetDevice()
+{
+  return _renderer.Vulkan.Devices[_renderer.DeviceIndex];
+}
+Vulkan::DescriptorLayout::DescriptorLayout GetMeshPreProcessorDescriptorLayout()
+{
+  return _renderer.MeshProcessor.DescriptorLayout;
+}
 
 FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height)
 {
-  const auto device = _renderer.Vulkan.Devices[0];
+  const auto device = _renderer.Vulkan.Devices[_renderer.DeviceIndex];
   const auto window = Vulkan::Window::Create(_renderer.Vulkan, title, width, height);
   const auto swapchain = Vulkan::Swapchain::Create(device, window);
   std::vector<Graphics::Vulkan::DescriptorLayout::Binding> bindings(1);
@@ -74,7 +122,6 @@ FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height)
   _renderer.Windows.push_back(fullWindow);
   return fullWindow;
 }
-
 void DestroyWindow(FullWindow window)
 {
   for (uint32_t i = 0; i < _renderer.Windows.size(); i++)

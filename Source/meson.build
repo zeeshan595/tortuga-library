@@ -17,5 +17,6 @@ sourceCppFiles = [
   './Source/Tortuga/Graphics/Vulkan/CommandPool.cpp',
   './Source/Tortuga/Graphics/Vulkan/ErrorCheck.cpp',
   './Source/Tortuga/Graphics/Vulkan/Renderer.cpp',
-  './Source/Tortuga/Graphics/Screen.cpp'
+  './Source/Tortuga/Graphics/Screen.cpp',
+  './Source/Tortuga/Graphics/Mesh.cpp'
 ]

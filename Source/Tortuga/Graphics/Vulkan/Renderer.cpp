@@ -85,14 +85,14 @@ Renderer Create(
     data.DescriptorPool = DescriptorPool::Create(device, data.DescriptorLayout);
     data.DescriptorSet = DescriptorSets::Create(device, data.DescriptorPool, {data.DescriptorLayout});
 
-    auto shaderCode = Utils::IO::GetFileContents("Shaders/ray-marching.comp");
+    auto shaderCode = Utils::IO::GetFileContents("Shaders/RayMarching.comp");
     auto compiledShader = Shader::CompileShader(vulkan, Shader::COMPUTE, shaderCode);
     data.Shader = Shader::Create(device, compiledShader);
-    auto pipelineCache = Utils::IO::GetFileContents("Shaders/ray-marching.comp.cache");
+    auto pipelineCache = Utils::IO::GetFileContents("Shaders/RayMarching.comp.cache");
     data.Pipeline = Pipeline::CreateComputePipeline(device, data.Shader, pipelineCache, layouts);
     auto newpipelineCache = Pipeline::GetCacheData(data.Pipeline);
     if (pipelineCache != newpipelineCache)
-        Utils::IO::SetFileContents("Shaders/ray-marching.comp.cache", newpipelineCache);
+        Utils::IO::SetFileContents("Shaders/RayMarching.comp.cache", newpipelineCache);
 
     data.Image = Image::Create(device, renderWidth, renderHeight);
     data.Buffer = Buffer::CreateDeviceOnlySrc(device, data.ImageSizeBytes);
