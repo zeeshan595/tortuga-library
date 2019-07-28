@@ -159,6 +159,7 @@ void RenderThread(
         Command::Submit({command}, device.Queues.Graphics[0]);
         Device::WaitForQueue(device.Queues.Graphics[0]);
         Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Present);
+        Device::WaitForQueue(device.Queues.Present);
     }
 }
 } // namespace Renderer

@@ -52,8 +52,8 @@ FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height)
   auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayout);
   auto descriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, descriptorPool, {descriptorLayout});
 
-  auto stagingBuffer = Graphics::Vulkan::Buffer::CreateHostSrc(device, MESH_SIZE_IN_BYTES);
-  auto buffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, MESH_SIZE_IN_BYTES);
+  auto stagingBuffer = Graphics::Vulkan::Buffer::CreateHostSrc(device, sizeof(uint32_t));
+  auto buffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, sizeof(uint32_t));
   Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(descriptorSet, 0, {buffer});
 
   auto renderer = Graphics::Vulkan::Renderer::Create(_renderer.Vulkan, device, width, height, {descriptorLayout});
@@ -70,7 +70,6 @@ FullWindow CreateWindow(const char *title, uint32_t width, uint32_t height)
 
   const auto exitSignal = new std::promise<void>();
   const auto renderThread = new std::thread(Graphics::Vulkan::Renderer::RenderThread, device, renderer, swapchain, command, std::move((*exitSignal).get_future()));
-
   FullWindow fullWindow = {device, window, swapchain, descriptorLayout, descriptorPool, stagingBuffer, buffer, commandPool, bufferTransferPool, bufferTransfer, renderer, exitSignal, renderThread};
   _renderer.Windows.push_back(fullWindow);
   return fullWindow;
@@ -104,9 +103,10 @@ void DestroyWindow(FullWindow window)
 }
 void UpdateRenderData(FullWindow window, std::vector<Mesh> data)
 {
-  Vulkan::Buffer::SetData(window.StagingBuffer, data.data(), MESH_SIZE_IN_BYTES * data.size());
-  Vulkan::Command::Submit({window.BufferTransferCommand}, window.Device.Queues.Transfer[0]);
-  Vulkan::Device::WaitForQueue(window.Device.Queues.Transfer[0]);
+  uint32_t temp;
+  Vulkan::Buffer::SetData(window.StagingBuffer, &temp, sizeof(uint32_t));
+  Vulkan::Command::Submit({window.BufferTransferCommand}, window.Device.Queues.Transfer[1]);
+  Vulkan::Device::WaitForQueue(window.Device.Queues.Transfer[1]);
 }
 SDL_Event PollEvents(FullWindow window)
 {
