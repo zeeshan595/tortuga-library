@@ -54,6 +54,7 @@ struct Environment
 };
 Entity *Create();
 void Destroy(Entity *data);
+std::vector<Entity *> GetAllEntities();
 } // namespace Entity
 } // namespace Core
 } // namespace Tortuga

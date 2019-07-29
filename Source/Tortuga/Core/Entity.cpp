@@ -10,9 +10,8 @@ auto environment = Environment();
 Environment::~Environment()
 {
   for (auto i = environment.Entities.begin(); i < environment.Entities.end(); i++)
-  {
     delete *i;
-  }
+    
   environment.Entities.clear();
 }
 Entity *Create()
@@ -31,6 +30,11 @@ void Destroy(Entity *data)
       break;
     }
   }
+}
+
+std::vector<Entity *> GetAllEntities()
+{
+  return environment.Entities;
 }
 } // namespace Entity
 } // namespace Core

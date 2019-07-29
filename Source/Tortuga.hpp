@@ -5,6 +5,7 @@
 
 //Core
 #include "./Tortuga/Core/Entity.hpp"
+#include "./Tortuga/Core/System.hpp"
 
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
@@ -29,5 +30,8 @@
 #include "./Tortuga/Graphics/Screen.hpp"
 #include "./Tortuga/Graphics/Vertex.hpp"
 #include "./Tortuga/Graphics/Mesh.hpp"
+
+//Systems
+#include "./Tortuga/Systems/Example.hpp"
 
 #endif
