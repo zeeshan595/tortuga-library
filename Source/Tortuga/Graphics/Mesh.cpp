@@ -19,9 +19,9 @@ Mesh::Mesh()
 }
 Mesh::~Mesh()
 {
-  Vulkan::DescriptorPool::Destroy(this->DescriptorPool);
-  Vulkan::Buffer::Destroy(this->Staging);
-  Vulkan::Buffer::Destroy(this->Buffer);
+  //Vulkan::DescriptorPool::Destroy(this->DescriptorPool);
+  //Vulkan::Buffer::Destroy(this->Staging);
+  //Vulkan::Buffer::Destroy(this->Buffer);
 }
 void Mesh::ResetTransformation()
 {

@@ -2,6 +2,7 @@
 #define _EXAMPLE_SYSTEM
 
 #include "../Core/System.hpp"
+#include "../Graphics/Mesh.hpp"
 
 namespace Tortuga
 {
@@ -12,6 +13,7 @@ class Example : public Core::System
 public:
   void Start()
   {
+    auto data = this->GetData<Graphics::Mesh>();
   }
   void Update()
   {

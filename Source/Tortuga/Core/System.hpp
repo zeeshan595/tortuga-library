@@ -1,6 +1,8 @@
 #ifndef _SYSTEM
 #define _SYSTEM
 
+#include <cstring>
+
 #include "unordered_map"
 #include "typeindex"
 #include <thread>
@@ -18,19 +20,28 @@ struct ComponentData
   Entity::Entity *Entity;
   T *Data;
 };
+std::mutex Lock;
 class System
 {
 protected:
   template <typename T>
-  std::vector<ComponentData<T>> GetData()
+  std::vector<ComponentData<T> *> GetData()
   {
+    Lock.lock();
     auto entities = Entity::GetAllEntities();
-    std::vector<ComponentData<T>> data(entities.size());
+    std::vector<ComponentData<T> *> data;
     for (uint32_t i = 0; i < entities.size(); i++)
     {
-      data[i].Entity = entities[i];
-      data[i].Data = entities[i]->GetComponent<T>();
+      auto comp = new ComponentData<T>();
+      {
+        comp->Entity = entities[i];
+        comp->Data = new T();
+        auto temp = *entities[i]->GetComponent<T>();
+        std::memcpy(comp->Data, &temp, sizeof(temp));
+      }
+      data.push_back(comp);
     }
+    Lock.unlock();
     return data;
   }
 
