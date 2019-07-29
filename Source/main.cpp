@@ -13,6 +13,9 @@ int main()
   auto temp = entity->GetComponent<Graphics::Mesh>();
   entity->RemoveComponent<Graphics::Mesh>();
 
+  Core::CreateSystem<Systems::Example>();
+  Core::DestroySystem<Systems::Example>();
+
   bool signalClose = false;
   while (!signalClose)
   {
