@@ -3,6 +3,9 @@
 
 #include "./Tortuga/Console.hpp"
 
+//Core
+#include "./Tortuga/Core/Entity.hpp"
+
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
