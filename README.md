@@ -40,6 +40,6 @@ You can download `shaderc` from github and place the extracted folders (`bin`, `
 **Building the library**
 
 1. Download the project `git clone https://github.com/zeeshan595/tortuga-library`
-2. Use meson to build the project `meson build && cd build && ninja`
-3. The library will be located in `build/libtortuga.so`
-4. Run engine `cd build && ./tortuga`
+2. Use meson to build the project `meson Build && cd Build && ninja`
+3. Copy Shaders folder to build directory `cp -r ../Shaders/ ./`
+4. Run engine `./tortuga`
