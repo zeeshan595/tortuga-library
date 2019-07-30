@@ -7,7 +7,8 @@ int main()
   Graphics::Screen::Initialize();
   const auto window = Graphics::Screen::CreateWindow("Tortuga", 1920, 1080);
   //todo: Graphics::Screen::UpdateRenderData(window, {m});
-
+  
+  /*
   auto data = new Graphics::Mesh();
   data->BufferData.VerticesSize = 5;
   data->BufferData.VerticesSize = 3;
@@ -20,6 +21,7 @@ int main()
 
   entity->RemoveComponent<Graphics::Mesh>();
   Core::Entity::Destroy(entity);
+  */
 
   bool signalClose = false;
   while (!signalClose)
