@@ -105,7 +105,6 @@ void UpdateSystems()
 void SystemThread(System *system, std::future<void> cancellation)
 {
   system->Start();
-  system->FetchData();
   while (cancellation.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout)
   {
     system->Update();

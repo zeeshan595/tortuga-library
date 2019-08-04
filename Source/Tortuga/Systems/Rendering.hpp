@@ -12,8 +12,11 @@
 #include "../Graphics/Vulkan/Window.hpp"
 
 #include "../Core/System.hpp"
-#include "../Components/Mesh.hpp"
+#include "../Core/Screen.hpp"
 #include "../Console.hpp"
+
+#include "../Components/Mesh.hpp"
+#include "../Components/Transform.hpp"
 
 namespace Tortuga
 {
@@ -23,10 +26,10 @@ class Rendering : public Core::System
 {
 public:
   std::vector<ComponentData<Component::Mesh> *> MeshData;
+  std::vector<ComponentData<Component::Transform> *> TransformData;
 
   void Start()
   {
-
   }
   void Update()
   {
@@ -38,6 +41,7 @@ public:
   void FetchData()
   {
     this->MeshData = GetData<Component::Mesh>();
+    this->TransformData = GetData<Component::Transform>();
   }
 };
 } // namespace Systems

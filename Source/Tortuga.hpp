@@ -3,10 +3,6 @@
 
 #include "./Tortuga/Console.hpp"
 
-//Core
-#include "./Tortuga/Core/Entity.hpp"
-#include "./Tortuga/Core/System.hpp"
-
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
@@ -28,6 +24,12 @@
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
 #include "./Tortuga/Graphics/Vulkan/Renderer.hpp"
 #include "./Tortuga/Graphics/Vertex.hpp"
+
+//Core
+#include "./Tortuga/Core/Entity.hpp"
+#include "./Tortuga/Core/System.hpp"
+#include "./Tortuga/Core/Engine.hpp"
+#include "./Tortuga/Core/Screen.hpp"
 
 //Systems
 #include "./Tortuga/Systems/Rendering.hpp"

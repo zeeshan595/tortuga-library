@@ -4,19 +4,37 @@ using namespace Tortuga;
 
 int main()
 {
-  auto data = new Component::Mesh();
-  data->BufferData.VerticesSize = 3;
-  auto entity = Core::Entity::Create();
+  Core::Screen::SetWindowTitle("Hello World");
+  Core::Screen::ResizeWindow(1920, 1080);
 
-  entity->AddComponent<Component::Mesh>(data);
-  auto temp = entity->GetComponent<Component::Mesh>();
+  //Start rendering system
   Core::CreateSystem<Systems::Rendering>();
 
+  //create entity
+  auto entity = Core::Entity::Create();
+  //attach transform and mesh component
+  entity->AddComponent<Component::Transform>();
+  entity->AddComponent<Component::Mesh>();
 
+  //Main Loop
+  bool shouldClose = false;
+  while (!shouldClose)
+  {
+    //Window events
+    auto event = Core::Screen::PollEvents();
+    //Quit on close pressed
+    if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+      shouldClose = true;
+  }
 
+  //remove transform and mesh component
   entity->RemoveComponent<Component::Mesh>();
-  Core::Entity::Destroy(entity);
-  Core::DestroySystem<Systems::Rendering>();
+  entity->RemoveComponent<Component::Transform>();
 
+  //destroy entity
+  Core::Entity::Destroy(entity);
+
+  //destroy rendering system
+  Core::DestroySystem<Systems::Rendering>();
   return 0;
 }

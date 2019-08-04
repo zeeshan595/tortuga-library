@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <any>
+#include "../Console.hpp"
 
 namespace Tortuga
 {
@@ -45,6 +46,12 @@ public:
   {
     auto type = std::type_index(typeid(T));
     return static_cast<T *>(this->Components[type]);
+  }
+
+  ~Entity()
+  {
+    if (this->Components.size() > 0)
+      Console::Warning("Please remove all components before destroying the entity");
   }
 };
 struct Environment
