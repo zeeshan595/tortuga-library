@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <any>
+#include "./GUID.hpp"
 #include "../Console.hpp"
 
 namespace Tortuga
@@ -16,6 +17,7 @@ namespace Entity
 struct Entity
 {
 private:
+  std::string GUID;
   std::unordered_map<std::type_index, void *> Components;
 
 public:
@@ -48,10 +50,18 @@ public:
     return static_cast<T *>(this->Components[type]);
   }
 
+  Entity()
+  {
+    this->GUID = Core::GUID::GenerateGUID();
+  }
   ~Entity()
   {
     if (this->Components.size() > 0)
       Console::Warning("Please remove all components before destroying the entity");
+  }
+  std::string GetGUID()
+  {
+    return this->GUID;
   }
 };
 struct Environment

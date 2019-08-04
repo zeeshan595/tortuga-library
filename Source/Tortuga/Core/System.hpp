@@ -47,12 +47,9 @@ protected:
   }
 
 public:
-  std::atomic<bool> TriggerDataUpdate;
-
   virtual void Start() {}
   virtual void Update() {}
   virtual void End() {}
-  virtual void FetchData() {}
 };
 struct SystemWrapper
 {
@@ -92,26 +89,12 @@ void DestroySystem()
   SystemManager.erase(type);
 }
 
-void UpdateSystems()
-{
-  for (auto i = SystemManager.begin(); i != SystemManager.end(); i++)
-  {
-    auto system = *i;
-    bool testValue = false;
-    system.second->SystemPtr->TriggerDataUpdate.compare_exchange_weak(testValue, true);
-  }
-}
-
 void SystemThread(System *system, std::future<void> cancellation)
 {
   system->Start();
   while (cancellation.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout)
   {
     system->Update();
-    bool testValue = true;
-    bool triggerDataUpdate = system->TriggerDataUpdate.compare_exchange_weak(testValue, false);
-    if (triggerDataUpdate)
-      system->FetchData();
   }
   system->End();
 }

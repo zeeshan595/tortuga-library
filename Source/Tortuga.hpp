@@ -26,6 +26,7 @@
 #include "./Tortuga/Graphics/Vertex.hpp"
 
 //Core
+#include "./Tortuga/Core/GUID.hpp"
 #include "./Tortuga/Core/Entity.hpp"
 #include "./Tortuga/Core/System.hpp"
 #include "./Tortuga/Core/Engine.hpp"

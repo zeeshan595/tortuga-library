@@ -19,6 +19,7 @@ sourceCppFiles = [
   './Source/Tortuga/Graphics/Vulkan/Renderer.cpp',
   './Source/Tortuga/Core/Engine.cpp',
   './Source/Tortuga/Core/Screen.cpp',
+  './Source/Tortuga/Core/GUID.cpp',
   './Source/Tortuga/Core/Entity.cpp',
   './Source/Tortuga/Components/Mesh.cpp',
 ]

@@ -37,12 +37,6 @@ public:
   void End()
   {
   }
-
-  void FetchData()
-  {
-    this->MeshData = GetData<Component::Mesh>();
-    this->TransformData = GetData<Component::Transform>();
-  }
 };
 } // namespace Systems
 } // namespace Tortuga
