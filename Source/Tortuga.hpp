@@ -27,11 +27,12 @@
 #include "./Tortuga/Graphics/Vulkan/DescriptorSets.hpp"
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
 #include "./Tortuga/Graphics/Vulkan/Renderer.hpp"
-#include "./Tortuga/Graphics/Screen.hpp"
 #include "./Tortuga/Graphics/Vertex.hpp"
-#include "./Tortuga/Graphics/Mesh.hpp"
 
 //Systems
-#include "./Tortuga/Systems/Example.hpp"
+#include "./Tortuga/Systems/Rendering.hpp"
+
+//Components
+#include "./Tortuga/Components/Mesh.hpp"
 
 #endif
