@@ -25,6 +25,9 @@ int main()
     //Quit on close pressed
     if (event.window.event == SDL_WINDOWEVENT_CLOSE)
       shouldClose = true;
+
+    //iterate through all system and execute update functions
+    Core::IterateSystemLoop();
   }
 
   //remove transform and mesh component

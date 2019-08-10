@@ -25,9 +25,6 @@ namespace Systems
 class Rendering : public Core::System
 {
 public:
-  std::vector<ComponentData<Component::Mesh> *> MeshData;
-  std::vector<ComponentData<Component::Transform> *> TransformData;
-
   void Start()
   {
   }

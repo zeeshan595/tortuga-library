@@ -52,6 +52,8 @@
     "typeindex": "cpp",
     "typeinfo": "cpp",
     "utility": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "deque": "cpp",
+    "numeric": "cpp"
   }
 }
