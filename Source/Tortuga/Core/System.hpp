@@ -20,6 +20,8 @@ public:
   virtual void Created() {}
   virtual void Update() {}
   virtual void Destroyed() {}
+
+  virtual ~System() = default;
 };
 std::unordered_map<std::type_index, System *> SystemManager;
 template <typename T>
@@ -27,11 +29,11 @@ T *CreateSystem()
 {
   auto type = std::type_index(typeid(T));
   if (SystemManager[type] != nullptr)
-    return static_cast<T *>(SystemManager[type]);
+    return dynamic_cast<T *>(SystemManager[type]);
 
-  SystemManager[type] = static_cast<System *>(new T());
+  SystemManager[type] = dynamic_cast<System *>(new T());
   SystemManager[type]->Created();
-  return static_cast<T *>(SystemManager[type]);
+  return dynamic_cast<T *>(SystemManager[type]);
 }
 template <typename T>
 void DestroySystem()

@@ -13,6 +13,7 @@
 
 #include "../Core/System.hpp"
 #include "../Core/Screen.hpp"
+#include "../Core/Entity.hpp"
 #include "../Console.hpp"
 
 #include "../Components/Mesh.hpp"
@@ -25,13 +26,29 @@ namespace Systems
 class Rendering : public Core::System
 {
 public:
-  void Start()
+  void Created()
   {
+    //todo: create geometry pipeline
+    //todo: create image object where rendered image will be stored
+    //todo: create ray marching pipeline
   }
   void Update()
   {
+    //todo: run all meshes through geometry pipeline
+
+    auto entities = Core::Entity::GetAllEntities();
+    for (auto entity : entities)
+    {
+      auto mesh = entity->GetComponent<Component::Mesh>();
+
+    }
+
+    //todo: Wait for all transformations to finish 
+    //todo: start ray marching renderer pipeline
+    //todo: make sure correct swapchain is bound
+    //todo: present the image
   }
-  void End()
+  void Destroyed()
   {
   }
 };

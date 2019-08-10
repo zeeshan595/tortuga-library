@@ -16,7 +16,7 @@ unsigned char RandomChar()
 std::string GenerateGUID(const unsigned int len)
 {
   std::stringstream ss;
-  for (auto i = 0; i < len; i++)
+  for (uint32_t i = 0; i < len; i++)
   {
     auto rc = RandomChar();
     std::stringstream hexstream;
