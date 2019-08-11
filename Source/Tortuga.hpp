@@ -15,6 +15,7 @@
 #include "./Tortuga/Graphics/Vulkan/Shader.hpp"
 #include "./Tortuga/Graphics/Vulkan/Image.hpp"
 #include "./Tortuga/Graphics/Vulkan/Fence.hpp"
+#include "./Tortuga/Graphics/Vulkan/Semaphore.hpp"
 #include "./Tortuga/Graphics/Vulkan/Buffer.hpp"
 #include "./Tortuga/Graphics/Vulkan/CommandPool.hpp"
 #include "./Tortuga/Graphics/Vulkan/Command.hpp"

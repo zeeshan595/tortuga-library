@@ -11,6 +11,7 @@
 #include "./DescriptorSets.hpp"
 #include "./Buffer.hpp"
 #include "./Image.hpp"
+#include "./Semaphore.hpp"
 
 namespace Tortuga
 {
@@ -39,7 +40,7 @@ void End(Command data);
 void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination);
 void BindPipeline(Command data,VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets = {});
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z);
-void Submit(std::vector<Command> data, VkQueue queue);
+void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait = {}, std::vector<Semaphore::Semaphore> signal = {});
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout);
 void BufferToImage(Command data, Buffer::Buffer buffer, Image::Image image, glm::vec2 offset, glm::vec2 size);
 void CopyImage(Command data, Image::Image source, Image::Image destination);

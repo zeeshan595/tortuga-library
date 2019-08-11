@@ -9,6 +9,8 @@
 #include "../Graphics/Vulkan/DescriptorPool.hpp"
 #include "../Graphics/Vulkan/DescriptorSets.hpp"
 #include "../Graphics/Vulkan/Buffer.hpp"
+#include "../Graphics/Vulkan/CommandPool.hpp"
+#include "../Graphics/Vulkan/Command.hpp"
 
 #include "../Core/Engine.hpp"
 #include "../Console.hpp"
@@ -40,6 +42,8 @@ struct Mesh
   Graphics::Vulkan::DescriptorSets::DescriptorSets DescriptorSets;
   Graphics::Vulkan::Buffer::Buffer Staging;
   Graphics::Vulkan::Buffer::Buffer Buffer;
+  Graphics::Vulkan::CommandPool::CommandPool CommandPool;
+  Graphics::Vulkan::Command::Command Command;
 
   void ResetTransformation();
   void ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3 scale);

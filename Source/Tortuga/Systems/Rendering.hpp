@@ -1,6 +1,9 @@
 #ifndef _RENDERING_SYSTEM
 #define _RENDERING_SYSTEM
 
+#include <future>
+#include <thread>
+
 #include "../Graphics/Vulkan/DescriptorLayout.hpp"
 #include "../Graphics/Vulkan/DescriptorPool.hpp"
 #include "../Graphics/Vulkan/DescriptorSets.hpp"
@@ -32,6 +35,16 @@ private:
 public:
   void Update()
   {
+    auto entities = Core::Entity::GetAllEntities();
+    for (auto entity : entities)
+    {
+      auto mesh = entity->GetComponent<Component::Mesh>();
+      Graphics::Vulkan::Command::Begin(mesh->Command, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+      Graphics::Vulkan::Command::CopyBuffer(mesh->Command, mesh->Staging, mesh->Buffer);
+      uint32_t computeGroupSize = (mesh->BufferData.VerticesSize / 16) + 1;
+      Graphics::Vulkan::Command::Compute(mesh->Command, computeGroupSize, computeGroupSize, 1);
+      Graphics::Vulkan::Command::End(mesh->Command);
+    }
     //todo: run all meshes through geometry pipeline
     //todo: Wait for all transformations to finish
     //todo: start ray marching renderer pipeline

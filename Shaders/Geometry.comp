@@ -1,5 +1,12 @@
 #version 450
 
+#define LOCAL_INVOCATION 8
+layout(local_size_x = LOCAL_INVOCATION) in;
+layout(local_size_y = LOCAL_INVOCATION) in;
+layout(local_size_z = 1) in;
+
+
+
 void main() {
 
 }

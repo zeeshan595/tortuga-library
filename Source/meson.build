@@ -3,6 +3,7 @@ sourceCppFiles = [
   './Source/Tortuga/Console.cpp',
   './Source/Tortuga/Graphics/Vulkan/Window.cpp',
   './Source/Tortuga/Graphics/Vulkan/Fence.cpp',
+  './Source/Tortuga/Graphics/Vulkan/Semaphore.cpp',
   './Source/Tortuga/Graphics/Vulkan/Swapchain.cpp',
   './Source/Tortuga/Graphics/Vulkan/Buffer.cpp',
   './Source/Tortuga/Graphics/Vulkan/Instance.cpp',

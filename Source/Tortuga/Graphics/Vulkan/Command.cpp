@@ -84,10 +84,11 @@ void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination)
   }
   vkCmdCopyBuffer(data.Command, source.Buffer, destination.Buffer, 1, &bufferCopy);
 }
-void BindPipeline(Command data,VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets)
+void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets)
 {
-  std::vector<VkDescriptorSet> vulkanDescriptorSets(descriptorSets.size()); 
-  for (uint32_t i = 0; i < vulkanDescriptorSets.size(); i++) {
+  std::vector<VkDescriptorSet> vulkanDescriptorSets(descriptorSets.size());
+  for (uint32_t i = 0; i < vulkanDescriptorSets.size(); i++)
+  {
     vulkanDescriptorSets[i] = descriptorSets[i].set;
   }
 
@@ -98,10 +99,18 @@ void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {
   vkCmdDispatch(data.Command, x, y, z);
 }
-void Submit(std::vector<Command> data, VkQueue queue)
+void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait, std::vector<Semaphore::Semaphore> signal)
 {
   if (data.size() <= 0)
     return;
+
+  std::vector<VkSemaphore> waitSemaphores(wait.size());
+  for (uint32_t i = 0; i < wait.size(); i++)
+    waitSemaphores[i] = wait[i].Semaphore;
+
+  std::vector<VkSemaphore> signalSemaphores(signal.size());
+  for (uint32_t i = 0; i < signal.size(); i++)
+    signalSemaphores[i] = signal[i].Semaphore;
 
   std::vector<VkCommandBuffer> cmdBuffers(data.size());
   for (uint32_t i = 0; i < cmdBuffers.size(); i++)
@@ -113,10 +122,10 @@ void Submit(std::vector<Command> data, VkQueue queue)
     submitInfo.pWaitDstStageMask = 0;
     submitInfo.commandBufferCount = cmdBuffers.size();
     submitInfo.pCommandBuffers = cmdBuffers.data();
-    submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitSemaphores = nullptr;
-    submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores = nullptr;
+    submitInfo.waitSemaphoreCount = waitSemaphores.size();
+    submitInfo.pWaitSemaphores = waitSemaphores.data();
+    submitInfo.signalSemaphoreCount = signalSemaphores.size();
+    submitInfo.pSignalSemaphores = signalSemaphores.data();
   }
   ErrorCheck::Callback(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 }

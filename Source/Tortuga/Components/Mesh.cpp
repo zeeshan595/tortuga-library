@@ -82,13 +82,16 @@ Mesh::Mesh()
   this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), DescriptorLayout.meshDescriptorLayout);
   this->DescriptorSets = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), this->DescriptorPool, {DescriptorLayout.meshDescriptorLayout});
   this->Staging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), MESH_SIZE);
-  this->Buffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(Core::Engine::GetMainDevice(), MESH_SIZE);
+  this->Buffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), MESH_SIZE);
+  this->CommandPool = Graphics::Vulkan::CommandPool::Create(Core::Engine::GetMainDevice(), Core::Engine::GetMainDevice().QueueFamilies.Compute.Index);
+  this->Command = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), this->CommandPool, Graphics::Vulkan::Command::PRIMARY);
 }
 Mesh::~Mesh()
 {
   Graphics::Vulkan::Buffer::Destroy(this->Staging);
   Graphics::Vulkan::Buffer::Destroy(this->Buffer);
   Graphics::Vulkan::DescriptorPool::Destroy(this->DescriptorPool);
+  Graphics::Vulkan::CommandPool::Destroy(this->CommandPool);
 }
 } // namespace Component
 } // namespace Tortuga
