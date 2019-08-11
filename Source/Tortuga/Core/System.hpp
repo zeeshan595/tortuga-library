@@ -17,9 +17,7 @@ namespace Core
 class System
 {
 public:
-  virtual void Created() {}
   virtual void Update() {}
-  virtual void Destroyed() {}
 
   virtual ~System() = default;
 };
@@ -32,7 +30,6 @@ T *CreateSystem()
     return dynamic_cast<T *>(SystemManager[type]);
 
   SystemManager[type] = dynamic_cast<System *>(new T());
-  SystemManager[type]->Created();
   return dynamic_cast<T *>(SystemManager[type]);
 }
 template <typename T>
@@ -42,8 +39,7 @@ void DestroySystem()
   if (SystemManager[type] == nullptr)
     return;
 
-  SystemManager[type]->Destroyed();
-  delete SystemManager[type];
+  delete dynamic_cast<T *>(SystemManager[type]);
   SystemManager.erase(type);
 }
 void IterateSystemLoop()
