@@ -49,7 +49,7 @@ struct Mesh
   Mesh();
   ~Mesh();
 };
-Graphics::Vulkan::DescriptorLayout::DescriptorLayout MeshDescriptorLayout;
+Graphics::Vulkan::DescriptorLayout::DescriptorLayout GetMeshDescriptorLayout();
 } // namespace Component
 } // namespace Tortuga
 

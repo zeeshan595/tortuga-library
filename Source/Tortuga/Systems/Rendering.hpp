@@ -27,7 +27,6 @@ class Rendering : public Core::System
 {
 private:
   Graphics::Vulkan::Shader::Shader GeometryShader;
-  Graphics::Vulkan::DescriptorLayout::DescriptorLayout GeometryDescriptorLayout;
   Graphics::Vulkan::Pipeline::Pipeline GeometryPipeline;
 
 public:
@@ -49,25 +48,8 @@ public:
       auto compiledGeometryShaderCode = Graphics::Vulkan::Shader::CompileShader(Core::Engine::GetVulkan(), Graphics::Vulkan::Shader::COMPUTE, geometryShaderCode);
       GeometryShader = Graphics::Vulkan::Shader::Create(Core::Engine::GetMainDevice(), compiledGeometryShaderCode);
 
-      //descriptor layout
-      std::vector<Graphics::Vulkan::DescriptorLayout::Binding> bindings(2);
-      {
-        //input
-        bindings[0].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        bindings[0].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
-        bindings[0].DescriptorCount = 1;
-        bindings[0].Sampler = VK_NULL_HANDLE;
-
-        //output
-        bindings[1].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        bindings[1].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
-        bindings[1].DescriptorCount = 1;
-        bindings[1].Sampler = VK_NULL_HANDLE;
-      }
-      GeometryDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), bindings);
-
       //pipeline
-      GeometryPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(Core::Engine::GetMainDevice(), GeometryShader, {}, {GeometryDescriptorLayout});
+      GeometryPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(Core::Engine::GetMainDevice(), GeometryShader, {}, {Component::GetMeshDescriptorLayout()});
     }
     //todo: create geometry pipeline
     //todo: create image object where rendered image will be stored
@@ -79,7 +61,6 @@ public:
     //geometry pipeline
     {
       Graphics::Vulkan::Pipeline::DestroyPipeline(GeometryPipeline);
-      Graphics::Vulkan::DescriptorLayout::Destroy(GeometryDescriptorLayout);
       Graphics::Vulkan::Shader::Destroy(GeometryShader);
     }
   }
