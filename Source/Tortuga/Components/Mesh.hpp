@@ -10,6 +10,7 @@
 #include "../Graphics/Vulkan/DescriptorSets.hpp"
 #include "../Graphics/Vulkan/Buffer.hpp"
 
+#include "../Core/Engine.hpp"
 #include "../Console.hpp"
 #include "../Graphics/Vertex.hpp"
 
@@ -35,6 +36,8 @@ struct MeshBufferData
 struct Mesh
 {
   MeshBufferData BufferData;
+  Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
+  Graphics::Vulkan::DescriptorSets::DescriptorSets DescriptorSets;
   Graphics::Vulkan::Buffer::Buffer Staging;
   Graphics::Vulkan::Buffer::Buffer Buffer;
 
@@ -42,7 +45,11 @@ struct Mesh
   void ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3 scale);
   void SetVertices(std::vector<Graphics::Vertex> vertices);
   void SetIndices(std::vector<uint32_t> indices);
+
+  Mesh();
+  ~Mesh();
 };
+Graphics::Vulkan::DescriptorLayout::DescriptorLayout MeshDescriptorLayout;
 } // namespace Component
 } // namespace Tortuga
 

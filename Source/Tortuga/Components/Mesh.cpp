@@ -4,6 +4,22 @@ namespace Tortuga
 {
 namespace Component
 {
+std::vector<Graphics::Vulkan::DescriptorLayout::Binding> bindings(2);
+{
+  //input
+  bindings[0].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+  bindings[0].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
+  bindings[0].DescriptorCount = 1;
+  bindings[0].Sampler = VK_NULL_HANDLE;
+
+  //output
+  bindings[1].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+  bindings[1].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
+  bindings[1].DescriptorCount = 1;
+  bindings[1].Sampler = VK_NULL_HANDLE;
+}
+MeshDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), bindings);
+
 void Mesh::ResetTransformation()
 {
   this->BufferData.Transformation = glm::mat4x4(1.0f);
@@ -42,6 +58,24 @@ void Mesh::SetIndices(std::vector<uint32_t> indices)
   }
   memcpy(this->BufferData.Indices, indices.data(), indices.size() * sizeof(uint32_t));
   this->BufferData.IndicesSize = indices.size();
+}
+
+Mesh::Mesh()
+{
+  this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), MeshDescriptorLayout);
+  this->DescriptorSets = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), this->DescriptorPool, {MeshDescriptorLayout});
+
+  this->Staging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), MESH_SIZE);
+  this->Buffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(Core::Engine::GetMainDevice(), MESH_SIZE);
+}
+Mesh::~Mesh()
+{
+  Graphics::Vulkan::Buffer::Destroy(this->Staging);
+  Graphics::Vulkan::Buffer::Destroy(this->Buffer);
+
+  Graphics::Vulkan::DescriptorSets::Destroy(this->DescriptorSets);
+  Graphics::Vulkan::DescriptorPool::Destroy(this->DescriptorPool);
+  Graphics::Vulkan::DescriptorLayout::Destroy(this->DescriptorLayout);
 }
 } // namespace Component
 } // namespace Tortuga
