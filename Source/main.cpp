@@ -12,9 +12,24 @@ int main()
 
   //create entity
   auto entity = Core::Entity::Create();
+
+  Component::Mesh meshData = {};
+  meshData.SetVertices({
+    {
+      {0, 0, 0}
+    },
+    {
+      {0, 0, 0}
+    },
+    {
+      {0, 0, 0}
+    }
+  });
+  meshData.SetIndices({0, 1, 2});
+
   //attach transform and mesh component
   entity->AddComponent<Component::Transform>();
-  entity->AddComponent<Component::Mesh>();
+  entity->AddComponent<Component::Mesh>(&meshData);
 
   //Main Loop
   bool shouldClose = false;

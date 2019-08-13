@@ -37,7 +37,7 @@ std::vector<Command> Create(Device::Device device, CommandPool::CommandPool pool
 
 void Begin(Command data, VkCommandBufferUsageFlags usage);
 void End(Command data);
-void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination);
+void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination, uint32_t sourceOffset = 0, uint32_t destinationOffset = 0);
 void BindPipeline(Command data,VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets = {});
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z);
 void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait = {}, std::vector<Semaphore::Semaphore> signal = {});

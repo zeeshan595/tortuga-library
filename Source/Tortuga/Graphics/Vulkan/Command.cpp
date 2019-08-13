@@ -68,7 +68,7 @@ void End(Command data)
 {
   ErrorCheck::Callback(vkEndCommandBuffer(data.Command));
 }
-void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination)
+void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination, uint32_t sourceOffset, uint32_t destinationOffset)
 {
   if (source.Size > destination.Size)
   {
@@ -78,8 +78,8 @@ void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination)
 
   VkBufferCopy bufferCopy = {};
   {
-    bufferCopy.srcOffset = 0;
-    bufferCopy.dstOffset = 0;
+    bufferCopy.srcOffset = sourceOffset;
+    bufferCopy.dstOffset = destinationOffset;
     bufferCopy.size = source.Size;
   }
   vkCmdCopyBuffer(data.Command, source.Buffer, destination.Buffer, 1, &bufferCopy);
