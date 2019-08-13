@@ -117,9 +117,10 @@ void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Sem
     cmdBuffers[i] = data[i].Command;
 
   VkSubmitInfo submitInfo = {};
+  VkShaderStageFlags waitDstStageMask = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
   {
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pWaitDstStageMask = 0;
+    submitInfo.pWaitDstStageMask = &waitDstStageMask;
     submitInfo.commandBufferCount = cmdBuffers.size();
     submitInfo.pCommandBuffers = cmdBuffers.data();
     submitInfo.waitSemaphoreCount = waitSemaphores.size();
