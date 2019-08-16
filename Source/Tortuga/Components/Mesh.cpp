@@ -11,21 +11,7 @@ public:
 
   MeshDescriptorLayout()
   {
-    std::vector<Graphics::Vulkan::DescriptorLayout::Binding> _bindings(2);
-    {
-      //input
-      _bindings[0].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-      _bindings[0].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
-      _bindings[0].DescriptorCount = 1;
-      _bindings[0].Sampler = VK_NULL_HANDLE;
-
-      //output
-      _bindings[1].Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-      _bindings[1].ShaderStage = VK_SHADER_STAGE_COMPUTE_BIT;
-      _bindings[1].DescriptorCount = 1;
-      _bindings[1].Sampler = VK_NULL_HANDLE;
-    }
-    meshDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), _bindings);
+    meshDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), 2);
   }
   ~MeshDescriptorLayout()
   {
@@ -79,7 +65,7 @@ void Mesh::SetIndices(std::vector<uint32_t> indices)
 
 Mesh::Mesh()
 {
-  this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), DescriptorLayout.meshDescriptorLayout);
+  this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice());
   this->DescriptorSets = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), this->DescriptorPool, {DescriptorLayout.meshDescriptorLayout});
   this->Staging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), MESH_SIZE);
   this->Buffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), MESH_SIZE);

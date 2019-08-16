@@ -20,9 +20,10 @@ struct DescriptorPool
   VkDevice Device;
   VkDescriptorPool Pool;
   uint32_t DescriptorSetCounts;
+  std::vector<VkDescriptorPoolSize> PoolSizes;
 };
 
-DescriptorPool Create(Device::Device device, DescriptorLayout::DescriptorLayout layout, uint32_t descriptorSetsCount = 1);
+DescriptorPool Create(Device::Device device, uint32_t descriptorSetsCount = 1, std::vector<uint32_t> bindingsAmount = {1});
 void Destroy(DescriptorPool data);
 } // namespace DescriptorPool
 } // namespace Vulkan

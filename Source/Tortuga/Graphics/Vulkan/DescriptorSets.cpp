@@ -12,14 +12,8 @@ DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool
 {
   DescriptorSets data = {};
   data.Device = device.Device;
-  data.Pool = pool.Pool;
-  data.DescriptorSetCount = pool.DescriptorSetCounts;
+  data.Pool = pool;
   data.Layouts = layouts;
-
-  if (layouts.size() != pool.DescriptorSetCounts) {
-    Console::Error("You must provide a layout for each descriptor set");
-    return data;
-  }
 
   std::vector<VkDescriptorSetLayout> descriptorSetsLayouts(layouts.size());
   for (uint32_t i = 0; i < descriptorSetsLayouts.size(); i++)
@@ -35,22 +29,17 @@ DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool
   ErrorCheck::Callback(vkAllocateDescriptorSets(device.Device, &info, &data.set));
   return data;
 }
-void Destroy(DescriptorSets data)
-{
-  ErrorCheck::Callback(vkFreeDescriptorSets(data.Device, data.Pool, data.DescriptorSetCount, &data.set));
-}
-
 void UpdateDescriptorSets(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content)
 {
-  if (data.Layouts[descriptorSetIndex].PoolSizes.size() != content.size())
+  if (data.Layouts[descriptorSetIndex].BindingsAmount != content.size())
   {
     Console::Error("Provided Content does not match this descriptor set size");
     return;
   }
 
   std::vector<VkDescriptorBufferInfo> bufferInfos(content.size());
-  std::vector<VkWriteDescriptorSet> writeInfos(data.Layouts[descriptorSetIndex].PoolSizes.size());
-  for (uint32_t i = 0; i < data.Layouts[descriptorSetIndex].PoolSizes.size(); i++)
+  std::vector<VkWriteDescriptorSet> writeInfos(data.Layouts[descriptorSetIndex].BindingsAmount);
+  for (uint32_t i = 0; i < data.Layouts[descriptorSetIndex].BindingsAmount; i++)
   {
     {
       bufferInfos[i] = {};
@@ -63,16 +52,16 @@ void UpdateDescriptorSets(DescriptorSets data, uint32_t descriptorSetIndex, std:
     writeInfos[i].dstSet = data.set;
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = descriptorSetIndex;
-    writeInfos[i].descriptorCount = data.DescriptorSetCount;
-    writeInfos[i].descriptorType = data.Layouts[descriptorSetIndex].PoolSizes[i].type;
+    writeInfos[i].descriptorCount = data.Pool.PoolSizes[descriptorSetIndex].descriptorCount;
+    writeInfos[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 
-    writeInfos[i].pBufferInfo = &bufferInfos[i];
+    writeInfos[i].pBufferInfo = &(bufferInfos[i]);
     writeInfos[i].pImageInfo = VK_NULL_HANDLE;
     writeInfos[i].pTexelBufferView = VK_NULL_HANDLE;
   }
   vkUpdateDescriptorSets(data.Device, writeInfos.size(), writeInfos.data(), 0, 0);
 }
-} // namespace DescriptorSet
+} // namespace DescriptorSets
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Tortuga

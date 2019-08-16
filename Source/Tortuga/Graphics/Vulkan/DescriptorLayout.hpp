@@ -14,21 +14,14 @@ namespace Vulkan
 {
 namespace DescriptorLayout
 {
-struct Binding
-{
-  uint32_t DescriptorCount = 1;
-  VkDescriptorType Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-  VkShaderStageFlags ShaderStage = VK_SHADER_STAGE_ALL;
-  VkSampler Sampler = VK_NULL_HANDLE;
-};
 struct DescriptorLayout
 {
   VkDevice Device = VK_NULL_HANDLE;
   VkDescriptorSetLayout Layouts = VK_NULL_HANDLE;
-  std::vector<VkDescriptorPoolSize> PoolSizes;
+  uint32_t BindingsAmount = 0;
 };
 
-DescriptorLayout Create(Device::Device device, std::vector<Binding> bindings);
+DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount = 1);
 void Destroy(DescriptorLayout data);
 } // namespace DescriptorLayout
 } // namespace Vulkan

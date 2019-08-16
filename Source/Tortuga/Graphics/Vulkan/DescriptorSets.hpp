@@ -21,13 +21,11 @@ struct DescriptorSets
 {
   VkDevice Device;
   VkDescriptorSet set;
-  VkDescriptorPool Pool;
-  uint32_t DescriptorSetCount;
+  DescriptorPool::DescriptorPool Pool;
   std::vector<DescriptorLayout::DescriptorLayout> Layouts;
 };
 
 DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool, std::vector<DescriptorLayout::DescriptorLayout> layouts);
-void Destroy(DescriptorSets data);
 void UpdateDescriptorSets(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content);
 } // namespace DescriptorSet
 } // namespace Vulkan

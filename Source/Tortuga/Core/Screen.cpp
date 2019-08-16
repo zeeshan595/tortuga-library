@@ -55,6 +55,13 @@ Graphics::Vulkan::Swapchain::Swapchain GetSwapchain()
 {
   return window.Swapchain;
 }
+std::vector<int32_t> GetWindowSize()
+{
+  int32_t width = 0;
+  int32_t height = 0;
+  SDL_GetWindowSize(window.VulkanWindow.Window, &width, &height);
+  return {width, height};
+}
 } // namespace Screen
 } // namespace Core
 } // namespace Tortuga

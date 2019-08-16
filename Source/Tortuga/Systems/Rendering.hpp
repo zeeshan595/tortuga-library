@@ -30,14 +30,58 @@ namespace Systems
 class Rendering : public Core::System
 {
 private:
+  struct Pixel
+  {
+    float R;
+    float G;
+    float B;
+    float A;
+  };
+  struct RenderInfo
+  {
+    int32_t WindowWidth;
+    int32_t WindowHeight;
+  };
+
+  //general
+  Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
+  Graphics::Vulkan::CommandPool::CommandPool ComputeCommandPool;
+
   //geometry
   Graphics::Vulkan::Shader::Shader GeometryShader;
   Graphics::Vulkan::Pipeline::Pipeline GeometryPipeline;
   Graphics::Vulkan::Semaphore::Semaphore GeometrySemaphore;
 
-  //Rendering (Ray marching)
-  Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
-  Graphics::Vulkan::DescriptorSets::DescriptorSets DescriptorSets;
+  //combine meshes into single buffer
+  Graphics::Vulkan::Buffer::Buffer MeshCombineBuffer;
+  Graphics::Vulkan::Command::Command MeshCombineCommand;
+  Graphics::Vulkan::Semaphore::Semaphore MeshCombineSemaphore;
+
+  //rendering
+  std::vector<int32_t> RenderingWindowSize;
+  Graphics::Vulkan::DescriptorLayout::DescriptorLayout OutRenderingDescriptorLayout;
+  Graphics::Vulkan::DescriptorLayout::DescriptorLayout InRenderingDescriptorLayout;
+  Graphics::Vulkan::DescriptorPool::DescriptorPool RenderingDescriptorPool;
+  Graphics::Vulkan::DescriptorSets::DescriptorSets RenderingDescriptorSet;
+  Graphics::Vulkan::Buffer::Buffer RenderingBuffer;
+  Graphics::Vulkan::Buffer::Buffer RenderingInfoBufferStaging;
+  Graphics::Vulkan::Buffer::Buffer RenderingInfoBuffer;
+
+  void UpdateWindowSize()
+  {
+    RenderInfo renderInfo = {};
+    {
+      renderInfo.WindowWidth = RenderingWindowSize[0];
+      renderInfo.WindowHeight = RenderingWindowSize[1];
+    }
+    Graphics::Vulkan::Buffer::SetData(RenderingInfoBufferStaging, &renderInfo, sizeof(renderInfo));
+    auto renderInfoTransfer = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    Graphics::Vulkan::Command::Begin(renderInfoTransfer, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    Graphics::Vulkan::Command::CopyBuffer(renderInfoTransfer, RenderingInfoBufferStaging, RenderingInfoBuffer);
+    Graphics::Vulkan::Command::End(renderInfoTransfer);
+    Graphics::Vulkan::Command::Submit({renderInfoTransfer}, Core::Engine::GetMainDevice().Queues.Transfer[0]);
+    Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Transfer[0]);
+  }
 
 public:
   void Update()
@@ -72,6 +116,38 @@ public:
       Graphics::Vulkan::Command::Submit(meshCommands, Core::Engine::GetMainDevice().Queues.Compute[0], {}, {GeometrySemaphore});
     }
 
+    //combine meshes into single buffer
+    {
+      auto totalSize = meshBuffers.size() * Component::MESH_SIZE;
+      if (totalSize != MeshCombineBuffer.Size)
+      {
+        //buffer needs to be recreated
+        Graphics::Vulkan::Buffer::Destroy(MeshCombineBuffer);
+        MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), totalSize);
+        Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(RenderingDescriptorSet, 0, {MeshCombineBuffer});
+      }
+      Graphics::Vulkan::Command::Begin(MeshCombineCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+      uint32_t offset = 0;
+      for (auto meshBuffer : meshBuffers)
+      {
+        Graphics::Vulkan::Command::CopyBuffer(MeshCombineCommand, meshBuffer, MeshCombineBuffer, 0, offset);
+        offset += meshBuffer.Size;
+      }
+      Graphics::Vulkan::Command::End(MeshCombineCommand);
+      Graphics::Vulkan::Command::Submit({MeshCombineCommand}, Core::Engine::GetMainDevice().Queues.Transfer[0], {GeometrySemaphore}, {MeshCombineSemaphore});
+    }
+
+    //rendering
+    {
+      auto windowSize = Core::Screen::GetWindowSize();
+      if (RenderingWindowSize != windowSize)
+      {
+        RenderingWindowSize = windowSize;
+        Graphics::Vulkan::Buffer::Destroy(RenderingBuffer);
+        RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlySrc(Core::Engine::GetMainDevice(), sizeof(Pixel) * RenderingWindowSize[0] * RenderingWindowSize[1]);
+        UpdateWindowSize();
+      }
+    }
     //todo: start ray marching renderer pipeline
     //todo: make sure correct swapchain is bound
     //todo: present the image
@@ -79,6 +155,12 @@ public:
 
   Rendering()
   {
+    //general
+    {
+      TransferCommandPool = Graphics::Vulkan::CommandPool::Create(Core::Engine::GetMainDevice(), Core::Engine::GetMainDevice().QueueFamilies.Transfer.Index);
+      ComputeCommandPool = Graphics::Vulkan::CommandPool::Create(Core::Engine::GetMainDevice(), Core::Engine::GetMainDevice().QueueFamilies.Compute.Index);
+    }
+
     //geometry pipeline
     {
       //shader
@@ -90,23 +172,61 @@ public:
       GeometryPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(Core::Engine::GetMainDevice(), GeometryShader, {}, {Component::GetMeshDescriptorLayout()});
       GeometrySemaphore = Graphics::Vulkan::Semaphore::Create(Core::Engine::GetMainDevice());
     }
-    //Descriptor Set
+
+    //combine meshes into single buffer
     {
-      
+      MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(Core::Engine::GetMainDevice(), 1);
+      MeshCombineCommand = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+      MeshCombineSemaphore = Graphics::Vulkan::Semaphore::Create(Core::Engine::GetMainDevice());
     }
 
-    //todo: create meshes buffer (copy all meshes to be rendered in a single buffer array)
-    //todo: create image object where rendered image will be stored
+    //rendering
+    {
+      RenderingWindowSize = Core::Screen::GetWindowSize();
+      RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlySrc(Core::Engine::GetMainDevice(), sizeof(Pixel) * RenderingWindowSize[0] * RenderingWindowSize[1]);
+      RenderingInfoBufferStaging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), sizeof(RenderInfo));
+      RenderingInfoBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(Core::Engine::GetMainDevice(), sizeof(RenderInfo));
+      UpdateWindowSize();
+
+      InRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), 2);
+      OutRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), 1);
+      RenderingDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), 2, {2, 1});
+      RenderingDescriptorSet = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), RenderingDescriptorPool, {InRenderingDescriptorLayout, OutRenderingDescriptorLayout});
+      Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(RenderingDescriptorSet, 0, {RenderingInfoBuffer, RenderingBuffer});
+    }
+
     //todo: create ray marching pipeline
   }
 
   ~Rendering()
   {
+    //general
+    {
+      Graphics::Vulkan::CommandPool::Destroy(TransferCommandPool);
+      Graphics::Vulkan::CommandPool::Destroy(ComputeCommandPool);
+    }
+
     //geometry pipeline
     {
       Graphics::Vulkan::Pipeline::DestroyPipeline(GeometryPipeline);
       Graphics::Vulkan::Shader::Destroy(GeometryShader);
       Graphics::Vulkan::Semaphore::Destroy(GeometrySemaphore);
+    }
+
+    //combine meshes into single buffer
+    {
+      Graphics::Vulkan::Buffer::Destroy(MeshCombineBuffer);
+      Graphics::Vulkan::Semaphore::Destroy(MeshCombineSemaphore);
+    }
+
+    //rendering
+    {
+      Graphics::Vulkan::Buffer::Destroy(RenderingBuffer);
+      Graphics::Vulkan::Buffer::Destroy(RenderingInfoBuffer);
+      Graphics::Vulkan::Buffer::Destroy(RenderingInfoBufferStaging);
+      Graphics::Vulkan::DescriptorLayout::Destroy(InRenderingDescriptorLayout);
+      Graphics::Vulkan::DescriptorPool::Destroy(RenderingDescriptorPool);
+      Graphics::Vulkan::DescriptorLayout::Destroy(OutRenderingDescriptorLayout);
     }
   }
 };

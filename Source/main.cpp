@@ -31,6 +31,8 @@ int main()
   entity->AddComponent<Component::Transform>();
   entity->AddComponent<Component::Mesh>(&meshData);
 
+  Core::IterateSystemLoop();
+
   //Main Loop
   bool shouldClose = false;
   while (!shouldClose)
@@ -42,7 +44,7 @@ int main()
       shouldClose = true;
 
     //iterate through all system and execute update functions
-    Core::IterateSystemLoop();
+    //Core::IterateSystemLoop();
   }
 
   //remove transform and mesh component
