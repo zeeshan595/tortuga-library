@@ -22,11 +22,11 @@ struct DescriptorSets
   VkDevice Device;
   VkDescriptorSet set;
   DescriptorPool::DescriptorPool Pool;
-  std::vector<DescriptorLayout::DescriptorLayout> Layouts;
+  DescriptorLayout::DescriptorLayout Layout;
 };
 
-DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool, std::vector<DescriptorLayout::DescriptorLayout> layouts);
-void UpdateDescriptorSets(DescriptorSets data, uint32_t descriptorSetIndex, std::vector<Buffer::Buffer> content);
+DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool, DescriptorLayout::DescriptorLayout layout);
+void UpdateDescriptorSets(DescriptorSets data, std::vector<Buffer::Buffer> content);
 } // namespace DescriptorSet
 } // namespace Vulkan
 } // namespace Graphics
