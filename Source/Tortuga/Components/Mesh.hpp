@@ -25,7 +25,7 @@ namespace Component
 const uint32_t MESH_SIZE = ((sizeof(uint32_t) + sizeof(uint32_t)) +
                             (sizeof(Graphics::Vertex) * MAX_VERTICES_SIZE) +
                             (sizeof(uint32_t) * MAX_INDICES_SIZE) +
-                            (sizeof(glm::mat4)));
+                            (sizeof(glm::mat4x4) * 2));
 
 struct MeshBufferData
 {
@@ -34,6 +34,7 @@ struct MeshBufferData
   Graphics::Vertex Vertices[MAX_VERTICES_SIZE];
   uint32_t Indices[MAX_INDICES_SIZE];
   glm::mat4x4 Transformation;
+  glm::mat4x4 NormalMatrix;
 };
 struct Mesh
 {

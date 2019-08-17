@@ -144,14 +144,18 @@ Image::Image GetImage(Swapchain data, uint32_t index)
   image.Memory = VK_NULL_HANDLE;
   return image;
 }
-void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue)
+void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue, std::vector<Semaphore::Semaphore> waitSemaphores)
 {
+  std::vector<VkSemaphore> semaphores(waitSemaphores.size());
+  for (uint32_t i = 0; i < waitSemaphores.size(); i++)
+    semaphores[i] = waitSemaphores[i].Semaphore;
+
   std::vector<VkSwapchainKHR> swapChains = {data.Swapchain};
   auto presentInfo = VkPresentInfoKHR();
   {
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.waitSemaphoreCount = 0;
-    presentInfo.pWaitSemaphores = VK_NULL_HANDLE;
+    presentInfo.waitSemaphoreCount = semaphores.size();
+    presentInfo.pWaitSemaphores = semaphores.data();
     presentInfo.swapchainCount = swapChains.size();
     presentInfo.pSwapchains = swapChains.data();
     presentInfo.pImageIndices = &imageIndex;

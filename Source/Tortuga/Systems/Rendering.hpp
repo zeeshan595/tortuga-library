@@ -113,6 +113,7 @@ public:
         meshBuffers.push_back(mesh->Buffer);
         meshCommands.push_back(mesh->Command);
         meshThreads.push_back(std::async(std::launch::async, [mesh, geometryPipeline] {
+          Graphics::Vulkan::Buffer::SetData(mesh->Staging, &mesh->BufferData, sizeof(mesh->BufferData));
           Graphics::Vulkan::Command::Begin(mesh->Command, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
           Graphics::Vulkan::Command::CopyBuffer(mesh->Command, mesh->Staging, mesh->Buffer);
           Graphics::Vulkan::Command::BindPipeline(mesh->Command, VK_PIPELINE_BIND_POINT_COMPUTE, geometryPipeline, {mesh->DescriptorSets});
@@ -185,7 +186,7 @@ public:
       Graphics::Vulkan::Command::End(PresentCommand);
       Graphics::Vulkan::Command::Submit({PresentCommand}, Core::Engine::GetMainDevice().Queues.Graphics[0], {RenderingSemaphore}, {PresentSemaphore});
 
-      Graphics::Vulkan::Swapchain::PresentImage(Core::Screen::GetSwapchain(), index, Core::Engine::GetMainDevice().Queues.Present);
+      Graphics::Vulkan::Swapchain::PresentImage(Core::Screen::GetSwapchain(), index, Core::Engine::GetMainDevice().Queues.Present, {PresentSemaphore});
     }
   }
 

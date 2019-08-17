@@ -1,12 +1,24 @@
 #version 450
-
+#extension GL_GOOGLE_include_directive: enable
 #define LOCAL_INVOCATION 8
 layout(local_size_x = LOCAL_INVOCATION) in;
 layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
 
+#include "./Partial/Mesh.comp"
 
+layout(set = 0, binding = 0) buffer OutMesh {
+  MeshData mesh;
+};
 
 void main() {
-
+  uint index = (gl_GlobalInvocationID.y * gl_NumWorkGroups.x * LOCAL_INVOCATION) + gl_GlobalInvocationID.x;
+  
+  if (index >= mesh.VerticesSize)
+    return;
+  
+  vec4 worldPosition = mesh.Transformation * vec4(mesh.Verticies[index].Position, 1.);
+  vec4 worldNormal = mesh.NormalMatrix * vec4(mesh.Verticies[index].Normal, 1.);
+  mesh.Verticies[index].Position = worldPosition.xyz;
+  mesh.Verticies[index].Normal = worldNormal.xyz;
 }

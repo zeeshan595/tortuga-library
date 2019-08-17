@@ -26,6 +26,7 @@ Graphics::Vulkan::DescriptorLayout::DescriptorLayout GetMeshDescriptorLayout()
 void Mesh::ResetTransformation()
 {
   this->BufferData.Transformation = glm::mat4x4(1.0f);
+  this->BufferData.NormalMatrix = glm::mat4x4(1.0);
 }
 
 void Mesh::ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3 scale)
@@ -34,6 +35,9 @@ void Mesh::ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3
   this->BufferData.Transformation = glm::scale(this->BufferData.Transformation, scale);
   this->BufferData.Transformation = glm::rotate(this->BufferData.Transformation, rotation.w, glm::vec3(rotation.x, rotation.y, rotation.z));
   this->BufferData.Transformation = glm::translate(this->BufferData.Transformation, position);
+
+  this->BufferData.NormalMatrix = glm::mat4x4(1.0);
+  this->BufferData.NormalMatrix = glm::rotate(this->BufferData.NormalMatrix, rotation.w, glm::vec3(rotation.x, rotation.y, rotation.z));
 }
 
 void Mesh::SetVertices(std::vector<Graphics::Vertex> vertices)
@@ -65,6 +69,8 @@ void Mesh::SetIndices(std::vector<uint32_t> indices)
 
 Mesh::Mesh()
 {
+  this->BufferData.Transformation = glm::mat4x4(1.0);
+  this->BufferData.NormalMatrix = glm::mat4x4(1.0);
   this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), {DescriptorLayout.meshDescriptorLayout});
   this->DescriptorSets = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), this->DescriptorPool, DescriptorLayout.meshDescriptorLayout);
   this->Staging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), MESH_SIZE);

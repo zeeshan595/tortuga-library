@@ -6,6 +6,7 @@
 #include "./Device.hpp"
 #include "./Window.hpp"
 #include "./Image.hpp"
+#include "./Semaphore.hpp"
 
 namespace Tortuga
 {
@@ -38,7 +39,7 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
 void Destroy(Swapchain data);
 uint32_t AquireNextImage(Swapchain data);
 Image::Image GetImage(Swapchain data, uint32_t index);
-void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue);
+void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue, std::vector<Semaphore::Semaphore> waitSemaphores = {});
 
 SwapChainSupportDetails GetSupportDetails(Device::Device device, Window::Window window);
 VkSurfaceFormatKHR ChooseSurfaceFormat(std::vector<VkSurfaceFormatKHR> formats);
