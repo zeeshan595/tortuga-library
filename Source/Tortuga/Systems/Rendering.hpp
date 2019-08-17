@@ -190,7 +190,7 @@ public:
 
       InRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), 2);
       OutRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), 1);
-      RenderingDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), 2, {2, 1});
+      RenderingDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), {InRenderingDescriptorLayout, OutRenderingDescriptorLayout}, 2);
       RenderingDescriptorSet = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), RenderingDescriptorPool, {InRenderingDescriptorLayout, OutRenderingDescriptorLayout});
       Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(RenderingDescriptorSet, 0, {RenderingInfoBuffer, RenderingBuffer});
     }

@@ -8,26 +8,26 @@ namespace Vulkan
 {
 namespace DescriptorPool
 {
-DescriptorPool Create(Device::Device device, uint32_t descriptorSetsCount, std::vector<uint32_t> bindingsAmount)
+DescriptorPool Create(Device::Device device, std::vector<DescriptorLayout::DescriptorLayout> layouts, uint32_t descriptorSetsCount)
 {
   DescriptorPool data = {};
   data.Device = device.Device;
   data.DescriptorSetCounts = descriptorSetsCount;
 
-  std::vector<VkDescriptorPoolSize> poolSize(bindingsAmount.size());
-  for (uint32_t i = 0; i < bindingsAmount.size(); i++)
-  {
-    poolSize[i].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    poolSize[i].descriptorCount = bindingsAmount[i];
-  }
-  data.PoolSizes = poolSize;
+  uint32_t bindingsCount = 0;
+  for (auto layout : layouts)
+    bindingsCount += layout.BindingsAmount;
+
+  VkDescriptorPoolSize poolSize = {};
+  poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+  poolSize.descriptorCount = bindingsCount;
 
   VkDescriptorPoolCreateInfo createInfo = {};
   {
     createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     createInfo.maxSets = descriptorSetsCount;
-    createInfo.poolSizeCount = poolSize.size();
-    createInfo.pPoolSizes = poolSize.data();
+    createInfo.poolSizeCount = 1;
+    createInfo.pPoolSizes = &poolSize;
   }
   ErrorCheck::Callback(vkCreateDescriptorPool(device.Device, &createInfo, nullptr, &data.Pool));
   return data;

@@ -65,7 +65,7 @@ void Mesh::SetIndices(std::vector<uint32_t> indices)
 
 Mesh::Mesh()
 {
-  this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice());
+  this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), {DescriptorLayout.meshDescriptorLayout});
   this->DescriptorSets = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), this->DescriptorPool, {DescriptorLayout.meshDescriptorLayout});
   this->Staging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), MESH_SIZE);
   this->Buffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), MESH_SIZE);

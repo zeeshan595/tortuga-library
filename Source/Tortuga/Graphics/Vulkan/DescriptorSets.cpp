@@ -52,7 +52,7 @@ void UpdateDescriptorSets(DescriptorSets data, uint32_t descriptorSetIndex, std:
     writeInfos[i].dstSet = data.set;
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = descriptorSetIndex;
-    writeInfos[i].descriptorCount = data.Pool.PoolSizes[descriptorSetIndex].descriptorCount;
+    writeInfos[i].descriptorCount = 1;
     writeInfos[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 
     writeInfos[i].pBufferInfo = &(bufferInfos[i]);
