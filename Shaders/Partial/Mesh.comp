@@ -8,9 +8,9 @@ struct Vertex {
 
 struct MeshData{
   Vertex Verticies[MAX_VERTICES_SIZE];
-  int Indicies[MAX_INDICES_SIZE];
-  int VerticesSize;
-  int IndiciesSize;
+  uint Indicies[MAX_INDICES_SIZE];
+  uint VerticesSize;
+  uint IndiciesSize;
   mat4x4 Transformation;
   mat4x4 NormalMatrix;
 };

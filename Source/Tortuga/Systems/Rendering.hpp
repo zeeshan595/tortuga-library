@@ -30,17 +30,10 @@ namespace Systems
 class Rendering : public Core::System
 {
 private:
-  struct Pixel
-  {
-    float R;
-    float G;
-    float B;
-    float A;
-  };
   struct RenderInfo
   {
-    int32_t WindowWidth;
-    int32_t WindowHeight;
+    uint32_t WindowWidth;
+    uint32_t WindowHeight;
   };
 
   //general
@@ -157,7 +150,7 @@ public:
       {
         RenderingWindowSize = windowSize;
         Graphics::Vulkan::Buffer::Destroy(RenderingBuffer);
-        RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlySrc(Core::Engine::GetMainDevice(), sizeof(Pixel) * RenderingWindowSize[0] * RenderingWindowSize[1]);
+        RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlySrc(Core::Engine::GetMainDevice(), sizeof(glm::vec4) * RenderingWindowSize[0] * RenderingWindowSize[1]);
         UpdateWindowSize();
       }
 
@@ -221,7 +214,7 @@ public:
     //rendering
     {
       RenderingWindowSize = Core::Screen::GetWindowSize();
-      RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), sizeof(Pixel) * RenderingWindowSize[0] * RenderingWindowSize[1]);
+      RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), sizeof(glm::vec4) * RenderingWindowSize[0] * RenderingWindowSize[1]);
       RenderingInfoBufferStaging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), sizeof(RenderInfo));
       RenderingInfoBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(Core::Engine::GetMainDevice(), sizeof(RenderInfo));
       UpdateWindowSize();
