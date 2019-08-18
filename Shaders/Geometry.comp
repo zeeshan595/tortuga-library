@@ -7,12 +7,17 @@ layout(local_size_z = 1) in;
 
 #include "./Partial/Mesh.comp"
 
-layout(set = 0, binding = 0) buffer OutMesh {
-  MeshData mesh;
-};
+layout(set = 0, binding = 0) buffer Mesh {
+  MeshData data;
+} mesh;
 
 void main() {
-  uint index = (gl_GlobalInvocationID.y * gl_NumWorkGroups.x * LOCAL_INVOCATION) + gl_GlobalInvocationID.x;
+  mesh.data.Verticies[0].Position = vec3(10, 10, 10);
+  mesh.data.Verticies[1].Position = vec3(10, 10, 10);
+  mesh.data.Verticies[2].Position = vec3(10, 10, 10);
+  
+  /*
+  uint index = (gl_GlobalInvocationID.y * gl_NumWorkGroups.x) + gl_GlobalInvocationID.x;
   
   if (index >= mesh.VerticesSize)
     return;
@@ -21,4 +26,5 @@ void main() {
   vec4 worldNormal = mesh.NormalMatrix * vec4(mesh.Verticies[index].Normal, 1.);
   mesh.Verticies[index].Position = worldPosition.xyz;
   mesh.Verticies[index].Normal = worldNormal.xyz;
+  */
 }

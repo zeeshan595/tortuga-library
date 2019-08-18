@@ -113,7 +113,7 @@ public:
         meshBuffers.push_back(mesh->Buffer);
         meshCommands.push_back(mesh->Command);
         meshThreads.push_back(std::async(std::launch::async, [mesh, geometryPipeline] {
-          Graphics::Vulkan::Buffer::SetData(mesh->Staging, &mesh->BufferData, sizeof(mesh->BufferData));
+          Graphics::Vulkan::Buffer::SetData(mesh->Staging, &mesh->BufferData, Component::MESH_SIZE);
           Graphics::Vulkan::Command::Begin(mesh->Command, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
           Graphics::Vulkan::Command::CopyBuffer(mesh->Command, mesh->Staging, mesh->Buffer);
           Graphics::Vulkan::Command::BindPipeline(mesh->Command, VK_PIPELINE_BIND_POINT_COMPUTE, geometryPipeline, {mesh->DescriptorSets});
@@ -126,6 +126,22 @@ public:
         meshThreads[i].wait();
 
       Graphics::Vulkan::Command::Submit(meshCommands, Core::Engine::GetMainDevice().Queues.Compute[0], {}, {GeometrySemaphore});
+    }
+
+    //testing
+    {
+      Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Compute[0]);
+      auto entities = Core::Entity::GetAllEntities();
+      for (auto entity : entities)
+      {
+        auto mesh = entity->GetComponent<Component::Mesh>();
+        if (mesh == nullptr)
+          continue;
+        
+        Component::MeshBufferData data = {};
+        Graphics::Vulkan::Buffer::GetData<Component::MeshBufferData>(mesh->Buffer, &data, Component::MESH_SIZE);
+        std::cout<< "Test" <<std::endl;
+      }
     }
 
     //combine meshes into single buffer

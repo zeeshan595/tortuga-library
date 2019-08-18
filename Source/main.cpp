@@ -14,18 +14,14 @@ int main()
   auto entity = Core::Entity::Create();
 
   Component::Mesh meshData = {};
-  meshData.SetVertices({
-    {
-      {0, 0, 0}
-    },
-    {
-      {0, 0, 0}
-    },
-    {
-      {0, 0, 0}
-    }
-  });
+  meshData.SetVertices({{{0, 1, 0},
+                         {0, 0, 1}},
+                        {{-1, 0, 0},
+                         {0, 0, 1}},
+                        {{1, 0, 0},
+                         {0, 0, 1}}});
   meshData.SetIndices({0, 1, 2});
+  meshData.ApplyTransformation({10, 1, 10}, {0, 0, 0, 1}, {1, 1, 1});
 
   //attach transform and mesh component
   entity->AddComponent<Component::Transform>();
