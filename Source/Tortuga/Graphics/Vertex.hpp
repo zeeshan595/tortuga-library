@@ -9,8 +9,8 @@ namespace Graphics
 {
 struct Vertex
 {
-  glm::vec3 Position;
-  glm::vec3 Normal;
+  glm::vec4 Position;
+  glm::vec4 Normal;
 };
 } // namespace Graphics
 } // namespace Tortuga

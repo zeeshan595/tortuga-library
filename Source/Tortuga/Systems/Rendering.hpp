@@ -128,22 +128,6 @@ public:
       Graphics::Vulkan::Command::Submit(meshCommands, Core::Engine::GetMainDevice().Queues.Compute[0], {}, {GeometrySemaphore});
     }
 
-    //testing
-    {
-      Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Compute[0]);
-      auto entities = Core::Entity::GetAllEntities();
-      for (auto entity : entities)
-      {
-        auto mesh = entity->GetComponent<Component::Mesh>();
-        if (mesh == nullptr)
-          continue;
-        
-        Component::MeshBufferData data = {};
-        Graphics::Vulkan::Buffer::GetData<Component::MeshBufferData>(mesh->Buffer, &data, Component::MESH_SIZE);
-        std::cout<< "Test" <<std::endl;
-      }
-    }
-
     //combine meshes into single buffer
     {
       auto totalSize = meshBuffers.size() * Component::MESH_SIZE;
