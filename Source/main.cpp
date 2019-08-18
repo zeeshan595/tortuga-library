@@ -15,13 +15,13 @@ int main()
 
   Component::Mesh meshData = {};
   meshData.SetVertices({{{0, 1, 0, 0},
-                         {0, 0, 1, 0}},
+                         {0, 0, -1, 0}},
                         {{-1, 0, 0, 0},
-                         {0, 0, 1, 0}},
+                         {0, 0, -1, 0}},
                         {{1, 0, 0, 0},
-                         {0, 0, 1, 0}}});
+                         {0, 0, -1, 0}}});
   meshData.SetIndices({0, 1, 2});
-  meshData.ApplyTransformation({10, 1, 10}, {0, 0, 0, 1}, {1, 1, 1});
+  meshData.ApplyTransformation({0, 1, 10}, {0, 0, 0, 1}, {1, 1, 1});
 
   //attach transform and mesh component
   entity->AddComponent<Component::Transform>();

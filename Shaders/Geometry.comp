@@ -12,7 +12,7 @@ layout(set = 0, binding = 0) buffer Mesh {
 };
 
 void main() {
-  uint index = (gl_GlobalInvocationID.y * gl_NumWorkGroups.x * LOCAL_INVOCATION) + gl_GlobalInvocationID.x;
+  uint index = (gl_GlobalInvocationID.y * (mesh.VerticesSize / 2)) + gl_GlobalInvocationID.x;
   
   if (index >= mesh.VerticesSize)
     return;
