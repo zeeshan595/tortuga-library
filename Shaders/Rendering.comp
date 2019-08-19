@@ -109,25 +109,22 @@ void main() {
   //d /= 5.;
   //vec3 col = vec3(d);
 
-  float d = 1.;
-
-  Vertex tri[3] = {
-    {
-      {0, 1, 3, 0},
-      {0, 0, -1, 0}
-    },
-    {
-      {1, 0, 3, 0},
-      {0, 0, -1, 0}
-    },
-    {
-      {-1, 0, 3, 0},
-      {0, 0, -1, 0}
+  for (uint i = 0; i < 1; i++) {
+    for (uint j = 0; j < meshes[i].IndiciesSize; j+=3) {
+      uint i0 = meshes[i].Indicies[j + 0];
+      uint i1 = meshes[i].Indicies[j + 1];
+      uint i2 = meshes[i].Indicies[j + 2];
+      Vertex vertices[3];
+      vertices[0] = meshes[i].Verticies[i0];
+      vertices[1] = meshes[i].Verticies[i1];
+      vertices[2] = meshes[i].Verticies[i2];
+      bool intersect = triangleIntersection(rayOrigin, rayDirection, vertices);
+      if (intersect) {
+        pixels[index] = vec4(0., 0., 0., 1.);
+        return;
+      }
     }
-  };
-  bool intersect = triangleIntersection(rayOrigin, rayDirection, tri);
-  if (intersect)
-    d = 0.;
-
-  pixels[index] = vec4(d, d, d, 1.);
+  }
+  
+  pixels[index] = vec4(1., 1., 1., 1.);
 }

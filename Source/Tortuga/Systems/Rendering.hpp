@@ -124,11 +124,13 @@ public:
     //combine meshes into single buffer
     {
       auto totalSize = meshBuffers.size() * Component::MESH_SIZE;
-      if (totalSize != MeshCombineBuffer.Size)
+      if (MeshCombineBuffer.Buffer == VK_NULL_HANDLE || totalSize != MeshCombineBuffer.Size)
       {
         //buffer needs to be recreated
-        Graphics::Vulkan::Buffer::Destroy(MeshCombineBuffer);
-        MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), totalSize);
+        if (MeshCombineBuffer.Buffer != VK_NULL_HANDLE)
+          Graphics::Vulkan::Buffer::Destroy(MeshCombineBuffer);
+        
+        MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateHostDest(Core::Engine::GetMainDevice(), totalSize);
         Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(InRenderingDescriptorSet, {MeshCombineBuffer});
       }
       Graphics::Vulkan::Command::Begin(MeshCombineCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -141,6 +143,15 @@ public:
       Graphics::Vulkan::Command::End(MeshCombineCommand);
       Graphics::Vulkan::Command::Submit({MeshCombineCommand}, Core::Engine::GetMainDevice().Queues.Transfer[0], {GeometrySemaphore}, {MeshCombineSemaphore});
     }
+
+    Graphics::Vulkan::Device::WaitForDevice(Core::Engine::GetMainDevice());
+    Component::MeshBufferData temp = {};
+    auto entities = Core::Entity::GetAllEntities();
+    auto mesh = entities[0]->GetComponent<Component::Mesh>();
+    
+    Graphics::Vulkan::Buffer::GetData(mesh->Buffer, &temp, Component::MESH_SIZE);
+    Graphics::Vulkan::Buffer::GetData(MeshCombineBuffer, &temp, Component::MESH_SIZE);
+    Console::Info("test");
 
     //rendering
     {
@@ -206,7 +217,7 @@ public:
 
     //combine meshes into single buffer
     {
-      MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(Core::Engine::GetMainDevice(), 1);
+      MeshCombineBuffer.Buffer = VK_NULL_HANDLE;
       MeshCombineCommand = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
       MeshCombineSemaphore = Graphics::Vulkan::Semaphore::Create(Core::Engine::GetMainDevice());
     }

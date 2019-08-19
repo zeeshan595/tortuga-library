@@ -1,5 +1,5 @@
-#define MAX_VERTICES_SIZE 65535
-#define MAX_INDICES_SIZE 65535
+#define MAX_VERTICES_SIZE 3//65535
+#define MAX_INDICES_SIZE 3
 
 struct Vertex {
   vec4 Position;
@@ -11,6 +11,6 @@ struct MeshData{
   uint Indicies[MAX_INDICES_SIZE];
   uint VerticesSize;
   uint IndiciesSize;
-  mat4x4 Transformation;
-  mat4x4 NormalMatrix;
+  mat4 Transformation;
+  mat4 NormalMatrix;
 };
