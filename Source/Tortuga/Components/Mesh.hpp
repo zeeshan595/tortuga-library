@@ -22,19 +22,19 @@ namespace Component
 {
 #define MAX_VERTICES_SIZE 3
 #define MAX_INDICES_SIZE 3
-const uint32_t MESH_SIZE = ((sizeof(uint32_t) + sizeof(uint32_t)) +
+const uint32_t MESH_SIZE = ((sizeof(glm::mat4) + sizeof(glm::mat4)) +
                             (sizeof(Graphics::Vertex) * MAX_VERTICES_SIZE) +
-                            (sizeof(uint32_t) * MAX_INDICES_SIZE) +
-                            (sizeof(glm::mat4x4) + sizeof(glm::mat4x4)));
+                            (sizeof(int32_t) * MAX_INDICES_SIZE) +
+                            (sizeof(int32_t) + sizeof(int32_t)));
 
 struct MeshBufferData
 {
-  Graphics::Vertex Vertices[MAX_VERTICES_SIZE];
-  uint32_t Indices[MAX_INDICES_SIZE];
-  uint32_t VerticesSize;
-  uint32_t IndicesSize;
+  int32_t VerticesSize;
+  int32_t IndicesSize;
   glm::mat4 Transformation;
   glm::mat4 NormalMatrix;
+  Graphics::Vertex Vertices[MAX_VERTICES_SIZE];
+  int32_t Indices[MAX_INDICES_SIZE];
 };
 struct Mesh
 {

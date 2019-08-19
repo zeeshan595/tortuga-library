@@ -16,8 +16,7 @@ void main() {
   
   if (index >= mesh.VerticesSize)
     return;
-  
-  mesh.Verticies[index].Position = mesh.Verticies[index].Position * mesh.Transformation;
+    
+  mesh.Verticies[index].Position = mesh.Transformation[0];//mesh.Verticies[index].Position * mesh.Transformation;
   mesh.Verticies[index].Normal = mesh.Verticies[index].Normal * mesh.NormalMatrix;
 }
-

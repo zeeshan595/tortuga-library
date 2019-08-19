@@ -29,8 +29,7 @@ CreateComputePipeline(Device::Device device, Shader::Shader shader, std::vector<
     layoutInfo.setLayoutCount = setLayouts.size();
     layoutInfo.pSetLayouts = setLayouts.data();
   }
-  ErrorCheck::Callback(
-      vkCreatePipelineLayout(device.Device, &layoutInfo, nullptr, &data.Layout));
+  ErrorCheck::Callback(vkCreatePipelineLayout(device.Device, &layoutInfo, nullptr, &data.Layout));
 
   VkPipelineCacheCreateInfo cacheInfo = {};
   {
@@ -38,8 +37,7 @@ CreateComputePipeline(Device::Device device, Shader::Shader shader, std::vector<
     cacheInfo.initialDataSize = cache.size();
     cacheInfo.pInitialData = cache.data();
   }
-  ErrorCheck::Callback(
-      vkCreatePipelineCache(device.Device, &cacheInfo, nullptr, &data.Cache));
+  ErrorCheck::Callback(vkCreatePipelineCache(device.Device, &cacheInfo, nullptr, &data.Cache));
 
   VkComputePipelineCreateInfo pipelineInfo = {};
   {
@@ -57,8 +55,7 @@ CreateComputePipeline(Device::Device device, Shader::Shader shader, std::vector<
     pipelineInfo.basePipelineIndex = 0;
     pipelineInfo.basePipelineHandle = 0;
   }
-  ErrorCheck::Callback(vkCreateComputePipelines(
-      device.Device, data.Cache, 1, &pipelineInfo, nullptr, &data.Pipeline));
+  ErrorCheck::Callback(vkCreateComputePipelines(device.Device, data.Cache, 1, &pipelineInfo, nullptr, &data.Pipeline));
   return data;
 }
 void DestroyPipeline(Pipeline data)
@@ -71,11 +68,9 @@ std::vector<char>
 GetCacheData(Pipeline data)
 {
   size_t cacheCount;
-  ErrorCheck::Callback(
-      vkGetPipelineCacheData(data.Device, data.Cache, &cacheCount, nullptr));
+  ErrorCheck::Callback(vkGetPipelineCacheData(data.Device, data.Cache, &cacheCount, nullptr));
   std::vector<char> cacheData(cacheCount);
-  ErrorCheck::Callback(vkGetPipelineCacheData(
-      data.Device, data.Cache, &cacheCount, cacheData.data()));
+  ErrorCheck::Callback(vkGetPipelineCacheData(data.Device, data.Cache, &cacheCount, cacheData.data()));
   return cacheData;
 }
 } // namespace Pipeline
