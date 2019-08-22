@@ -7,12 +7,12 @@ struct Vertex {
 };
 
 struct MeshBufferData{
-  int VerticesSize; //1N
-  int IndiciesSize; //1N
-  int reserved1; //1N
-  int reserved2; //1N
-  mat4 Transformation; //16N
+  uint VerticesSize; //1N
+  uint IndiciesSize; //1N
+  uint reserved1; //1N
+  uint reserved2; //1N
+  mat4 Transformation; //16N 
   mat4 NormalMatrix; //16N
   Vertex Verticies[MAX_VERTICES_SIZE]; //4N * MAX_VERTICES_SIZE
-  int Indicies[MAX_INDICES_SIZE]; //1N * MAX_INDICES_SIZE
+  uint Indicies[MAX_INDICES_SIZE]; //1N * MAX_INDICES_SIZE
 };

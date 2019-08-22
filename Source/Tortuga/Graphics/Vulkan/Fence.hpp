@@ -20,11 +20,12 @@ struct Fence
   VkFence Fence;
 };
 
-Fence Create(Device::Device device);
+Fence Create(Device::Device device, bool signaled = false);
 void Destroy(Fence data);
 
 void ResetFences(std::vector<Fence> data);
 void WaitForFences(std::vector<Fence> data, bool waitAll = true, uint32_t timeout = std::numeric_limits<uint32_t>::max());
+bool IsFenceSignaled(Fence data);
 } // namespace Fence
 } // namespace Vulkan
 } // namespace Graphics

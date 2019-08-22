@@ -99,7 +99,7 @@ void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {
   vkCmdDispatch(data.Command, x, y, z);
 }
-void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait, std::vector<Semaphore::Semaphore> signal)
+void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait, std::vector<Semaphore::Semaphore> signal, Fence::Fence fence)
 {
   if (data.size() <= 0)
     return;
@@ -128,7 +128,7 @@ void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Sem
     submitInfo.signalSemaphoreCount = signalSemaphores.size();
     submitInfo.pSignalSemaphores = signalSemaphores.data();
   }
-  ErrorCheck::Callback(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+  ErrorCheck::Callback(vkQueueSubmit(queue, 1, &submitInfo, fence.Fence));
 }
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout)
 {

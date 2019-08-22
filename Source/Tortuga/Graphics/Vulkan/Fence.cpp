@@ -8,7 +8,7 @@ namespace Vulkan
 {
 namespace Fence
 {
-Fence Create(Device::Device device)
+Fence Create(Device::Device device, bool signaled)
 {
   Fence data = {};
   data.Device = device.Device;
@@ -16,6 +16,8 @@ Fence Create(Device::Device device)
   VkFenceCreateInfo fenceInfo = {};
   {
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    if (signaled)
+      fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
   }
   ErrorCheck::Callback(vkCreateFence(device.Device, &fenceInfo, nullptr, &data.Fence));
   return data;
@@ -68,6 +70,11 @@ void WaitForFences(std::vector<Fence> data, bool waitAll, uint32_t timeout)
   }
 
   ErrorCheck::Callback(vkWaitForFences(device, fences.size(), fences.data(), waitAll, timeout));
+}
+bool IsFenceSignaled(Fence data)
+{
+  const auto result = vkGetFenceStatus(data.Device, data.Fence);
+  return result == VK_SUCCESS;
 }
 } // namespace Fence
 } // namespace Vulkan

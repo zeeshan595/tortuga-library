@@ -128,6 +128,7 @@ void Destroy(Swapchain data)
 }
 uint32_t AquireNextImage(Swapchain data)
 {
+  
   vkResetFences(data.Device, 1, &data.Fence);
   uint32_t imageIndex;
   ErrorCheck::Callback(vkAcquireNextImageKHR(data.Device, data.Swapchain, std::numeric_limits<uint64_t>::max(), VK_NULL_HANDLE, data.Fence, &imageIndex));

@@ -14,6 +14,7 @@
 #include "../Graphics/Vulkan/Instance.hpp"
 #include "../Graphics/Vulkan/Window.hpp"
 #include "../Graphics/Vulkan/Semaphore.hpp"
+#include "../Graphics/Vulkan/Fence.hpp"
 
 #include "../Core/System.hpp"
 #include "../Core/Screen.hpp"
@@ -40,6 +41,7 @@ private:
   Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool ComputeCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
+  Graphics::Vulkan::Fence::Fence RenderingWaiter;
 
   //geometry
   Graphics::Vulkan::Shader::Shader GeometryShader;
@@ -90,6 +92,11 @@ private:
 public:
   void Update()
   {
+    //wait for previous render to finish before starting a new render process
+    if (!Graphics::Vulkan::Fence::IsFenceSignaled(RenderingWaiter))
+      return;
+    Graphics::Vulkan::Fence::ResetFences({RenderingWaiter});
+
     //geometry processing
     std::vector<Graphics::Vulkan::Buffer::Buffer> meshBuffers;
     {
@@ -144,11 +151,6 @@ public:
       Graphics::Vulkan::Command::Submit({MeshCombineCommand}, Core::Engine::GetMainDevice().Queues.Transfer[0], {GeometrySemaphore}, {MeshCombineSemaphore});
     }
 
-    Graphics::Vulkan::Device::WaitForDevice(Core::Engine::GetMainDevice());
-    Component::MeshBufferData temp = {};
-    auto entities = Core::Entity::GetAllEntities();
-    auto mesh = entities[0]->GetComponent<Component::Mesh>();
-
     //rendering
     {
       //check if window was resized
@@ -184,7 +186,7 @@ public:
       Graphics::Vulkan::Command::BlitImage(PresentCommand, RenderingImage, presentImage, {RenderingWindowSize[0], RenderingWindowSize[1]}, {0, 0}, {0, 0});
       Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, presentImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
       Graphics::Vulkan::Command::End(PresentCommand);
-      Graphics::Vulkan::Command::Submit({PresentCommand}, Core::Engine::GetMainDevice().Queues.Graphics[0], {RenderingSemaphore}, {PresentSemaphore});
+      Graphics::Vulkan::Command::Submit({PresentCommand}, Core::Engine::GetMainDevice().Queues.Graphics[0], {RenderingSemaphore}, {PresentSemaphore}, RenderingWaiter);
 
       Graphics::Vulkan::Swapchain::PresentImage(Core::Screen::GetSwapchain(), index, Core::Engine::GetMainDevice().Queues.Present, {PresentSemaphore});
     }
@@ -197,6 +199,7 @@ public:
       TransferCommandPool = Graphics::Vulkan::CommandPool::Create(Core::Engine::GetMainDevice(), Core::Engine::GetMainDevice().QueueFamilies.Transfer.Index);
       ComputeCommandPool = Graphics::Vulkan::CommandPool::Create(Core::Engine::GetMainDevice(), Core::Engine::GetMainDevice().QueueFamilies.Compute.Index);
       GraphicsCommandPool = Graphics::Vulkan::CommandPool::Create(Core::Engine::GetMainDevice(), Core::Engine::GetMainDevice().QueueFamilies.Graphics.Index);
+      RenderingWaiter = Graphics::Vulkan::Fence::Create(Core::Engine::GetMainDevice(), true);
     }
 
     //geometry pipeline
@@ -260,6 +263,7 @@ public:
       Graphics::Vulkan::CommandPool::Destroy(TransferCommandPool);
       Graphics::Vulkan::CommandPool::Destroy(ComputeCommandPool);
       Graphics::Vulkan::CommandPool::Destroy(GraphicsCommandPool);
+      Graphics::Vulkan::Fence::Destroy(RenderingWaiter);
     }
 
     //geometry pipeline
