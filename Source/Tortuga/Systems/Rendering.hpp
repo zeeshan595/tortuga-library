@@ -75,6 +75,10 @@ private:
 
   void UpdateWindowSize()
   {
+    Graphics::Vulkan::Device::WaitForDevice(Core::Engine::GetMainDevice());
+    Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Compute[0]);
+    Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Transfer[0]);
+    Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Graphics[0]);
     RenderInfo renderInfo = {};
     {
       renderInfo.WindowWidth = RenderingWindowSize[0];
