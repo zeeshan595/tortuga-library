@@ -1,4 +1,4 @@
-#define MAX_VERTICES_SIZE 3//65535
+#define MAX_VERTICES_SIZE 3
 #define MAX_INDICES_SIZE 3
 
 struct Vertex {
@@ -6,9 +6,11 @@ struct Vertex {
   vec4 Normal;
 };
 
-struct MeshData{
+struct MeshBufferData{
   int VerticesSize;
   int IndiciesSize;
+  int reserved1;
+  int reserved2;
   mat4 Transformation;
   mat4 NormalMatrix;
   Vertex Verticies[MAX_VERTICES_SIZE];

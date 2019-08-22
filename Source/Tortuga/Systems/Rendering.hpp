@@ -148,10 +148,6 @@ public:
     Component::MeshBufferData temp = {};
     auto entities = Core::Entity::GetAllEntities();
     auto mesh = entities[0]->GetComponent<Component::Mesh>();
-    
-    Graphics::Vulkan::Buffer::GetData(mesh->Buffer, &temp, Component::MESH_SIZE);
-    Graphics::Vulkan::Buffer::GetData(MeshCombineBuffer, &temp, Component::MESH_SIZE);
-    Console::Info("test");
 
     //rendering
     {

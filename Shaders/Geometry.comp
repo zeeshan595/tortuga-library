@@ -8,31 +8,18 @@ layout(local_size_z = 1) in;
 #define MAX_VERTICES_SIZE 3//65535
 #define MAX_INDICES_SIZE 3
 
-struct Vertex {
-  vec4 Position;
-  vec4 Normal;
-};
+#include "./Partial/Mesh.comp"
 
 layout(set = 0, binding = 0) buffer Mesh {
-  int VerticesSize;
-  int IndiciesSize;
-  mat4 Transformation;
-  mat4 NormalMatrix;
-  Vertex Verticies[MAX_VERTICES_SIZE];
-  int Indicies[MAX_INDICES_SIZE];
-} mesh;
+  MeshBufferData mesh;
+};
 
 void main() {
-  for (uint i = 0; i < MAX_VERTICES_SIZE; i++)
-    mesh.Verticies[i].Position = mesh.Transformation[0];
-    
-  /*
   uint index = (gl_GlobalInvocationID.y * (mesh.VerticesSize / 2)) + gl_GlobalInvocationID.x;
   
   if (index >= mesh.VerticesSize)
     return;
     
-  mesh.Verticies[index].Position = mesh.Transformation[0];//mesh.Verticies[index].Position * mesh.Transformation;
-  mesh.Verticies[index].Normal = mesh.Verticies[index].Normal * mesh.NormalMatrix;
-  */
+  mesh.Verticies[index].Position = mesh.Transformation * mesh.Verticies[index].Position;
+  mesh.Verticies[index].Normal = mesh.NormalMatrix * mesh.Verticies[index].Normal;
 }

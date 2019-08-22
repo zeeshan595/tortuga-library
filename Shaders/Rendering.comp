@@ -9,7 +9,7 @@ layout(local_size_z = 1) in;
 
 //meshes buffer
 layout(set = 0, binding = 0) buffer Mesh {
-  MeshData meshes[];
+  MeshBufferData meshes[];
 };
 
 //render image buffers
@@ -110,7 +110,7 @@ void main() {
   //vec3 col = vec3(d);
 
   for (uint i = 0; i < 1; i++) {
-    for (uint j = 0; j < meshes[i].IndiciesSize; j+=3) {
+    for (uint j = 0; j < 3; j+=3) {
       uint i0 = meshes[i].Indicies[j + 0];
       uint i1 = meshes[i].Indicies[j + 1];
       uint i2 = meshes[i].Indicies[j + 2];
