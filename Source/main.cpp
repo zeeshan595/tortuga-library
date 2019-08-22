@@ -21,13 +21,11 @@ int main()
                         {{1, 0, 0, 1},
                          {0, 0, 1, 1}}});
   meshData.SetIndices({0, 1, 2});
-  meshData.ApplyTransformation({0, 0, 10}, {0, 0, 0, 1}, {1, 1, 1});
+  meshData.ApplyTransformation({0, 0, 3}, {0, 0, 0, 1}, {1, 1, 1});
 
   //attach transform and mesh component
   entity->AddComponent<Component::Transform>();
   entity->AddComponent<Component::Mesh>(&meshData);
-
-  Core::IterateSystemLoop();
 
   //Main Loop
   bool shouldClose = false;
@@ -40,7 +38,7 @@ int main()
       shouldClose = true;
 
     //iterate through all system and execute update functions
-    //Core::IterateSystemLoop();
+    Core::IterateSystemLoop();
   }
 
   //remove transform and mesh component

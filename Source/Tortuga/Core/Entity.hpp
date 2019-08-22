@@ -40,7 +40,7 @@ public:
     if (this->Components[type] == nullptr)
       return;
 
-    delete static_cast<T *>(this->Components[type]);
+    //delete this->Components[type];
     this->Components.erase(type);
   }
   template <typename T>

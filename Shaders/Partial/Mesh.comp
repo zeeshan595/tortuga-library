@@ -2,17 +2,17 @@
 #define MAX_INDICES_SIZE 3
 
 struct Vertex {
-  vec4 Position;
-  vec4 Normal;
+  vec4 Position; //4N
+  vec4 Normal; //4N
 };
 
 struct MeshBufferData{
-  int VerticesSize;
-  int IndiciesSize;
-  int reserved1;
-  int reserved2;
-  mat4 Transformation;
-  mat4 NormalMatrix;
-  Vertex Verticies[MAX_VERTICES_SIZE];
-  int Indicies[MAX_INDICES_SIZE];
+  int VerticesSize; //1N
+  int IndiciesSize; //1N
+  int reserved1; //1N
+  int reserved2; //1N
+  mat4 Transformation; //16N
+  mat4 NormalMatrix; //16N
+  Vertex Verticies[MAX_VERTICES_SIZE]; //4N * MAX_VERTICES_SIZE
+  int Indicies[MAX_INDICES_SIZE]; //1N * MAX_INDICES_SIZE
 };
