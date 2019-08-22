@@ -1,5 +1,5 @@
-#define MAX_VERTICES_SIZE 3
-#define MAX_INDICES_SIZE 3
+#define MAX_VERTICES_SIZE 65535
+#define MAX_INDICES_SIZE 65535
 
 struct Vertex {
   vec4 Position; //4N

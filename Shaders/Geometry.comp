@@ -5,9 +5,6 @@ layout(local_size_x = LOCAL_INVOCATION) in;
 layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
 
-#define MAX_VERTICES_SIZE 3//65535
-#define MAX_INDICES_SIZE 3
-
 #include "./Partial/Mesh.comp"
 
 layout(set = 0, binding = 0) buffer Mesh {

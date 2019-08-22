@@ -20,13 +20,8 @@ namespace Tortuga
 {
 namespace Component
 {
-#define MAX_VERTICES_SIZE 3
-#define MAX_INDICES_SIZE 3
-const uint32_t MESH_SIZE = ((sizeof(glm::mat4) + sizeof(glm::mat4)) +
-                            (sizeof(Graphics::Vertex) * MAX_VERTICES_SIZE) +
-                            (sizeof(uint32_t) * MAX_INDICES_SIZE) +
-                            (sizeof(uint32_t) + sizeof(uint32_t)) +
-                            (sizeof(uint32_t) + sizeof(uint32_t)));
+#define MAX_VERTICES_SIZE 65535
+#define MAX_INDICES_SIZE 65535
 
 struct MeshBufferData
 {
@@ -39,6 +34,7 @@ struct MeshBufferData
   Graphics::Vertex Vertices[MAX_VERTICES_SIZE];
   uint32_t Indices[MAX_INDICES_SIZE];
 };
+const uint32_t MESH_SIZE = sizeof(MeshBufferData);
 struct Mesh
 {
   MeshBufferData BufferData;
