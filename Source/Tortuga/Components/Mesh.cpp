@@ -89,8 +89,19 @@ void Mesh::SetIndices(std::vector<uint32_t> indices)
   this->BufferData.IndicesSize = indices.size();
 }
 
+void Mesh::SetStatic()
+{
+  this->IsStatic = true;
+}
+void Mesh::SetDynamic()
+{
+  this->IsStatic = false;
+}
+
 Mesh::Mesh()
 {
+  this->IsStatic = false;
+  this->IsProcessedOnce = false;
   this->BufferData.Transformation = glm::mat4(1.0);
   this->BufferData.NormalMatrix = glm::mat4(1.0);
   this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), {DescriptorLayout.meshDescriptorLayout});

@@ -38,6 +38,8 @@ struct MeshBufferData
 const uint32_t MESH_SIZE = sizeof(MeshBufferData);
 struct Mesh
 {
+  bool IsStatic;
+  bool IsProcessedOnce;
   MeshBufferData BufferData;
   Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
   Graphics::Vulkan::DescriptorSets::DescriptorSets DescriptorSets;
@@ -50,6 +52,8 @@ struct Mesh
   void ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3 scale);
   void SetVertices(std::vector<Graphics::Vertex> vertices, bool recalculateBounds = false);
   void SetIndices(std::vector<uint32_t> indices);
+  void SetStatic();
+  void SetDynamic();
 
   Mesh();
   ~Mesh();

@@ -23,6 +23,7 @@ int main()
                        true);
   meshData.SetIndices({0, 1, 2});
   meshData.ApplyTransformation({0, 0, 3}, {0, 0, 0, 1}, {1, 1, 1});
+  meshData.SetStatic();
 
   //attach transform and mesh component
   entity->AddComponent<Component::Transform>();

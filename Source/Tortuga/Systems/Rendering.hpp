@@ -99,6 +99,7 @@ public:
 
     //geometry processing
     std::vector<Graphics::Vulkan::Buffer::Buffer> meshBuffers;
+    std::vector<Graphics::Vulkan::Semaphore::Semaphore> meshSemaphore;
     {
       auto geometryPipeline = this->GeometryPipeline;
       auto entities = Core::Entity::GetAllEntities();
@@ -111,6 +112,8 @@ public:
           continue;
 
         meshBuffers.push_back(mesh->Buffer);
+        if (mesh->IsStatic && mesh->IsProcessedOnce)
+          continue;
         meshCommands.push_back(mesh->Command);
         meshThreads.push_back(std::async(std::launch::async, [mesh, geometryPipeline] {
           Graphics::Vulkan::Buffer::SetData(mesh->Staging, &mesh->BufferData, Component::MESH_SIZE);
@@ -121,11 +124,15 @@ public:
           Graphics::Vulkan::Command::Compute(mesh->Command, computeGroupSize, computeGroupSize, 1);
           Graphics::Vulkan::Command::End(mesh->Command);
         }));
+        mesh->IsProcessedOnce = true;
       }
       for (uint32_t i = 0; i < meshThreads.size(); i++)
         meshThreads[i].wait();
 
-      Graphics::Vulkan::Command::Submit(meshCommands, Core::Engine::GetMainDevice().Queues.Compute[0], {}, {GeometrySemaphore});
+      if (meshCommands.size() > 0)
+        meshSemaphore.push_back(GeometrySemaphore);
+
+      Graphics::Vulkan::Command::Submit(meshCommands, Core::Engine::GetMainDevice().Queues.Compute[0], {}, meshSemaphore);
     }
 
     //combine meshes into single buffer
@@ -136,7 +143,7 @@ public:
         //buffer needs to be recreated
         if (MeshCombineBuffer.Buffer != VK_NULL_HANDLE)
           Graphics::Vulkan::Buffer::Destroy(MeshCombineBuffer);
-        
+
         MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateHostDest(Core::Engine::GetMainDevice(), totalSize);
         Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(InRenderingDescriptorSet, {MeshCombineBuffer});
       }
@@ -148,7 +155,7 @@ public:
         offset += meshBuffer.Size;
       }
       Graphics::Vulkan::Command::End(MeshCombineCommand);
-      Graphics::Vulkan::Command::Submit({MeshCombineCommand}, Core::Engine::GetMainDevice().Queues.Transfer[0], {GeometrySemaphore}, {MeshCombineSemaphore});
+      Graphics::Vulkan::Command::Submit({MeshCombineCommand}, Core::Engine::GetMainDevice().Queues.Transfer[0], meshSemaphore, {MeshCombineSemaphore});
     }
 
     //rendering
