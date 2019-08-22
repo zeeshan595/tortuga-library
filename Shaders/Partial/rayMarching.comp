@@ -1,0 +1,25 @@
+#define MAX_STEPS 100
+#define MAX_DIST 100.
+#define SURF_DIST .01
+
+struct MinDistanceResponse {
+  float dist;
+  uint meshIndex;
+};
+
+MinDistanceResponse GetMinDistance(vec3 point);
+
+MinDistanceResponse RayMarch(vec3 rayOrigin, vec3 rayDirection) {
+  MinDistanceResponse rtn = {0., 0};
+  for (int i = 0; i < MAX_STEPS; i++) {
+    vec3 rayLocation = rayOrigin + (rtn.dist * rayDirection);
+    MinDistanceResponse resp = GetMinDistance(rayLocation);
+    rtn.dist += resp.dist;
+    if (rtn.dist < SURF_DIST || rtn.dist > MAX_DIST)
+      break;
+  }
+  return rtn;
+}
+float SphereDist(vec3 position, float radius, vec3 point) {
+  return length(point - position) - radius;
+}
