@@ -28,7 +28,8 @@ struct MeshBufferData
   uint32_t VerticesSize;
   uint32_t IndicesSize;
   uint32_t Reserved1;
-  uint32_t Reserved2;
+  float Bounds;
+  glm::vec4 Center;
   glm::mat4 Transformation;
   glm::mat4 NormalMatrix;
   Graphics::Vertex Vertices[MAX_VERTICES_SIZE];
@@ -47,7 +48,7 @@ struct Mesh
 
   void ResetTransformation();
   void ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3 scale);
-  void SetVertices(std::vector<Graphics::Vertex> vertices);
+  void SetVertices(std::vector<Graphics::Vertex> vertices, bool recalculateBounds = false);
   void SetIndices(std::vector<uint32_t> indices);
 
   Mesh();

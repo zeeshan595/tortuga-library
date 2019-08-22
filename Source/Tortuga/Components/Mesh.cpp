@@ -44,7 +44,7 @@ void Mesh::ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3
   this->BufferData.NormalMatrix = glm::rotate(this->BufferData.NormalMatrix, rotation.z, glm::vec3(0, 0, rotation.w));
 }
 
-void Mesh::SetVertices(std::vector<Graphics::Vertex> vertices)
+void Mesh::SetVertices(std::vector<Graphics::Vertex> vertices, bool recalculateBounds)
 {
   if (vertices.size() > MAX_VERTICES_SIZE)
   {
@@ -53,6 +53,24 @@ void Mesh::SetVertices(std::vector<Graphics::Vertex> vertices)
   }
   memcpy(this->BufferData.Vertices, vertices.data(), vertices.size() * sizeof(Graphics::Vertex));
   this->BufferData.VerticesSize = vertices.size();
+
+  if (recalculateBounds)
+  {
+    //calculate center
+    this->BufferData.Center = glm::vec4(0, 0, 0, 0);
+    for (uint32_t i = 0; i < this->BufferData.VerticesSize; i++)
+      this->BufferData.Center += this->BufferData.Vertices[i].Position;
+    this->BufferData.Center /= this->BufferData.VerticesSize;
+
+    //calculate bounds
+    this->BufferData.Bounds = glm::length(this->BufferData.Vertices[0].Position - this->BufferData.Center);
+    for (uint32_t i = 0; i < this->BufferData.VerticesSize; i++)
+    {
+      float len = glm::length(this->BufferData.Vertices[i].Position - this->BufferData.Center);
+      if (len > this->BufferData.Bounds)
+        this->BufferData.Bounds = len;
+    }
+  }
 }
 
 void Mesh::SetIndices(std::vector<uint32_t> indices)

@@ -9,8 +9,9 @@ struct Vertex {
 struct MeshBufferData{
   uint VerticesSize; //1N
   uint IndiciesSize; //1N
-  uint reserved1; //1N
-  uint reserved2; //1N
+  uint Reserved1; // 1N
+  float Bounds; //1N
+  vec4 Center; //4N
   mat4 Transformation; //16N 
   mat4 NormalMatrix; //16N
   Vertex Verticies[MAX_VERTICES_SIZE]; //4N * MAX_VERTICES_SIZE
