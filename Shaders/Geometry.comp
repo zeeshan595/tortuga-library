@@ -16,7 +16,11 @@ void main() {
   
   if (index >= mesh.VerticesSize)
     return;
-    
+  
+  if (index == 0) {
+    mesh.Center = mesh.Transformation * mesh.Center;
+  }
+
   mesh.Verticies[index].Position = mesh.Transformation * mesh.Verticies[index].Position;
   mesh.Verticies[index].Normal = mesh.NormalMatrix * mesh.Verticies[index].Normal;
 }
