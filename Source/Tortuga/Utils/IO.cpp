@@ -25,13 +25,10 @@ std::vector<char> GetFileContents(std::string filePath)
 }
 ObjExport LoadObjFile(std::string filePath)
 {
-  std::vector<uint> indices;
+  std::vector<uint> vertexIndices, textureIndices, normalIndices;
   std::vector<glm::vec3> temp_vertices;
-  std::vector<glm::vec2> temp_uvs;
+  std::vector<glm::vec2> temp_texture;
   std::vector<glm::vec3> temp_normals;
-
-  std::vector<glm::vec2> texture;
-  std::vector<glm::vec3> normal;
 
   FILE *file = fopen(filePath.c_str(), "r");
   if (file == NULL)
@@ -58,7 +55,7 @@ ObjExport LoadObjFile(std::string filePath)
     {
       glm::vec2 uv;
       fscanf(file, "%f %f\n", &uv.x, &uv.y);
-      temp_uvs.push_back(uv);
+      temp_texture.push_back(uv);
     }
     else if (strcmp(lineHeader, "vn") == 0)
     {
@@ -68,11 +65,6 @@ ObjExport LoadObjFile(std::string filePath)
     }
     else if (strcmp(lineHeader, "f") == 0)
     {
-      if (texture.size() != temp_vertices.size())
-        texture.resize(temp_vertices.size());
-      if (normal.size() != temp_vertices.size())
-        normal.resize(temp_vertices.size());
-
       std::string vertex1, vertex2, vertex3;
       unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
       int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
@@ -81,25 +73,37 @@ ObjExport LoadObjFile(std::string filePath)
         printf("File can't be read by our simple parser : ( Try exporting with other options\n");
         return {};
       }
-      indices.push_back(vertexIndex[0] - 1);
-      indices.push_back(vertexIndex[1] - 1);
-      indices.push_back(vertexIndex[2] - 1);
-      texture.push_back(temp_uvs[uvIndex[0] - 1]);
-      texture.push_back(temp_uvs[uvIndex[1] - 1]);
-      texture.push_back(temp_uvs[uvIndex[2] - 1]);
-      normal.push_back(temp_normals[normalIndex[0] - 1]);
-      normal.push_back(temp_normals[normalIndex[1] - 1]);
-      normal.push_back(temp_normals[normalIndex[2] - 1]);
+      vertexIndices.push_back(vertexIndex[0] - 1);
+      vertexIndices.push_back(vertexIndex[1] - 1);
+      vertexIndices.push_back(vertexIndex[2] - 1);
+      textureIndices.push_back(uvIndex[0] - 1);
+      textureIndices.push_back(uvIndex[1] - 1);
+      textureIndices.push_back(uvIndex[2] - 1);
+      normalIndices.push_back(normalIndex[0] - 1);
+      normalIndices.push_back(normalIndex[1] - 1);
+      normalIndices.push_back(normalIndex[2] - 1);
     }
   }
+  if (vertexIndices.size() != textureIndices.size() || textureIndices.size() != normalIndices.size())
+    return {};
 
-  std::vector<Graphics::Vertex> vertices(temp_vertices.size());
-  for (uint32_t i = 0; i < vertices.size(); i++)
+  std::vector<Graphics::Vertex> vertices(vertexIndices.size());
+  std::vector<uint> indices;
+  for (uint32_t i = 0; i < vertexIndices.size(); i++)
   {
-    vertices[i].Position = glm::vec4(temp_vertices[i].x, temp_vertices[i].y, temp_vertices[i].z, 1.0f);
-    //vertices[i].Texture = glm::vec4(texture[i].x, texture[i].y, 0, 0);
-    vertices[i].Normal = glm::vec4(normal[i].x, normal[i].y, normal[i].z, 1.0f);
+    indices.push_back(i);
+    vertices[i].Position = glm::vec4(
+        temp_vertices[vertexIndices[i]].x,
+        temp_vertices[vertexIndices[i]].y,
+        temp_vertices[vertexIndices[i]].z,
+        1.0f);
+    vertices[i].Normal = glm::vec4(
+        temp_normals[normalIndices[i]].x,
+        temp_normals[normalIndices[i]].y,
+        temp_normals[normalIndices[i]].z,
+        1.0f);
   }
+
   return {vertices, indices};
 }
 void SetFileContents(std::string filePath, std::vector<char> data)

@@ -32,11 +32,11 @@ void Mesh::ResetTransformation()
 void Mesh::ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3 scale)
 {
   this->BufferData.Transformation = glm::mat4(1.0f);
-  this->BufferData.Transformation = glm::scale(this->BufferData.Transformation, scale);
+  this->BufferData.Transformation = glm::translate(this->BufferData.Transformation, position);
   this->BufferData.Transformation = glm::rotate(this->BufferData.Transformation, rotation.y, glm::vec3(0, rotation.w, 0));
   this->BufferData.Transformation = glm::rotate(this->BufferData.Transformation, rotation.x, glm::vec3(rotation.w, 0, 0));
   this->BufferData.Transformation = glm::rotate(this->BufferData.Transformation, rotation.z, glm::vec3(0, 0, rotation.w));
-  this->BufferData.Transformation = glm::translate(this->BufferData.Transformation, position);
+  this->BufferData.Transformation = glm::scale(this->BufferData.Transformation, scale);
 
   this->BufferData.NormalMatrix = glm::mat4(1.0);
   this->BufferData.NormalMatrix = glm::rotate(this->BufferData.NormalMatrix, rotation.y, glm::vec3(0, rotation.w, 0));

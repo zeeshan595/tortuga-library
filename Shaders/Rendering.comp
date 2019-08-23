@@ -24,7 +24,7 @@ layout(set = 1, binding = 1) buffer Render {
 };
 
 MinDistanceResponse GetMinDistance(vec3 point) {
-  MinDistanceResponse rtn = {99999, 0};
+  MinDistanceResponse rtn = {MAX_DIST, 0};
   for (uint i = 0; i < 1; i++) {
     float dist = SphereDist(meshes[i].Center.xyz, meshes[i].Bounds, point);
     if (rtn.dist > dist) {
@@ -47,10 +47,7 @@ void main() {
 
   MinDistanceResponse ray = RayMarch(rayOrigin, rayDirection);
   if (ray.dist <= SURF_DIST) {
-    pixels[index] = vec4(0., 0., 0., 1.);
-    return;
-    //fix below 'triangleIntersection(...);'
-    for (uint j = 0; j < 3; j+=3) {
+    for (uint j = 0; j < meshes[ray.meshIndex].IndiciesSize; j+=3) {
       uint i0 = meshes[ray.meshIndex].Indicies[j + 0];
       uint i1 = meshes[ray.meshIndex].Indicies[j + 1];
       uint i2 = meshes[ray.meshIndex].Indicies[j + 2];

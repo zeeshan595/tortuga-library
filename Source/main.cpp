@@ -18,12 +18,18 @@ int main()
   Component::Mesh meshData = {};
   meshData.SetVertices(cube.Vertices, true);
   meshData.SetIndices(cube.Indices);
-  meshData.ApplyTransformation({0, 0, 10}, {0, 0, 0, 1}, {1, 1, 1});
-  meshData.SetStatic();
+  meshData.SetDynamic();
+
+  Component::Transform transformData = {};
+  transformData.Position = glm::vec3(0, 0, 10);
+  transformData.Rotation = glm::vec4(0, 0, 0, 1);
+  transformData.Scale = glm::vec3(1, 1, 1);
 
   //attach transform and mesh component
-  entity->AddComponent<Component::Transform>();
+  entity->AddComponent<Component::Transform>(&transformData);
   entity->AddComponent<Component::Mesh>(&meshData);
+
+  float yPosition = 0.0f;
 
   //Main Loop
   bool shouldClose = false;
@@ -35,8 +41,11 @@ int main()
     if (event.window.event == SDL_WINDOWEVENT_CLOSE)
       shouldClose = true;
 
+    entity->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yPosition, 0, 1);
+
     //iterate through all system and execute update functions
     Core::IterateSystemLoop();
+    yPosition += 0.0001;
   }
 
   //remove transform and mesh component

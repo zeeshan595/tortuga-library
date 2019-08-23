@@ -115,6 +115,10 @@ public:
         if (mesh == nullptr)
           continue;
 
+        auto transform = entity->GetComponent<Component::Transform>();
+        if (transform)
+          mesh->ApplyTransformation(transform->Position, transform->Rotation, transform->Scale);
+
         meshBuffers.push_back(mesh->Buffer);
         if (mesh->IsStatic && mesh->IsProcessedOnce)
           continue;
