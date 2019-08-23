@@ -8,13 +8,14 @@ struct MinDistanceResponse {
 };
 
 MinDistanceResponse GetMinDistance(vec3 point);
-
 MinDistanceResponse RayMarch(vec3 rayOrigin, vec3 rayDirection) {
+  float rayTravelDist = 0.;
   MinDistanceResponse rtn = {0., 0};
   for (int i = 0; i < MAX_STEPS; i++) {
-    vec3 rayLocation = rayOrigin + (rtn.dist * rayDirection);
+    vec3 rayLocation = rayOrigin + (rayTravelDist * rayDirection);
     MinDistanceResponse resp = GetMinDistance(rayLocation);
-    rtn.dist += resp.dist;
+    rayTravelDist += resp.dist;
+    rtn.dist = resp.dist;
     if (rtn.dist < SURF_DIST || rtn.dist > MAX_DIST)
       break;
   }

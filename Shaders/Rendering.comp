@@ -23,14 +23,11 @@ layout(set = 1, binding = 1) buffer Render {
   vec4 pixels[];
 };
 
-bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, Vertex vertices[3]);
-float SphereDist(vec3 position, float radius, vec3 point);
-
 MinDistanceResponse GetMinDistance(vec3 point) {
   MinDistanceResponse rtn = {99999, 0};
-  for (uint i = 0; i < meshes.length(); i++) {
+  for (uint i = 0; i < 1; i++) {
     float dist = SphereDist(meshes[i].Center.xyz, meshes[i].Bounds, point);
-    if (rtn.dist < dist) {
+    if (rtn.dist > dist) {
       rtn.dist = dist;
       rtn.meshIndex = i;
     }
@@ -49,20 +46,20 @@ void main() {
   vec3 rayDirection = normalize(vec3(uv, 1.));
 
   MinDistanceResponse ray = RayMarch(rayOrigin, rayDirection);
-  uint meshIndex = ray.meshIndex;
-
-  for (uint j = 0; j < 3; j+=3) {
-    uint i0 = meshes[meshIndex].Indicies[j + 0];
-    uint i1 = meshes[meshIndex].Indicies[j + 1];
-    uint i2 = meshes[meshIndex].Indicies[j + 2];
-    Vertex vertices[3];
-    vertices[0] = meshes[meshIndex].Verticies[i0];
-    vertices[1] = meshes[meshIndex].Verticies[i1];
-    vertices[2] = meshes[meshIndex].Verticies[i2];
-    bool intersect = triangleIntersection(rayOrigin, rayDirection, vertices);
-    if (intersect) {
-      pixels[index] = vec4(0., 0., 0., 1.);
-      return;
+  if (ray.dist <= SURF_DIST) {
+    for (uint j = 0; j < 3; j+=3) {
+      uint i0 = meshes[ray.meshIndex].Indicies[j + 0];
+      uint i1 = meshes[ray.meshIndex].Indicies[j + 1];
+      uint i2 = meshes[ray.meshIndex].Indicies[j + 2];
+      Vertex vertices[3];
+      vertices[0] = meshes[ray.meshIndex].Verticies[i0];
+      vertices[1] = meshes[ray.meshIndex].Verticies[i1];
+      vertices[2] = meshes[ray.meshIndex].Verticies[i2];
+      bool intersect = triangleIntersection(rayOrigin, rayDirection, vertices);
+      if (intersect) {
+        pixels[index] = vec4(0., 0., 0., 1.);
+        return;
+      }
     }
   }
   
