@@ -13,17 +13,12 @@ int main()
   //create entity
   auto entity = Core::Entity::Create();
 
+  auto cube = Utils::IO::LoadObjFile("Models/Cube.obj");
+
   Component::Mesh meshData = {};
-  meshData.SetVertices(
-      {{{0, 1, 0, 1},
-        {0, 0, -1, 1}},
-       {{-1, 0, 0, 1},
-        {0, 0, -1, 1}},
-       {{1, 0, 0, 1},
-        {0, 0, -1, 1}}},
-      true);
-  meshData.SetIndices({0, 1, 2});
-  meshData.ApplyTransformation({0, 0, 3}, {0, 0, 0, 1}, {1, 1, 1});
+  meshData.SetVertices(cube.Vertices, true);
+  meshData.SetIndices(cube.Indices);
+  meshData.ApplyTransformation({0, 0, 10}, {0, 0, 0, 1}, {1, 1, 1});
   meshData.SetStatic();
 
   //attach transform and mesh component
