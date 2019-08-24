@@ -6,7 +6,9 @@ struct MinDistanceResponse {
   float dist;
   uint meshIndex;
 };
-
+float SphereDist(vec3 position, float radius, vec3 point) {
+  return length(point - position) - radius;
+}
 MinDistanceResponse GetMinDistance(vec3 point);
 MinDistanceResponse RayMarch(vec3 rayOrigin, vec3 rayDirection) {
   float rayTravelDist = 0.;
@@ -20,7 +22,4 @@ MinDistanceResponse RayMarch(vec3 rayOrigin, vec3 rayDirection) {
       break;
   }
   return rtn;
-}
-float SphereDist(vec3 position, float radius, vec3 point) {
-  return length(point - position) - radius;
 }

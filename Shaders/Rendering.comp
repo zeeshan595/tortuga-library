@@ -25,7 +25,7 @@ layout(set = 1, binding = 1) buffer Render {
 
 MinDistanceResponse GetMinDistance(vec3 point) {
   MinDistanceResponse rtn = {MAX_DIST, 0};
-  for (uint i = 0; i < 1; i++) {
+  for (uint i = 0; i < meshes.length(); i++) {
     float dist = SphereDist(meshes[i].Center.xyz, meshes[i].Bounds, point);
     if (rtn.dist > dist) {
       rtn.dist = dist;
@@ -51,21 +51,25 @@ void main() {
       Index i0 = meshes[ray.meshIndex].Indices[j + 0];
       Index i1 = meshes[ray.meshIndex].Indices[j + 1];
       Index i2 = meshes[ray.meshIndex].Indices[j + 2];
-      vec4 vertices[3];
-      vertices[0] = meshes[ray.meshIndex].Vertices[i0.Vertex];
-      vertices[1] = meshes[ray.meshIndex].Vertices[i1.Vertex];
-      vertices[2] = meshes[ray.meshIndex].Vertices[i2.Vertex];
-      vec4 normals[3];
-      normals[0] = meshes[ray.meshIndex].Normals[i0.Normal];
-      normals[1] = meshes[ray.meshIndex].Normals[i1.Normal];
-      normals[2] = meshes[ray.meshIndex].Normals[i2.Normal];
-      bool intersect = triangleIntersection(rayOrigin, rayDirection, vertices, normals);
+      vec3 vertices[3];
+      vertices[0] = meshes[ray.meshIndex].Vertices[i0.Vertex].xyz;
+      vertices[1] = meshes[ray.meshIndex].Vertices[i1.Vertex].xyz;
+      vertices[2] = meshes[ray.meshIndex].Vertices[i2.Vertex].xyz;
+      vec3 normals[3];
+      normals[0] = meshes[ray.meshIndex].Normals[i0.Normal].xyz;
+      normals[1] = meshes[ray.meshIndex].Normals[i1.Normal].xyz;
+      normals[2] = meshes[ray.meshIndex].Normals[i2.Normal].xyz;
+      vec2 textures[3];
+      textures[0] = meshes[ray.meshIndex].Textures[i0.Texture].xy;
+      textures[1] = meshes[ray.meshIndex].Textures[i0.Texture].xy;
+      textures[2] = meshes[ray.meshIndex].Textures[i0.Texture].xy;
+      bool intersect = triangleIntersection(rayOrigin, rayDirection, vertices, normals, textures);
       if (intersect) {
-        pixels[index] = vec4(0., 0., 0., 1.);
+        pixels[index] = vec4(1., 1., 1., 1.);
         return;
       }
     }
   }
   
-  pixels[index] = vec4(1., 1., 1., 1.);
+  pixels[index] = vec4(0., 0., 0., 1.);
 }

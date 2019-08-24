@@ -5,7 +5,7 @@ using namespace Tortuga;
 int main()
 {
   Core::Screen::SetWindowTitle("Hello World");
-  Core::Screen::ResizeWindow(800, 600);
+  Core::Screen::ResizeWindow(1920, 1080);
 
   //Start rendering system
   Core::CreateSystem<Systems::Rendering>();

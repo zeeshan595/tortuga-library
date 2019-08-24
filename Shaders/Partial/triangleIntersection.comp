@@ -1,21 +1,17 @@
-bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec4 vertices[3], vec4 normals[3]) {
+bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec3 vertices[3], vec3 normals[3], vec2 textures[3]) {
   //ray origin
   vec3 orig = rayOrigin;
   
   //ray direction
   vec3 dir = rayDirection;
 
-  //triangle points
-  vec3 v0 = vertices[0].xyz;
-  vec3 v1 = vertices[1].xyz;
-  vec3 v2 = vertices[2].xyz;
+  //triangle vertices
+  vec3 v0 = vertices[0];
+  vec3 v1 = vertices[1];
+  vec3 v2 = vertices[2];
 
-  // compute plane's normal
-  //vec3 v0v1 = v1 - v0;
-  //vec3 v0v2 = v2 - v0;
-  // no need to normalize
-  vec3 N = normalize((normals[0].xyz + normals[1].xyz + normals[2].xyz) / 3);//cross(v0v1, v0v2);
-  //float area2 = length(N);
+  //get face normal
+  vec3 N = normalize((normals[0] + normals[1] + normals[2]) / 3);
    
   //check if ray is parallel to the triangle
   float NdotRayDirection = dot(N, dir);
@@ -31,7 +27,6 @@ bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec4 vertices[3], v
   vec3 P = orig + t * dir;
 
   vec3 C;
-
   //edge testing to see if intersection is inside triangle
   vec3 edge0 = v1 - v0;
   vec3 vp0 = P - v0;
