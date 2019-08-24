@@ -44,8 +44,10 @@ int main()
 
     entity->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yPosition, 0, 1);
 
-    if (event.type == SDL_KEYDOWN) {
-      if (event.key.keysym.sym == SDLK_SPACE && !isDone) {
+    if (event.type == SDL_KEYDOWN)
+    {
+      if (event.key.keysym.sym == SDLK_SPACE && !isDone)
+      {
         Core::Screen::ResizeWindow(1920, 1080);
         isDone = true;
       }

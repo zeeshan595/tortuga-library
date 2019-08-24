@@ -127,6 +127,9 @@ bool IsExtensionsSupported(VkPhysicalDevice physicalDevice, std::vector<const ch
   std::vector<VkExtensionProperties> availableExtensions(extensionCount);
   ErrorCheck::Callback(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data()));
 
+  for (auto ext : availableExtensions)
+    Console::Info("${0}", ext.extensionName);
+
   std::set<std::string> requiredExtensions(extensions.begin(), extensions.end());
   for (const auto &extension : availableExtensions)
     requiredExtensions.erase(extension.extensionName);

@@ -30,6 +30,7 @@ Window Create(Instance::Instance instance, const char *title, uint32_t width, ui
 void Destroy(Window data);
 SDL_Event PollEvents(Window window);
 Window ResizeWindow(Window data, uint32_t width, uint32_t height);
+Window UpdateWindowSize(Window data);
 } // namespace Window
 } // namespace Vulkan
 } // namespace Graphics

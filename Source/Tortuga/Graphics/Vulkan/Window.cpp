@@ -16,7 +16,7 @@ Window Create(Instance::Instance instance, const char *title, uint32_t width, ui
   data.VulkanInstance = instance;
   data.Title = title;
 
-  data.Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_VULKAN);
+  data.Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
   if (data.Window == nullptr)
     Console::Fatal("Failed to create window");
 
@@ -38,9 +38,15 @@ SDL_Event PollEvents(Window window)
 }
 Window ResizeWindow(Window data, uint32_t width, uint32_t height)
 {
-  vkDestroySurfaceKHR(data.VulkanInstance.Instance, data.Surface, nullptr);
-  Destroy(data);
-  return Create(data.VulkanInstance, data.Title.c_str(), width, height);
+  return data;
+}
+Window UpdateWindowSize(Window data)
+{
+  int width, height;
+  SDL_GetWindowSize(data.Window, &width, &height);
+  data.Width = width;
+  data.Height = height;
+  return data;
 }
 } // namespace Window
 } // namespace Vulkan

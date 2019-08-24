@@ -118,8 +118,6 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
   }
   ErrorCheck::Callback(vkCreateFence(data.Device, &fenceInfo, nullptr, &data.Fence));
-  if (oldSwapchain != VK_NULL_HANDLE)
-    vkDestroySwapchainKHR(device.Device, oldSwapchain, nullptr);
 
   return data;
 }
