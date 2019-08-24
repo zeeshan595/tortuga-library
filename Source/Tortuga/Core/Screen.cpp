@@ -26,10 +26,13 @@ struct Window
 
   void ResizeWindow(uint32_t width, uint32_t height)
   {
-    Graphics::Vulkan::Window::Destroy(VulkanWindow);
-    Graphics::Vulkan::Swapchain::Destroy(Swapchain);
-    VulkanWindow = Graphics::Vulkan::Window::Create(Engine::GetVulkan(), this->Title.c_str(), width, height);
-    Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
+    VulkanWindow = Graphics::Vulkan::Window::ResizeWindow(VulkanWindow, width, height);
+    if (Swapchain.Swapchain != VK_NULL_HANDLE)
+      Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow, Swapchain.Swapchain);
+    else
+      Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
+    
+    std::cout << "test" << std::endl;
   }
 };
 auto window = Window("Tortuga", 800, 600);
@@ -46,6 +49,11 @@ void SetWindowTitle(std::string title)
 void ResizeWindow(uint32_t width, uint32_t height)
 {
   window.ResizeWindow(width, height);
+  for (auto i = 0; i < OnWindowResize.size(); i++)
+  {
+    auto ptr = OnWindowResize[i];
+    ((void (*)(void *))ptr.func)(ptr.param);
+  }
 }
 Graphics::Vulkan::Window::Window GetWindow()
 {

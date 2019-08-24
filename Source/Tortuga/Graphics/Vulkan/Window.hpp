@@ -26,6 +26,7 @@ struct Window
 Window Create(Instance::Instance instance, const char *title, uint32_t width, uint32_t height);
 void Destroy(Window data);
 SDL_Event PollEvents(Window window);
+Window ResizeWindow(Window data, uint32_t width, uint32_t height);
 } // namespace Window
 } // namespace Vulkan
 } // namespace Graphics

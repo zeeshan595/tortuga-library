@@ -73,7 +73,7 @@ private:
   Graphics::Vulkan::Command::Command PresentCommand;
   Graphics::Vulkan::Semaphore::Semaphore PresentSemaphore;
 
-  void UpdateWindowSize()
+  static void UpdateWindowSize(Rendering *render)
   {
     Graphics::Vulkan::Device::WaitForDevice(Core::Engine::GetMainDevice());
     Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Compute[0]);
@@ -81,16 +81,26 @@ private:
     Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Graphics[0]);
     RenderInfo renderInfo = {};
     {
-      renderInfo.WindowWidth = RenderingWindowSize[0];
-      renderInfo.WindowHeight = RenderingWindowSize[1];
+      renderInfo.WindowWidth = render->RenderingWindowSize[0];
+      renderInfo.WindowHeight = render->RenderingWindowSize[1];
     }
-    Graphics::Vulkan::Buffer::SetData(RenderingInfoBufferStaging, &renderInfo, sizeof(renderInfo));
-    auto renderInfoTransfer = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    Graphics::Vulkan::Buffer::SetData(render->RenderingInfoBufferStaging, &renderInfo, sizeof(renderInfo));
+    auto renderInfoTransfer = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), render->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
     Graphics::Vulkan::Command::Begin(renderInfoTransfer, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    Graphics::Vulkan::Command::CopyBuffer(renderInfoTransfer, RenderingInfoBufferStaging, RenderingInfoBuffer);
+    Graphics::Vulkan::Command::CopyBuffer(renderInfoTransfer, render->RenderingInfoBufferStaging, render->RenderingInfoBuffer);
     Graphics::Vulkan::Command::End(renderInfoTransfer);
     Graphics::Vulkan::Command::Submit({renderInfoTransfer}, Core::Engine::GetMainDevice().Queues.Transfer[0]);
     Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Transfer[0]);
+
+    if (render->RenderingBuffer.Buffer != VK_NULL_HANDLE)
+      Graphics::Vulkan::Buffer::Destroy(render->RenderingBuffer);
+    render->RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), sizeof(glm::vec4) * render->RenderingWindowSize[0] * render->RenderingWindowSize[1]);
+
+    Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(render->OutRenderingDescriptorSet, {render->RenderingInfoBuffer, render->RenderingBuffer});
+
+    if (render->RenderingImage.Image != VK_NULL_HANDLE)
+      Graphics::Vulkan::Image::Destroy(render->RenderingImage);
+    render->RenderingImage = Graphics::Vulkan::Image::Create(Core::Engine::GetMainDevice(), render->RenderingWindowSize[0], render->RenderingWindowSize[1]);
   }
 
 public:
@@ -98,9 +108,13 @@ public:
   {
     //wait for previous render to finish before starting a new render process
     if (!Graphics::Vulkan::Fence::IsFenceSignaled(RenderingWaiter))
+    {
+      auto temp = Core::Screen::GetSwapchain();
+      std::cout << std::endl;
       return;
-    Graphics::Vulkan::Fence::ResetFences({RenderingWaiter});
+    }
 
+    Graphics::Vulkan::Fence::ResetFences({RenderingWaiter});
     //geometry processing
     std::vector<Graphics::Vulkan::Buffer::Buffer> meshBuffers;
     std::vector<Graphics::Vulkan::Semaphore::Semaphore> meshSemaphore;
@@ -173,9 +187,7 @@ public:
       if (RenderingWindowSize != windowSize)
       {
         RenderingWindowSize = windowSize;
-        Graphics::Vulkan::Buffer::Destroy(RenderingBuffer);
-        RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlySrc(Core::Engine::GetMainDevice(), sizeof(glm::vec4) * RenderingWindowSize[0] * RenderingWindowSize[1]);
-        UpdateWindowSize();
+        UpdateWindowSize(this);
       }
 
       //submit command
@@ -194,6 +206,8 @@ public:
     {
       auto index = Graphics::Vulkan::Swapchain::AquireNextImage(Core::Screen::GetSwapchain());
       auto presentImage = Graphics::Vulkan::Swapchain::GetImage(Core::Screen::GetSwapchain(), index);
+      if (presentImage.Width != RenderingImage.Width || presentImage.Height != RenderingImage.Height)
+        return;
 
       Graphics::Vulkan::Command::Begin(PresentCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
       Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, RenderingImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
@@ -239,17 +253,14 @@ public:
     //rendering
     {
       RenderingWindowSize = Core::Screen::GetWindowSize();
-      RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), sizeof(glm::vec4) * RenderingWindowSize[0] * RenderingWindowSize[1]);
       RenderingInfoBufferStaging = Graphics::Vulkan::Buffer::CreateHostSrc(Core::Engine::GetMainDevice(), sizeof(RenderInfo));
       RenderingInfoBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(Core::Engine::GetMainDevice(), sizeof(RenderInfo));
-      UpdateWindowSize();
 
       InRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), 1);
       OutRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(Core::Engine::GetMainDevice(), 2);
       RenderingDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), {InRenderingDescriptorLayout, OutRenderingDescriptorLayout}, 2);
       InRenderingDescriptorSet = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), RenderingDescriptorPool, InRenderingDescriptorLayout);
       OutRenderingDescriptorSet = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), RenderingDescriptorPool, OutRenderingDescriptorLayout);
-      Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(OutRenderingDescriptorSet, {RenderingInfoBuffer, RenderingBuffer});
       RenderingCommand = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), ComputeCommandPool, Graphics::Vulkan::Command::PRIMARY);
 
       auto shaderCode = Utils::IO::GetFileContents("Shaders/Rendering.comp");
@@ -257,7 +268,10 @@ public:
       RenderingShader = Graphics::Vulkan::Shader::Create(Core::Engine::GetMainDevice(), compiledShader);
       RenderingPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(Core::Engine::GetMainDevice(), RenderingShader, {}, {InRenderingDescriptorLayout, OutRenderingDescriptorLayout});
       RenderingSemaphore = Graphics::Vulkan::Semaphore::Create(Core::Engine::GetMainDevice());
-      RenderingImage = Graphics::Vulkan::Image::Create(Core::Engine::GetMainDevice(), RenderingWindowSize[0], RenderingWindowSize[1]);
+
+      RenderingBuffer.Buffer = VK_NULL_HANDLE;
+      RenderingImage.Image = VK_NULL_HANDLE;
+      UpdateWindowSize(this);
     }
 
     //present

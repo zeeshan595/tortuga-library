@@ -34,6 +34,13 @@ SDL_Event PollEvents(Window window)
   SDL_PollEvent(&event);
   return event;
 }
+Window ResizeWindow(Window data, uint32_t width, uint32_t height)
+{
+  SDL_SetWindowSize(data.Window, width, height);
+  data.Width = width;
+  data.Height = height;
+  return data;
+}
 } // namespace Window
 } // namespace Vulkan
 } // namespace Graphics

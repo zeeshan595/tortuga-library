@@ -54,6 +54,10 @@
     "utility": "cpp",
     "algorithm": "cpp",
     "deque": "cpp",
-    "numeric": "cpp"
+    "numeric": "cpp",
+    "hash_map": "cpp",
+    "list": "cpp",
+    "unordered_set": "cpp",
+    "valarray": "cpp"
   }
 }

@@ -11,6 +11,12 @@ namespace Core
 {
 namespace Screen
 {
+struct OnWindowResizeParams
+{
+  void *func;
+  void *param;
+};
+std::vector<OnWindowResizeParams> OnWindowResize;
 SDL_Event PollEvents();
 void SetWindowTitle(std::string title);
 void ResizeWindow(uint32_t width, uint32_t height);

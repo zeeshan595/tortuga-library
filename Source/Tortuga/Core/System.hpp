@@ -42,6 +42,15 @@ void DestroySystem()
   delete dynamic_cast<T *>(SystemManager[type]);
   SystemManager.erase(type);
 }
+template <typename T>
+T *GetSystem()
+{
+  auto type = std::type_index(typeid(T));
+  if (SystemManager[type] != nullptr)
+    return dynamic_cast<T *>(SystemManager[type]);
+
+  return nullptr;
+}
 void IterateSystemLoop()
 {
   for (auto system : SystemManager)
