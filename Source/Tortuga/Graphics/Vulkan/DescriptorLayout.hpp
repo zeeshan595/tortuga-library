@@ -19,9 +19,10 @@ struct DescriptorLayout
   VkDevice Device = VK_NULL_HANDLE;
   VkDescriptorSetLayout Layouts = VK_NULL_HANDLE;
   uint32_t BindingsAmount = 0;
+  VkDescriptorType Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 };
 
-DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount = 1);
+DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount = 1, VkDescriptorType type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);
 void Destroy(DescriptorLayout data);
 } // namespace DescriptorLayout
 } // namespace Vulkan

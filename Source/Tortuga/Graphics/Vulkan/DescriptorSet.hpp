@@ -15,9 +15,9 @@ namespace Graphics
 {
 namespace Vulkan
 {
-namespace DescriptorSets
+namespace DescriptorSet
 {
-struct DescriptorSets
+struct DescriptorSet
 {
   VkDevice Device;
   VkDescriptorSet set;
@@ -25,8 +25,8 @@ struct DescriptorSets
   DescriptorLayout::DescriptorLayout Layout;
 };
 
-DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool, DescriptorLayout::DescriptorLayout layout);
-void UpdateDescriptorSets(DescriptorSets data, std::vector<Buffer::Buffer> content);
+DescriptorSet Create(Device::Device device, DescriptorPool::DescriptorPool pool, DescriptorLayout::DescriptorLayout layout);
+void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> content);
 } // namespace DescriptorSet
 } // namespace Vulkan
 } // namespace Graphics

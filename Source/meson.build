@@ -14,7 +14,7 @@ sourceCppFiles = [
   './Source/Tortuga/Graphics/Vulkan/Device.cpp',
   './Source/Tortuga/Graphics/Vulkan/Command.cpp',
   './Source/Tortuga/Graphics/Vulkan/DescriptorPool.cpp',
-  './Source/Tortuga/Graphics/Vulkan/DescriptorSets.cpp',
+  './Source/Tortuga/Graphics/Vulkan/DescriptorSet.cpp',
   './Source/Tortuga/Graphics/Vulkan/CommandPool.cpp',
   './Source/Tortuga/Graphics/Vulkan/ErrorCheck.cpp',
   './Source/Tortuga/Core/Engine.cpp',

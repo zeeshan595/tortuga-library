@@ -32,7 +32,6 @@ int main()
   entity->AddComponent<Component::Mesh>(&meshData);
 
   float yPosition = 0.0f;
-  bool isDone = false;
 
   //Main Loop
   bool shouldClose = false;

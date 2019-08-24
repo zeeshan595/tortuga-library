@@ -14,20 +14,23 @@ DescriptorPool Create(Device::Device device, std::vector<DescriptorLayout::Descr
   data.Device = device.Device;
   data.DescriptorSetCounts = descriptorSetsCount;
 
-  uint32_t bindingsCount = 0;
+  std::unordered_map<VkDescriptorType, uint> BindingCounts;
   for (auto layout : layouts)
-    bindingsCount += layout.BindingsAmount;
+    BindingCounts[layout.Type] += layout.BindingsAmount;
 
-  VkDescriptorPoolSize poolSize = {};
-  poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-  poolSize.descriptorCount = bindingsCount;
+  std::vector<VkDescriptorPoolSize> poolSizes;
+  for (auto binding : BindingCounts)
+  {
+    if (binding.second > 0)
+      poolSizes.push_back({binding.first, binding.second});
+  }
 
   VkDescriptorPoolCreateInfo createInfo = {};
   {
     createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     createInfo.maxSets = descriptorSetsCount;
-    createInfo.poolSizeCount = 1;
-    createInfo.pPoolSizes = &poolSize;
+    createInfo.poolSizeCount = poolSizes.size();
+    createInfo.pPoolSizes = poolSizes.data();
   }
   ErrorCheck::Callback(vkCreateDescriptorPool(device.Device, &createInfo, nullptr, &data.Pool));
   return data;

@@ -2,6 +2,7 @@
 #define _VULKAN_DESCRIPTOR_POOL
 
 #include <vulkan/vulkan.h>
+#include <unordered_map>
 
 #include "./ErrorCheck.hpp"
 #include "./Device.hpp"

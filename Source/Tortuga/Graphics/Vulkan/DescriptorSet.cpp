@@ -1,4 +1,4 @@
-#include "./DescriptorSets.hpp"
+#include "./DescriptorSet.hpp"
 
 namespace Tortuga
 {
@@ -6,11 +6,11 @@ namespace Graphics
 {
 namespace Vulkan
 {
-namespace DescriptorSets
+namespace DescriptorSet
 {
-DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool, DescriptorLayout::DescriptorLayout layout)
+DescriptorSet Create(Device::Device device, DescriptorPool::DescriptorPool pool, DescriptorLayout::DescriptorLayout layout)
 {
-  DescriptorSets data = {};
+  DescriptorSet data = {};
   data.Device = device.Device;
   data.Pool = pool;
   data.Layout = layout;
@@ -25,7 +25,7 @@ DescriptorSets Create(Device::Device device, DescriptorPool::DescriptorPool pool
   ErrorCheck::Callback(vkAllocateDescriptorSets(device.Device, &info, &data.set));
   return data;
 }
-void UpdateDescriptorSets(DescriptorSets data, std::vector<Buffer::Buffer> content)
+void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> content)
 {
   if (data.Layout.BindingsAmount != content.size())
   {

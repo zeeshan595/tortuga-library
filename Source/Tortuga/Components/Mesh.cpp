@@ -122,10 +122,10 @@ Mesh::Mesh()
   this->BufferData.Transformation = glm::mat4(1.0);
   this->BufferData.NormalMatrix = glm::mat4(1.0);
   this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(Core::Engine::GetMainDevice(), {DescriptorLayout.meshDescriptorLayout});
-  this->DescriptorSets = Graphics::Vulkan::DescriptorSets::Create(Core::Engine::GetMainDevice(), this->DescriptorPool, DescriptorLayout.meshDescriptorLayout);
+  this->DescriptorSets = Graphics::Vulkan::DescriptorSet::Create(Core::Engine::GetMainDevice(), this->DescriptorPool, DescriptorLayout.meshDescriptorLayout);
   this->Staging = Graphics::Vulkan::Buffer::CreateHost(Core::Engine::GetMainDevice(), MESH_SIZE);
   this->Buffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), MESH_SIZE);
-  Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(this->DescriptorSets, {this->Buffer});
+  Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(this->DescriptorSets, {this->Buffer});
   this->CommandPool = Graphics::Vulkan::CommandPool::Create(Core::Engine::GetMainDevice(), Core::Engine::GetMainDevice().QueueFamilies.Compute.Index);
   this->Command = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), this->CommandPool, Graphics::Vulkan::Command::PRIMARY);
 }

@@ -7,7 +7,7 @@
 
 #include "../Graphics/Vulkan/DescriptorLayout.hpp"
 #include "../Graphics/Vulkan/DescriptorPool.hpp"
-#include "../Graphics/Vulkan/DescriptorSets.hpp"
+#include "../Graphics/Vulkan/DescriptorSet.hpp"
 #include "../Graphics/Vulkan/Pipeline.hpp"
 #include "../Graphics/Vulkan/Buffer.hpp"
 #include "../Graphics/Vulkan/CommandPool.hpp"
@@ -59,8 +59,8 @@ private:
   Graphics::Vulkan::DescriptorLayout::DescriptorLayout OutRenderingDescriptorLayout;
   Graphics::Vulkan::DescriptorLayout::DescriptorLayout InRenderingDescriptorLayout;
   Graphics::Vulkan::DescriptorPool::DescriptorPool RenderingDescriptorPool;
-  Graphics::Vulkan::DescriptorSets::DescriptorSets InRenderingDescriptorSet;
-  Graphics::Vulkan::DescriptorSets::DescriptorSets OutRenderingDescriptorSet;
+  Graphics::Vulkan::DescriptorSet::DescriptorSet InRenderingDescriptorSet;
+  Graphics::Vulkan::DescriptorSet::DescriptorSet OutRenderingDescriptorSet;
   Graphics::Vulkan::Buffer::Buffer RenderingBuffer;
   Graphics::Vulkan::Buffer::Buffer RenderingInfoBufferStaging;
   Graphics::Vulkan::Buffer::Buffer RenderingInfoBuffer;
@@ -95,7 +95,7 @@ private:
       Graphics::Vulkan::Buffer::Destroy(render->RenderingBuffer);
     render->RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(device, sizeof(glm::vec4) * render->SwapchainExtent.width * render->SwapchainExtent.height);
 
-    Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(render->OutRenderingDescriptorSet, {render->RenderingInfoBuffer, render->RenderingBuffer});
+    Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(render->OutRenderingDescriptorSet, {render->RenderingInfoBuffer, render->RenderingBuffer});
 
     if (render->RenderingImage.Image != VK_NULL_HANDLE)
       Graphics::Vulkan::Image::Destroy(render->RenderingImage);
@@ -165,7 +165,7 @@ public:
           Graphics::Vulkan::Buffer::Destroy(MeshCombineBuffer);
 
         MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateHostDest(device, totalSize);
-        Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(InRenderingDescriptorSet, {MeshCombineBuffer});
+        Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(InRenderingDescriptorSet, {MeshCombineBuffer});
       }
       Graphics::Vulkan::Command::Begin(MeshCombineCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
       uint32_t offset = 0;
@@ -259,8 +259,8 @@ public:
       InRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, 1);
       OutRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, 2);
       RenderingDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, {InRenderingDescriptorLayout, OutRenderingDescriptorLayout}, 2);
-      InRenderingDescriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, RenderingDescriptorPool, InRenderingDescriptorLayout);
-      OutRenderingDescriptorSet = Graphics::Vulkan::DescriptorSets::Create(device, RenderingDescriptorPool, OutRenderingDescriptorLayout);
+      InRenderingDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderingDescriptorPool, InRenderingDescriptorLayout);
+      OutRenderingDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderingDescriptorPool, OutRenderingDescriptorLayout);
       RenderingCommand = Graphics::Vulkan::Command::Create(device, ComputeCommandPool, Graphics::Vulkan::Command::PRIMARY);
 
       auto shaderCode = Utils::IO::GetFileContents("Shaders/Rendering.comp");

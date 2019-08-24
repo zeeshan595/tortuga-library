@@ -84,7 +84,7 @@ void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination,
   }
   vkCmdCopyBuffer(data.Command, source.Buffer, destination.Buffer, 1, &bufferCopy);
 }
-void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSets::DescriptorSets> descriptorSets)
+void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSet::DescriptorSet> descriptorSets)
 {
   std::vector<VkDescriptorSet> vulkanDescriptorSets(descriptorSets.size());
   for (uint32_t i = 0; i < vulkanDescriptorSets.size(); i++)

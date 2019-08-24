@@ -7,7 +7,7 @@
 
 #include "../Graphics/Vulkan/DescriptorLayout.hpp"
 #include "../Graphics/Vulkan/DescriptorPool.hpp"
-#include "../Graphics/Vulkan/DescriptorSets.hpp"
+#include "../Graphics/Vulkan/DescriptorSet.hpp"
 #include "../Graphics/Vulkan/Buffer.hpp"
 #include "../Graphics/Vulkan/CommandPool.hpp"
 #include "../Graphics/Vulkan/Command.hpp"
@@ -45,7 +45,7 @@ struct Mesh
   bool IsProcessedOnce;
   MeshBufferData BufferData;
   Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
-  Graphics::Vulkan::DescriptorSets::DescriptorSets DescriptorSets;
+  Graphics::Vulkan::DescriptorSet::DescriptorSet DescriptorSets;
   Graphics::Vulkan::Buffer::Buffer Staging;
   Graphics::Vulkan::Buffer::Buffer Buffer;
   Graphics::Vulkan::CommandPool::CommandPool CommandPool;
