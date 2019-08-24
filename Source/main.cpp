@@ -52,8 +52,8 @@ int main()
   }
 
   //remove transform and mesh component
-  entity->RemoveComponent<Component::Mesh>();
-  entity->RemoveComponent<Component::Transform>();
+  //entity->RemoveComponent<Component::Mesh>();
+  //entity->RemoveComponent<Component::Transform>();
 
   //destroy entity
   Core::Entity::Destroy(entity);
