@@ -27,12 +27,7 @@ struct Window
   void ResizeWindow(uint32_t width, uint32_t height)
   {
     VulkanWindow = Graphics::Vulkan::Window::ResizeWindow(VulkanWindow, width, height);
-    if (Swapchain.Swapchain != VK_NULL_HANDLE)
-      Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow, Swapchain.Swapchain);
-    else
-      Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
-    
-    std::cout << "test" << std::endl;
+    Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow, Swapchain.Swapchain);
   }
 };
 auto window = Window("Tortuga", 800, 600);

@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan.h>
 
 #include "../../Console.hpp"
 #include "./Instance.hpp"
@@ -17,6 +18,7 @@ namespace Window
 {
 struct Window
 {
+	VkInstance VulkanInstance;
 	SDL_Window *Window = nullptr;
 	VkSurfaceKHR Surface = VK_NULL_HANDLE;
 	uint32_t Width;

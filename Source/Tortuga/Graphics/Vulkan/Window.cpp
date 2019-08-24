@@ -13,6 +13,7 @@ Window Create(Instance::Instance instance, const char *title, uint32_t width, ui
   Window data = {};
   data.Width = width;
   data.Height = height;
+  data.VulkanInstance = instance.Instance;
 
   data.Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_VULKAN);
   if (data.Window == nullptr)
@@ -37,6 +38,9 @@ SDL_Event PollEvents(Window window)
 Window ResizeWindow(Window data, uint32_t width, uint32_t height)
 {
   SDL_SetWindowSize(data.Window, width, height);
+  vkDestroySurfaceKHR(data.VulkanInstance, data.Surface, nullptr);
+  if (!SDL_Vulkan_CreateSurface(data.Window, data.VulkanInstance, &data.Surface))
+    Console::Fatal("Failed to create window surface");
   data.Width = width;
   data.Height = height;
   return data;

@@ -47,6 +47,8 @@ void main() {
 
   MinDistanceResponse ray = RayMarch(rayOrigin, rayDirection);
   if (ray.dist <= SURF_DIST) {
+    pixels[index] = vec4(0., 0., 0., 1.);
+    return;
     for (uint j = 0; j < meshes[ray.meshIndex].IndiciesSize; j+=3) {
       uint i0 = meshes[ray.meshIndex].Indicies[j + 0];
       uint i1 = meshes[ray.meshIndex].Indicies[j + 1];

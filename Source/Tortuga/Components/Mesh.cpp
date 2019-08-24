@@ -53,20 +53,15 @@ void Mesh::SetVertices(std::vector<Graphics::Vertex> vertices, bool recalculateB
   }
   memcpy(this->BufferData.Vertices, vertices.data(), vertices.size() * sizeof(Graphics::Vertex));
   this->BufferData.VerticesSize = vertices.size();
+  this->BufferData.Center = glm::vec4(0, 0, 0, 1);
 
   if (recalculateBounds)
   {
-    //calculate center
-    this->BufferData.Center = glm::vec4(0, 0, 0, 0);
-    for (uint32_t i = 0; i < this->BufferData.VerticesSize; i++)
-      this->BufferData.Center += this->BufferData.Vertices[i].Position;
-    this->BufferData.Center /= this->BufferData.VerticesSize;
-
     //calculate bounds
-    this->BufferData.Bounds = glm::length(this->BufferData.Vertices[0].Position - this->BufferData.Center);
+    this->BufferData.Bounds = glm::length(glm::abs(this->BufferData.Vertices[0].Position));
     for (uint32_t i = 0; i < this->BufferData.VerticesSize; i++)
     {
-      float len = glm::length(this->BufferData.Vertices[i].Position - this->BufferData.Center);
+      float len = glm::length(glm::abs(this->BufferData.Vertices[i].Position));
       if (len > this->BufferData.Bounds)
         this->BufferData.Bounds = len;
     }
