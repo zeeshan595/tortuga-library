@@ -1,19 +1,23 @@
 #define MAX_VERTICES_SIZE 65535
 #define MAX_INDICES_SIZE 65535
 
-struct Vertex {
-  vec4 Position; //4N
-  vec4 Normal; //4N
+struct Index {
+  uint Vertex;
+  uint Normal;
+  uint Texture;
 };
 
 struct MeshBufferData{
   uint VerticesSize; //1N
+  uint NormalsSize; //1N
+  uint TexturesSize; //1N
   uint IndiciesSize; //1N
-  uint Reserved1; // 1N
-  float Bounds; //1N
   vec4 Center; //4N
   mat4 Transformation; //16N 
   mat4 NormalMatrix; //16N
-  Vertex Verticies[MAX_VERTICES_SIZE]; //4N * MAX_VERTICES_SIZE
-  uint Indicies[MAX_INDICES_SIZE]; //1N * MAX_INDICES_SIZE
+  vec4 Vertices[MAX_VERTICES_SIZE];
+  vec4 Normals[MAX_VERTICES_SIZE];
+  vec2 Textures[MAX_VERTICES_SIZE];
+  Index Indices[MAX_INDICES_SIZE];
+  float Bounds; //1N
 };

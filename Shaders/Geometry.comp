@@ -21,6 +21,6 @@ void main() {
     mesh.Center = mesh.Transformation * mesh.Center;
   }
 
-  mesh.Verticies[index].Position = mesh.Transformation * mesh.Verticies[index].Position;
-  mesh.Verticies[index].Normal = mesh.NormalMatrix * mesh.Verticies[index].Normal;
+  mesh.Vertices[index] = mesh.Transformation * mesh.Vertices[index];
+  mesh.Normals[index] = mesh.NormalMatrix * mesh.Normals[index];
 }

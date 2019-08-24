@@ -23,7 +23,6 @@
 #include "./Tortuga/Graphics/Vulkan/DescriptorPool.hpp"
 #include "./Tortuga/Graphics/Vulkan/DescriptorSets.hpp"
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
-#include "./Tortuga/Graphics/Vertex.hpp"
 
 //Core
 #include "./Tortuga/Core/GUID.hpp"

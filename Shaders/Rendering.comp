@@ -47,17 +47,19 @@ void main() {
 
   MinDistanceResponse ray = RayMarch(rayOrigin, rayDirection);
   if (ray.dist <= SURF_DIST) {
-    pixels[index] = vec4(0., 0., 0., 1.);
-    return;
     for (uint j = 0; j < meshes[ray.meshIndex].IndiciesSize; j+=3) {
-      uint i0 = meshes[ray.meshIndex].Indicies[j + 0];
-      uint i1 = meshes[ray.meshIndex].Indicies[j + 1];
-      uint i2 = meshes[ray.meshIndex].Indicies[j + 2];
-      Vertex vertices[3];
-      vertices[0] = meshes[ray.meshIndex].Verticies[i0];
-      vertices[1] = meshes[ray.meshIndex].Verticies[i1];
-      vertices[2] = meshes[ray.meshIndex].Verticies[i2];
-      bool intersect = triangleIntersection(rayOrigin, rayDirection, vertices);
+      Index i0 = meshes[ray.meshIndex].Indices[j + 0];
+      Index i1 = meshes[ray.meshIndex].Indices[j + 1];
+      Index i2 = meshes[ray.meshIndex].Indices[j + 2];
+      vec4 vertices[3];
+      vertices[0] = meshes[ray.meshIndex].Vertices[i0.Vertex];
+      vertices[1] = meshes[ray.meshIndex].Vertices[i1.Vertex];
+      vertices[2] = meshes[ray.meshIndex].Vertices[i2.Vertex];
+      vec4 normals[3];
+      normals[0] = meshes[ray.meshIndex].Normals[i0.Normal];
+      normals[1] = meshes[ray.meshIndex].Normals[i1.Normal];
+      normals[2] = meshes[ray.meshIndex].Normals[i2.Normal];
+      bool intersect = triangleIntersection(rayOrigin, rayDirection, vertices, normals);
       if (intersect) {
         pixels[index] = vec4(0., 0., 0., 1.);
         return;

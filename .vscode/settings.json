@@ -70,6 +70,7 @@
     "hash_map": "cpp",
     "list": "cpp",
     "unordered_set": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "*.ipp": "cpp"
   }
 }

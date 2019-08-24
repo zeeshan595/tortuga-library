@@ -44,31 +44,53 @@ void Mesh::ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3
   this->BufferData.NormalMatrix = glm::rotate(this->BufferData.NormalMatrix, rotation.z, glm::vec3(0, 0, rotation.w));
 }
 
-void Mesh::SetVertices(std::vector<Graphics::Vertex> vertices, bool recalculateBounds)
+void Mesh::SetVertices(std::vector<glm::vec4> vertices, bool recalculateBounds)
 {
   if (vertices.size() > MAX_VERTICES_SIZE)
   {
     Console::Warning("Vertices length is too large!");
     return;
   }
-  memcpy(this->BufferData.Vertices, vertices.data(), vertices.size() * sizeof(Graphics::Vertex));
+  memcpy(this->BufferData.Vertices, vertices.data(), vertices.size() * sizeof(glm::vec4));
   this->BufferData.VerticesSize = vertices.size();
   this->BufferData.Center = glm::vec4(0, 0, 0, 1);
 
   if (recalculateBounds)
   {
     //calculate bounds
-    this->BufferData.Bounds = glm::length(glm::abs(this->BufferData.Vertices[0].Position));
+    this->BufferData.Bounds = glm::length(glm::abs(this->BufferData.Vertices[0]));
     for (uint32_t i = 0; i < this->BufferData.VerticesSize; i++)
     {
-      float len = glm::length(glm::abs(this->BufferData.Vertices[i].Position));
+      float len = glm::length(glm::abs(this->BufferData.Vertices[i]));
       if (len > this->BufferData.Bounds)
         this->BufferData.Bounds = len;
     }
   }
 }
 
-void Mesh::SetIndices(std::vector<uint32_t> indices)
+void Mesh::SetNormals(std::vector<glm::vec4> normals)
+{
+  if (normals.size() > MAX_VERTICES_SIZE)
+  {
+    Console::Warning("Normals length is too large!");
+    return;
+  }
+  memcpy(this->BufferData.Normals, normals.data(), normals.size() * sizeof(glm::vec4));
+  this->BufferData.NormalsSize = normals.size();
+}
+
+void Mesh::SetTextures(std::vector<glm::vec4> textures)
+{
+  if (textures.size() > MAX_VERTICES_SIZE)
+  {
+    Console::Warning("Normals length is too large!");
+    return;
+  }
+  memcpy(this->BufferData.Textures, textures.data(), textures.size() * sizeof(glm::vec4));
+  this->BufferData.TexturesSize = textures.size();
+}
+
+void Mesh::SetIndices(std::vector<Graphics::Index> indices)
 {
   if (indices.size() > MAX_INDICES_SIZE)
   {
@@ -80,7 +102,7 @@ void Mesh::SetIndices(std::vector<uint32_t> indices)
     Console::Warning("Indices' length must be a multiple of 3!");
     return;
   }
-  memcpy(this->BufferData.Indices, indices.data(), indices.size() * sizeof(uint32_t));
+  memcpy(this->BufferData.Indices, indices.data(), indices.size() * sizeof(Graphics::Index));
   this->BufferData.IndicesSize = indices.size();
 }
 

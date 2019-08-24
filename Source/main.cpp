@@ -17,6 +17,8 @@ int main()
 
   Component::Mesh meshData = {};
   meshData.SetVertices(cube.Vertices, true);
+  meshData.SetNormals(cube.Normals);
+  meshData.SetTextures(cube.Textures);
   meshData.SetIndices(cube.Indices);
   meshData.SetDynamic();
 
@@ -43,15 +45,6 @@ int main()
       shouldClose = true;
 
     entity->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yPosition, 0, 1);
-
-    if (event.type == SDL_KEYDOWN)
-    {
-      if (event.key.keysym.sym == SDLK_SPACE && !isDone)
-      {
-        Core::Screen::ResizeWindow(1920, 1080);
-        isDone = true;
-      }
-    }
 
     //iterate through all system and execute update functions
     Core::IterateSystemLoop();
