@@ -26,15 +26,17 @@ struct Window
 
   void ResizeWindow(uint32_t width, uint32_t height)
   {
+    Graphics::Vulkan::Swapchain::Destroy(Swapchain);
     VulkanWindow = Graphics::Vulkan::Window::ResizeWindow(VulkanWindow, width, height);
-    Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow, Swapchain.Swapchain);
+    Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
   }
 };
 auto window = Window("Tortuga", 800, 600);
 
 SDL_Event PollEvents()
 {
-  return Graphics::Vulkan::Window::PollEvents(window.VulkanWindow);
+  auto event = Graphics::Vulkan::Window::PollEvents(window.VulkanWindow);
+  return event;
 }
 void SetWindowTitle(std::string title)
 {

@@ -108,11 +108,7 @@ public:
   {
     //wait for previous render to finish before starting a new render process
     if (!Graphics::Vulkan::Fence::IsFenceSignaled(RenderingWaiter))
-    {
-      auto temp = Core::Screen::GetSwapchain();
-      std::cout << std::endl;
       return;
-    }
 
     Graphics::Vulkan::Fence::ResetFences({RenderingWaiter});
     //geometry processing
