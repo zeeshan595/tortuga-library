@@ -1,4 +1,16 @@
 {
+  "search.exclude": {
+    "**/Build": true,
+    ".github": true
+  },
+  "files.watcherExclude": {
+    "**/Build/**": true,
+    ".github": true
+  },
+  "files.exclude": {
+    "**/Build": true,
+    ".github": true
+  },
   "files.associations": {
     "cctype": "cpp",
     "clocale": "cpp",
