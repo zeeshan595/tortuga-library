@@ -43,7 +43,6 @@ private:
   Graphics::Vulkan::CommandPool::CommandPool ComputeCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
   Graphics::Vulkan::Fence::Fence RenderingWaiter;
-  Graphics::Vulkan::Fence::Fence PresentWaiter;
 
   //geometry
   Graphics::Vulkan::Shader::Shader GeometryShader;
@@ -77,38 +76,34 @@ private:
 
   static void UpdateWindowSize(Rendering *render)
   {
+    auto device = Core::Engine::GetMainDevice();
+
     RenderInfo renderInfo = {};
     {
       renderInfo.WindowWidth = render->SwapchainExtent.width;
       renderInfo.WindowHeight = render->SwapchainExtent.height;
     }
     Graphics::Vulkan::Buffer::SetData(render->RenderingInfoBufferStaging, &renderInfo, sizeof(renderInfo));
-    auto renderInfoTransfer = Graphics::Vulkan::Command::Create(Core::Engine::GetMainDevice(), render->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    auto renderInfoTransfer = Graphics::Vulkan::Command::Create(device, render->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
     Graphics::Vulkan::Command::Begin(renderInfoTransfer, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
     Graphics::Vulkan::Command::CopyBuffer(renderInfoTransfer, render->RenderingInfoBufferStaging, render->RenderingInfoBuffer);
     Graphics::Vulkan::Command::End(renderInfoTransfer);
-    Graphics::Vulkan::Command::Submit({renderInfoTransfer}, Core::Engine::GetMainDevice().Queues.Transfer[0]);
-    Graphics::Vulkan::Device::WaitForQueue(Core::Engine::GetMainDevice().Queues.Transfer[0]);
+    Graphics::Vulkan::Command::Submit({renderInfoTransfer}, device.Queues.Transfer[0]);
+    Graphics::Vulkan::Device::WaitForQueue(device.Queues.Transfer[0]);
 
     if (render->RenderingBuffer.Buffer != VK_NULL_HANDLE)
       Graphics::Vulkan::Buffer::Destroy(render->RenderingBuffer);
-    render->RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(Core::Engine::GetMainDevice(), sizeof(glm::vec4) * render->SwapchainExtent.width * render->SwapchainExtent.height);
+    render->RenderingBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnly(device, sizeof(glm::vec4) * render->SwapchainExtent.width * render->SwapchainExtent.height);
 
     Graphics::Vulkan::DescriptorSets::UpdateDescriptorSets(render->OutRenderingDescriptorSet, {render->RenderingInfoBuffer, render->RenderingBuffer});
 
     if (render->RenderingImage.Image != VK_NULL_HANDLE)
       Graphics::Vulkan::Image::Destroy(render->RenderingImage);
-    render->RenderingImage = Graphics::Vulkan::Image::Create(Core::Engine::GetMainDevice(), render->SwapchainExtent.width, render->SwapchainExtent.height);
+    render->RenderingImage = Graphics::Vulkan::Image::Create(device, render->SwapchainExtent.width, render->SwapchainExtent.height);
   }
 
 public:
   void Update()
-  {
-    Render();
-    Present();
-  }
-
-  void Render()
   {
     auto swapchain = Core::Screen::GetSwapchain();
     auto device = Core::Engine::GetMainDevice();
@@ -201,34 +196,25 @@ public:
       Graphics::Vulkan::Command::TransferImageLayout(RenderingCommand, RenderingImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
       Graphics::Vulkan::Command::BufferToImage(RenderingCommand, RenderingBuffer, RenderingImage, {0, 0}, {SwapchainExtent.width, SwapchainExtent.height});
       Graphics::Vulkan::Command::End(RenderingCommand);
-      Graphics::Vulkan::Command::Submit({RenderingCommand}, Core::Engine::GetMainDevice().Queues.Compute[0], {MeshCombineSemaphore}, {RenderingSemaphore}, RenderingWaiter);
+      Graphics::Vulkan::Command::Submit({RenderingCommand}, Core::Engine::GetMainDevice().Queues.Compute[0], {MeshCombineSemaphore}, {RenderingSemaphore});
     }
-  }
 
-  void Present()
-  {
-    auto swapchain = Core::Screen::GetSwapchain();
-    auto window = Core::Screen::GetWindow();
-    auto device = Core::Engine::GetMainDevice();
-    //VK_KHR_shared_presentable_image
-    if (!Graphics::Vulkan::Fence::IsFenceSignaled(PresentWaiter))
-      return;
-
-    Graphics::Vulkan::Fence::ResetFences({PresentWaiter});
-
-    auto index = Graphics::Vulkan::Swapchain::AquireNextImage(swapchain);
-    auto presentImage = Graphics::Vulkan::Swapchain::GetImage(swapchain, index);
-
+    //present
     {
-      Graphics::Vulkan::Command::Begin(PresentCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-      Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, RenderingImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-      Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, presentImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-      Graphics::Vulkan::Command::BlitImage(PresentCommand, RenderingImage, presentImage, {SwapchainExtent.width, SwapchainExtent.height}, {0, 0}, {0, 0});
-      Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, presentImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-      Graphics::Vulkan::Command::End(PresentCommand);
+      auto index = Graphics::Vulkan::Swapchain::AquireNextImage(swapchain);
+      auto presentImage = Graphics::Vulkan::Swapchain::GetImage(swapchain, index);
+
+      {
+        Graphics::Vulkan::Command::Begin(PresentCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, RenderingImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, presentImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        Graphics::Vulkan::Command::BlitImage(PresentCommand, RenderingImage, presentImage, {SwapchainExtent.width, SwapchainExtent.height}, {0, 0}, {0, 0});
+        Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, presentImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+        Graphics::Vulkan::Command::End(PresentCommand);
+      }
+      Graphics::Vulkan::Command::Submit({PresentCommand}, device.Queues.Graphics[0], {RenderingSemaphore}, {PresentSemaphore}, RenderingWaiter);
+      Graphics::Vulkan::Swapchain::PresentImage(swapchain, index, device.Queues.Present, {PresentSemaphore});
     }
-    Graphics::Vulkan::Command::Submit({PresentCommand}, device.Queues.Graphics[0], {RenderingSemaphore}, {PresentSemaphore}, PresentWaiter);
-    Graphics::Vulkan::Swapchain::PresentImage(swapchain, index, device.Queues.Present, {PresentSemaphore});
   }
 
   Rendering()
@@ -242,7 +228,6 @@ public:
       ComputeCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Compute.Index);
       GraphicsCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
       RenderingWaiter = Graphics::Vulkan::Fence::Create(device, true);
-      PresentWaiter = Graphics::Vulkan::Fence::Create(device, true);
     }
 
     //geometry pipeline
@@ -310,7 +295,6 @@ public:
       Graphics::Vulkan::CommandPool::Destroy(ComputeCommandPool);
       Graphics::Vulkan::CommandPool::Destroy(GraphicsCommandPool);
       Graphics::Vulkan::Fence::Destroy(RenderingWaiter);
-      Graphics::Vulkan::Fence::Destroy(PresentWaiter);
     }
 
     //geometry pipeline

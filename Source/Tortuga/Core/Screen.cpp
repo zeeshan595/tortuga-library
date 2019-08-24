@@ -26,7 +26,9 @@ struct Window
 
   void ResizeWindow(uint32_t width, uint32_t height)
   {
-    VulkanWindow = Graphics::Vulkan::Window::ResizeWindow(VulkanWindow, width, height);
+    Graphics::Vulkan::Swapchain::Destroy(Swapchain);
+    Graphics::Vulkan::Window::Destroy(VulkanWindow);
+    VulkanWindow = Graphics::Vulkan::Window::Create(Engine::GetVulkan(), VulkanWindow.Title.c_str(), width, height);
     Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
   }
 };
@@ -34,16 +36,7 @@ auto window = Window("Tortuga", 800, 600);
 
 SDL_Event PollEvents()
 {
-  auto event = Graphics::Vulkan::Window::PollEvents(window.VulkanWindow);
-  if (event.type == SDL_WINDOWEVENT)
-  {
-    if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-    {
-      window.VulkanWindow = Graphics::Vulkan::Window::UpdateWindowSize(window.VulkanWindow);
-      window.Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), window.VulkanWindow, window.Swapchain.Swapchain);
-    }
-  }
-  return event;
+  return Graphics::Vulkan::Window::PollEvents(window.VulkanWindow);
 }
 void SetWindowTitle(std::string title)
 {

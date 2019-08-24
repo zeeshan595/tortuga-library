@@ -16,7 +16,7 @@ Window Create(Instance::Instance instance, const char *title, uint32_t width, ui
   data.VulkanInstance = instance;
   data.Title = title;
 
-  data.Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+  data.Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_VULKAN);
   if (data.Window == nullptr)
     Console::Fatal("Failed to create window");
 
@@ -35,10 +35,6 @@ SDL_Event PollEvents(Window window)
   SDL_Event event;
   SDL_PollEvent(&event);
   return event;
-}
-Window ResizeWindow(Window data, uint32_t width, uint32_t height)
-{
-  return data;
 }
 Window UpdateWindowSize(Window data)
 {
