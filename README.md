@@ -1,17 +1,18 @@
 # tortuga-library
 
-Tortuga is a open source Game Engine built in C++ 11. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. 
-Tortuga is built in Linux but it should be cross platform compatible if you wish to build it for a different platform. 
-For editing the source code & building the project, a `Linux` system is recommended with a copy of `vs code`/`gnome-builder`.
-
-Tortuga Editor UI: https://github.com/zeeshan595/tortuga-editor
+Tortuga is a open source Game Engine built in C++ 11. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. Tortuga is built in Linux but it should be cross platform compatible if you wish to build it for a different platform. For editing the source code & building the project, a `Linux` system is recommended with a copy of `vs code`/`gnome-builder`.
 
 **Key Features**
 
 * Multi-Threaded Rendering
-* Ray Marching
+* Ray Marching (Signed Distance)
 * Data Oriented Design
 * Multi GPU Support (Split Screen) _[NOT IMPLIMENTED]_
+* OBJ Support
+
+**Information on Renderer**
+
+The renderer uses ray marching (signed distance function) on an object's bounds (sphere based). If the ray marching hits the object's bounds then it uses triangle intersection to render that mesh.
 
 **Required Resources**
 
@@ -42,4 +43,5 @@ You can download `shaderc` from github and place the extracted folders (`bin`, `
 1. Download the project `git clone https://github.com/zeeshan595/tortuga-library`
 2. Use meson to build the project `meson Build && cd Build && ninja`
 3. Copy Shaders folder to build directory `cp -r ../Shaders/ ./`
-4. Run engine `./tortuga`
+4. Copy Models folder to build directory `cp -r ../Models/ ./`
+5. Run engine `./tortuga`
