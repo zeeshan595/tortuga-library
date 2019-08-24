@@ -126,16 +126,15 @@ public:
         auto mesh = entity->GetComponent<Component::Mesh>();
         if (mesh == nullptr)
           continue;
-
         auto transform = entity->GetComponent<Component::Transform>();
-        if (transform)
-          mesh->ApplyTransformation(transform->Position, transform->Rotation, transform->Scale);
 
         meshBuffers.push_back(mesh->Buffer);
         if (mesh->IsStatic && mesh->IsProcessedOnce)
           continue;
         meshCommands.push_back(mesh->Command);
-        meshThreads.push_back(std::async(std::launch::async, [mesh, geometryPipeline] {
+        meshThreads.push_back(std::async(std::launch::async, [mesh, geometryPipeline, transform] {
+          if (transform)
+            mesh->ApplyTransformation(transform->Position, transform->Rotation, transform->Scale);
           Graphics::Vulkan::Buffer::SetData(mesh->Staging, &mesh->BufferData, Component::MESH_SIZE);
           Graphics::Vulkan::Command::Begin(mesh->Command, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
           Graphics::Vulkan::Command::CopyBuffer(mesh->Command, mesh->Staging, mesh->Buffer);

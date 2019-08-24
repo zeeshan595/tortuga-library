@@ -22,16 +22,20 @@ private:
 
 public:
   template <typename T>
-  void AddComponent(T *data = nullptr)
+  T* AddComponent(T *data = nullptr)
   {
     auto type = std::type_index(typeid(T));
     if (this->Components[type] != nullptr)
-      return;
+      return static_cast<T *>(this->Components[type]);
 
+    T* temp = nullptr;
     if (data != nullptr)
-      this->Components[type] = data;
+      temp = data;
     else
-      this->Components[type] = new T();
+      temp = new T();
+    this->Components[type] = temp;
+    
+    return temp;
   }
   template <typename T>
   void RemoveComponent()

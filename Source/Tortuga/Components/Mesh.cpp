@@ -113,6 +113,7 @@ void Mesh::SetStatic()
 void Mesh::SetDynamic()
 {
   this->IsStatic = false;
+  this->IsProcessedOnce = false;
 }
 
 Mesh::Mesh()

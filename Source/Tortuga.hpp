@@ -35,6 +35,8 @@
 #include "./Tortuga/Systems/Rendering.hpp"
 
 //Components
+#include "./Tortuga/Components/Transform.hpp"
 #include "./Tortuga/Components/Mesh.hpp"
+#include "./Tortuga/Components/Light.hpp"
 
 #endif
