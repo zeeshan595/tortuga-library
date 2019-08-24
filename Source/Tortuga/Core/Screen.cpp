@@ -46,7 +46,7 @@ void SetWindowTitle(std::string title)
 void ResizeWindow(uint32_t width, uint32_t height)
 {
   window.ResizeWindow(width, height);
-  for (auto i = 0; i < OnWindowResize.size(); i++)
+  for (uint i = 0; i < OnWindowResize.size(); i++)
   {
     auto ptr = OnWindowResize[i];
     ((void (*)(void *))ptr.func)(ptr.param);
