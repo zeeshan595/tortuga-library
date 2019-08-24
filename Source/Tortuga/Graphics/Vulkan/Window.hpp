@@ -18,11 +18,12 @@ namespace Window
 {
 struct Window
 {
-	VkInstance VulkanInstance;
+	Instance::Instance VulkanInstance;
 	SDL_Window *Window = nullptr;
 	VkSurfaceKHR Surface = VK_NULL_HANDLE;
 	uint32_t Width;
 	uint32_t Height;
+	std::string Title;
 };
 
 Window Create(Instance::Instance instance, const char *title, uint32_t width, uint32_t height);

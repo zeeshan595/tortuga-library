@@ -118,6 +118,8 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
   }
   ErrorCheck::Callback(vkCreateFence(data.Device, &fenceInfo, nullptr, &data.Fence));
+  if (oldSwapchain != VK_NULL_HANDLE)
+    vkDestroySwapchainKHR(device.Device, oldSwapchain, nullptr);
 
   return data;
 }
@@ -128,7 +130,7 @@ void Destroy(Swapchain data)
 }
 uint32_t AquireNextImage(Swapchain data)
 {
-  
+
   vkResetFences(data.Device, 1, &data.Fence);
   uint32_t imageIndex;
   ErrorCheck::Callback(vkAcquireNextImageKHR(data.Device, data.Swapchain, std::numeric_limits<uint64_t>::max(), VK_NULL_HANDLE, data.Fence, &imageIndex));
