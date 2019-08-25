@@ -63,6 +63,7 @@ void Rendering::Update()
           {
             Graphics::Vulkan::Buffer::SetData(light->Staging, &light->Data, sizeof(Component::LightData));
             lightCommands.push_back(light->Command);
+            lightBuffers.push_back(light->Buffer);
             light->IsProcessed = false;
           }
         }
@@ -117,7 +118,7 @@ void Rendering::Update()
       if (LightCombineBuffer.Buffer != VK_NULL_HANDLE)
         Graphics::Vulkan::Buffer::Destroy(LightCombineBuffer);
 
-      LightCombineBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, totalSize);
+      LightCombineBuffer = Graphics::Vulkan::Buffer::CreateHostDest(device, totalSize);
       Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(LightsDescriptorSet, {LightCombineBuffer});
     }
     Graphics::Vulkan::Command::Begin(LightCombineCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
