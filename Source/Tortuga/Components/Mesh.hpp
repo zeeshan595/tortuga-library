@@ -58,10 +58,8 @@ struct Mesh
   void SetNormals(std::vector<glm::vec4> normals);
   void SetTextures(std::vector<glm::vec4> textures);
   void SetIndices(std::vector<Graphics::Index> indices);
-  void SetStatic();
-  void SetDynamic();
-  void SetEnable();
-  void SetDisable();
+  void SetStatic(bool isStatic);
+  void SetActive(bool isActive);
 
   Mesh();
   ~Mesh();

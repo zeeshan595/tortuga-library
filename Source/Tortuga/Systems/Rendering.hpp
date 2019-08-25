@@ -22,21 +22,14 @@
 #include "../Core/Entity.hpp"
 #include "../Console.hpp"
 
-#include "../Components/Mesh.hpp"
 #include "../Components/Transform.hpp"
+#include "../Components/Mesh.hpp"
+#include "../Components/Light.hpp"
 
 namespace Tortuga
 {
 namespace Systems
 {
-struct GlslLight
-{
-  glm::vec4 Position;
-  glm::vec4 Rotation;
-  uint Type;
-  float Intensity;
-  float Range;
-};
 class Rendering : public Core::System
 {
 private:
@@ -56,18 +49,25 @@ private:
   Graphics::Vulkan::Shader::Shader GeometryShader;
   Graphics::Vulkan::Pipeline::Pipeline GeometryPipeline;
   Graphics::Vulkan::Semaphore::Semaphore GeometrySemaphore;
+  Graphics::Vulkan::Semaphore::Semaphore LightSemaphore;
 
   //combine meshes into single buffer
   Graphics::Vulkan::Buffer::Buffer MeshCombineBuffer;
   Graphics::Vulkan::Command::Command MeshCombineCommand;
   Graphics::Vulkan::Semaphore::Semaphore MeshCombineSemaphore;
+  //lights
+  Graphics::Vulkan::Buffer::Buffer LightCombineBuffer;
+  Graphics::Vulkan::Command::Command LightCombineCommand;
+  Graphics::Vulkan::Semaphore::Semaphore LightCombineSemaphore;
 
   //rendering
   VkExtent2D SwapchainExtent;
   Graphics::Vulkan::DescriptorLayout::DescriptorLayout OutRenderingDescriptorLayout;
-  Graphics::Vulkan::DescriptorLayout::DescriptorLayout InRenderingDescriptorLayout;
+  Graphics::Vulkan::DescriptorLayout::DescriptorLayout MeshesDescriptorLayout;
+  Graphics::Vulkan::DescriptorLayout::DescriptorLayout LightsDescriptorLayout;
   Graphics::Vulkan::DescriptorPool::DescriptorPool RenderingDescriptorPool;
-  Graphics::Vulkan::DescriptorSet::DescriptorSet InRenderingDescriptorSet;
+  Graphics::Vulkan::DescriptorSet::DescriptorSet MeshesDescriptorSet;
+  Graphics::Vulkan::DescriptorSet::DescriptorSet LightsDescriptorSet;
   Graphics::Vulkan::DescriptorSet::DescriptorSet OutRenderingDescriptorSet;
   Graphics::Vulkan::Buffer::Buffer RenderingBuffer;
   Graphics::Vulkan::Buffer::Buffer RenderingInfoBufferStaging;

@@ -106,22 +106,15 @@ void Mesh::SetIndices(std::vector<Graphics::Index> indices)
   this->BufferData.IndicesSize = indices.size();
 }
 
-void Mesh::SetStatic()
+void Mesh::SetStatic(bool isStatic)
 {
-  this->IsStatic = true;
+  this->IsStatic = isStatic;
+  if (isStatic)
+    this->IsProcessedOnce = false;
 }
-void Mesh::SetDynamic()
+void Mesh::SetActive(bool isActive)
 {
-  this->IsStatic = false;
-  this->IsProcessedOnce = false;
-}
-void Mesh::SetEnable()
-{
-  this->IsEnabled = true;
-}
-void Mesh::SetDisable()
-{
-  this->IsEnabled = false;
+  this->IsEnabled = isActive;
 }
 
 Mesh::Mesh()

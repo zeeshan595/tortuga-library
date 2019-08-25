@@ -6,20 +6,26 @@ layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
 
 #include "./Partial/Mesh.comp"
+#include "./Partial/Light.comp"
 #include "./Partial/triangleIntersection.comp"
 #include "./Partial/rayMarching.comp"
 
-//meshes buffer
+//meshes
 layout(set = 0, binding = 0) buffer Mesh {
   MeshBufferData meshes[];
 };
 
-//render image buffers
-layout(set = 1, binding = 0) buffer RenderInfo {
+//lights
+layout(set = 1, binding = 0) buffer Light {
+  LightData lights[];
+};
+
+//render image
+layout(set = 2, binding = 0) buffer RenderInfo {
   uint renderWidth;
   uint renderHeight;
 };
-layout(set = 1, binding = 1) buffer Render {
+layout(set = 2, binding = 1) buffer Render {
   vec4 pixels[];
 };
 

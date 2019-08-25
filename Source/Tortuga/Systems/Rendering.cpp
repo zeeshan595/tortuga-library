@@ -15,46 +15,69 @@ void Rendering::Update()
 
   Graphics::Vulkan::Fence::ResetFences({RenderingWaiter});
   //geometry processing
+  std::vector<Graphics::Vulkan::Buffer::Buffer> lightBuffers;
   std::vector<Graphics::Vulkan::Buffer::Buffer> meshBuffers;
   std::vector<Graphics::Vulkan::Semaphore::Semaphore> meshSemaphore;
+  std::vector<Graphics::Vulkan::Semaphore::Semaphore> lightSemaphore;
   {
     auto geometryPipeline = this->GeometryPipeline;
     auto entities = Core::Entity::GetAllEntities();
-    std::vector<std::future<void>> meshThreads(0);
+    std::vector<std::future<void>> commandThreads(0);
     std::vector<Graphics::Vulkan::Command::Command> meshCommands;
+    std::vector<Graphics::Vulkan::Command::Command> lightCommands;
     for (auto entity : entities)
     {
+      //process mesh info
       auto mesh = entity->GetComponent<Component::Mesh>();
-      if (mesh == nullptr)
-        continue;
-      if (mesh->IsEnabled == false)
-        continue;
-
-      auto transform = entity->GetComponent<Component::Transform>();
-      meshBuffers.push_back(mesh->Buffer);
-      if (mesh->IsStatic && mesh->IsProcessedOnce)
-        continue;
-      meshCommands.push_back(mesh->Command);
-      meshThreads.push_back(std::async(std::launch::async, [mesh, geometryPipeline, transform] {
-        if (transform)
-          mesh->ApplyTransformation(transform->Position, transform->Rotation, transform->Scale);
-        Graphics::Vulkan::Buffer::SetData(mesh->Staging, &mesh->BufferData, Component::MESH_SIZE);
-        Graphics::Vulkan::Command::Begin(mesh->Command, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        Graphics::Vulkan::Command::CopyBuffer(mesh->Command, mesh->Staging, mesh->Buffer);
-        Graphics::Vulkan::Command::BindPipeline(mesh->Command, VK_PIPELINE_BIND_POINT_COMPUTE, geometryPipeline, {mesh->DescriptorSets});
-        uint32_t computeGroupSize = (mesh->BufferData.VerticesSize / 16) + 1;
-        Graphics::Vulkan::Command::Compute(mesh->Command, computeGroupSize, computeGroupSize, 1);
-        Graphics::Vulkan::Command::End(mesh->Command);
-      }));
-      mesh->IsProcessedOnce = true;
+      if (mesh != nullptr)
+      {
+        if (mesh->IsEnabled)
+        {
+          meshBuffers.push_back(mesh->Buffer);
+          if (!mesh->IsStatic || !mesh->IsProcessedOnce)
+          {
+            auto transform = entity->GetComponent<Component::Transform>();
+            meshCommands.push_back(mesh->Command);
+            commandThreads.push_back(std::async(std::launch::async, [mesh, geometryPipeline, transform] {
+              if (transform)
+                mesh->ApplyTransformation(transform->Position, transform->Rotation, transform->Scale);
+              Graphics::Vulkan::Buffer::SetData(mesh->Staging, &mesh->BufferData, Component::MESH_SIZE);
+              Graphics::Vulkan::Command::Begin(mesh->Command, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+              Graphics::Vulkan::Command::CopyBuffer(mesh->Command, mesh->Staging, mesh->Buffer);
+              Graphics::Vulkan::Command::BindPipeline(mesh->Command, VK_PIPELINE_BIND_POINT_COMPUTE, geometryPipeline, {mesh->DescriptorSets});
+              uint32_t computeGroupSize = (mesh->BufferData.VerticesSize / 16) + 1;
+              Graphics::Vulkan::Command::Compute(mesh->Command, computeGroupSize, computeGroupSize, 1);
+              Graphics::Vulkan::Command::End(mesh->Command);
+            }));
+            mesh->IsProcessedOnce = true;
+          }
+        }
+      }
+      //process light info
+      auto light = entity->GetComponent<Component::Light>();
+      if (light != nullptr)
+      {
+        if (light->IsEnabled)
+        {
+          if (!light->IsStatic || !light->IsProcessed)
+          {
+            Graphics::Vulkan::Buffer::SetData(light->Staging, &light->Data, sizeof(Component::LightData));
+            lightCommands.push_back(light->Command);
+            light->IsProcessed = false;
+          }
+        }
+      }
     }
-    for (uint32_t i = 0; i < meshThreads.size(); i++)
-      meshThreads[i].wait();
+    for (uint32_t i = 0; i < commandThreads.size(); i++)
+      commandThreads[i].wait();
 
     if (meshCommands.size() > 0)
       meshSemaphore.push_back(GeometrySemaphore);
+    if (lightCommands.size() > 0)
+      lightSemaphore.push_back(LightSemaphore);
 
     Graphics::Vulkan::Command::Submit(meshCommands, device.Queues.Compute[0], {}, meshSemaphore);
+    Graphics::Vulkan::Command::Submit(lightCommands, device.Queues.Transfer[0], {}, lightSemaphore);
   }
 
   //combine meshes into single buffer
@@ -68,8 +91,8 @@ void Rendering::Update()
       if (MeshCombineBuffer.Buffer != VK_NULL_HANDLE)
         Graphics::Vulkan::Buffer::Destroy(MeshCombineBuffer);
 
-      MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateHostDest(device, totalSize);
-      Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(InRenderingDescriptorSet, {MeshCombineBuffer});
+      MeshCombineBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, totalSize);
+      Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(MeshesDescriptorSet, {MeshCombineBuffer});
     }
     Graphics::Vulkan::Command::Begin(MeshCombineCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
     uint32_t offset = 0;
@@ -80,6 +103,32 @@ void Rendering::Update()
     }
     Graphics::Vulkan::Command::End(MeshCombineCommand);
     Graphics::Vulkan::Command::Submit({MeshCombineCommand}, device.Queues.Transfer[0], meshSemaphore, {MeshCombineSemaphore});
+  }
+
+  //combine lights into a single buffer
+  {
+    auto totalSize = lightBuffers.size() * sizeof(Component::LightData);
+    if (totalSize <= 0)
+      totalSize = 1;
+    
+    if (LightCombineBuffer.Buffer == VK_NULL_HANDLE || totalSize != LightCombineBuffer.Size)
+    {
+      //buffer needs to be recreated
+      if (LightCombineBuffer.Buffer != VK_NULL_HANDLE)
+        Graphics::Vulkan::Buffer::Destroy(LightCombineBuffer);
+
+      LightCombineBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, totalSize);
+      Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(LightsDescriptorSet, {LightCombineBuffer});
+    }
+    Graphics::Vulkan::Command::Begin(LightCombineCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    uint32_t offset = 0;
+    for (auto lightBuffer : lightBuffers)
+    {
+      Graphics::Vulkan::Command::CopyBuffer(LightCombineCommand, lightBuffer, LightCombineBuffer, 0, offset);
+      offset += lightBuffer.Size;
+    }
+    Graphics::Vulkan::Command::End(LightCombineCommand);
+    Graphics::Vulkan::Command::Submit({LightCombineCommand}, device.Queues.Transfer[0], lightSemaphore, {LightCombineSemaphore});
   }
 
   //rendering
@@ -95,12 +144,12 @@ void Rendering::Update()
     auto windowWidth = (SwapchainExtent.width / 8) + 1;
     auto windowHeight = (SwapchainExtent.height / 8) + 1;
     Graphics::Vulkan::Command::Begin(RenderingCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    Graphics::Vulkan::Command::BindPipeline(RenderingCommand, VK_PIPELINE_BIND_POINT_COMPUTE, RenderingPipeline, {InRenderingDescriptorSet, OutRenderingDescriptorSet});
+    Graphics::Vulkan::Command::BindPipeline(RenderingCommand, VK_PIPELINE_BIND_POINT_COMPUTE, RenderingPipeline, {MeshesDescriptorSet, LightsDescriptorSet, OutRenderingDescriptorSet});
     Graphics::Vulkan::Command::Compute(RenderingCommand, windowWidth, windowHeight, 1);
     Graphics::Vulkan::Command::TransferImageLayout(RenderingCommand, RenderingImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     Graphics::Vulkan::Command::BufferToImage(RenderingCommand, RenderingBuffer, RenderingImage, {0, 0}, {SwapchainExtent.width, SwapchainExtent.height});
     Graphics::Vulkan::Command::End(RenderingCommand);
-    Graphics::Vulkan::Command::Submit({RenderingCommand}, Core::Engine::GetMainDevice().Queues.Compute[0], {MeshCombineSemaphore}, {RenderingSemaphore});
+    Graphics::Vulkan::Command::Submit({RenderingCommand}, Core::Engine::GetMainDevice().Queues.Compute[0], {MeshCombineSemaphore, LightCombineSemaphore}, {RenderingSemaphore});
   }
 
   //present
@@ -143,6 +192,7 @@ Rendering::Rendering()
     //pipeline
     GeometryPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, GeometryShader, {}, {Component::GetMeshDescriptorLayout()});
     GeometrySemaphore = Graphics::Vulkan::Semaphore::Create(device);
+    LightSemaphore = Graphics::Vulkan::Semaphore::Create(device);
   }
 
   //combine meshes into single buffer
@@ -152,6 +202,13 @@ Rendering::Rendering()
     MeshCombineSemaphore = Graphics::Vulkan::Semaphore::Create(device);
   }
 
+  //combine lights into single buffer
+  {
+    LightCombineBuffer.Buffer = VK_NULL_HANDLE;
+    LightCombineCommand = Graphics::Vulkan::Command::Create(device, TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    LightCombineSemaphore = Graphics::Vulkan::Semaphore::Create(device);
+  }
+
   //rendering
   {
     auto swapchain = Core::Screen::GetSwapchain();
@@ -159,17 +216,19 @@ Rendering::Rendering()
     RenderingInfoBufferStaging = Graphics::Vulkan::Buffer::CreateHostSrc(device, sizeof(RenderInfo));
     RenderingInfoBuffer = Graphics::Vulkan::Buffer::CreateDeviceOnlyDest(device, sizeof(RenderInfo));
 
-    InRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, 1);
+    MeshesDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, 1);
+    LightsDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, 1);
     OutRenderingDescriptorLayout = Graphics::Vulkan::DescriptorLayout::Create(device, 2);
-    RenderingDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, {InRenderingDescriptorLayout, OutRenderingDescriptorLayout}, 2);
-    InRenderingDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderingDescriptorPool, InRenderingDescriptorLayout);
+    RenderingDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, {MeshesDescriptorLayout, LightsDescriptorLayout, OutRenderingDescriptorLayout}, 3);
+    MeshesDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderingDescriptorPool, MeshesDescriptorLayout);
+    LightsDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderingDescriptorPool, LightsDescriptorLayout);
     OutRenderingDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderingDescriptorPool, OutRenderingDescriptorLayout);
     RenderingCommand = Graphics::Vulkan::Command::Create(device, ComputeCommandPool, Graphics::Vulkan::Command::PRIMARY);
 
     auto shaderCode = Utils::IO::GetFileContents("Shaders/Rendering.comp");
     auto compiledShader = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::COMPUTE, shaderCode);
     RenderingShader = Graphics::Vulkan::Shader::Create(device, compiledShader);
-    RenderingPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, RenderingShader, {}, {InRenderingDescriptorLayout, OutRenderingDescriptorLayout});
+    RenderingPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, RenderingShader, {}, {MeshesDescriptorLayout, LightsDescriptorLayout, OutRenderingDescriptorLayout});
     RenderingSemaphore = Graphics::Vulkan::Semaphore::Create(device);
 
     RenderingBuffer.Buffer = VK_NULL_HANDLE;
@@ -205,6 +264,7 @@ Rendering::~Rendering()
     Graphics::Vulkan::Pipeline::DestroyPipeline(GeometryPipeline);
     Graphics::Vulkan::Shader::Destroy(GeometryShader);
     Graphics::Vulkan::Semaphore::Destroy(GeometrySemaphore);
+    Graphics::Vulkan::Semaphore::Destroy(LightSemaphore);
   }
 
   //combine meshes into single buffer
@@ -213,13 +273,20 @@ Rendering::~Rendering()
     Graphics::Vulkan::Semaphore::Destroy(MeshCombineSemaphore);
   }
 
+  //combine lights into single buffer
+  {
+    Graphics::Vulkan::Buffer::Destroy(LightCombineBuffer);
+    Graphics::Vulkan::Semaphore::Destroy(LightCombineSemaphore);
+  }
+
   //rendering
   {
     Graphics::Vulkan::Buffer::Destroy(RenderingBuffer);
     Graphics::Vulkan::Buffer::Destroy(RenderingInfoBuffer);
     Graphics::Vulkan::Buffer::Destroy(RenderingInfoBufferStaging);
-    Graphics::Vulkan::DescriptorLayout::Destroy(InRenderingDescriptorLayout);
+    Graphics::Vulkan::DescriptorLayout::Destroy(MeshesDescriptorLayout);
     Graphics::Vulkan::DescriptorLayout::Destroy(OutRenderingDescriptorLayout);
+    Graphics::Vulkan::DescriptorLayout::Destroy(LightsDescriptorLayout);
     Graphics::Vulkan::DescriptorPool::Destroy(RenderingDescriptorPool);
     Graphics::Vulkan::Shader::Destroy(RenderingShader);
     Graphics::Vulkan::Pipeline::DestroyPipeline(RenderingPipeline);

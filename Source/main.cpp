@@ -26,8 +26,6 @@ int main()
     mesh->SetNormals(model.Normals);
     mesh->SetTextures(model.Textures);
     mesh->SetIndices(model.Indices);
-    mesh->SetDynamic();
-    mesh->SetEnable();
   }
 
   //create light entity
@@ -39,8 +37,7 @@ int main()
     transform->Scale = glm::vec4(1, 1, 1, 1);
 
     auto lightComponent = light->AddComponent<Component::Light>();
-    lightComponent->Intensity = 1.0f;
-    lightComponent->Range = 10.0f;
+    lightComponent->SetStatic(true);
   }
 
   float yRotation = 0.0f;
