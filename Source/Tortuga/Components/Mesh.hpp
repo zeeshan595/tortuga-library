@@ -41,6 +41,7 @@ struct MeshBufferData
 const uint32_t MESH_SIZE = sizeof(MeshBufferData);
 struct Mesh
 {
+  bool IsEnabled;
   bool IsStatic;
   bool IsProcessedOnce;
   MeshBufferData BufferData;
@@ -59,6 +60,8 @@ struct Mesh
   void SetIndices(std::vector<Graphics::Index> indices);
   void SetStatic();
   void SetDynamic();
+  void SetEnable();
+  void SetDisable();
 
   Mesh();
   ~Mesh();

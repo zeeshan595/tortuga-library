@@ -126,8 +126,10 @@ public:
         auto mesh = entity->GetComponent<Component::Mesh>();
         if (mesh == nullptr)
           continue;
+        if (mesh->IsEnabled == false)
+          continue;
+          
         auto transform = entity->GetComponent<Component::Transform>();
-
         meshBuffers.push_back(mesh->Buffer);
         if (mesh->IsStatic && mesh->IsProcessedOnce)
           continue;
@@ -157,6 +159,8 @@ public:
     //combine meshes into single buffer
     {
       auto totalSize = meshBuffers.size() * Component::MESH_SIZE;
+      if (totalSize <= 0)
+        totalSize = 1;
       if (MeshCombineBuffer.Buffer == VK_NULL_HANDLE || totalSize != MeshCombineBuffer.Size)
       {
         //buffer needs to be recreated

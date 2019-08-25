@@ -63,6 +63,7 @@ int main()
 
   //destroy cube
   Core::Entity::Destroy(cube);
+  Core::Entity::Destroy(light);
 
   //destroy rendering system
   Core::DestroySystem<Systems::Rendering>();

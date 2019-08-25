@@ -115,6 +115,14 @@ void Mesh::SetDynamic()
   this->IsStatic = false;
   this->IsProcessedOnce = false;
 }
+void Mesh::SetEnable()
+{
+  this->IsEnabled = true;
+}
+void Mesh::SetDisable()
+{
+  this->IsEnabled = false;
+}
 
 Mesh::Mesh()
 {
