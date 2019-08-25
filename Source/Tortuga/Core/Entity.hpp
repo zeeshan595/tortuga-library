@@ -25,7 +25,7 @@ public:
   T *AddComponent(T *data = nullptr)
   {
     auto type = std::type_index(typeid(T));
-    if (this->Components[type] != nullptr)
+    if (this->Components.find(type) != this->Components.end())
       return static_cast<T *>(this->Components[type]);
 
     T *temp = nullptr;
@@ -41,10 +41,10 @@ public:
   void RemoveComponent()
   {
     auto type = std::type_index(typeid(T));
-    if (this->Components[type] == nullptr)
+    if (this->Components.find(type) == this->Components.end())
       return;
 
-    delete this->Components[type];
+    delete static_cast<T *>(this->Components[type]);
     this->Components.erase(type);
   }
   template <typename T>
