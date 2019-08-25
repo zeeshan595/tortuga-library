@@ -43,7 +43,7 @@ int main()
     lightComponent->Range = 10.0f;
   }
 
-  float yPosition = 0.0f;
+  float yRotation = 0.0f;
 
   //Main Loop
   bool shouldClose = false;
@@ -55,11 +55,11 @@ int main()
     if (event.window.event == SDL_WINDOWEVENT_CLOSE)
       shouldClose = true;
 
-    cube->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yPosition, 0, 1);
+    cube->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
 
     //iterate through all system and execute update functions
     Core::IterateSystemLoop();
-    yPosition += 0.00001;
+    yRotation += 0.00001;
   }
 
   //remove components
