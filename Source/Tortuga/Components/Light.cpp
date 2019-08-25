@@ -43,5 +43,10 @@ void Light::SetActive(bool isActive)
 {
   this->IsEnabled = isActive;
 }
+void Light::UpdateTransform(glm::vec4 position, glm::vec4 rotation)
+{
+  this->Data.Position = position;
+  this->Data.Rotation = rotation;
+}
 } // namespace Component
 } // namespace Tortuga

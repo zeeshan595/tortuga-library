@@ -14,7 +14,6 @@ struct MeshBufferData{
   uint IndiciesSize; //1N
   vec4 Center; //4N
   mat4 Transformation; //16N 
-  mat4 NormalMatrix; //16N
   vec4 Vertices[MAX_VERTICES_SIZE];
   vec4 Normals[MAX_VERTICES_SIZE];
   vec2 Textures[MAX_VERTICES_SIZE];

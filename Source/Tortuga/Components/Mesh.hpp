@@ -31,7 +31,6 @@ struct MeshBufferData
   uint32_t IndicesSize;
   glm::vec4 Center;
   glm::mat4 Transformation;
-  glm::mat4 NormalMatrix;
   glm::vec4 Vertices[MAX_VERTICES_SIZE];
   glm::vec4 Normals[MAX_VERTICES_SIZE];
   glm::vec2 Textures[MAX_VERTICES_SIZE];

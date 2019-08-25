@@ -22,5 +22,5 @@ void main() {
   }
 
   mesh.Vertices[index] = mesh.Transformation * mesh.Vertices[index];
-  mesh.Normals[index] = mesh.NormalMatrix * mesh.Normals[index];
+  mesh.Normals[index] = mesh.Transformation * mesh.Normals[index];
 }

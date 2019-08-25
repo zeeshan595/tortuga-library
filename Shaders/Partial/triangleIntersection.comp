@@ -1,4 +1,10 @@
-bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec3 vertices[3], vec3 normals[3], vec2 textures[3]) {
+struct Intersection
+{
+  bool IsIntersected;
+  vec3 Point;
+};
+
+Intersection triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec3 vertices[3], vec3 normals[3], vec2 textures[3]) {
   //ray origin
   vec3 orig = rayOrigin;
   
@@ -12,19 +18,22 @@ bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec3 vertices[3], v
 
   //get face normal
   vec3 N = normalize((normals[0] + normals[1] + normals[2]) / 3);
+
+  Intersection rtn = {false, vec3(0.)};
    
   //check if ray is parallel to the triangle
   float NdotRayDirection = dot(N, dir);
   if (abs(NdotRayDirection) < 0)
-    return false; //ray and triangle are parallel
+    return rtn; //ray and triangle are parallel
 
   float d = dot(N, v0);
   float t = (dot(N, orig) + d) / NdotRayDirection;
   if (t < 0)
-    return false;
+    return rtn;
 
   //intersection point
   vec3 P = orig + t * dir;
+  rtn.Point = P;
 
   vec3 C;
   //edge testing to see if intersection is inside triangle
@@ -32,19 +41,20 @@ bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec3 vertices[3], v
   vec3 vp0 = P - v0;
   C = cross(edge0, vp0);
   if (dot(N, C) < 0)
-    return false;
+    return rtn;
 
   vec3 edge1 = v2 - v1;
   vec3 vp1 = P - v1;
   C = cross(edge1, vp1);
   if (dot(N, C) < 0)
-    return false;
+    return rtn;
 
   vec3 edge2 = v0 - v2;
   vec3 vp2 = P - v2;
   C = cross(edge2, vp2);
   if (dot(N, C) < 0)
-    return false;
+    return rtn;
 
-  return true;
+  rtn.IsIntersected = true;
+  return rtn;
 }

@@ -61,6 +61,9 @@ void Rendering::Update()
         {
           if (!light->IsStatic || !light->IsProcessed)
           {
+            auto transform = entity->GetComponent<Component::Transform>();
+            if (transform)
+              light->UpdateTransform(glm::vec4(transform->Position.x, transform->Position.y, transform->Position.z, 1.0f), transform->Rotation);
             Graphics::Vulkan::Buffer::SetData(light->Staging, &light->Data, sizeof(Component::LightData));
             lightCommands.push_back(light->Command);
             lightBuffers.push_back(light->Buffer);

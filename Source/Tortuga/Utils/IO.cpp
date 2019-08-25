@@ -58,7 +58,7 @@ ObjExport LoadObjFile(std::string filePath)
     {
       glm::vec3 normal;
       fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-      exporter.Normals.push_back(glm::vec4(normal.x, normal.y, normal.z, 1));
+      exporter.Normals.push_back(glm::vec4(normal.x, normal.y, normal.z, 0));
     }
     else if (strcmp(lineHeader, "f") == 0)
     {
