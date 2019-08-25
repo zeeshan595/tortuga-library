@@ -4,8 +4,6 @@ namespace Tortuga
 {
 namespace Core
 {
-void System::OnCreate() {}
-void System::OnDestroy() {}
 void System::Update() {}
 std::unordered_map<std::type_index, System *> SystemManager = std::unordered_map<std::type_index, System *>();
 std::unordered_map<std::type_index, System *> GetSystemManager()

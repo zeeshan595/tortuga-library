@@ -18,8 +18,6 @@ class System
 {
 public:
   virtual void Update();
-  virtual void OnCreate();
-  virtual void OnDestroy();
   virtual ~System() = default;
 };
 std::unordered_map<std::type_index, System *> GetSystemManager();
@@ -34,7 +32,6 @@ T *CreateSystem()
     return dynamic_cast<T *>(systemManager[type]);
 
   systemManager[type] = dynamic_cast<System *>(new T());
-  systemManager[type]->OnCreate();
   SetSystemManager(systemManager);
   return dynamic_cast<T *>(systemManager[type]);
 }
@@ -46,7 +43,6 @@ void DestroySystem()
   if (systemManager[type] == nullptr)
     return;
 
-  systemManager[type]->OnDestroy();
   delete dynamic_cast<T *>(systemManager[type]);
   systemManager.erase(type);
   SetSystemManager(systemManager);

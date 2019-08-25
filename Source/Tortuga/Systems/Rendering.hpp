@@ -29,6 +29,14 @@ namespace Tortuga
 {
 namespace Systems
 {
+struct GlslLight
+{
+  glm::vec4 Position;
+  glm::vec4 Rotation;
+  uint Type;
+  float Intensity;
+  float Range;
+};
 class Rendering : public Core::System
 {
 private:
@@ -77,8 +85,8 @@ private:
   
 public:
   void Update();
-  void OnCreate();
-  void OnDestroy();
+  Rendering();
+  ~Rendering();
 };
 } // namespace Systems
 } // namespace Tortuga

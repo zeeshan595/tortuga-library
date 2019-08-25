@@ -120,7 +120,7 @@ void Rendering::Update()
     Graphics::Vulkan::Swapchain::PresentImage(swapchain, index, device.Queues.Present, {PresentSemaphore});
   }
 }
-void Rendering::OnCreate()
+Rendering::Rendering()
 {
   auto vulkan = Core::Engine::GetVulkan();
   auto device = Core::Engine::GetMainDevice();
@@ -183,7 +183,7 @@ void Rendering::OnCreate()
     PresentSemaphore = Graphics::Vulkan::Semaphore::Create(device);
   }
 }
-void Rendering::OnDestroy()
+Rendering::~Rendering()
 {
   auto device = Core::Engine::GetMainDevice();
 
