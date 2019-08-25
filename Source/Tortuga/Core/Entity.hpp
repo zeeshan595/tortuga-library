@@ -19,6 +19,7 @@ struct Entity
 private:
   std::string GUID;
   std::unordered_map<std::type_index, void *> Components;
+  std::unordered_map<std::type_index, void *> ComponentsToCleanUp;
 
 public:
   template <typename T>

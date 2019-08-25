@@ -62,14 +62,14 @@ int main()
     yPosition += 0.00001;
   }
 
-  //systems should be destroyed before components
-  Core::DestroySystem<Systems::Rendering>();
-
   //remove components
   cube->RemoveComponent<Component::Transform>();
   cube->RemoveComponent<Component::Mesh>();
   light->RemoveComponent<Component::Transform>();
   light->RemoveComponent<Component::Light>();
+
+  //destroy systems
+  Core::DestroySystem<Systems::Rendering>();
 
   //destroy cube
   Core::Entity::Destroy(cube);

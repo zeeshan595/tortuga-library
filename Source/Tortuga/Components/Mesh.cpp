@@ -141,6 +141,7 @@ Mesh::Mesh()
 }
 Mesh::~Mesh()
 {
+  Graphics::Vulkan::Device::WaitForDevice(Core::Engine::GetMainDevice());
   Graphics::Vulkan::Buffer::Destroy(this->Staging);
   Graphics::Vulkan::Buffer::Destroy(this->Buffer);
   Graphics::Vulkan::DescriptorPool::Destroy(this->DescriptorPool);
