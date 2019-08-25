@@ -71,6 +71,16 @@
     "list": "cpp",
     "unordered_set": "cpp",
     "valarray": "cpp",
-    "*.ipp": "cpp"
+    "*.ipp": "cpp",
+    "csignal": "cpp",
+    "bitset": "cpp",
+    "codecvt": "cpp",
+    "complex": "cpp",
+    "iterator": "cpp",
+    "memory_resource": "cpp",
+    "random": "cpp",
+    "cfenv": "cpp",
+    "cinttypes": "cpp",
+    "variant": "cpp"
   }
 }

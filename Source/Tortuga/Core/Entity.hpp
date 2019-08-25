@@ -22,19 +22,19 @@ private:
 
 public:
   template <typename T>
-  T* AddComponent(T *data = nullptr)
+  T *AddComponent(T *data = nullptr)
   {
     auto type = std::type_index(typeid(T));
     if (this->Components[type] != nullptr)
       return static_cast<T *>(this->Components[type]);
 
-    T* temp = nullptr;
+    T *temp = nullptr;
     if (data != nullptr)
       temp = data;
     else
       temp = new T();
     this->Components[type] = temp;
-    
+
     return temp;
   }
   template <typename T>
@@ -44,29 +44,22 @@ public:
     if (this->Components[type] == nullptr)
       return;
 
-    //delete this->Components[type];
+    delete this->Components[type];
     this->Components.erase(type);
   }
   template <typename T>
   T *GetComponent()
   {
     auto type = std::type_index(typeid(T));
-    return static_cast<T *>(this->Components[type]);
+    if (this->Components.find(type) == this->Components.end())
+      return nullptr;
+    else
+      return static_cast<T *>(this->Components[type]);
   }
 
-  Entity()
-  {
-    this->GUID = Core::GUID::GenerateGUID();
-  }
-  ~Entity()
-  {
-    if (this->Components.size() > 0)
-      Console::Warning("Please remove all components before destroying the entity");
-  }
-  std::string GetGUID()
-  {
-    return this->GUID;
-  }
+  Entity();
+  ~Entity();
+  std::string GetGUID();
 };
 struct Environment
 {

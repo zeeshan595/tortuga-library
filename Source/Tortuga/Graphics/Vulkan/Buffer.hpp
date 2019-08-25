@@ -2,6 +2,7 @@
 #define _VULKAN_BUFFER
 
 #include <vulkan/vulkan.h>
+#include <cstring>
 
 #include "./ErrorCheck.hpp"
 #include "./Device.hpp"

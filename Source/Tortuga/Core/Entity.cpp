@@ -6,6 +6,19 @@ namespace Core
 {
 namespace Entity
 {
+Entity::Entity()
+{
+  this->GUID = Core::GUID::GenerateGUID();
+}
+Entity::~Entity()
+{
+  if (this->Components.size() > 0)
+    Console::Warning("Please remove all components before destroying the entity");
+}
+std::string Entity::GetGUID()
+{
+  return this->GUID;
+}
 auto environment = Environment();
 Environment::~Environment()
 {
@@ -27,6 +40,7 @@ void Destroy(Entity *data)
     if (*i == data)
     {
       environment.Entities.erase(i);
+      delete data;
       break;
     }
   }

@@ -61,6 +61,12 @@ int main()
     yPosition += 0.00001;
   }
 
+  //remove components
+  cube->RemoveComponent<Component::Transform>();
+  cube->RemoveComponent<Component::Mesh>();
+  light->RemoveComponent<Component::Transform>();
+  light->RemoveComponent<Component::Light>();
+
   //destroy cube
   Core::Entity::Destroy(cube);
   Core::Entity::Destroy(light);
