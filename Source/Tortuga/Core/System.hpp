@@ -17,47 +17,49 @@ namespace Core
 class System
 {
 public:
-  virtual void Update() {}
-
+  virtual void Update();
+  virtual void OnCreate();
+  virtual void OnDestroy();
   virtual ~System() = default;
 };
-std::unordered_map<std::type_index, System *> SystemManager;
+std::unordered_map<std::type_index, System *> GetSystemManager();
+void SetSystemManager(std::unordered_map<std::type_index, System *> data);
+void IterateSystemLoop();
 template <typename T>
 T *CreateSystem()
 {
+  auto systemManager = GetSystemManager();
   auto type = std::type_index(typeid(T));
-  if (SystemManager[type] != nullptr)
-    return dynamic_cast<T *>(SystemManager[type]);
+  if (systemManager[type] != nullptr)
+    return dynamic_cast<T *>(systemManager[type]);
 
-  SystemManager[type] = dynamic_cast<System *>(new T());
-  return dynamic_cast<T *>(SystemManager[type]);
+  systemManager[type] = dynamic_cast<System *>(new T());
+  systemManager[type]->OnCreate();
+  SetSystemManager(systemManager);
+  return dynamic_cast<T *>(systemManager[type]);
 }
 template <typename T>
 void DestroySystem()
 {
+  auto systemManager = GetSystemManager();
   auto type = std::type_index(typeid(T));
-  if (SystemManager[type] == nullptr)
+  if (systemManager[type] == nullptr)
     return;
 
-  delete dynamic_cast<T *>(SystemManager[type]);
-  SystemManager.erase(type);
+  systemManager[type]->OnDestroy();
+  delete dynamic_cast<T *>(systemManager[type]);
+  systemManager.erase(type);
+  SetSystemManager(systemManager);
 }
 template <typename T>
 T *GetSystem()
 {
+  auto systemManager = GetSystemManager();
   auto type = std::type_index(typeid(T));
-  if (SystemManager[type] != nullptr)
-    return dynamic_cast<T *>(SystemManager[type]);
+  if (systemManager[type] != nullptr)
+    return dynamic_cast<T *>(systemManager[type]);
 
   return nullptr;
-}
-void IterateSystemLoop()
-{
-  for (auto system : SystemManager)
-  {
-    if (system.second != nullptr)
-      system.second->Update();
-  }
 }
 } // namespace Core
 } // namespace Tortuga

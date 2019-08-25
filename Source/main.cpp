@@ -27,6 +27,7 @@ int main()
     mesh->SetTextures(model.Textures);
     mesh->SetIndices(model.Indices);
     mesh->SetDynamic();
+    mesh->SetEnable();
   }
 
   //create light entity
@@ -61,6 +62,9 @@ int main()
     yPosition += 0.00001;
   }
 
+  //systems should be destroyed before components
+  Core::DestroySystem<Systems::Rendering>();
+
   //remove components
   cube->RemoveComponent<Component::Transform>();
   cube->RemoveComponent<Component::Mesh>();
@@ -71,7 +75,5 @@ int main()
   Core::Entity::Destroy(cube);
   Core::Entity::Destroy(light);
 
-  //destroy rendering system
-  Core::DestroySystem<Systems::Rendering>();
   return 0;
 }

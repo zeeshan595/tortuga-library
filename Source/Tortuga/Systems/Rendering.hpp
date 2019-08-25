@@ -77,8 +77,8 @@ private:
   
 public:
   void Update();
-  Rendering();
-  ~Rendering();
+  void OnCreate();
+  void OnDestroy();
 };
 } // namespace Systems
 } // namespace Tortuga

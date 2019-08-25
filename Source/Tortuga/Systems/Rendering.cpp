@@ -120,7 +120,7 @@ void Rendering::Update()
     Graphics::Vulkan::Swapchain::PresentImage(swapchain, index, device.Queues.Present, {PresentSemaphore});
   }
 }
-Rendering::Rendering()
+void Rendering::OnCreate()
 {
   auto vulkan = Core::Engine::GetVulkan();
   auto device = Core::Engine::GetMainDevice();
@@ -183,14 +183,15 @@ Rendering::Rendering()
     PresentSemaphore = Graphics::Vulkan::Semaphore::Create(device);
   }
 }
-Rendering::~Rendering()
+void Rendering::OnDestroy()
 {
   auto device = Core::Engine::GetMainDevice();
 
-  Graphics::Vulkan::Device::WaitForDevice(device);
   Graphics::Vulkan::Device::WaitForQueue(device.Queues.Compute[0]);
   Graphics::Vulkan::Device::WaitForQueue(device.Queues.Transfer[0]);
   Graphics::Vulkan::Device::WaitForQueue(device.Queues.Graphics[0]);
+  Graphics::Vulkan::Device::WaitForDevice(device);
+
   //general
   {
     Graphics::Vulkan::CommandPool::Destroy(TransferCommandPool);

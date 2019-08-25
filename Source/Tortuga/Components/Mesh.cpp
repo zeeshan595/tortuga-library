@@ -126,6 +126,7 @@ void Mesh::SetDisable()
 
 Mesh::Mesh()
 {
+  this->IsEnabled = true;
   this->IsStatic = false;
   this->IsProcessedOnce = false;
   this->BufferData.Transformation = glm::mat4(1.0);
