@@ -2,7 +2,6 @@
 #define _UTILS_INPUT_OUTPUT
 
 #include "../Console.hpp"
-#include "../Graphics/Index.hpp"
 
 #include <fstream>
 #include <string>
@@ -21,7 +20,7 @@ struct ObjExport
   std::vector<glm::vec4> Vertices;
   std::vector<glm::vec4> Normals;
   std::vector<glm::vec4> Textures;
-  std::vector<Graphics::Index> Indices;
+  //std::vector<Graphics::Index> Indices;
 };
 
 ObjExport LoadObjFile(std::string filePath);

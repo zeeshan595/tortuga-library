@@ -31,7 +31,9 @@ Pipeline CreateGraphicsPipeline(
     Shader::Shader vertexShader,
     Shader::Shader fragmentShader,
     RenderPass::RenderPass renderPass,
-    uint32_t width, uint32_t height);
+    uint32_t width, uint32_t height,
+    std::vector<VkVertexInputBindingDescription> bindings = {},
+    std::vector<VkVertexInputAttributeDescription> attributes = {});
 Pipeline CreateComputePipeline(
     Device::Device device,
     Shader::Shader shader,

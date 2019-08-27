@@ -15,7 +15,7 @@ std::vector<VkDescriptorSetLayout> GetVulkanDescriptorLayouts(std::vector<Descri
     setLayouts[i] = layouts[i].Layouts;
   return setLayouts;
 }
-Pipeline CreateGraphicsPipeline(Device::Device device, Shader::Shader vertexShader, Shader::Shader fragmentShader, RenderPass::RenderPass renderPass, uint32_t width, uint32_t height)
+Pipeline CreateGraphicsPipeline(Device::Device device, Shader::Shader vertexShader, Shader::Shader fragmentShader, RenderPass::RenderPass renderPass, uint32_t width, uint32_t height, std::vector<VkVertexInputBindingDescription> bindings, std::vector<VkVertexInputAttributeDescription> attributes)
 {
   Pipeline data = {};
   data.Device = device.Device;
@@ -24,10 +24,10 @@ Pipeline CreateGraphicsPipeline(Device::Device device, Shader::Shader vertexShad
   VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
   {
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+    vertexInputInfo.vertexBindingDescriptionCount = bindings.size();
+    vertexInputInfo.pVertexBindingDescriptions = bindings.data();
+    vertexInputInfo.vertexAttributeDescriptionCount = attributes.size();
+    vertexInputInfo.pVertexAttributeDescriptions = attributes.data();
   }
 
   VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};

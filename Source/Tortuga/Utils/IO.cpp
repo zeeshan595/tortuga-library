@@ -70,19 +70,19 @@ ObjExport LoadObjFile(std::string filePath)
         printf("File can't be read by our simple parser : ( Try exporting with other options\n");
         return {};
       }
-      Graphics::Index index1, index2, index3;
-      index1.Vertex = vertexIndex[0] - 1;
-      index2.Vertex = vertexIndex[1] - 1;
-      index3.Vertex = vertexIndex[2] - 1;
-      index1.Texture = uvIndex[0] - 1;
-      index2.Texture = uvIndex[1] - 1;
-      index3.Texture = uvIndex[2] - 1;
-      index1.Normal = normalIndex[0] - 1;
-      index2.Normal = normalIndex[1] - 1;
-      index3.Normal = normalIndex[2] - 1;
-      exporter.Indices.push_back(index1);
-      exporter.Indices.push_back(index2);
-      exporter.Indices.push_back(index3);
+      //Graphics::Index index1, index2, index3;
+      //index1.Vertex = vertexIndex[0] - 1;
+      //index2.Vertex = vertexIndex[1] - 1;
+      //index3.Vertex = vertexIndex[2] - 1;
+      //index1.Texture = uvIndex[0] - 1;
+      //index2.Texture = uvIndex[1] - 1;
+      //index3.Texture = uvIndex[2] - 1;
+      //index1.Normal = normalIndex[0] - 1;
+      //index2.Normal = normalIndex[1] - 1;
+      //index3.Normal = normalIndex[2] - 1;
+      //exporter.Indices.push_back(index1);
+      //exporter.Indices.push_back(index2);
+      //exporter.Indices.push_back(index3);
     }
   }
   return exporter;

@@ -25,7 +25,6 @@ sourceCppFiles = [
   './Source/Tortuga/Core/Screen.cpp',
   './Source/Tortuga/Core/GUID.cpp',
   './Source/Tortuga/Core/Entity.cpp',
-  './Source/Tortuga/Components/Mesh.cpp',
   './Source/Tortuga/Components/Light.cpp',
   './Source/Tortuga/Systems/Rendering.cpp'
 ]

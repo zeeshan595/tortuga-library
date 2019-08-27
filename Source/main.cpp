@@ -22,10 +22,6 @@ int main()
     //mesh data
     auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
     auto mesh = cube->AddComponent<Component::Mesh>();
-    mesh->SetVertices(model.Vertices);
-    mesh->SetNormals(model.Normals);
-    mesh->SetTextures(model.Textures);
-    mesh->SetIndices(model.Indices);
   }
 
   //create light entity
