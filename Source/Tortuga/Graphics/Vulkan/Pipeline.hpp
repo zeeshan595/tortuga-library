@@ -7,6 +7,7 @@
 #include "./Device.hpp"
 #include "./DescriptorLayout.hpp"
 #include "./Shader.hpp"
+#include "./RenderPass.hpp"
 
 namespace Tortuga
 {
@@ -28,9 +29,15 @@ struct Pipeline
 Pipeline CreateComputePipeline(
     Device::Device device,
     Shader::Shader shader,
+    RenderPass::RenderPass renderPass,
+    uint32_t width, uint32_t height);
+Pipeline CreateGraphicsPipeline(
+    Device::Device device,
+    Shader::Shader vertexShader,
+    Shader::Shader fragmentShader,
     std::vector<char> cache = {},
     std::vector<DescriptorLayout::DescriptorLayout> layouts = {});
-void DestroyPipeline(Pipeline data);
+void Destroy(Pipeline data);
 std::vector<char> GetCacheData(Pipeline data);
 } // namespace Pipeline
 } // namespace Vulkan
