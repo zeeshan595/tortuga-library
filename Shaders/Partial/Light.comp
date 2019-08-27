@@ -1,9 +1,0 @@
-
-struct LightData
-{
-  vec4 Position;
-  vec4 Rotation;
-  uint Type;
-  float Intensity;
-  float Range;
-};

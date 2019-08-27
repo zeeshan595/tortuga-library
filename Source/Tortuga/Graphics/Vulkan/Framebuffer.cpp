@@ -19,7 +19,7 @@ Framebuffer Create(Device::Device device, uint32_t width, uint32_t height, Rende
 
   VkFramebufferCreateInfo createInfo = {};
   {
-    createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    createInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     createInfo.renderPass = renderPass.RenderPass;
     createInfo.attachmentCount = attachments.size();
     createInfo.pAttachments = attachments.data();
@@ -29,6 +29,8 @@ Framebuffer Create(Device::Device device, uint32_t width, uint32_t height, Rende
   }
 
   ErrorCheck::Callback(vkCreateFramebuffer(data.Device, &createInfo, nullptr, &data.Framebuffer));
+
+  return data;
 }
 void Destroy(Framebuffer data)
 {

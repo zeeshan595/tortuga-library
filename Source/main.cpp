@@ -22,7 +22,7 @@ int main()
     //mesh data
     auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
     auto mesh = cube->AddComponent<Component::Mesh>();
-    mesh->SetVertices(model.Vertices, true);
+    mesh->SetVertices(model.Vertices);
     mesh->SetNormals(model.Normals);
     mesh->SetTextures(model.Textures);
     mesh->SetIndices(model.Indices);
@@ -41,6 +41,7 @@ int main()
   }
 
   float yRotation = 0.0f;
+  Core::IterateSystemLoop();
 
   //Main Loop
   bool shouldClose = false;
@@ -52,10 +53,10 @@ int main()
     if (event.window.event == SDL_WINDOWEVENT_CLOSE)
       shouldClose = true;
 
-    cube->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
+    //cube->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
 
     //iterate through all system and execute update functions
-    Core::IterateSystemLoop();
+    //Core::IterateSystemLoop();
     yRotation += 0.00001;
   }
 

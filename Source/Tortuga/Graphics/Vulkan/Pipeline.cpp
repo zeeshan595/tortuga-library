@@ -133,7 +133,7 @@ Pipeline CreateGraphicsPipeline(Device::Device device, Shader::Shader vertexShad
 
   ErrorCheck::Callback(vkCreatePipelineLayout(data.Device, &pipelineLayoutInfo, nullptr, &data.Layout));
 
-  std::vector<VkPipelineShaderStageCreateInfo> shaderModules;
+  std::vector<VkPipelineShaderStageCreateInfo> shaderModules(2);
   {
     shaderModules[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderModules[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -167,6 +167,7 @@ Pipeline CreateGraphicsPipeline(Device::Device device, Shader::Shader vertexShad
   }
 
   ErrorCheck::Callback(vkCreateGraphicsPipelines(data.Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &data.Pipeline));
+  return data;
 }
 Pipeline CreateComputePipeline(Device::Device device, Shader::Shader shader, std::vector<char> cache, std::vector<DescriptorLayout::DescriptorLayout> layouts)
 {

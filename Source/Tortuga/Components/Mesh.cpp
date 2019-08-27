@@ -38,7 +38,7 @@ void Mesh::ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3
   this->BufferData.Transformation = glm::scale(this->BufferData.Transformation, scale);
 }
 
-void Mesh::SetVertices(std::vector<glm::vec4> vertices, bool recalculateBounds)
+void Mesh::SetVertices(std::vector<glm::vec4> vertices)
 {
   if (vertices.size() > MAX_VERTICES_SIZE)
   {
@@ -48,19 +48,6 @@ void Mesh::SetVertices(std::vector<glm::vec4> vertices, bool recalculateBounds)
   }
   memcpy(this->BufferData.Vertices, vertices.data(), vertices.size() * sizeof(glm::vec4));
   this->BufferData.VerticesSize = vertices.size();
-  this->BufferData.Center = glm::vec4(0, 0, 0, 1);
-
-  if (recalculateBounds)
-  {
-    //calculate bounds
-    this->BufferData.Bounds = glm::length(glm::abs(this->BufferData.Vertices[0]));
-    for (uint32_t i = 0; i < this->BufferData.VerticesSize; i++)
-    {
-      float len = glm::length(glm::abs(this->BufferData.Vertices[i]));
-      if (len > this->BufferData.Bounds)
-        this->BufferData.Bounds = len;
-    }
-  }
 }
 
 void Mesh::SetNormals(std::vector<glm::vec4> normals)

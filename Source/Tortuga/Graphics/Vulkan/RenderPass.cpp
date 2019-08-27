@@ -51,6 +51,8 @@ RenderPass Create(Device::Device device, VkFormat imageFormat)
   }
 
   ErrorCheck::Callback(vkCreateRenderPass(data.Device, &createInfo, nullptr, &data.RenderPass));
+
+  return data;
 }
 void Destroy(RenderPass data)
 {

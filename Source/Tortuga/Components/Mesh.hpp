@@ -53,7 +53,7 @@ struct Mesh
 
   void ResetTransformation();
   void ApplyTransformation(glm::vec3 position, glm::vec4 rotation, glm::vec3 scale);
-  void SetVertices(std::vector<glm::vec4> vertices, bool recalculateBounds = false);
+  void SetVertices(std::vector<glm::vec4> vertices);
   void SetNormals(std::vector<glm::vec4> normals);
   void SetTextures(std::vector<glm::vec4> textures);
   void SetIndices(std::vector<Graphics::Index> indices);

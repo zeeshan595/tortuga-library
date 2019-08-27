@@ -46,6 +46,7 @@ private:
   Graphics::Vulkan::RenderPass::RenderPass RenderPass;
   Graphics::Vulkan::Pipeline::Pipeline Pipeline;
   std::vector<Graphics::Vulkan::Framebuffer::Framebuffer> Framebuffers;
+  Graphics::Vulkan::Command::Command Renderer;
 
 public:
   void Update();

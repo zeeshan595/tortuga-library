@@ -68,6 +68,27 @@ void End(Command data)
 {
   ErrorCheck::Callback(vkEndCommandBuffer(data.Command));
 }
+void BeginRenderPass(Command data, RenderPass::RenderPass renderPass, Framebuffer::Framebuffer framebuffer, uint32_t width, uint32_t height)
+{
+  VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+
+  VkRenderPassBeginInfo beginInfo = {};
+  {
+    beginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    beginInfo.renderPass = renderPass.RenderPass;
+    beginInfo.framebuffer = framebuffer.Framebuffer;
+    beginInfo.renderArea.offset = {0, 0};
+    beginInfo.renderArea.extent = {width, height};
+    beginInfo.clearValueCount = 1;
+    beginInfo.pClearValues = &clearColor;
+  }
+
+  vkCmdBeginRenderPass(data.Command, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+void EndRenderPass(Command data)
+{
+  vkCmdEndRenderPass(data.Command);
+}
 void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination, uint32_t sourceOffset, uint32_t destinationOffset)
 {
   if (source.Size > destination.Size)
@@ -93,7 +114,8 @@ void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipelin
   }
 
   vkCmdBindPipeline(data.Command, BindPoint, pipeline.Pipeline);
-  vkCmdBindDescriptorSets(data.Command, BindPoint, pipeline.Layout, 0, vulkanDescriptorSets.size(), vulkanDescriptorSets.data(), 0, VK_NULL_HANDLE);
+  if (vulkanDescriptorSets.size() > 0)
+    vkCmdBindDescriptorSets(data.Command, BindPoint, pipeline.Layout, 0, vulkanDescriptorSets.size(), vulkanDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {
