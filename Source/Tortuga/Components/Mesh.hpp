@@ -17,16 +17,26 @@ namespace Component
 struct Mesh
 {
 private:
-
 public:
   Graphics::Vulkan::Command::Command RenderCommand;
+  Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
   Graphics::Vulkan::Buffer::Buffer VertexBuffer;
   std::vector<Graphics::Vertex> Vertices;
 
   Mesh()
   {
     RenderCommand.Command = VK_NULL_HANDLE;
+    StagingVertexBuffer.Buffer = VK_NULL_HANDLE;
     VertexBuffer.Buffer = VK_NULL_HANDLE;
+  }
+
+  ~Mesh()
+  {
+    if (StagingVertexBuffer.Buffer != VK_NULL_HANDLE)
+      Graphics::Vulkan::Buffer::Destroy(StagingVertexBuffer);
+
+    if (VertexBuffer.Buffer != VK_NULL_HANDLE)
+      Graphics::Vulkan::Buffer::Destroy(VertexBuffer);
   }
 };
 } // namespace Component

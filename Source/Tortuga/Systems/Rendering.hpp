@@ -46,7 +46,9 @@ private:
   Graphics::Vulkan::Pipeline::Pipeline Pipeline;
   std::vector<Graphics::Vulkan::Framebuffer::Framebuffer> Framebuffers;
   Graphics::Vulkan::Command::Command Renderer;
+  Graphics::Vulkan::Command::Command Transfer;
   Graphics::Vulkan::Fence::Fence RenderFence;
+  Graphics::Vulkan::Semaphore::Semaphore RenderSemaphore;
   Graphics::Vulkan::Semaphore::Semaphore PresentSemaphore;
 
 public:

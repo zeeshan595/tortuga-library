@@ -11,17 +11,21 @@ int main()
   Core::CreateSystem<Systems::Rendering>();
 
   //create cube entity
-  auto cube = Core::Entity::Create();
+  const auto cube = Core::Entity::Create();
   {
     //transform data
-    auto transform = cube->AddComponent<Component::Transform>();
+    const auto transform = cube->AddComponent<Component::Transform>();
     transform->Position = glm::vec3(0, 0, 10);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
     transform->Scale = glm::vec3(1, 1, 1);
 
     //mesh data
-    auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
-    auto mesh = cube->AddComponent<Component::Mesh>();
+    const auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
+    const auto mesh = cube->AddComponent<Component::Mesh>();
+    mesh->Vertices = {
+        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
   }
 
   float yRotation = 0.0f;
