@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 
 #include "./ErrorCheck.hpp"
+#include "./Image.hpp"
 #include "./Device.hpp"
 
 namespace Tortuga

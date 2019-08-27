@@ -117,6 +117,22 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
   for (uint32_t i = 0; i < data.ImageCount; i++)
     data.Views[i] = ImageView::Create(data.Device, data.Images[i], data.SurfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
 
+  //initialize depth buffer
+  {
+    auto depthFormat = Image::findDepthFormat(device.PhysicalDevice);
+    data.DepthImage = Image::Create(device, data.Extent.width, data.Extent.height, depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+    data.DepthImageView = ImageView::Create(device, data.DepthImage, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+    auto depthCommandPool = CommandPool::Create(device, device.QueueFamilies.Transfer.Index);
+    auto depthCommand = Command::Create(device, depthCommandPool, Command::PRIMARY);
+    Command::Begin(depthCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    Command::TransferImageLayout(depthCommand, data.DepthImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+    Command::End(depthCommand);
+    Command::Submit({depthCommand}, device.Queues.Transfer[0]);
+    Device::WaitForQueue(device.Queues.Transfer[0]);
+    CommandPool::Destroy(depthCommandPool);
+  }
+
   VkFenceCreateInfo fenceInfo = {};
   {
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;

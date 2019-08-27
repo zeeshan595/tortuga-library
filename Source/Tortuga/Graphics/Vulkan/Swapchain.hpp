@@ -8,6 +8,8 @@
 #include "./Image.hpp"
 #include "./Semaphore.hpp"
 #include "./ImageView.hpp"
+#include "./CommandPool.hpp"
+#include "./Command.hpp"
 
 namespace Tortuga
 {
@@ -34,6 +36,8 @@ struct Swapchain
   uint32_t ImageCount;
   std::vector<VkImage> Images;
   std::vector<ImageView::ImageView> Views;
+  Image::Image DepthImage;
+  ImageView::ImageView DepthImageView;
   VkFence Fence;
 };
 

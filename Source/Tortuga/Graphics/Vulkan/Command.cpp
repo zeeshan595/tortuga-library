@@ -81,7 +81,11 @@ void End(Command data)
 }
 void BeginRenderPass(Command data, RenderPass::RenderPass renderPass, Framebuffer::Framebuffer framebuffer, uint32_t width, uint32_t height)
 {
-  VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+  std::vector<VkClearValue> clearValues(2);
+  {
+    clearValues[0] = {0.0f, 0.0f, 0.0f, 1.0f};
+    clearValues[1] = {1.0f, 0};
+  }
 
   VkRenderPassBeginInfo beginInfo = {};
   {
@@ -90,8 +94,8 @@ void BeginRenderPass(Command data, RenderPass::RenderPass renderPass, Framebuffe
     beginInfo.framebuffer = framebuffer.Framebuffer;
     beginInfo.renderArea.offset = {0, 0};
     beginInfo.renderArea.extent = {width, height};
-    beginInfo.clearValueCount = 1;
-    beginInfo.pClearValues = &clearColor;
+    beginInfo.clearValueCount = clearValues.size();
+    beginInfo.pClearValues = clearValues.data();
   }
 
   vkCmdBeginRenderPass(data.Command, &beginInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
@@ -205,7 +209,18 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.image = image.Image;
-    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+    {
+      barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+      if (Image::hasStencilComponent(image.Format))
+      {
+        barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+      }
+    }
+    else
+    {
+      barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    }
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = 1;
     barrier.subresourceRange.baseArrayLayer = 0;

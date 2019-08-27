@@ -27,16 +27,29 @@ RenderPass Create(Device::Device device, VkFormat imageFormat)
   }
   data.Attachments.push_back(colorAttachment);
 
+  VkAttachmentDescription depthAttachment = {};
+  {
+    depthAttachment.format = Image::findDepthFormat(device.PhysicalDevice);
+    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+  }
+  data.Attachments.push_back(depthAttachment);
+
   VkAttachmentReference colorAttachmentRef = {};
   {
     colorAttachmentRef.attachment = 0;
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
   }
 
-  VkAttachmentReference depthAttachment = {};
+  VkAttachmentReference depthAttachmentRef = {};
   {
-    depthAttachment.attachment = 1;
-    depthAttachment.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    depthAttachmentRef.attachment = 1;
+    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
   }
 
   VkSubpassDescription subpass = {};
@@ -44,7 +57,7 @@ RenderPass Create(Device::Device device, VkFormat imageFormat)
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
-    subpass.pDepthStencilAttachment = &depthAttachment;
+    subpass.pDepthStencilAttachment = &depthAttachmentRef;
   }
 
   VkRenderPassCreateInfo createInfo = {};
