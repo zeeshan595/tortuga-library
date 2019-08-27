@@ -26,7 +26,6 @@
 
 #include "../Components/Transform.hpp"
 #include "../Components/Mesh.hpp"
-#include "../Components/Light.hpp"
 
 namespace Tortuga
 {

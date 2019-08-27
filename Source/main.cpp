@@ -24,18 +24,6 @@ int main()
     auto mesh = cube->AddComponent<Component::Mesh>();
   }
 
-  //create light entity
-  auto light = Core::Entity::Create();
-  {
-    auto transform = light->AddComponent<Component::Transform>();
-    transform->Position = glm::vec4(1, 5, 10, 1);
-    transform->Rotation = glm::vec4(0, 0, 0, 1);
-    transform->Scale = glm::vec4(1, 1, 1, 1);
-
-    auto lightComponent = light->AddComponent<Component::Light>();
-    lightComponent->SetStatic(true);
-  }
-
   float yRotation = 0.0f;
 
   //Main Loop
@@ -58,15 +46,12 @@ int main()
   //remove components
   cube->RemoveComponent<Component::Transform>();
   cube->RemoveComponent<Component::Mesh>();
-  light->RemoveComponent<Component::Transform>();
-  light->RemoveComponent<Component::Light>();
 
   //destroy systems
   Core::DestroySystem<Systems::Rendering>();
 
   //destroy cube
   Core::Entity::Destroy(cube);
-  Core::Entity::Destroy(light);
 
   return 0;
 }
