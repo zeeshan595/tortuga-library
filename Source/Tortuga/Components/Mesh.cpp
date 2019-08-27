@@ -43,6 +43,7 @@ void Mesh::SetVertices(std::vector<glm::vec4> vertices, bool recalculateBounds)
   if (vertices.size() > MAX_VERTICES_SIZE)
   {
     Console::Warning("Vertices length is too large!");
+    this->SetActive(false);
     return;
   }
   memcpy(this->BufferData.Vertices, vertices.data(), vertices.size() * sizeof(glm::vec4));
@@ -67,6 +68,7 @@ void Mesh::SetNormals(std::vector<glm::vec4> normals)
   if (normals.size() > MAX_VERTICES_SIZE)
   {
     Console::Warning("Normals length is too large!");
+    this->SetActive(false);
     return;
   }
   memcpy(this->BufferData.Normals, normals.data(), normals.size() * sizeof(glm::vec4));
@@ -78,6 +80,7 @@ void Mesh::SetTextures(std::vector<glm::vec4> textures)
   if (textures.size() > MAX_VERTICES_SIZE)
   {
     Console::Warning("Normals length is too large!");
+    this->SetActive(false);
     return;
   }
   memcpy(this->BufferData.Textures, textures.data(), textures.size() * sizeof(glm::vec4));
@@ -89,6 +92,7 @@ void Mesh::SetIndices(std::vector<Graphics::Index> indices)
   if (indices.size() > MAX_INDICES_SIZE)
   {
     Console::Warning("Indices length is too large!");
+    this->SetActive(false);
     return;
   }
   if (indices.size() % 3 != 0)
