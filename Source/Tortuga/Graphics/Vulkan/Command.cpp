@@ -140,6 +140,14 @@ void BindVertexBuffer(Command data, std::vector<Buffer::Buffer> buffers, uint32_
 
   vkCmdBindVertexBuffers(data.Command, 0, vulkanBuffers.size(), vulkanBuffers.data(), offsets.data());
 }
+void BindIndexBuffer(Command data, Buffer::Buffer buffer, uint32_t offset)
+{
+  vkCmdBindIndexBuffer(data.Command, buffer.Buffer, offset, VK_INDEX_TYPE_UINT32);
+}
+void DrawIndexed(Command data, uint32_t indexCount, uint32_t instanceCount, uint32_t indexOffset, uint32_t vertexOffset, uint32_t instanceOffset)
+{
+  vkCmdDrawIndexed(data.Command, indexCount, instanceCount, indexOffset, vertexOffset, instanceOffset);
+}
 void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount, uint32_t vertexOffset, uint32_t instanceOffset)
 {
   vkCmdDraw(data.Command, vertexCount, instanceCount, vertexOffset, instanceOffset);

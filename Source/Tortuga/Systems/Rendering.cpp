@@ -46,7 +46,7 @@ void Rendering::Update()
         //record mesh sub-command
         Graphics::Vulkan::Command::Begin(mesh->RenderCommand, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, renderPass, framebuffer);
 
-        //make mesh data is up to date
+        //make mesh vertices data is up to date
         uint vertexBufferSize = mesh->Vertices.size() * sizeof(Graphics::Vertex);
         if (mesh->StagingVertexBuffer.Buffer == VK_NULL_HANDLE || vertexBufferSize != mesh->StagingVertexBuffer.Size)
         {
@@ -64,10 +64,29 @@ void Rendering::Update()
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(transferCommand, mesh->StagingVertexBuffer, mesh->VertexBuffer);
         }
+        //make mesh indices data is up to date
+        uint32_t indexBufferSize = mesh->Indices.size() * sizeof(uint32_t);
+        if (mesh->StagingIndexBuffer.Buffer == VK_NULL_HANDLE || indexBufferSize != mesh->StagingIndexBuffer.Size)
+        {
+          //delete old buffers if they exist
+          if (mesh->StagingIndexBuffer.Buffer != VK_NULL_HANDLE)
+          {
+            Graphics::Vulkan::Buffer::Destroy(mesh->StagingIndexBuffer);
+            Graphics::Vulkan::Buffer::Destroy(mesh->IndexBuffer);
+          }
+          //create new buffers
+          mesh->StagingIndexBuffer = Graphics::Vulkan::Buffer::Create(device, indexBufferSize, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+          mesh->IndexBuffer = Graphics::Vulkan::Buffer::Create(device, indexBufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+          //copy data
+          Graphics::Vulkan::Buffer::SetData(mesh->StagingIndexBuffer, mesh->Indices.data(), indexBufferSize);
+          //data needs to be copied by transfer command
+          Graphics::Vulkan::Command::CopyBuffer(transferCommand, mesh->StagingIndexBuffer, mesh->IndexBuffer);
+        }
 
         Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {});
         Graphics::Vulkan::Command::BindVertexBuffer(mesh->RenderCommand, {mesh->VertexBuffer});
-        Graphics::Vulkan::Command::Draw(mesh->RenderCommand, mesh->Vertices.size());
+        Graphics::Vulkan::Command::BindIndexBuffer(mesh->RenderCommand, mesh->IndexBuffer);
+        Graphics::Vulkan::Command::DrawIndexed(mesh->RenderCommand, mesh->Indices.size());
         Graphics::Vulkan::Command::End(mesh->RenderCommand);
       }));
     }

@@ -46,6 +46,8 @@ void EndRenderPass(Command data);
 void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination, uint32_t sourceOffset = 0, uint32_t destinationOffset = 0);
 void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSet::DescriptorSet> descriptorSets = {});
 void BindVertexBuffer(Command data, std::vector<Buffer::Buffer> buffers, uint32_t firstBinding = 0);
+void BindIndexBuffer(Command data, Buffer::Buffer buffer, uint32_t offset = 0);
+void DrawIndexed(Command data, uint32_t indexCount, uint32_t instanceCount = 1, uint32_t indexOffset = 0, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z);
 void ExecuteCommands(Command data, std::vector<Command> commands);

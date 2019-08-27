@@ -23,9 +23,12 @@ int main()
     const auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
     const auto mesh = cube->AddComponent<Component::Mesh>();
     mesh->Vertices = {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+
+    mesh->Indices = {0, 1, 2, 2, 3, 0};
   }
 
   float yRotation = 0.0f;
