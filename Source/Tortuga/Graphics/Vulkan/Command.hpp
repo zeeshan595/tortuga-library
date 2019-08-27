@@ -44,6 +44,8 @@ void BeginRenderPass(Command data, RenderPass::RenderPass renderPass, Framebuffe
 void EndRenderPass(Command data);
 void CopyBuffer(Command data, Buffer::Buffer source, Buffer::Buffer destination, uint32_t sourceOffset = 0, uint32_t destinationOffset = 0);
 void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipeline pipeline, std::vector<DescriptorSet::DescriptorSet> descriptorSets = {});
+void BindVertexBuffer(Command data, std::vector<Buffer::Buffer> buffers, uint32_t firstBinding = 0);
+void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z);
 void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait = {}, std::vector<Semaphore::Semaphore> signal = {}, Fence::Fence fence = {VK_NULL_HANDLE, VK_NULL_HANDLE});
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout);

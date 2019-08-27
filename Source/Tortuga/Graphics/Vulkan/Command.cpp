@@ -117,6 +117,22 @@ void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipelin
   if (vulkanDescriptorSets.size() > 0)
     vkCmdBindDescriptorSets(data.Command, BindPoint, pipeline.Layout, 0, vulkanDescriptorSets.size(), vulkanDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }
+void BindVertexBuffer(Command data, std::vector<Buffer::Buffer> buffers, uint32_t firstBinding)
+{
+  std::vector<VkBuffer> vulkanBuffers(buffers.size());
+  std::vector<VkDeviceSize> offsets(buffers.size());
+  for (uint32_t i = 0; i < buffers.size(); i++)
+  {
+    offsets[i] = 0;
+    vulkanBuffers[i] = buffers[i].Buffer;
+  }
+  
+  vkCmdBindVertexBuffers(data.Command, 0, vulkanBuffers.size(), vulkanBuffers.data(), offsets.data());
+}
+void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount, uint32_t vertexOffset, uint32_t instanceOffset)
+{
+  vkCmdDraw(data.Command, vertexCount, instanceCount, vertexOffset, instanceOffset);
+}
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {
   vkCmdDispatch(data.Command, x, y, z);

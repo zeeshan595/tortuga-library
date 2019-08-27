@@ -32,6 +32,22 @@ Buffer CreateDeviceOnlyDest(Device::Device device, uint32_t bufferSize)
 {
   return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 }
+Buffer CreateHostVertex(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+}
+Buffer CreateDeviceOnlyVertex(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+}
+Buffer CreateHostIndex(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+}
+Buffer CreateDeviceOnlyIndex(Device::Device device, uint32_t bufferSize)
+{
+  return Create(device, bufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+}
 Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties, VkBufferUsageFlags usageFlags)
 {
   Buffer data = {};

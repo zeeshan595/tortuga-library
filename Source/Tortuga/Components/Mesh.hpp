@@ -5,15 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "../Graphics/Vulkan/DescriptorLayout.hpp"
-#include "../Graphics/Vulkan/DescriptorPool.hpp"
-#include "../Graphics/Vulkan/DescriptorSet.hpp"
-#include "../Graphics/Vulkan/Buffer.hpp"
-#include "../Graphics/Vulkan/CommandPool.hpp"
-#include "../Graphics/Vulkan/Command.hpp"
-
-#include "../Core/Engine.hpp"
-#include "../Console.hpp"
+#include "../Graphics/Vertex.hpp"
 
 namespace Tortuga
 {
@@ -21,6 +13,8 @@ namespace Component
 {
 struct Mesh
 {
+  std::vector<Graphics::Vertex> Vertices;
+  std::vector<uint32_t> Indices;
 };
 } // namespace Component
 } // namespace Tortuga
