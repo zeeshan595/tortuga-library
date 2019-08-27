@@ -81,7 +81,7 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
   VkBool32 isComputeSupported = false;
   VkBool32 isGraphicsSupported = false;
   ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Compute.Index, window.Surface, &isComputeSupported));
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Compute.Index, window.Surface, &isGraphicsSupported));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Graphics.Index, window.Surface, &isGraphicsSupported));
   if (!isComputeSupported && !isGraphicsSupported)
     Console::Fatal("This device does not have any present queues");
 
