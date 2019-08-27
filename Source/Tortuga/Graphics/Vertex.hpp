@@ -13,8 +13,9 @@ namespace Graphics
 {
 struct Vertex
 {
-  glm::vec2 Position;
-  glm::vec3 Color;
+  glm::vec3 Position;
+  glm::vec3 Normal;
+  glm::vec2 Texture;
 
   static VkVertexInputBindingDescription getBindingDescription()
   {
@@ -29,7 +30,7 @@ struct Vertex
 
   static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions()
   {
-    std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions(3);
     {
       attributeDescriptions[0].binding = 0;
       attributeDescriptions[0].location = 0;
@@ -39,7 +40,12 @@ struct Vertex
       attributeDescriptions[1].binding = 0;
       attributeDescriptions[1].location = 1;
       attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-      attributeDescriptions[1].offset = offsetof(Vertex, Color);
+      attributeDescriptions[1].offset = offsetof(Vertex, Normal);
+
+      attributeDescriptions[2].binding = 0;
+      attributeDescriptions[2].location = 2;
+      attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+      attributeDescriptions[2].offset = offsetof(Vertex, Texture);
     }
     return attributeDescriptions;
   }

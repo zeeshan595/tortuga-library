@@ -33,7 +33,8 @@ Pipeline CreateGraphicsPipeline(
     RenderPass::RenderPass renderPass,
     uint32_t width, uint32_t height,
     std::vector<VkVertexInputBindingDescription> bindings = {},
-    std::vector<VkVertexInputAttributeDescription> attributes = {});
+    std::vector<VkVertexInputAttributeDescription> attributes = {},
+    std::vector<DescriptorLayout::DescriptorLayout> descriptorSetLayouts = {});
 Pipeline CreateComputePipeline(
     Device::Device device,
     Shader::Shader shader,

@@ -15,7 +15,15 @@ std::vector<VkDescriptorSetLayout> GetVulkanDescriptorLayouts(std::vector<Descri
     setLayouts[i] = layouts[i].Layouts;
   return setLayouts;
 }
-Pipeline CreateGraphicsPipeline(Device::Device device, Shader::Shader vertexShader, Shader::Shader fragmentShader, RenderPass::RenderPass renderPass, uint32_t width, uint32_t height, std::vector<VkVertexInputBindingDescription> bindings, std::vector<VkVertexInputAttributeDescription> attributes)
+Pipeline CreateGraphicsPipeline(
+    Device::Device device,
+    Shader::Shader vertexShader,
+    Shader::Shader fragmentShader,
+    RenderPass::RenderPass renderPass,
+    uint32_t width, uint32_t height,
+    std::vector<VkVertexInputBindingDescription> bindings,
+    std::vector<VkVertexInputAttributeDescription> attributes,
+    std::vector<DescriptorLayout::DescriptorLayout> descriptorSetLayouts)
 {
   Pipeline data = {};
   data.Device = device.Device;
@@ -122,11 +130,12 @@ Pipeline CreateGraphicsPipeline(Device::Device device, Shader::Shader vertexShad
     dynamicState.pDynamicStates = dynamicStates.data();
   }
 
+  auto descriptorLayouts = GetVulkanDescriptorLayouts(descriptorSetLayouts);
   VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
   {
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;            // Optional
-    pipelineLayoutInfo.pSetLayouts = nullptr;         // Optional
+    pipelineLayoutInfo.setLayoutCount = descriptorLayouts.size();
+    pipelineLayoutInfo.pSetLayouts = descriptorLayouts.data();
     pipelineLayoutInfo.pushConstantRangeCount = 0;    // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
   }

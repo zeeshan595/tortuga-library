@@ -26,7 +26,7 @@ namespace Vulkan
 {
 namespace DescriptorLayout
 {
-DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount, VkDescriptorType type)
+DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount, VkShaderStageFlags shaderStage, VkDescriptorType type)
 {
   DescriptorLayout data = {};
   data.Device = device.Device;
@@ -40,7 +40,7 @@ DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount, VkDescri
     pBindings[i].binding = i;
     pBindings[i].descriptorType = type;
     pBindings[i].descriptorCount = 1;
-    pBindings[i].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+    pBindings[i].stageFlags = shaderStage;
     pBindings[i].pImmutableSamplers = VK_NULL_HANDLE;
   }
   VkDescriptorSetLayoutCreateInfo createInfo = {};

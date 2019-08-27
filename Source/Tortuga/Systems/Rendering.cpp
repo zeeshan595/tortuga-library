@@ -27,7 +27,22 @@ void Rendering::Update()
   //record a sub-command for each mesh
   std::vector<Graphics::Vulkan::Command::Command> renderCommands;
   std::vector<std::future<void>> vulkanThreads;
-  for (auto entity : Core::Entity::GetAllEntities())
+  auto allEntities = Core::Entity::GetAllEntities();
+  auto cameraView = glm::mat4(-1.0f);
+  auto cameraPerspective = glm::perspective(45.0f, 16.0f/9.0f, 0.1f, 100.0f);
+  for (auto entity : allEntities)
+  {
+    auto camera = entity->GetComponent<Component::Camera>();
+    if (camera != nullptr)
+    {
+      cameraPerspective = glm::perspective(camera->FieldOfView, camera->aspectRatio, camera->nearClipPlane, camera->farClipPlane);
+      auto transform = entity->GetComponent<Component::Transform>();
+      if (transform)
+        cameraView = glm::inverse(transform->GetModelMatrix());
+    }
+  }
+  cameraPerspective[1][1] *= -1;
+  for (auto entity : allEntities)
   {
     auto mesh = entity->GetComponent<Component::Mesh>();
     if (mesh != nullptr)
@@ -38,15 +53,21 @@ void Rendering::Update()
       renderCommands.push_back(mesh->RenderCommand);
 
       //thread data
+      const auto transform = entity->GetComponent<Component::Transform>();
+      auto modelMatrix = glm::mat4(1.0);
+      if (transform != nullptr)
+        modelMatrix = transform->GetModelMatrix();
+
       const auto pipeline = Pipeline;
       const auto renderPass = RenderPass;
       const auto framebuffer = Framebuffers[swapchainIndex];
       const auto transferCommand = Transfer;
-      vulkanThreads.push_back(std::async(std::launch::async, [mesh, pipeline, renderPass, framebuffer, device, transferCommand] {
+      const auto descriptorLayouts = DescriptorLayouts;
+      vulkanThreads.push_back(std::async(std::launch::async, [mesh, pipeline, renderPass, framebuffer, device, transferCommand, descriptorLayouts, modelMatrix, cameraView, cameraPerspective] {
         //record mesh sub-command
         Graphics::Vulkan::Command::Begin(mesh->RenderCommand, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, renderPass, framebuffer);
 
-        //make mesh vertices data is up to date
+        //check if mesh vertices data is up to date
         uint vertexBufferSize = mesh->Vertices.size() * sizeof(Graphics::Vertex);
         if (mesh->StagingVertexBuffer.Buffer == VK_NULL_HANDLE || vertexBufferSize != mesh->StagingVertexBuffer.Size)
         {
@@ -64,7 +85,7 @@ void Rendering::Update()
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(transferCommand, mesh->StagingVertexBuffer, mesh->VertexBuffer);
         }
-        //make mesh indices data is up to date
+        //check if mesh indices data is up to date
         uint32_t indexBufferSize = mesh->Indices.size() * sizeof(uint32_t);
         if (mesh->StagingIndexBuffer.Buffer == VK_NULL_HANDLE || indexBufferSize != mesh->StagingIndexBuffer.Size)
         {
@@ -82,8 +103,30 @@ void Rendering::Update()
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(transferCommand, mesh->StagingIndexBuffer, mesh->IndexBuffer);
         }
+        //make sure mesh descriptor sets are initialized
+        if (mesh->DescriptorPool.Pool == VK_NULL_HANDLE)
+        {
+          mesh->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayouts);
+          mesh->DescriptorSets.clear();
+          for (auto layout : descriptorLayouts)
+            mesh->DescriptorSets.push_back(Graphics::Vulkan::DescriptorSet::Create(device, mesh->DescriptorPool, layout));
 
-        Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {});
+          //setup uniform buffer object
+          mesh->StagingUniformBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(Graphics::UniformBufferObject), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+          mesh->UniformBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(Graphics::UniformBufferObject), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+          Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(mesh->DescriptorSets[0], {mesh->UniformBuffer});
+        }
+
+        //update ubo buffer
+
+        Graphics::UniformBufferObject ubo = {};
+        ubo.Projection = cameraPerspective;
+        ubo.View = cameraView;
+        ubo.Model = modelMatrix;
+        Graphics::Vulkan::Buffer::SetData(mesh->StagingUniformBuffer, &ubo, sizeof(ubo));
+        Graphics::Vulkan::Command::CopyBuffer(transferCommand, mesh->StagingUniformBuffer, mesh->UniformBuffer);
+
+        Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, mesh->DescriptorSets);
         Graphics::Vulkan::Command::BindVertexBuffer(mesh->RenderCommand, {mesh->VertexBuffer});
         Graphics::Vulkan::Command::BindIndexBuffer(mesh->RenderCommand, mesh->IndexBuffer);
         Graphics::Vulkan::Command::DrawIndexed(mesh->RenderCommand, mesh->Indices.size());
@@ -108,6 +151,7 @@ void Rendering::Update()
   //present the image
   Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {PresentSemaphore});
 }
+
 Rendering::Rendering()
 {
   const auto vulkan = Core::Engine::GetVulkan();
@@ -123,15 +167,30 @@ Rendering::Rendering()
 
   //graphics pipeline
   {
+    //descriptor sets / uniform buffer object
+    DescriptorLayouts.resize(1);
+    {
+      DescriptorLayouts[0] = Graphics::Vulkan::DescriptorLayout::Create(device, 1, VK_SHADER_STAGE_VERTEX_BIT);
+    }
+
+    //shader
     auto vertexCode = Utils::IO::GetFileContents("Shaders/simple.vert");
     auto vertexCompile = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::VERTEX, vertexCode);
     auto fragmentCode = Utils::IO::GetFileContents("Shaders/simple.frag");
     auto fragmentCompile = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::FRAGMENT, fragmentCode);
 
+    //pipeline & render pass
     VertexShader = Graphics::Vulkan::Shader::Create(device, vertexCompile);
     FragmentShader = Graphics::Vulkan::Shader::Create(device, fragmentCompile);
     RenderPass = Graphics::Vulkan::RenderPass::Create(device, swapchain.SurfaceFormat.format);
-    Pipeline = Graphics::Vulkan::Pipeline::CreateGraphicsPipeline(device, VertexShader, FragmentShader, RenderPass, swapchain.Extent.width, swapchain.Extent.height, {Graphics::Vertex::getBindingDescription()}, Graphics::Vertex::getAttributeDescriptions());
+    Pipeline = Graphics::Vulkan::Pipeline::CreateGraphicsPipeline(
+        device,
+        VertexShader, FragmentShader,
+        RenderPass,
+        swapchain.Extent.width, swapchain.Extent.height,
+        {Graphics::Vertex::getBindingDescription()},
+        Graphics::Vertex::getAttributeDescriptions(),
+        DescriptorLayouts);
 
     Framebuffers.resize(swapchain.Images.size());
     for (uint32_t i = 0; i < Framebuffers.size(); i++)
@@ -161,6 +220,8 @@ Rendering::~Rendering()
 
   //graphics pipeline
   {
+    for (auto layout : DescriptorLayouts)
+      Graphics::Vulkan::DescriptorLayout::Destroy(layout);
     Graphics::Vulkan::Fence::Destroy(RenderFence);
     Graphics::Vulkan::Semaphore::Destroy(RenderSemaphore);
     Graphics::Vulkan::Semaphore::Destroy(PresentSemaphore);

@@ -49,7 +49,7 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> conten
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = 0;
     writeInfos[i].descriptorCount = 1;
-    writeInfos[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writeInfos[i].descriptorType = data.Layout.Type;
 
     writeInfos[i].pBufferInfo = &(bufferInfos[i]);
     writeInfos[i].pImageInfo = VK_NULL_HANDLE;

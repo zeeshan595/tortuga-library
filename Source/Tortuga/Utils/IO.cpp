@@ -27,6 +27,9 @@ ObjExport LoadObjFile(std::string filePath)
 {
   ObjExport exporter = {};
 
+  std::vector<glm::vec3> temp_positions, temp_normals;
+  std::vector<glm::vec2> temp_textures;
+
   FILE *file = fopen(filePath.c_str(), "r");
   if (file == NULL)
   {
@@ -46,19 +49,19 @@ ObjExport LoadObjFile(std::string filePath)
     {
       glm::vec3 vertex;
       fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-      exporter.Vertices.push_back(glm::vec4(vertex.x, vertex.y, vertex.z, 1));
+      temp_positions.push_back(vertex);
     }
     else if (strcmp(lineHeader, "vt") == 0)
     {
       glm::vec2 uv;
       fscanf(file, "%f %f\n", &uv.x, &uv.y);
-      exporter.Textures.push_back(glm::vec4(uv.x, uv.y, 0, 1));
+      temp_textures.push_back(uv);
     }
     else if (strcmp(lineHeader, "vn") == 0)
     {
       glm::vec3 normal;
       fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-      exporter.Normals.push_back(glm::vec4(normal.x, normal.y, normal.z, 0));
+      temp_normals.push_back(normal);
     }
     else if (strcmp(lineHeader, "f") == 0)
     {
@@ -71,6 +74,10 @@ ObjExport LoadObjFile(std::string filePath)
         return {};
       }
       //Graphics::Index index1, index2, index3;
+
+      Graphics::Vertex vertex;
+      uint32_t index1, index2, index3;
+
       //index1.Vertex = vertexIndex[0] - 1;
       //index2.Vertex = vertexIndex[1] - 1;
       //index3.Vertex = vertexIndex[2] - 1;

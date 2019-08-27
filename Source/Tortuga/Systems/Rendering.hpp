@@ -18,6 +18,7 @@
 #include "../Graphics/Vulkan/Window.hpp"
 #include "../Graphics/Vulkan/Semaphore.hpp"
 #include "../Graphics/Vulkan/Fence.hpp"
+#include "../Graphics/UniformBuffer.hpp"
 
 #include "../Core/System.hpp"
 #include "../Core/Screen.hpp"
@@ -26,6 +27,7 @@
 
 #include "../Components/Transform.hpp"
 #include "../Components/Mesh.hpp"
+#include "../Components/Camera.hpp"
 
 namespace Tortuga
 {
@@ -43,6 +45,7 @@ private:
   Graphics::Vulkan::Shader::Shader VertexShader;
   Graphics::Vulkan::Shader::Shader FragmentShader;
   Graphics::Vulkan::RenderPass::RenderPass RenderPass;
+  std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> DescriptorLayouts;
   Graphics::Vulkan::Pipeline::Pipeline Pipeline;
   std::vector<Graphics::Vulkan::Framebuffer::Framebuffer> Framebuffers;
   Graphics::Vulkan::Command::Command Renderer;

@@ -22,7 +22,7 @@ struct DescriptorLayout
   VkDescriptorType Type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 };
 
-DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount = 1, VkDescriptorType type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);
+DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount, VkShaderStageFlags shaderStage, VkDescriptorType type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 void Destroy(DescriptorLayout data);
 } // namespace DescriptorLayout
 } // namespace Vulkan

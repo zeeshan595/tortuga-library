@@ -1,13 +1,14 @@
 #ifndef _UTILS_INPUT_OUTPUT
 #define _UTILS_INPUT_OUTPUT
 
-#include "../Console.hpp"
-
 #include <fstream>
 #include <string>
 #include <vector>
 #include <glm/glm.hpp>
 #include <cstring>
+
+#include "../Console.hpp"
+#include "../Graphics/Vertex.hpp"
 
 namespace Tortuga
 {
@@ -17,10 +18,8 @@ namespace IO
 {
 struct ObjExport
 {
-  std::vector<glm::vec4> Vertices;
-  std::vector<glm::vec4> Normals;
-  std::vector<glm::vec4> Textures;
-  //std::vector<Graphics::Index> Indices;
+  std::vector<Graphics::Vertex> Vertices;
+  std::vector<uint32_t> Indices;
 };
 
 ObjExport LoadObjFile(std::string filePath);
