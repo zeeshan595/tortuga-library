@@ -37,7 +37,6 @@ int main()
   }
 
   float yRotation = 0.0f;
-  Core::IterateSystemLoop();
 
   //Main Loop
   bool shouldClose = false;
@@ -52,7 +51,7 @@ int main()
     //cube->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
 
     //iterate through all system and execute update functions
-    //Core::IterateSystemLoop();
+    Core::IterateSystemLoop();
     yRotation += 0.00001;
   }
 

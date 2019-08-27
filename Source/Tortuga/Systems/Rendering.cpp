@@ -6,6 +6,11 @@ namespace Systems
 {
 void Rendering::Update()
 {
+  //check if rendering is already in progress
+  if (!Graphics::Vulkan::Fence::IsFenceSignaled(RenderFence))
+    return;
+  Graphics::Vulkan::Fence::ResetFences({RenderFence});
+
   auto device = Core::Engine::GetMainDevice();
   auto swapchain = Core::Screen::GetSwapchain();
 
@@ -52,7 +57,7 @@ void Rendering::Update()
   Graphics::Vulkan::Command::End(Renderer);
 
   //submit primary command
-  Graphics::Vulkan::Command::Submit({Renderer}, device.Queues.Graphics[0], {}, {PresentSemaphore});
+  Graphics::Vulkan::Command::Submit({Renderer}, device.Queues.Graphics[0], {}, {PresentSemaphore}, RenderFence);
   //present the image
   Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {PresentSemaphore});
 }
@@ -86,9 +91,11 @@ Rendering::Rendering()
       Framebuffers[i] = Graphics::Vulkan::Framebuffer::Create(device, swapchain.Extent.width, swapchain.Extent.height, RenderPass, {swapchain.Views[i]});
 
     Renderer = Graphics::Vulkan::Command::Create(device, GraphicsCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    RenderFence = Graphics::Vulkan::Fence::Create(device, true);
     PresentSemaphore = Graphics::Vulkan::Semaphore::Create(device);
   }
 }
+
 Rendering::~Rendering()
 {
   auto vulkan = Core::Engine::GetVulkan();
@@ -105,6 +112,7 @@ Rendering::~Rendering()
 
   //graphics pipeline
   {
+    Graphics::Vulkan::Fence::Destroy(RenderFence);
     Graphics::Vulkan::Semaphore::Destroy(PresentSemaphore);
     Graphics::Vulkan::Pipeline::Destroy(Pipeline);
     Graphics::Vulkan::RenderPass::Destroy(RenderPass);
