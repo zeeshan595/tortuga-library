@@ -8,12 +8,13 @@ namespace Vulkan
 {
 namespace Image
 {
-Image Create(Device::Device device, uint32_t width, uint32_t height)
+Image Create(Device::Device device, uint32_t width, uint32_t height, VkFormat imageFormat, VkImageUsageFlags usageFlags)
 {
   Image data = {};
   data.Device = device.Device;
   data.Width = width;
   data.Height = height;
+  data.Format = imageFormat;
 
   //Image handle
   VkImageCreateInfo imageInfo = {};
@@ -22,13 +23,13 @@ Image Create(Device::Device device, uint32_t width, uint32_t height)
     imageInfo.pNext = 0;
     imageInfo.flags = 0;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    imageInfo.format = imageFormat;
     imageInfo.extent = {width, height, 1};
     imageInfo.mipLevels = 1;
     imageInfo.arrayLayers = 1;
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    imageInfo.usage = usageFlags;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   }
@@ -50,7 +51,6 @@ Image Create(Device::Device device, uint32_t width, uint32_t height)
 
   return data;
 }
-
 void Destroy(Image data)
 {
   vkDestroyImage(data.Device, data.Image, nullptr);
