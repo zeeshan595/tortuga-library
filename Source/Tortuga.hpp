@@ -1,6 +1,9 @@
 #ifndef _TORTUGA
 #define _TORTUGA
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include "./Tortuga/Console.hpp"
 
 //Utils

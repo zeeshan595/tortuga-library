@@ -23,12 +23,14 @@ std::vector<char> GetFileContents(std::string filePath)
 
   return buffer;
 }
+
 ObjExport LoadObjFile(std::string filePath)
 {
-  ObjExport exporter = {};
-
   std::vector<glm::vec3> temp_positions, temp_normals;
   std::vector<glm::vec2> temp_textures;
+
+  std::vector<uint32_t> indices;
+  std::vector<Graphics::Vertex> vertices;
 
   FILE *file = fopen(filePath.c_str(), "r");
   if (file == NULL)
@@ -73,26 +75,22 @@ ObjExport LoadObjFile(std::string filePath)
         printf("File can't be read by our simple parser : ( Try exporting with other options\n");
         return {};
       }
-      //Graphics::Index index1, index2, index3;
+      if (vertices.size() != temp_positions.size())
+        vertices.resize(temp_positions.size());
 
-      Graphics::Vertex vertex;
-      uint32_t index1, index2, index3;
-
-      //index1.Vertex = vertexIndex[0] - 1;
-      //index2.Vertex = vertexIndex[1] - 1;
-      //index3.Vertex = vertexIndex[2] - 1;
-      //index1.Texture = uvIndex[0] - 1;
-      //index2.Texture = uvIndex[1] - 1;
-      //index3.Texture = uvIndex[2] - 1;
-      //index1.Normal = normalIndex[0] - 1;
-      //index2.Normal = normalIndex[1] - 1;
-      //index3.Normal = normalIndex[2] - 1;
-      //exporter.Indices.push_back(index1);
-      //exporter.Indices.push_back(index2);
-      //exporter.Indices.push_back(index3);
+      for (uint32_t i = 0; i < 3; i++)
+      {
+        uint vertIndex = vertexIndex[i] - 1;
+        indices.push_back(vertIndex);
+        glm::vec2 currentTexture = temp_textures[uvIndex[i] - 1];
+        glm::vec3 currentNorm = temp_normals[normalIndex[i] - 1];
+        vertices[vertIndex].Position = temp_positions[vertIndex];
+        vertices[vertIndex].Normal = currentNorm;
+        vertices[vertIndex].Texture = currentTexture;
+      }
     }
   }
-  return exporter;
+  return {vertices, indices};
 }
 void SetFileContents(std::string filePath, std::vector<char> data)
 {
