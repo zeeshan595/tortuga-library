@@ -9,20 +9,52 @@ void Rendering::Update()
   auto device = Core::Engine::GetMainDevice();
   auto swapchain = Core::Screen::GetSwapchain();
 
-  auto secondary = Graphics::Vulkan::Command::Create(device, GraphicsCommandPool, Graphics::Vulkan::Command::SECONDARY);
+  //get current swapchain image being rendered
   auto swapchainIndex = Graphics::Vulkan::Swapchain::AquireNextImage(swapchain);
 
+  //start recording primary command for gpu
   Graphics::Vulkan::Command::Begin(Renderer, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
   Graphics::Vulkan::Command::BeginRenderPass(Renderer, RenderPass, Framebuffers[swapchainIndex], swapchain.Extent.width, swapchain.Extent.height);
-  Graphics::Vulkan::Command::Begin(secondary, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, RenderPass, Framebuffers[swapchainIndex]);
-  Graphics::Vulkan::Command::BindPipeline(secondary, VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline, {});
-  Graphics::Vulkan::Command::Draw(secondary, 3);
-  Graphics::Vulkan::Command::End(secondary);
-  Graphics::Vulkan::Command::ExecuteCommands(Renderer, {secondary});
+
+  //record a sub-command for each mesh
+  std::vector<Graphics::Vulkan::Command::Command> vulkanCommands;
+  std::vector<std::future<void>> vulkanThreads;
+  for (auto entity : Core::Entity::GetAllEntities())
+  {
+    auto mesh = entity->GetComponent<Component::Mesh>();
+    if (mesh != nullptr)
+    {
+      //make sure mesh's render sub-command is setup
+      if (mesh->RenderCommand.Command == VK_NULL_HANDLE)
+        mesh->RenderCommand = Graphics::Vulkan::Command::Create(device, GraphicsCommandPool, Graphics::Vulkan::Command::SECONDARY);
+      vulkanCommands.push_back(mesh->RenderCommand);
+
+      //thread data
+      auto pipeline = Pipeline;
+      auto renderPass = RenderPass;
+      auto framebuffer = Framebuffers[swapchainIndex];
+      vulkanThreads.push_back(std::async(std::launch::async, [mesh, pipeline, renderPass, framebuffer] {
+        //record mesh sub-command
+        Graphics::Vulkan::Command::Begin(mesh->RenderCommand, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, renderPass, framebuffer);
+        Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {});
+        Graphics::Vulkan::Command::Draw(mesh->RenderCommand, 3);
+        Graphics::Vulkan::Command::End(mesh->RenderCommand);
+      }));
+    }
+  }
+  //wait for all threads to complete
+  for (uint32_t i = 0; i < vulkanThreads.size(); i++)
+    vulkanThreads[i].wait();
+
+  //execute all sub-commands
+  Graphics::Vulkan::Command::ExecuteCommands(Renderer, vulkanCommands);
   Graphics::Vulkan::Command::EndRenderPass(Renderer);
   Graphics::Vulkan::Command::End(Renderer);
-  Graphics::Vulkan::Command::Submit({Renderer}, device.Queues.Graphics[0]);
-  Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0]);
+
+  //submit primary command
+  Graphics::Vulkan::Command::Submit({Renderer}, device.Queues.Graphics[0], {}, {PresentSemaphore});
+  //present the image
+  Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {PresentSemaphore});
 }
 Rendering::Rendering()
 {
@@ -54,6 +86,7 @@ Rendering::Rendering()
       Framebuffers[i] = Graphics::Vulkan::Framebuffer::Create(device, swapchain.Extent.width, swapchain.Extent.height, RenderPass, {swapchain.Views[i]});
 
     Renderer = Graphics::Vulkan::Command::Create(device, GraphicsCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    PresentSemaphore = Graphics::Vulkan::Semaphore::Create(device);
   }
 }
 Rendering::~Rendering()
@@ -72,6 +105,7 @@ Rendering::~Rendering()
 
   //graphics pipeline
   {
+    Graphics::Vulkan::Semaphore::Destroy(PresentSemaphore);
     Graphics::Vulkan::Pipeline::Destroy(Pipeline);
     Graphics::Vulkan::RenderPass::Destroy(RenderPass);
     Graphics::Vulkan::Shader::Destroy(FragmentShader);

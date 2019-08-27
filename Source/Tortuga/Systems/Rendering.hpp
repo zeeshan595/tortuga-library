@@ -47,6 +47,7 @@ private:
   Graphics::Vulkan::Pipeline::Pipeline Pipeline;
   std::vector<Graphics::Vulkan::Framebuffer::Framebuffer> Framebuffers;
   Graphics::Vulkan::Command::Command Renderer;
+  Graphics::Vulkan::Semaphore::Semaphore PresentSemaphore;
 
 public:
   void Update();

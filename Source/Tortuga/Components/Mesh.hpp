@@ -17,17 +17,12 @@ namespace Component
 {
 struct Mesh
 {
-private:
-
 public:
+  Graphics::Vulkan::Command::Command RenderCommand;
 
   Mesh()
   {
-    
-  }
-  ~Mesh()
-  {
-
+    RenderCommand.Command = VK_NULL_HANDLE;
   }
 };
 } // namespace Component
