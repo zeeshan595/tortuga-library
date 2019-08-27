@@ -10,12 +10,11 @@ void Rendering::Update()
   auto swapchain = Core::Screen::GetSwapchain();
 
   auto secondary = Graphics::Vulkan::Command::Create(device, GraphicsCommandPool, Graphics::Vulkan::Command::SECONDARY);
-
   auto swapchainIndex = Graphics::Vulkan::Swapchain::AquireNextImage(swapchain);
 
   Graphics::Vulkan::Command::Begin(Renderer, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
   Graphics::Vulkan::Command::BeginRenderPass(Renderer, RenderPass, Framebuffers[swapchainIndex], swapchain.Extent.width, swapchain.Extent.height);
-  Graphics::Vulkan::Command::Begin(secondary, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, RenderPass);
+  Graphics::Vulkan::Command::Begin(secondary, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, RenderPass, Framebuffers[swapchainIndex]);
   Graphics::Vulkan::Command::BindPipeline(secondary, VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline, {});
   Graphics::Vulkan::Command::Draw(secondary, 3);
   Graphics::Vulkan::Command::End(secondary);
