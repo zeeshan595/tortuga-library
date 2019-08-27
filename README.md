@@ -5,14 +5,10 @@ Tortuga is a open source Game Engine built in C++ 11. Tortuga ONLY uses vulkan f
 **Key Features**
 
 * Multi-Threaded Rendering
-* Ray Marching (Signed Distance)
+* Ray Marching (Signed Distance) _[NOT IMPLIMENTED]_
 * Data Oriented Design
 * Multi GPU Support (Split Screen) _[NOT IMPLIMENTED]_
 * OBJ Support
-
-**Information on Renderer**
-
-The renderer uses ray marching (signed distance function) on an object's bounds (sphere based). If the ray marching hits the object's bounds then it uses triangle intersection to render that mesh.
 
 **Required Resources**
 
