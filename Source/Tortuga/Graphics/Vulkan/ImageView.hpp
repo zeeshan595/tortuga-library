@@ -22,6 +22,7 @@ struct ImageView
   VkImageView View;
 };
 ImageView Create(Device::Device device, Image::Image image, VkImageAspectFlags aspectFlags);
+ImageView Create(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 void Destroy(ImageView data);
 } // namespace ImageView
 } // namespace Vulkan

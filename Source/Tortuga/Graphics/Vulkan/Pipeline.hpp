@@ -26,17 +26,17 @@ struct Pipeline
   VkPipelineCache Cache;
 };
 
-Pipeline CreateComputePipeline(
-    Device::Device device,
-    Shader::Shader shader,
-    RenderPass::RenderPass renderPass,
-    uint32_t width, uint32_t height);
 Pipeline CreateGraphicsPipeline(
     Device::Device device,
     Shader::Shader vertexShader,
     Shader::Shader fragmentShader,
-    std::vector<char> cache = {},
-    std::vector<DescriptorLayout::DescriptorLayout> layouts = {});
+    RenderPass::RenderPass renderPass,
+    uint32_t width, uint32_t height);
+Pipeline CreateComputePipeline(
+    Device::Device device,
+    Shader::Shader shader,
+    std::vector<char> cache,
+    std::vector<DescriptorLayout::DescriptorLayout> layouts);
 void Destroy(Pipeline data);
 std::vector<char> GetCacheData(Pipeline data);
 } // namespace Pipeline

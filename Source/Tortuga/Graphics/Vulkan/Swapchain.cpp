@@ -113,6 +113,10 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
   data.Images.resize(data.ImageCount);
   ErrorCheck::Callback(vkGetSwapchainImagesKHR(device.Device, data.Swapchain, &data.ImageCount, data.Images.data()));
 
+  data.Views.resize(data.ImageCount);
+  for (uint32_t i = 0; i < data.ImageCount; i++)
+    data.Views[i] = ImageView::Create(data.Device, data.Images[i], data.SurfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
+
   VkFenceCreateInfo fenceInfo = {};
   {
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -125,6 +129,8 @@ void Destroy(Swapchain data)
 {
   vkDestroyFence(data.Device, data.Fence, nullptr);
   vkDestroySwapchainKHR(data.Device, data.Swapchain, nullptr);
+  for (uint32_t i = 0; i < data.ImageCount; i++)
+    ImageView::Destroy(data.Views[i]);
 }
 uint32_t AquireNextImage(Swapchain data)
 {
