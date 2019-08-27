@@ -9,22 +9,17 @@ void Rendering::Update()
   auto device = Core::Engine::GetMainDevice();
   auto swapchain = Core::Screen::GetSwapchain();
 
-  auto entities = Core::Entity::GetAllEntities();
-  for (auto entity : entities)
-  {
-    auto mesh = entity->GetComponent<Component::Mesh>();
-    if (mesh)
-    {
-      
-    }
-  }
+  auto secondary = Graphics::Vulkan::Command::Create(device, GraphicsCommandPool, Graphics::Vulkan::Command::SECONDARY);
 
   auto swapchainIndex = Graphics::Vulkan::Swapchain::AquireNextImage(swapchain);
 
   Graphics::Vulkan::Command::Begin(Renderer, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
   Graphics::Vulkan::Command::BeginRenderPass(Renderer, RenderPass, Framebuffers[swapchainIndex], swapchain.Extent.width, swapchain.Extent.height);
-  Graphics::Vulkan::Command::BindPipeline(Renderer, VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline, {});
-  Graphics::Vulkan::Command::Draw(Renderer, 3);
+  Graphics::Vulkan::Command::Begin(secondary, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, RenderPass);
+  Graphics::Vulkan::Command::BindPipeline(secondary, VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline, {});
+  Graphics::Vulkan::Command::Draw(secondary, 3);
+  Graphics::Vulkan::Command::End(secondary);
+  Graphics::Vulkan::Command::ExecuteCommands(Renderer, {secondary});
   Graphics::Vulkan::Command::EndRenderPass(Renderer);
   Graphics::Vulkan::Command::End(Renderer);
   Graphics::Vulkan::Command::Submit({Renderer}, device.Queues.Graphics[0]);

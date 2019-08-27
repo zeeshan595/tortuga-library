@@ -30,10 +30,6 @@ Buffer CreateHostSrc(Device::Device device, uint32_t bufferSize);
 Buffer CreateDeviceOnlySrc(Device::Device device, uint32_t bufferSize);
 Buffer CreateHostDest(Device::Device device, uint32_t bufferSize);
 Buffer CreateDeviceOnlyDest(Device::Device device, uint32_t bufferSize);
-Buffer CreateHostVertex(Device::Device device, uint32_t bufferSize);
-Buffer CreateDeviceOnlyVertex(Device::Device device, uint32_t bufferSize);
-Buffer CreateHostIndex(Device::Device device, uint32_t bufferSize);
-Buffer CreateDeviceOnlyIndex(Device::Device device, uint32_t bufferSize);
 Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties, VkBufferUsageFlags usageFlags);
 void Destroy(Buffer data);
 

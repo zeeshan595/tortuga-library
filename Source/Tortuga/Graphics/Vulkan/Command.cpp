@@ -12,6 +12,7 @@ Command Create(Device::Device device, CommandPool::CommandPool pool, Type type)
 {
   Command data = {};
   data.Device = device.Device;
+  data.CommandType = type;
 
   VkCommandBufferAllocateInfo commandInfo = {};
   {
@@ -49,18 +50,28 @@ std::vector<Command> Create(Device::Device device, CommandPool::CommandPool pool
   {
     data[i].Device = device.Device;
     data[i].Command = commands[i];
+    data[i].CommandType = type;
   }
 
   return data;
 }
 
-void Begin(Command data, VkCommandBufferUsageFlags usage)
+void Begin(Command data, VkCommandBufferUsageFlags usage, RenderPass::RenderPass renderPass, Framebuffer::Framebuffer framebuffer)
 {
+  VkCommandBufferInheritanceInfo inheritanceInfo = {};
+  {
+    inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+    inheritanceInfo.renderPass = renderPass.RenderPass;
+    inheritanceInfo.subpass = 0;
+    inheritanceInfo.framebuffer = framebuffer.Framebuffer;
+  }
+
   VkCommandBufferBeginInfo beginInfo = {};
   {
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = usage;
-    beginInfo.pInheritanceInfo = 0;
+    if (data.CommandType == SECONDARY)
+      beginInfo.pInheritanceInfo = &inheritanceInfo;
   }
   ErrorCheck::Callback(vkBeginCommandBuffer(data.Command, &beginInfo));
 }
@@ -83,7 +94,7 @@ void BeginRenderPass(Command data, RenderPass::RenderPass renderPass, Framebuffe
     beginInfo.pClearValues = &clearColor;
   }
 
-  vkCmdBeginRenderPass(data.Command, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+  vkCmdBeginRenderPass(data.Command, &beginInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
 }
 void EndRenderPass(Command data)
 {
@@ -126,7 +137,7 @@ void BindVertexBuffer(Command data, std::vector<Buffer::Buffer> buffers, uint32_
     offsets[i] = 0;
     vulkanBuffers[i] = buffers[i].Buffer;
   }
-  
+
   vkCmdBindVertexBuffers(data.Command, 0, vulkanBuffers.size(), vulkanBuffers.data(), offsets.data());
 }
 void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount, uint32_t vertexOffset, uint32_t instanceOffset)
@@ -136,6 +147,14 @@ void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount, uint32_t v
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {
   vkCmdDispatch(data.Command, x, y, z);
+}
+void ExecuteCommands(Command data, std::vector<Command> commands)
+{
+  std::vector<VkCommandBuffer> commandBuffers(commands.size());
+  for (uint32_t i = 0; i < commands.size(); i++)
+    commandBuffers[i] = commands[i].Command;
+
+  vkCmdExecuteCommands(data.Command, commandBuffers.size(), commandBuffers.data());
 }
 void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait, std::vector<Semaphore::Semaphore> signal, Fence::Fence fence)
 {

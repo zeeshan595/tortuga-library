@@ -33,12 +33,13 @@ struct Command
 {
   VkDevice Device;
   VkCommandBuffer Command;
+  Type CommandType;
 };
 
 Command Create(Device::Device device, CommandPool::CommandPool pool, Type type);
 std::vector<Command> Create(Device::Device device, CommandPool::CommandPool pool, Type type, uint32_t amount);
 
-void Begin(Command data, VkCommandBufferUsageFlags usage);
+void Begin(Command data, VkCommandBufferUsageFlags usage, RenderPass::RenderPass renderPass = {VK_NULL_HANDLE, VK_NULL_HANDLE, {}}, Framebuffer::Framebuffer framebuffer = {VK_NULL_HANDLE, VK_NULL_HANDLE});
 void End(Command data);
 void BeginRenderPass(Command data, RenderPass::RenderPass renderPass, Framebuffer::Framebuffer framebuffer, uint32_t width, uint32_t height);
 void EndRenderPass(Command data);
@@ -47,6 +48,7 @@ void BindPipeline(Command data, VkPipelineBindPoint BindPoint, Pipeline::Pipelin
 void BindVertexBuffer(Command data, std::vector<Buffer::Buffer> buffers, uint32_t firstBinding = 0);
 void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z);
+void ExecuteCommands(Command data, std::vector<Command> commands);
 void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait = {}, std::vector<Semaphore::Semaphore> signal = {}, Fence::Fence fence = {VK_NULL_HANDLE, VK_NULL_HANDLE});
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout);
 void BufferToImage(Command data, Buffer::Buffer buffer, Image::Image image, glm::vec2 offset, glm::vec2 size);
