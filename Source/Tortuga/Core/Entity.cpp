@@ -6,6 +6,9 @@ namespace Core
 {
 namespace Entity
 {
+auto environment = Environment();
+
+//entity
 Entity::Entity()
 {
   this->GUID = Core::GUID::GenerateGUID();
@@ -19,14 +22,21 @@ std::string Entity::GetGUID()
 {
   return this->GUID;
 }
-auto environment = Environment();
+Environment *Entity::GetEnvironment()
+{
+  return &environment;
+}
+
+//environment
 Environment::~Environment()
 {
   for (auto i = environment.Entities.begin(); i < environment.Entities.end(); i++)
     delete *i;
-    
+
   environment.Entities.clear();
 }
+
+//public
 Entity *Create()
 {
   auto temp = new Entity();
@@ -49,6 +59,13 @@ void Destroy(Entity *data)
 std::vector<Entity *> GetAllEntities()
 {
   return environment.Entities;
+}
+std::vector<Entity *> GetALlEntitiesWithComponent(std::type_index type)
+{
+  if (environment.EntitiesWithComponent.find(type) == environment.EntitiesWithComponent.end())
+    return environment.EntitiesWithComponent[type];
+
+  return {};
 }
 } // namespace Entity
 } // namespace Core

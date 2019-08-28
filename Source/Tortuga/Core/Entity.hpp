@@ -14,12 +14,14 @@ namespace Core
 {
 namespace Entity
 {
+struct Environment;
 struct Entity
 {
 private:
   std::string GUID;
   std::unordered_map<std::type_index, void *> Components;
   std::unordered_map<std::type_index, void *> ComponentsToCleanUp;
+  Environment *GetEnvironment();
 
 public:
   template <typename T>
@@ -36,6 +38,12 @@ public:
       temp = new T();
     this->Components[type] = temp;
 
+    auto environment = GetEnvironment();
+    if (environment->EntitiesWithComponent.find(type) != environment->EntitiesWithComponent.end())
+      environment->EntitiesWithComponent[type].push_back(this);
+    else
+      environment->EntitiesWithComponent[type] = {this};
+
     return temp;
   }
   template <typename T>
@@ -45,6 +53,9 @@ public:
     if (this->Components.find(type) == this->Components.end())
       return;
 
+    auto environment = GetEnvironment();
+    auto entityWithComponentIndex = std::find(environment->EntitiesWithComponent[type].begin(), environment->EntitiesWithComponent[type].end(), this);
+    GetEnvironment()->EntitiesWithComponent[type].erase(entityWithComponentIndex);
     delete static_cast<T *>(this->Components[type]);
     this->Components.erase(type);
   }
@@ -65,11 +76,19 @@ public:
 struct Environment
 {
   std::vector<Entity *> Entities;
+  std::unordered_map<std::type_index, std::vector<Entity *>> EntitiesWithComponent;
   ~Environment();
 };
 Entity *Create();
 void Destroy(Entity *data);
 std::vector<Entity *> GetAllEntities();
+std::vector<Entity *> GetALlEntitiesWithComponent(std::type_index type);
+template <typename T>
+std::vector<Entity *> GetALlEntitiesWithComponent()
+{
+  auto type = std::type_index(typeid(T));
+  return GetALlEntitiesWithComponent(type);
+}
 } // namespace Entity
 } // namespace Core
 } // namespace Tortuga
