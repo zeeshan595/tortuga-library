@@ -36,12 +36,7 @@ namespace Systems
 class Rendering : public Core::System
 {
 private:
-  //general
-  Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
-  Graphics::Vulkan::CommandPool::CommandPool ComputeCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
-  
-  //graphics pipeline
   Graphics::Vulkan::Shader::Shader VertexShader;
   Graphics::Vulkan::Shader::Shader FragmentShader;
   Graphics::Vulkan::RenderPass::RenderPass RenderPass;
@@ -49,7 +44,6 @@ private:
   Graphics::Vulkan::Pipeline::Pipeline Pipeline;
   std::vector<Graphics::Vulkan::Framebuffer::Framebuffer> Framebuffers;
   Graphics::Vulkan::Command::Command Renderer;
-  Graphics::Vulkan::Command::Command Transfer;
   Graphics::Vulkan::Fence::Fence RenderFence;
   Graphics::Vulkan::Semaphore::Semaphore RenderSemaphore;
   Graphics::Vulkan::Semaphore::Semaphore PresentSemaphore;

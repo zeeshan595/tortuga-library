@@ -18,7 +18,10 @@ struct Mesh
 {
 private:
 public:
+  Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
+  Graphics::Vulkan::CommandPool::CommandPool RenderCommandPool;
   Graphics::Vulkan::Command::Command RenderCommand;
+  Graphics::Vulkan::Command::Command TransferCommand;
   Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
   Graphics::Vulkan::Buffer::Buffer VertexBuffer;
   Graphics::Vulkan::Buffer::Buffer StagingIndexBuffer;
@@ -32,6 +35,9 @@ public:
 
   Mesh()
   {
+    TransferCommandPool.CommandPool = VK_NULL_HANDLE;
+    RenderCommandPool.CommandPool = VK_NULL_HANDLE;
+    TransferCommand.Command = VK_NULL_HANDLE;
     RenderCommand.Command = VK_NULL_HANDLE;
     StagingVertexBuffer.Buffer = VK_NULL_HANDLE;
     StagingIndexBuffer.Buffer = VK_NULL_HANDLE;
@@ -42,7 +48,13 @@ public:
   ~Mesh()
   {
     Graphics::Vulkan::Device::WaitForDevice(Core::Engine::GetMainDevice());
-    
+
+    if (RenderCommandPool.CommandPool != VK_NULL_HANDLE)
+      Graphics::Vulkan::CommandPool::Destroy(RenderCommandPool);
+
+    if (TransferCommandPool.CommandPool != VK_NULL_HANDLE)
+      Graphics::Vulkan::CommandPool::Destroy(TransferCommandPool);
+
     if (StagingVertexBuffer.Buffer != VK_NULL_HANDLE)
       Graphics::Vulkan::Buffer::Destroy(StagingVertexBuffer);
 
