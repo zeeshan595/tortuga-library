@@ -127,24 +127,24 @@ void Rendering::Update()
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingIndexBuffer, mesh->IndexBuffer);
         }
         //make sure mesh descriptor sets are initialized
-        if (mesh->DescriptorPool.size() != cameraInfos.size())
+        if (mesh->UniformBufferPool.size() != cameraInfos.size())
         {
-          for (auto pool : mesh->DescriptorPool)
+          for (auto pool : mesh->UniformBufferPool)
             Graphics::Vulkan::DescriptorPool::Destroy(pool);
           for (auto buffer : mesh->StagingUniformBuffer)
             Graphics::Vulkan::Buffer::Destroy(buffer);
           for (auto buffer : mesh->UniformBuffer)
             Graphics::Vulkan::Buffer::Destroy(buffer);
 
-          mesh->DescriptorPool.clear();
-          mesh->DescriptorSets.clear();
+          mesh->UniformBufferPool.clear();
+          mesh->UniformBufferSets.clear();
 
           for (auto camera : cameraInfos)
           {
             auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayouts);
             auto descriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, descriptorPool, descriptorLayouts[0]);
-            mesh->DescriptorPool.push_back(descriptorPool);
-            mesh->DescriptorSets.push_back(descriptorSet);
+            mesh->UniformBufferPool.push_back(descriptorPool);
+            mesh->UniformBufferSets.push_back(descriptorSet);
 
             //setup uniform buffer object
             mesh->StagingUniformBuffer.push_back(Graphics::Vulkan::Buffer::Create(device, sizeof(Graphics::UniformBufferObject), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_TRANSFER_SRC_BIT));
@@ -153,9 +153,6 @@ void Rendering::Update()
             Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(descriptorSet, {uniformBuffer});
           }
         }
-
-        if (mesh->StagingUniformBuffer.size() != mesh->UniformBuffer.size())
-          Console::Fatal("Something is wrong, staging uniform buffers do not match actual uniform buffers");
         for (uint32_t i = 0; i < cameraInfos.size(); i++)
         {
           auto camera = cameraInfos[i];
@@ -168,7 +165,7 @@ void Rendering::Update()
           Graphics::Vulkan::Buffer::SetData(mesh->StagingUniformBuffer[i], &ubo, sizeof(ubo));
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingUniformBuffer[i], mesh->UniformBuffer[i]);
 
-          Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {mesh->DescriptorSets[i]});
+          Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {mesh->UniformBufferSets[i]});
           Graphics::Vulkan::Command::SetViewport(
               mesh->RenderCommand,
               framebuffer.Width * camera.ViewportOffset.x, framebuffer.Height * camera.ViewportOffset.y,

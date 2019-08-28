@@ -31,8 +31,8 @@ public:
   Graphics::Vulkan::Buffer::Buffer VertexBuffer;
   Graphics::Vulkan::Buffer::Buffer StagingIndexBuffer;
   Graphics::Vulkan::Buffer::Buffer IndexBuffer;
-  std::vector<Graphics::Vulkan::DescriptorPool::DescriptorPool> DescriptorPool;
-  std::vector<Graphics::Vulkan::DescriptorSet::DescriptorSet> DescriptorSets;
+  std::vector<Graphics::Vulkan::DescriptorPool::DescriptorPool> UniformBufferPool;
+  std::vector<Graphics::Vulkan::DescriptorSet::DescriptorSet> UniformBufferSets;
   std::vector<Graphics::Vulkan::Buffer::Buffer> StagingUniformBuffer;
   std::vector<Graphics::Vulkan::Buffer::Buffer> UniformBuffer;
 
@@ -68,7 +68,7 @@ public:
     if (IndexBuffer.Buffer != VK_NULL_HANDLE)
       Graphics::Vulkan::Buffer::Destroy(IndexBuffer);
 
-    for (auto pool : DescriptorPool)
+    for (auto pool : UniformBufferPool)
       Graphics::Vulkan::DescriptorPool::Destroy(pool);
 
     for (auto buffer : StagingUniformBuffer)
