@@ -38,7 +38,7 @@ void Rendering::Update()
       cameraPerspective = glm::perspective(camera->FieldOfView, camera->aspectRatio, camera->nearClipPlane, camera->farClipPlane);
       auto transform = entity->GetComponent<Component::Transform>();
       if (transform)
-        cameraView = glm::inverse(transform->GetModelMatrix());
+        cameraView = transform->GetModelMatrix();
     }
   }
   cameraPerspective[1][1] *= -1;

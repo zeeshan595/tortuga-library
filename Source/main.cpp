@@ -13,12 +13,12 @@ int main()
   const auto camera = Core::Entity::Create();
   {
     const auto transform = camera->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, -10);
-    transform->Rotation = glm::vec4(0, 3.14, 0, 1);
+    transform->Position = glm::vec3(0, 0, 0);
+    transform->Rotation = glm::vec4(0, 0, 0, 1);
 
     const auto comp = camera->AddComponent<Component::Camera>();
-    comp->FieldOfView = 50.0f;
-    comp->aspectRatio = 1920.0f / 1080.0f;
+    comp->FieldOfView = 45.0f;
+    comp->aspectRatio = 16.0f / 9.0f;
     comp->nearClipPlane = 0.01f;
     comp->farClipPlane = 100.0f;
   }
@@ -28,12 +28,12 @@ int main()
   {
     //transform data
     const auto transform = cube->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, 5);
+    transform->Position = glm::vec3(0, 0, -10);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
     transform->Scale = glm::vec3(1, 1, 1);
 
     //mesh data
-    const auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
+    const auto model = Utils::IO::LoadObjFile("Models/Monkey.obj");
     const auto mesh = cube->AddComponent<Component::Mesh>();
     mesh->Vertices = model.Vertices;
     mesh->Indices = model.Indices;
