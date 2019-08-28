@@ -31,10 +31,10 @@ public:
   Graphics::Vulkan::Buffer::Buffer VertexBuffer;
   Graphics::Vulkan::Buffer::Buffer StagingIndexBuffer;
   Graphics::Vulkan::Buffer::Buffer IndexBuffer;
-  Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
+  std::vector<Graphics::Vulkan::DescriptorPool::DescriptorPool> DescriptorPool;
   std::vector<Graphics::Vulkan::DescriptorSet::DescriptorSet> DescriptorSets;
-  Graphics::Vulkan::Buffer::Buffer StagingUniformBuffer;
-  Graphics::Vulkan::Buffer::Buffer UniformBuffer;
+  std::vector<Graphics::Vulkan::Buffer::Buffer> StagingUniformBuffer;
+  std::vector<Graphics::Vulkan::Buffer::Buffer> UniformBuffer;
 
   Mesh()
   {
@@ -44,8 +44,6 @@ public:
     RenderCommand.Command = VK_NULL_HANDLE;
     StagingVertexBuffer.Buffer = VK_NULL_HANDLE;
     StagingIndexBuffer.Buffer = VK_NULL_HANDLE;
-    DescriptorPool.Pool = VK_NULL_HANDLE;
-    StagingUniformBuffer.Buffer = VK_NULL_HANDLE;
   }
 
   ~Mesh()
@@ -70,14 +68,14 @@ public:
     if (IndexBuffer.Buffer != VK_NULL_HANDLE)
       Graphics::Vulkan::Buffer::Destroy(IndexBuffer);
 
-    if (DescriptorPool.Pool != VK_NULL_HANDLE)
-      Graphics::Vulkan::DescriptorPool::Destroy(DescriptorPool);
+    for (auto pool : DescriptorPool)
+      Graphics::Vulkan::DescriptorPool::Destroy(pool);
 
-    if (StagingUniformBuffer.Buffer != VK_NULL_HANDLE)
-      Graphics::Vulkan::Buffer::Destroy(StagingUniformBuffer);
+    for (auto buffer : StagingUniformBuffer)
+      Graphics::Vulkan::Buffer::Destroy(buffer);
 
-    if (UniformBuffer.Buffer != VK_NULL_HANDLE)
-      Graphics::Vulkan::Buffer::Destroy(UniformBuffer);
+    for (auto buffer : UniformBuffer)
+      Graphics::Vulkan::Buffer::Destroy(buffer);
   }
 
   void SetVertices(std::vector<Graphics::Vertex> vertices)

@@ -49,6 +49,7 @@ void BindVertexBuffer(Command data, std::vector<Buffer::Buffer> buffers, uint32_
 void BindIndexBuffer(Command data, Buffer::Buffer buffer, uint32_t offset = 0);
 void DrawIndexed(Command data, uint32_t indexCount, uint32_t instanceCount = 1, uint32_t indexOffset = 0, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
+void SetViewport(Command data, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z);
 void ExecuteCommands(Command data, std::vector<Command> commands);
 void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Semaphore> wait = {}, std::vector<Semaphore::Semaphore> signal = {}, Fence::Fence fence = {VK_NULL_HANDLE, VK_NULL_HANDLE});

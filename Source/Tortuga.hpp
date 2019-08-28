@@ -39,7 +39,8 @@
 
 //Components
 #include "./Tortuga/Components/Transform.hpp"
-#include "./Tortuga/Components/Mesh.hpp"
 #include "./Tortuga/Components/Camera.hpp"
+#include "./Tortuga/Components/Mesh.hpp"
+#include "./Tortuga/Components/Light.hpp"
 
 #endif

@@ -13,14 +13,31 @@ int main()
   const auto camera = Core::Entity::Create();
   {
     const auto transform = camera->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, 0);
+    transform->Position = glm::vec3(0, 0, -10);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
 
     const auto comp = camera->AddComponent<Component::Camera>();
-    comp->FieldOfView = 45.0f;
-    comp->aspectRatio = 16.0f / 9.0f;
-    comp->nearClipPlane = 0.01f;
-    comp->farClipPlane = 100.0f;
+    comp->ViewportOffset = glm::vec2(0, 0);
+    comp->ViewportSize = glm::vec2(0.5f, 1.0f);
+  }
+
+  const auto camera2 = Core::Entity::Create();
+  {
+    const auto transform = camera2->AddComponent<Component::Transform>();
+    transform->Position = glm::vec3(0, 0, -3);
+    transform->Rotation = glm::vec4(0, 0, 0, 1);
+
+    const auto comp = camera2->AddComponent<Component::Camera>();
+    comp->ViewportOffset = glm::vec2(0.5f, 0);
+    comp->ViewportSize = glm::vec2(0.5f, 1.0f);
+  }
+
+  const auto light = Core::Entity::Create();
+  {
+    const auto transform = light->AddComponent<Component::Transform>();
+    transform->Position = glm::vec3(0, 2, 0);
+
+    light->AddComponent<Component::Light>();
   }
 
   //create cube entity
@@ -28,7 +45,7 @@ int main()
   {
     //transform data
     const auto transform = cube->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, -10);
+    transform->Position = glm::vec3(0, 0, 0);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
     transform->Scale = glm::vec3(1, 1, 1);
 
@@ -43,7 +60,7 @@ int main()
   {
     //transform data
     const auto transform = monkey->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, -10);
+    transform->Position = glm::vec3(0, 0, 0);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
     transform->Scale = glm::vec3(1, 1, 1);
 
@@ -80,11 +97,14 @@ int main()
   cube->RemoveComponent<Component::Mesh>();
   monkey->RemoveComponent<Component::Transform>();
   monkey->RemoveComponent<Component::Mesh>();
+  light->RemoveComponent<Component::Transform>();
+  light->RemoveComponent<Component::Light>();
 
   //destroy entities
   Core::Entity::Destroy(cube);
   Core::Entity::Destroy(camera);
   Core::Entity::Destroy(monkey);
+  Core::Entity::Destroy(light);
 
   //destroy systems
   Core::DestroySystem<Systems::Rendering>();

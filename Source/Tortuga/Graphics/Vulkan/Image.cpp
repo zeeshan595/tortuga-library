@@ -25,6 +25,7 @@ VkFormat findSupportedFormat(VkPhysicalDevice physicalDevice, const std::vector<
     }
   }
   Console::Fatal("failed to find supported format!");
+  return VK_FORMAT_UNDEFINED;
 }
 VkFormat findDepthFormat(VkPhysicalDevice device)
 {

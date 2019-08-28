@@ -20,6 +20,8 @@ struct Framebuffer
 {
   VkDevice Device;
   VkFramebuffer Framebuffer;
+  uint32_t Width;
+  uint32_t Height;
 };
 
 Framebuffer Create(Device::Device device, uint32_t width, uint32_t height, RenderPass::RenderPass renderPass, std::vector<ImageView::ImageView> imageViews);

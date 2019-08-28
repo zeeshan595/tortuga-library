@@ -181,7 +181,7 @@ Pipeline CreateGraphicsPipeline(
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pDepthStencilState = &depthStencil;
     pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.pDynamicState = nullptr; // Optional
+    pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.layout = data.Layout;
     pipelineInfo.renderPass = data.RenderPass;
     pipelineInfo.subpass = 0;

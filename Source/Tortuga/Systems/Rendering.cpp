@@ -4,6 +4,21 @@ namespace Tortuga
 {
 namespace Systems
 {
+struct CameraInfo
+{
+  glm::mat4 View;
+  glm::mat4 Perspective;
+  glm::vec2 ViewportOffset;
+  glm::vec2 ViewportSize;
+
+  CameraInfo()
+  {
+    View = glm::mat4(1.0);
+    Perspective = glm::mat4(1.0);
+    ViewportOffset = glm::vec2(0, 0);
+    ViewportSize = glm::vec2(1, 1);
+  }
+};
 void Rendering::Update()
 {
   //check if rendering is already in progress
@@ -25,20 +40,25 @@ void Rendering::Update()
   std::vector<Component::Mesh *> processedMeshes;
   std::vector<std::future<void>> vulkanThreads;
   auto allEntities = Core::Entity::GetAllEntities();
-  auto cameraView = glm::mat4(1.0f);
-  auto cameraPerspective = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
+  std::vector<CameraInfo> cameraInfos;
   for (auto entity : allEntities)
   {
     auto camera = entity->GetComponent<Component::Camera>();
     if (camera != nullptr)
     {
-      cameraPerspective = glm::perspective(camera->FieldOfView, camera->aspectRatio, camera->nearClipPlane, camera->farClipPlane);
-      auto transform = entity->GetComponent<Component::Transform>();
-      if (transform)
-        cameraView = transform->GetModelMatrix();
+      CameraInfo cameraInfo = {};
+      {
+        cameraInfo.Perspective = glm::perspective(camera->FieldOfView, camera->AspectRatio, camera->NearClipPlane, camera->FarClipPlane);
+        cameraInfo.Perspective[1][1] *= -1;
+        cameraInfo.ViewportOffset = camera->ViewportOffset;
+        cameraInfo.ViewportSize = camera->ViewportSize;
+        auto transform = entity->GetComponent<Component::Transform>();
+        if (transform)
+          cameraInfo.View = transform->GetModelMatrix();
+      }
+      cameraInfos.push_back(cameraInfo);
     }
   }
-  cameraPerspective[1][1] *= -1;
   for (auto entity : allEntities)
   {
     auto mesh = entity->GetComponent<Component::Mesh>();
@@ -54,8 +74,9 @@ void Rendering::Update()
       const auto renderPass = RenderPass;
       const auto framebuffer = Framebuffers[swapchainIndex];
       const auto descriptorLayouts = DescriptorLayouts;
+      //process mesh and make sure it is ready for render soon
       processedMeshes.push_back(mesh);
-      vulkanThreads.push_back(std::async(std::launch::async, [mesh, pipeline, renderPass, framebuffer, device, descriptorLayouts, modelMatrix, cameraView, cameraPerspective] {
+      vulkanThreads.push_back(std::async(std::launch::async, [mesh, pipeline, renderPass, framebuffer, device, descriptorLayouts, modelMatrix, cameraInfos] {
         if (mesh->RenderCommandPool.CommandPool == VK_NULL_HANDLE)
           mesh->RenderCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
         if (mesh->TransferCommandPool.CommandPool == VK_NULL_HANDLE)
@@ -106,31 +127,56 @@ void Rendering::Update()
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingIndexBuffer, mesh->IndexBuffer);
         }
         //make sure mesh descriptor sets are initialized
-        if (mesh->DescriptorPool.Pool == VK_NULL_HANDLE)
+        if (mesh->DescriptorPool.size() != cameraInfos.size())
         {
-          mesh->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayouts);
-          mesh->DescriptorSets.clear();
-          for (auto layout : descriptorLayouts)
-            mesh->DescriptorSets.push_back(Graphics::Vulkan::DescriptorSet::Create(device, mesh->DescriptorPool, layout));
+          for (auto pool : mesh->DescriptorPool)
+            Graphics::Vulkan::DescriptorPool::Destroy(pool);
+          for (auto buffer : mesh->StagingUniformBuffer)
+            Graphics::Vulkan::Buffer::Destroy(buffer);
+          for (auto buffer : mesh->UniformBuffer)
+            Graphics::Vulkan::Buffer::Destroy(buffer);
 
-          //setup uniform buffer object
-          mesh->StagingUniformBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(Graphics::UniformBufferObject), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-          mesh->UniformBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(Graphics::UniformBufferObject), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
-          Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(mesh->DescriptorSets[0], {mesh->UniformBuffer});
+          mesh->DescriptorPool.clear();
+          mesh->DescriptorSets.clear();
+
+          for (auto camera : cameraInfos)
+          {
+            auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayouts);
+            auto descriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, descriptorPool, descriptorLayouts[0]);
+            mesh->DescriptorPool.push_back(descriptorPool);
+            mesh->DescriptorSets.push_back(descriptorSet);
+
+            //setup uniform buffer object
+            mesh->StagingUniformBuffer.push_back(Graphics::Vulkan::Buffer::Create(device, sizeof(Graphics::UniformBufferObject), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_TRANSFER_SRC_BIT));
+            auto uniformBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(Graphics::UniformBufferObject), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+            mesh->UniformBuffer.push_back(uniformBuffer);
+            Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(descriptorSet, {uniformBuffer});
+          }
         }
 
-        //update ubo buffer
-        Graphics::UniformBufferObject ubo = {};
-        ubo.Projection = cameraPerspective;
-        ubo.View = cameraView;
-        ubo.Model = modelMatrix;
-        Graphics::Vulkan::Buffer::SetData(mesh->StagingUniformBuffer, &ubo, sizeof(ubo));
-        Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingUniformBuffer, mesh->UniformBuffer);
+        if (mesh->StagingUniformBuffer.size() != mesh->UniformBuffer.size())
+          Console::Fatal("Something is wrong, staging uniform buffers do not match actual uniform buffers");
+        for (uint32_t i = 0; i < cameraInfos.size(); i++)
+        {
+          auto camera = cameraInfos[i];
+          //update ubo buffer
+          Graphics::UniformBufferObject ubo = {};
+          ubo.Projection = camera.Perspective;
+          ubo.View = camera.View;
+          ubo.Model = modelMatrix;
 
-        Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, mesh->DescriptorSets);
-        Graphics::Vulkan::Command::BindVertexBuffer(mesh->RenderCommand, {mesh->VertexBuffer});
-        Graphics::Vulkan::Command::BindIndexBuffer(mesh->RenderCommand, mesh->IndexBuffer);
-        Graphics::Vulkan::Command::DrawIndexed(mesh->RenderCommand, mesh->GetIndices().size());
+          Graphics::Vulkan::Buffer::SetData(mesh->StagingUniformBuffer[i], &ubo, sizeof(ubo));
+          Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingUniformBuffer[i], mesh->UniformBuffer[i]);
+
+          Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {mesh->DescriptorSets[i]});
+          Graphics::Vulkan::Command::SetViewport(
+              mesh->RenderCommand,
+              framebuffer.Width * camera.ViewportOffset.x, framebuffer.Height * camera.ViewportOffset.y,
+              framebuffer.Width * camera.ViewportSize.x, framebuffer.Height * camera.ViewportSize.y);
+          Graphics::Vulkan::Command::BindVertexBuffer(mesh->RenderCommand, {mesh->VertexBuffer});
+          Graphics::Vulkan::Command::BindIndexBuffer(mesh->RenderCommand, mesh->IndexBuffer);
+          Graphics::Vulkan::Command::DrawIndexed(mesh->RenderCommand, mesh->GetIndices().size());
+        }
         Graphics::Vulkan::Command::End(mesh->TransferCommand);
         Graphics::Vulkan::Command::End(mesh->RenderCommand);
       }));
@@ -140,24 +186,31 @@ void Rendering::Update()
   for (uint32_t i = 0; i < vulkanThreads.size(); i++)
     vulkanThreads[i].wait();
 
-  //transfer commands
-  std::vector<Graphics::Vulkan::Command::Command> transferCommands(processedMeshes.size());
-  for (uint32_t i = 0; i < processedMeshes.size(); i++)
-    transferCommands[i] = processedMeshes[i]->TransferCommand;
-  Graphics::Vulkan::Command::Submit(transferCommands, device.Queues.Transfer[0], {}, {RenderSemaphore});
+  //launch present task in a new thread
+  auto renderer = Renderer;
+  auto renderSemaphore = RenderSemaphore;
+  auto presentSemaphore = PresentSemaphore;
+  auto renderFence = RenderFence;
+  std::async(std::launch::async, [device, processedMeshes, renderer, swapchain, swapchainIndex, renderSemaphore, presentSemaphore, renderFence] {
+    //transfer commands
+    std::vector<Graphics::Vulkan::Command::Command> transferCommands(processedMeshes.size());
+    for (uint32_t i = 0; i < processedMeshes.size(); i++)
+      transferCommands[i] = processedMeshes[i]->TransferCommand;
+    Graphics::Vulkan::Command::Submit(transferCommands, device.Queues.Transfer[0], {}, {renderSemaphore});
 
-  //execute all sub-commands
-  std::vector<Graphics::Vulkan::Command::Command> renderCommands(processedMeshes.size());
-  for (uint32_t i = 0; i < processedMeshes.size(); i++)
-    renderCommands[i] = processedMeshes[i]->RenderCommand;
-  Graphics::Vulkan::Command::ExecuteCommands(Renderer, renderCommands);
-  Graphics::Vulkan::Command::EndRenderPass(Renderer);
-  Graphics::Vulkan::Command::End(Renderer);
+    //execute all sub-commands
+    std::vector<Graphics::Vulkan::Command::Command> renderCommands(processedMeshes.size());
+    for (uint32_t i = 0; i < processedMeshes.size(); i++)
+      renderCommands[i] = processedMeshes[i]->RenderCommand;
+    Graphics::Vulkan::Command::ExecuteCommands(renderer, renderCommands);
+    Graphics::Vulkan::Command::EndRenderPass(renderer);
+    Graphics::Vulkan::Command::End(renderer);
 
-  //submit primary command
-  Graphics::Vulkan::Command::Submit({Renderer}, device.Queues.Graphics[0], {RenderSemaphore}, {PresentSemaphore}, RenderFence);
-  //present the image
-  Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {PresentSemaphore});
+    //submit primary command
+    Graphics::Vulkan::Command::Submit({renderer}, device.Queues.Graphics[0], {renderSemaphore}, {presentSemaphore}, renderFence);
+    //present the image
+    Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {presentSemaphore});
+  });
 }
 
 Rendering::Rendering()

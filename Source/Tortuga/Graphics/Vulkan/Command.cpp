@@ -156,6 +156,20 @@ void Draw(Command data, uint32_t vertexCount, uint32_t instanceCount, uint32_t v
 {
   vkCmdDraw(data.Command, vertexCount, instanceCount, vertexOffset, instanceOffset);
 }
+void SetViewport(Command data, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+{
+  VkViewport viewport = {};
+  {
+    viewport.x = x;
+    viewport.y = y;
+    viewport.width = width;
+    viewport.height = height;
+    viewport.minDepth = 0;
+    viewport.maxDepth = 1;
+  }
+
+  vkCmdSetViewport(data.Command, 0, 1, &viewport);
+}
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {
   vkCmdDispatch(data.Command, x, y, z);

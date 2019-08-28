@@ -12,6 +12,8 @@ Framebuffer Create(Device::Device device, uint32_t width, uint32_t height, Rende
 {
   Framebuffer data = {};
   data.Device = device.Device;
+  data.Width = width;
+  data.Height = height;
 
   std::vector<VkImageView> attachments(imageViews.size());
   for (uint32_t i = 0; i < imageViews.size(); i++)
