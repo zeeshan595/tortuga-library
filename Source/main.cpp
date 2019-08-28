@@ -35,8 +35,8 @@ int main()
     //mesh data
     const auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
     const auto mesh = cube->AddComponent<Component::Mesh>();
-    mesh->Vertices = model.Vertices;
-    mesh->Indices = model.Indices;
+    mesh->SetVertices(model.Vertices);
+    mesh->SetIndices(model.Indices);
   }
 
   const auto monkey = Core::Entity::Create();
@@ -50,8 +50,8 @@ int main()
     //mesh data
     const auto model = Utils::IO::LoadObjFile("Models/Monkey.obj");
     const auto mesh = monkey->AddComponent<Component::Mesh>();
-    mesh->Vertices = model.Vertices;
-    mesh->Indices = model.Indices;
+    mesh->SetVertices(model.Vertices);
+    mesh->SetIndices(model.Indices);
   }
 
   float yRotation = 0.0f;
@@ -74,12 +74,12 @@ int main()
   }
 
   //remove components
-  cube->RemoveComponent<Component::Transform>();
-  cube->RemoveComponent<Component::Mesh>();
   camera->RemoveComponent<Component::Transform>();
   camera->RemoveComponent<Component::Camera>();
+  cube->RemoveComponent<Component::Transform>();
+  cube->RemoveComponent<Component::Mesh>();
   monkey->RemoveComponent<Component::Transform>();
-  monkey->RemoveComponent<Component::Camera>();
+  monkey->RemoveComponent<Component::Mesh>();
 
   //destroy entities
   Core::Entity::Destroy(cube);

@@ -70,7 +70,7 @@ void Rendering::Update()
         Graphics::Vulkan::Command::Begin(mesh->TransferCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
         //check if mesh vertices data is up to date
-        uint vertexBufferSize = mesh->Vertices.size() * sizeof(Graphics::Vertex);
+        uint vertexBufferSize = mesh->GetVerticesByteSize();
         if (mesh->StagingVertexBuffer.Buffer == VK_NULL_HANDLE || vertexBufferSize != mesh->StagingVertexBuffer.Size)
         {
           //delete old buffers if they exist
@@ -83,12 +83,12 @@ void Rendering::Update()
           mesh->StagingVertexBuffer = Graphics::Vulkan::Buffer::Create(device, vertexBufferSize, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
           mesh->VertexBuffer = Graphics::Vulkan::Buffer::Create(device, vertexBufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
           //copy data
-          Graphics::Vulkan::Buffer::SetData(mesh->StagingVertexBuffer, mesh->Vertices.data(), vertexBufferSize);
+          Graphics::Vulkan::Buffer::SetData(mesh->StagingVertexBuffer, mesh->GetVertices().data(), vertexBufferSize);
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingVertexBuffer, mesh->VertexBuffer);
         }
         //check if mesh indices data is up to date
-        uint32_t indexBufferSize = mesh->Indices.size() * sizeof(uint32_t);
+        uint32_t indexBufferSize = mesh->GetIndicesByteSize();
         if (mesh->StagingIndexBuffer.Buffer == VK_NULL_HANDLE || indexBufferSize != mesh->StagingIndexBuffer.Size)
         {
           //delete old buffers if they exist
@@ -101,7 +101,7 @@ void Rendering::Update()
           mesh->StagingIndexBuffer = Graphics::Vulkan::Buffer::Create(device, indexBufferSize, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
           mesh->IndexBuffer = Graphics::Vulkan::Buffer::Create(device, indexBufferSize, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
           //copy data
-          Graphics::Vulkan::Buffer::SetData(mesh->StagingIndexBuffer, mesh->Indices.data(), indexBufferSize);
+          Graphics::Vulkan::Buffer::SetData(mesh->StagingIndexBuffer, mesh->GetIndices().data(), indexBufferSize);
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingIndexBuffer, mesh->IndexBuffer);
         }
@@ -130,7 +130,7 @@ void Rendering::Update()
         Graphics::Vulkan::Command::BindPipeline(mesh->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, mesh->DescriptorSets);
         Graphics::Vulkan::Command::BindVertexBuffer(mesh->RenderCommand, {mesh->VertexBuffer});
         Graphics::Vulkan::Command::BindIndexBuffer(mesh->RenderCommand, mesh->IndexBuffer);
-        Graphics::Vulkan::Command::DrawIndexed(mesh->RenderCommand, mesh->Indices.size());
+        Graphics::Vulkan::Command::DrawIndexed(mesh->RenderCommand, mesh->GetIndices().size());
         Graphics::Vulkan::Command::End(mesh->TransferCommand);
         Graphics::Vulkan::Command::End(mesh->RenderCommand);
       }));

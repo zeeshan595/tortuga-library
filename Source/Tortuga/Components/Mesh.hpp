@@ -17,6 +17,11 @@ namespace Component
 struct Mesh
 {
 private:
+  std::vector<Graphics::Vertex> Vertices;
+  std::vector<uint32_t> Indices;
+  uint32_t VerticesByteSize = 0;
+  uint32_t IndicesByteSize = 0;
+
 public:
   Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool RenderCommandPool;
@@ -30,8 +35,6 @@ public:
   std::vector<Graphics::Vulkan::DescriptorSet::DescriptorSet> DescriptorSets;
   Graphics::Vulkan::Buffer::Buffer StagingUniformBuffer;
   Graphics::Vulkan::Buffer::Buffer UniformBuffer;
-  std::vector<Graphics::Vertex> Vertices;
-  std::vector<uint32_t> Indices;
 
   Mesh()
   {
@@ -75,6 +78,35 @@ public:
 
     if (UniformBuffer.Buffer != VK_NULL_HANDLE)
       Graphics::Vulkan::Buffer::Destroy(UniformBuffer);
+  }
+
+  void SetVertices(std::vector<Graphics::Vertex> vertices)
+  {
+    Vertices = vertices;
+    VerticesByteSize = vertices.size() * sizeof(Graphics::Vertex);
+  }
+
+  void SetIndices(std::vector<uint32_t> indices)
+  {
+    Indices = indices;
+    IndicesByteSize = indices.size() * sizeof(uint32_t);
+  }
+
+  std::vector<Graphics::Vertex> GetVertices()
+  {
+    return Vertices;
+  }
+  std::vector<uint32_t> GetIndices()
+  {
+    return Indices;
+  }
+  uint32_t GetVerticesByteSize()
+  {
+    return VerticesByteSize;
+  }
+  uint32_t GetIndicesByteSize()
+  {
+    return IndicesByteSize;
   }
 };
 } // namespace Component
