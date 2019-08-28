@@ -39,9 +39,8 @@ void Rendering::Update()
   //record a sub-command for each mesh
   std::vector<Component::Mesh *> processedMeshes;
   std::vector<std::future<void>> vulkanThreads;
-  auto allEntities = Core::Entity::GetAllEntities();
   std::vector<CameraInfo> cameraInfos;
-  for (auto entity : allEntities)
+  for (auto entity : Core::Entity::GetAllEntitiesWithComponent<Component::Camera>())
   {
     auto camera = entity->GetComponent<Component::Camera>();
     if (camera != nullptr)
@@ -59,7 +58,7 @@ void Rendering::Update()
       cameraInfos.push_back(cameraInfo);
     }
   }
-  for (auto entity : allEntities)
+  for (auto entity : Core::Entity::GetAllEntitiesWithComponent<Component::Mesh>())
   {
     auto mesh = entity->GetComponent<Component::Mesh>();
     if (mesh != nullptr)

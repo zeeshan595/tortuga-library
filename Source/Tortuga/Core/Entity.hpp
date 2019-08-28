@@ -82,12 +82,12 @@ struct Environment
 Entity *Create();
 void Destroy(Entity *data);
 std::vector<Entity *> GetAllEntities();
-std::vector<Entity *> GetALlEntitiesWithComponent(std::type_index type);
+std::vector<Entity *> GetAllEntitiesWithComponent(std::type_index type);
 template <typename T>
-std::vector<Entity *> GetALlEntitiesWithComponent()
+std::vector<Entity *> GetAllEntitiesWithComponent()
 {
   auto type = std::type_index(typeid(T));
-  return GetALlEntitiesWithComponent(type);
+  return GetAllEntitiesWithComponent(type);
 }
 } // namespace Entity
 } // namespace Core

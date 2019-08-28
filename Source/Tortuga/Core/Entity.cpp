@@ -60,9 +60,9 @@ std::vector<Entity *> GetAllEntities()
 {
   return environment.Entities;
 }
-std::vector<Entity *> GetALlEntitiesWithComponent(std::type_index type)
+std::vector<Entity *> GetAllEntitiesWithComponent(std::type_index type)
 {
-  if (environment.EntitiesWithComponent.find(type) == environment.EntitiesWithComponent.end())
+  if (environment.EntitiesWithComponent.find(type) != environment.EntitiesWithComponent.end())
     return environment.EntitiesWithComponent[type];
 
   return {};
