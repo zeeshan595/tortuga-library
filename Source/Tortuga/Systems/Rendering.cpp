@@ -118,7 +118,6 @@ void Rendering::Update()
         }
 
         //update ubo buffer
-
         Graphics::UniformBufferObject ubo = {};
         ubo.Projection = cameraPerspective;
         ubo.View = cameraView;

@@ -33,8 +33,23 @@ int main()
     transform->Scale = glm::vec3(1, 1, 1);
 
     //mesh data
-    const auto model = Utils::IO::LoadObjFile("Models/Monkey.obj");
+    const auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
     const auto mesh = cube->AddComponent<Component::Mesh>();
+    mesh->Vertices = model.Vertices;
+    mesh->Indices = model.Indices;
+  }
+
+  const auto monkey = Core::Entity::Create();
+  {
+    //transform data
+    const auto transform = monkey->AddComponent<Component::Transform>();
+    transform->Position = glm::vec3(0, 0, -10);
+    transform->Rotation = glm::vec4(0, 0, 0, 1);
+    transform->Scale = glm::vec3(1, 1, 1);
+
+    //mesh data
+    const auto model = Utils::IO::LoadObjFile("Models/Monkey.obj");
+    const auto mesh = monkey->AddComponent<Component::Mesh>();
     mesh->Vertices = model.Vertices;
     mesh->Indices = model.Indices;
   }
@@ -63,10 +78,13 @@ int main()
   cube->RemoveComponent<Component::Mesh>();
   camera->RemoveComponent<Component::Transform>();
   camera->RemoveComponent<Component::Camera>();
+  monkey->RemoveComponent<Component::Transform>();
+  monkey->RemoveComponent<Component::Camera>();
 
   //destroy entities
   Core::Entity::Destroy(cube);
   Core::Entity::Destroy(camera);
+  Core::Entity::Destroy(monkey);
 
   //destroy systems
   Core::DestroySystem<Systems::Rendering>();
