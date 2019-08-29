@@ -167,8 +167,14 @@ void SetViewport(Command data, uint32_t x, uint32_t y, uint32_t width, uint32_t 
     viewport.minDepth = 0;
     viewport.maxDepth = 1;
   }
+  VkRect2D scissor = {};
+  {
+    scissor.offset = {x, y};
+    scissor.extent = {width, height};
+  }
 
   vkCmdSetViewport(data.Command, 0, 1, &viewport);
+  vkCmdSetScissor(data.Command, 0, 1, &scissor);
 }
 void Compute(Command data, uint32_t x, uint32_t y, uint32_t z)
 {

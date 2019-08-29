@@ -68,7 +68,7 @@ void Rendering::Update()
         cameraInfo.ViewportSize = camera->ViewportSize;
         const auto transform = entity->GetComponent<Component::Transform>();
         if (transform)
-          cameraInfo.View = transform->GetModelMatrix();
+          cameraInfo.View = glm::inverse(transform->GetModelMatrix());
       }
       cameraInfos.push_back(cameraInfo);
     }
@@ -299,7 +299,6 @@ Rendering::Rendering()
       device,
       VertexShader, FragmentShader,
       RenderPass,
-      swapchain.Extent.width, swapchain.Extent.height,
       {Graphics::Vertex::getBindingDescription()},
       Graphics::Vertex::getAttributeDescriptions(),
       DescriptorLayouts);

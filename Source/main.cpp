@@ -13,7 +13,7 @@ int main()
   const auto camera = Core::Entity::Create();
   {
     const auto transform = camera->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, -10);
+    transform->Position = glm::vec3(0, 10, 30);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
 
     const auto comp = camera->AddComponent<Component::Camera>();
@@ -24,7 +24,7 @@ int main()
   const auto camera2 = Core::Entity::Create();
   {
     const auto transform = camera2->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, -3);
+    transform->Position = glm::vec3(0, 3, 15);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
 
     const auto comp = camera2->AddComponent<Component::Camera>();
@@ -40,17 +40,17 @@ int main()
     light->AddComponent<Component::Light>();
   }
 
-  const auto monkey = Core::Entity::Create();
+  const auto dragon = Core::Entity::Create();
   {
     //transform data
-    const auto transform = monkey->AddComponent<Component::Transform>();
+    const auto transform = dragon->AddComponent<Component::Transform>();
     transform->Position = glm::vec3(0, 0, 0);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
     transform->Scale = glm::vec3(1, 1, 1);
 
     //mesh data
-    const auto model = Utils::IO::LoadObjFile("Models/Monkey.obj");
-    const auto mesh = monkey->AddComponent<Component::Mesh>();
+    const auto model = Utils::IO::LoadObjFile("Models/Dragon.obj");
+    const auto mesh = dragon->AddComponent<Component::Mesh>();
     mesh->SetVertices(model.Vertices);
     mesh->SetIndices(model.Indices);
   }
@@ -67,7 +67,7 @@ int main()
     if (event.window.event == SDL_WINDOWEVENT_CLOSE)
       shouldClose = true;
 
-    monkey->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
+    dragon->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
 
     //iterate through all system and execute update functions
     Core::IterateSystemLoop();
@@ -79,15 +79,15 @@ int main()
   camera->RemoveComponent<Component::Camera>();
   camera2->RemoveComponent<Component::Transform>();
   camera2->RemoveComponent<Component::Camera>();
-  monkey->RemoveComponent<Component::Transform>();
-  monkey->RemoveComponent<Component::Mesh>();
+  dragon->RemoveComponent<Component::Transform>();
+  dragon->RemoveComponent<Component::Mesh>();
   light->RemoveComponent<Component::Transform>();
   light->RemoveComponent<Component::Light>();
 
   //destroy entities
   Core::Entity::Destroy(camera);
   Core::Entity::Destroy(camera2);
-  Core::Entity::Destroy(monkey);
+  Core::Entity::Destroy(dragon);
   Core::Entity::Destroy(light);
 
   //destroy systems

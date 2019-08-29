@@ -20,7 +20,6 @@ Pipeline CreateGraphicsPipeline(
     Shader::Shader vertexShader,
     Shader::Shader fragmentShader,
     RenderPass::RenderPass renderPass,
-    uint32_t width, uint32_t height,
     std::vector<VkVertexInputBindingDescription> bindings,
     std::vector<VkVertexInputAttributeDescription> attributes,
     std::vector<DescriptorLayout::DescriptorLayout> descriptorSetLayouts)
@@ -49,8 +48,8 @@ Pipeline CreateGraphicsPipeline(
   {
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = width;
-    viewport.height = height;
+    viewport.width = 0;
+    viewport.height = 0;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
   }
@@ -58,7 +57,7 @@ Pipeline CreateGraphicsPipeline(
   VkRect2D scissor = {};
   {
     scissor.offset = {0, 0};
-    scissor.extent = {width, height};
+    scissor.extent = {0, 0};
   }
 
   VkPipelineViewportStateCreateInfo viewportState = {};
@@ -135,7 +134,7 @@ Pipeline CreateGraphicsPipeline(
     colorBlending.blendConstants[3] = 0.0f; // Optional
   }
 
-  std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH};
+  std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_LINE_WIDTH};
 
   VkPipelineDynamicStateCreateInfo dynamicState = {};
   {

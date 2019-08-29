@@ -18,9 +18,14 @@ layout(location = 2) in vec3 inTexture;
 
 layout(location = 0) out vec3 surfaceNormal;
 layout(location = 1) out vec3 lightVectors;
+layout(location = 2) out vec3 cameraVector;
 
 void main() {
-  gl_Position = ubo.projection * ubo.view * ubo.model * vec4(inPosition, 1.0);
+  vec4 worldPosition = ubo.model * vec4(inPosition, 1.0);
   surfaceNormal = (ubo.model * vec4(inNormal, 0.0)).xyz;
   lightVectors = lights[0].position.xyz - inPosition.xyz;
+  cameraVector = (inverse(ubo.view) * vec4(0., 0., 0., 1.)).xyz - worldPosition.xyz;
+
+  
+  gl_Position = ubo.projection * ubo.view * worldPosition;
 }
