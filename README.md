@@ -5,10 +5,10 @@ Tortuga is a open source Game Engine built in C++ 11. Tortuga ONLY uses vulkan f
 **Key Features**
 
 * Multi-Threaded Rendering
-* Ray Marching (Signed Distance) _[NOT IMPLIMENTED]_
 * Data Oriented Design
+* Entity Component System
+* Ray Marching (Signed Distance) _[NOT IMPLIMENTED]_
 * Multi GPU Support (Split Screen) _[NOT IMPLIMENTED]_
-* OBJ Support
 
 **Required Resources**
 
