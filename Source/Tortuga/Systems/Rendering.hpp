@@ -28,6 +28,7 @@
 #include "../Components/Transform.hpp"
 #include "../Components/Mesh.hpp"
 #include "../Components/Camera.hpp"
+#include "../Components/Light.hpp"
 
 namespace Tortuga
 {
@@ -36,10 +37,15 @@ namespace Systems
 class Rendering : public Core::System
 {
 private:
+  Graphics::Vulkan::Command::Command TransferCommand;
+  Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
   Graphics::Vulkan::Shader::Shader VertexShader;
   Graphics::Vulkan::Shader::Shader FragmentShader;
   Graphics::Vulkan::RenderPass::RenderPass RenderPass;
+  Graphics::Vulkan::DescriptorPool::DescriptorPool LightDescriptorPool;
+  Graphics::Vulkan::DescriptorSet::DescriptorSet LightDescriptorSet;
+  Graphics::Vulkan::Buffer::Buffer LightsBuffer;
   std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> DescriptorLayouts;
   Graphics::Vulkan::Pipeline::Pipeline Pipeline;
   std::vector<Graphics::Vulkan::Framebuffer::Framebuffer> Framebuffers;

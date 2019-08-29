@@ -93,6 +93,8 @@ int main()
   //remove components
   camera->RemoveComponent<Component::Transform>();
   camera->RemoveComponent<Component::Camera>();
+  camera2->RemoveComponent<Component::Transform>();
+  camera2->RemoveComponent<Component::Camera>();
   cube->RemoveComponent<Component::Transform>();
   cube->RemoveComponent<Component::Mesh>();
   monkey->RemoveComponent<Component::Transform>();
@@ -103,6 +105,7 @@ int main()
   //destroy entities
   Core::Entity::Destroy(cube);
   Core::Entity::Destroy(camera);
+  Core::Entity::Destroy(camera2);
   Core::Entity::Destroy(monkey);
   Core::Entity::Destroy(light);
 

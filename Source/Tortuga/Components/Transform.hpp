@@ -31,6 +31,15 @@ struct Transform
     transform = glm::scale(transform, Scale);
     return transform;
   }
+
+  glm::vec3 GetForward()
+  {
+    glm::mat4 transform = glm::mat4(1.0);
+    transform = glm::rotate(transform, Rotation.x, glm::vec3(Rotation.w, 0, 0));
+    transform = glm::rotate(transform, Rotation.y, glm::vec3(0, Rotation.w, 0));
+    transform = glm::rotate(transform, Rotation.z, glm::vec3(0, 0, Rotation.w));
+    return glm::normalize(glm::vec3(glm::inverse(transform)[2]));
+  }
 };
 } // namespace Component
 } // namespace Tortuga
