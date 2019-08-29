@@ -17,8 +17,8 @@ namespace Sampler
 {
 struct Sampler
 {
-  VkDevice Device;
-  VkSampler Sampler;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkSampler Sampler = VK_NULL_HANDLE;
 };
 Sampler Create(Device::Device device);
 void Destroy(Sampler data);

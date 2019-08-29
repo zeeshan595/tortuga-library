@@ -17,8 +17,8 @@ namespace Buffer
 {
 struct Buffer
 {
-  VkDevice Device;
-  VkBuffer Buffer;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkBuffer Buffer = VK_NULL_HANDLE;
   VkMemoryRequirements MemoryRequirements;
   VkDeviceMemory Memory;
   uint32_t Size;

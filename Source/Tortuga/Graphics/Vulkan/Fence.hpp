@@ -16,8 +16,8 @@ namespace Fence
 {
 struct Fence
 {
-  VkDevice Device;
-  VkFence Fence;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkFence Fence = VK_NULL_HANDLE;
 };
 
 Fence Create(Device::Device device, bool signaled = false);

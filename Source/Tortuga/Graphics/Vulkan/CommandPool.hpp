@@ -16,8 +16,8 @@ namespace CommandPool
 {
 struct CommandPool
 {
-  VkDevice Device;
-  VkCommandPool CommandPool;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkCommandPool CommandPool = VK_NULL_HANDLE;
 };
 
 CommandPool Create(Device::Device device, uint32_t queueFamilyIndex);

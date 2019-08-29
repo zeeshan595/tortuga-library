@@ -17,9 +17,9 @@ namespace ImageView
 {
 struct ImageView
 {
-  VkDevice Device;
-  VkImage Image;
-  VkImageView View;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkImage Image = VK_NULL_HANDLE;
+  VkImageView View = VK_NULL_HANDLE;
 };
 ImageView Create(Device::Device device, Image::Image image, VkImageAspectFlags aspectFlags);
 ImageView Create(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);

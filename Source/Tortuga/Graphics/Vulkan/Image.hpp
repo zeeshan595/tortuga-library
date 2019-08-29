@@ -16,9 +16,9 @@ namespace Image
 {
 struct Image
 {
-  VkDevice Device;
-  VkImage Image;
-  VkDeviceMemory Memory;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkImage Image = VK_NULL_HANDLE;
+  VkDeviceMemory Memory = VK_NULL_HANDLE;
   VkFormat Format;
   uint32_t Width;
   uint32_t Height;

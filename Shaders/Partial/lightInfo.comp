@@ -1,0 +1,9 @@
+struct LightInfo
+{
+  vec4 position;
+  vec4 forward;
+  vec4 color;
+  uint type;
+  float intensity;
+  float range;
+};

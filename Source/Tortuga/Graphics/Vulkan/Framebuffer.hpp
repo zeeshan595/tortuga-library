@@ -18,8 +18,8 @@ namespace Framebuffer
 {
 struct Framebuffer 
 {
-  VkDevice Device;
-  VkFramebuffer Framebuffer;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkFramebuffer Framebuffer = VK_NULL_HANDLE;
   uint32_t Width;
   uint32_t Height;
 };

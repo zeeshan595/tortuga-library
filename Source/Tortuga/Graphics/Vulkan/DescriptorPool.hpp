@@ -18,8 +18,8 @@ namespace DescriptorPool
 {
 struct DescriptorPool
 {
-  VkDevice Device;
-  VkDescriptorPool Pool;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkDescriptorPool Pool = VK_NULL_HANDLE;
   uint32_t DescriptorSetCounts;
 };
 

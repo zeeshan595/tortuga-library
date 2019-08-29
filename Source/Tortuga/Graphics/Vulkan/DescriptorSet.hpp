@@ -19,8 +19,8 @@ namespace DescriptorSet
 {
 struct DescriptorSet
 {
-  VkDevice Device;
-  VkDescriptorSet set;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkDescriptorSet set = VK_NULL_HANDLE;
   DescriptorPool::DescriptorPool Pool;
   DescriptorLayout::DescriptorLayout Layout;
 };

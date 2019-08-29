@@ -19,11 +19,11 @@ namespace Pipeline
 {
 struct Pipeline
 {
-  VkDevice Device;
-  VkPipelineLayout Layout;
-  VkPipeline Pipeline;
-  VkRenderPass RenderPass;
-  VkPipelineCache Cache;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkPipelineLayout Layout = VK_NULL_HANDLE;
+  VkPipeline Pipeline = VK_NULL_HANDLE;
+  VkRenderPass RenderPass = VK_NULL_HANDLE;
+  VkPipelineCache Cache = VK_NULL_HANDLE;
 };
 
 Pipeline CreateGraphicsPipeline(

@@ -31,8 +31,8 @@ enum Type
 };
 struct Command
 {
-  VkDevice Device;
-  VkCommandBuffer Command;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkCommandBuffer Command = VK_NULL_HANDLE;
   Type CommandType;
 };
 

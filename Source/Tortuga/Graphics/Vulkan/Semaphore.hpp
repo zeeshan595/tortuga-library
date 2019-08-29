@@ -16,8 +16,8 @@ namespace Semaphore
 {
 struct Semaphore
 {
-  VkDevice device;
-  VkSemaphore Semaphore;
+  VkDevice device = VK_NULL_HANDLE;
+  VkSemaphore Semaphore = VK_NULL_HANDLE;
 };
 
 Semaphore Create(Device::Device device);

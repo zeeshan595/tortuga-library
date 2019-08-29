@@ -275,7 +275,7 @@ Rendering::Rendering()
   DescriptorLayouts.resize(2);
   {
     DescriptorLayouts[0] = Graphics::Vulkan::DescriptorLayout::Create(device, 1, VK_SHADER_STAGE_VERTEX_BIT);
-    DescriptorLayouts[1] = Graphics::Vulkan::DescriptorLayout::Create(device, 1, VK_SHADER_STAGE_FRAGMENT_BIT);
+    DescriptorLayouts[1] = Graphics::Vulkan::DescriptorLayout::Create(device, 1, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
   }
 
   //light descriptors

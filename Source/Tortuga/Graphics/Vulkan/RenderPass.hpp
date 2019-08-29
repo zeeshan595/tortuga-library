@@ -17,8 +17,8 @@ namespace RenderPass
 {
 struct RenderPass 
 {
-  VkDevice Device;
-  VkRenderPass RenderPass;
+  VkDevice Device = VK_NULL_HANDLE;
+  VkRenderPass RenderPass = VK_NULL_HANDLE;
   std::vector<VkAttachmentDescription> Attachments;
 };
 

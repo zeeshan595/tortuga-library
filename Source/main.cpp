@@ -35,7 +35,7 @@ int main()
   const auto light = Core::Entity::Create();
   {
     const auto transform = light->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 2, 0);
+    transform->Position = glm::vec3(-1, 5, -1);
 
     light->AddComponent<Component::Light>();
   }
@@ -45,7 +45,7 @@ int main()
   {
     //transform data
     const auto transform = cube->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, 0);
+    transform->Position = glm::vec3(0, 0, 5);
     transform->Rotation = glm::vec4(0, 0, 0, 1);
     transform->Scale = glm::vec3(1, 1, 1);
 
@@ -83,7 +83,7 @@ int main()
     if (event.window.event == SDL_WINDOWEVENT_CLOSE)
       shouldClose = true;
 
-    cube->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
+    monkey->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
 
     //iterate through all system and execute update functions
     Core::IterateSystemLoop();
