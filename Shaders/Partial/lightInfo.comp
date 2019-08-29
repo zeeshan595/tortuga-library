@@ -7,3 +7,5 @@ struct LightInfo
   float intensity;
   float range;
 };
+
+#define LIGHTS_AMOUNT 16

@@ -35,7 +35,7 @@ int main()
   const auto light = Core::Entity::Create();
   {
     const auto transform = light->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(-3, 5, -3);
+    transform->Position = glm::vec3(3, 5, 3);
 
     light->AddComponent<Component::Light>();
   }

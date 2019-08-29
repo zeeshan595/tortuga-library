@@ -19,6 +19,7 @@ struct CameraInfo
     ViewportSize = glm::vec2(1, 1);
   }
 };
+#define MAX_LIGHTS_AMOUNT 16
 struct LightInfo
 {
   glm::vec4 Position;
@@ -55,6 +56,7 @@ void Rendering::Update()
   std::vector<Component::Mesh *> processedMeshes;
   std::vector<std::future<void>> vulkanThreads;
   std::vector<CameraInfo> cameraInfos;
+  //get camera infos from all active cameras in the scene
   for (auto entity : Core::Entity::GetAllEntitiesWithComponent<Component::Camera>())
   {
     const auto camera = entity->GetComponent<Component::Camera>();
@@ -73,18 +75,22 @@ void Rendering::Update()
       cameraInfos.push_back(cameraInfo);
     }
   }
+  //setup light buffers from lights in the scene
   const auto lights = Core::Entity::GetAllEntitiesWithComponent<Component::Light>();
-  //setup light buffer
-  if (LightsBuffer.Buffer == VK_NULL_HANDLE || LightsBuffer.Size != lights.size())
+  if (LightsBuffer.Buffer == VK_NULL_HANDLE)
   {
     if (LightsBuffer.Buffer != VK_NULL_HANDLE)
       Graphics::Vulkan::Buffer::Destroy(LightsBuffer);
-    LightsBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(LightInfo) * lights.size(), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    LightsBuffer = Graphics::Vulkan::Buffer::Create(device, (sizeof(LightInfo) * MAX_LIGHTS_AMOUNT), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   }
-  float lightBufferOffset = 0;
   Graphics::Vulkan::Command::Begin(TransferCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+  float lightBufferOffset = 0;
+  //copy the light data into light info
   for (uint32_t i = 0; i < lights.size(); i++)
   {
+    if (lights.size() == MAX_LIGHTS_AMOUNT)
+      break;
+
     auto lightInfo = LightInfo();
     const auto light = lights[i]->GetComponent<Component::Light>();
     if (light->StagingLightBuffer.Buffer == VK_NULL_HANDLE)
@@ -109,6 +115,7 @@ void Rendering::Update()
   }
   Graphics::Vulkan::Command::End(TransferCommand);
   Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(LightDescriptorSet, {LightsBuffer});
+  //go through each mesh
   for (auto entity : Core::Entity::GetAllEntitiesWithComponent<Component::Mesh>())
   {
     const auto mesh = entity->GetComponent<Component::Mesh>();
