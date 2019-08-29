@@ -35,25 +35,9 @@ int main()
   const auto light = Core::Entity::Create();
   {
     const auto transform = light->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(-1, 5, -1);
+    transform->Position = glm::vec3(-3, 5, -3);
 
     light->AddComponent<Component::Light>();
-  }
-
-  //create cube entity
-  const auto cube = Core::Entity::Create();
-  {
-    //transform data
-    const auto transform = cube->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, 5);
-    transform->Rotation = glm::vec4(0, 0, 0, 1);
-    transform->Scale = glm::vec3(1, 1, 1);
-
-    //mesh data
-    const auto model = Utils::IO::LoadObjFile("Models/Cube.obj");
-    const auto mesh = cube->AddComponent<Component::Mesh>();
-    mesh->SetVertices(model.Vertices);
-    mesh->SetIndices(model.Indices);
   }
 
   const auto monkey = Core::Entity::Create();
@@ -95,15 +79,12 @@ int main()
   camera->RemoveComponent<Component::Camera>();
   camera2->RemoveComponent<Component::Transform>();
   camera2->RemoveComponent<Component::Camera>();
-  cube->RemoveComponent<Component::Transform>();
-  cube->RemoveComponent<Component::Mesh>();
   monkey->RemoveComponent<Component::Transform>();
   monkey->RemoveComponent<Component::Mesh>();
   light->RemoveComponent<Component::Transform>();
   light->RemoveComponent<Component::Light>();
 
   //destroy entities
-  Core::Entity::Destroy(cube);
   Core::Entity::Destroy(camera);
   Core::Entity::Destroy(camera2);
   Core::Entity::Destroy(monkey);

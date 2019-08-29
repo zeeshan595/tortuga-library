@@ -190,7 +190,7 @@ void Rendering::Update()
           mesh->UniformBufferPool.clear();
           mesh->UniformBufferSets.clear();
 
-          for (auto camera : cameraInfos)
+          for (uint32_t i = 0; i < cameraInfos.size(); i++)
           {
             auto descriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, descriptorLayouts);
             auto descriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, descriptorPool, descriptorLayouts[0]);
@@ -234,33 +234,31 @@ void Rendering::Update()
   for (uint32_t i = 0; i < vulkanThreads.size(); i++)
     vulkanThreads[i].wait();
 
-  //launch present task in a new thread
+  //submit commands and present the image
   const auto renderer = Renderer;
   const auto renderSemaphore = RenderSemaphore;
   const auto presentSemaphore = PresentSemaphore;
   const auto renderFence = RenderFence;
   const auto transferCommand = TransferCommand;
-  std::async(std::launch::async, [device, processedMeshes, renderer, swapchain, swapchainIndex, renderSemaphore, presentSemaphore, renderFence, transferCommand] {
-    //transfer commands
-    std::vector<Graphics::Vulkan::Command::Command> transferCommands(processedMeshes.size());
-    for (uint32_t i = 0; i < processedMeshes.size(); i++)
-      transferCommands[i] = processedMeshes[i]->TransferCommand;
-    transferCommands.push_back(transferCommand);
-    Graphics::Vulkan::Command::Submit(transferCommands, device.Queues.Transfer[0], {}, {renderSemaphore});
+  //transfer commands
+  std::vector<Graphics::Vulkan::Command::Command> transferCommands(processedMeshes.size());
+  for (uint32_t i = 0; i < processedMeshes.size(); i++)
+    transferCommands[i] = processedMeshes[i]->TransferCommand;
+  transferCommands.push_back(transferCommand);
+  Graphics::Vulkan::Command::Submit(transferCommands, device.Queues.Transfer[0], {}, {renderSemaphore});
 
-    //execute all sub-commands
-    std::vector<Graphics::Vulkan::Command::Command> renderCommands(processedMeshes.size());
-    for (uint32_t i = 0; i < processedMeshes.size(); i++)
-      renderCommands[i] = processedMeshes[i]->RenderCommand;
-    Graphics::Vulkan::Command::ExecuteCommands(renderer, renderCommands);
-    Graphics::Vulkan::Command::EndRenderPass(renderer);
-    Graphics::Vulkan::Command::End(renderer);
+  //execute all sub-commands
+  std::vector<Graphics::Vulkan::Command::Command> renderCommands(processedMeshes.size());
+  for (uint32_t i = 0; i < processedMeshes.size(); i++)
+    renderCommands[i] = processedMeshes[i]->RenderCommand;
+  Graphics::Vulkan::Command::ExecuteCommands(renderer, renderCommands);
+  Graphics::Vulkan::Command::EndRenderPass(renderer);
+  Graphics::Vulkan::Command::End(renderer);
 
-    //submit primary command
-    Graphics::Vulkan::Command::Submit({renderer}, device.Queues.Graphics[0], {renderSemaphore}, {presentSemaphore}, renderFence);
-    //present the image
-    Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {presentSemaphore});
-  });
+  //submit primary command
+  Graphics::Vulkan::Command::Submit({renderer}, device.Queues.Graphics[0], {renderSemaphore}, {presentSemaphore}, renderFence);
+  //present the image
+  Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {presentSemaphore});
 }
 
 Rendering::Rendering()

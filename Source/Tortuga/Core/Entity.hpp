@@ -14,7 +14,14 @@ namespace Core
 {
 namespace Entity
 {
-struct Environment;
+struct Entity;
+struct Environment
+{
+  std::vector<Entity *> Entities;
+  std::unordered_map<std::type_index, std::vector<Entity *>> EntitiesWithComponent;
+  Environment() {}
+  ~Environment();
+};
 struct Entity
 {
 private:
@@ -39,10 +46,13 @@ public:
     this->Components[type] = temp;
 
     auto environment = GetEnvironment();
-    if (environment->EntitiesWithComponent.find(type) != environment->EntitiesWithComponent.end())
-      environment->EntitiesWithComponent[type].push_back(this);
-    else
-      environment->EntitiesWithComponent[type] = {this};
+    if (environment != nullptr)
+    {
+      if (environment->EntitiesWithComponent.find(type) != environment->EntitiesWithComponent.end())
+        environment->EntitiesWithComponent[type].push_back(this);
+      else
+        environment->EntitiesWithComponent[type] = {this};
+    }
 
     return temp;
   }
@@ -54,8 +64,11 @@ public:
       return;
 
     auto environment = GetEnvironment();
-    auto entityWithComponentIndex = std::find(environment->EntitiesWithComponent[type].begin(), environment->EntitiesWithComponent[type].end(), this);
-    GetEnvironment()->EntitiesWithComponent[type].erase(entityWithComponentIndex);
+    if (environment != nullptr)
+    {
+      auto entityWithComponentIndex = std::find(environment->EntitiesWithComponent[type].begin(), environment->EntitiesWithComponent[type].end(), this);
+      environment->EntitiesWithComponent[type].erase(entityWithComponentIndex);
+    }
     delete static_cast<T *>(this->Components[type]);
     this->Components.erase(type);
   }
@@ -72,12 +85,6 @@ public:
   Entity();
   ~Entity();
   std::string GetGUID();
-};
-struct Environment
-{
-  std::vector<Entity *> Entities;
-  std::unordered_map<std::type_index, std::vector<Entity *>> EntitiesWithComponent;
-  ~Environment();
 };
 Entity *Create();
 void Destroy(Entity *data);
