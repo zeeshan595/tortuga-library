@@ -129,6 +129,7 @@ void Rendering::Update()
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingVertexBuffer, mesh->VertexBuffer);
         }
+
         //indices
         uint32_t indexBufferSize = mesh->GetIndicesByteSize();
         if (mesh->StagingIndexBuffer.Buffer == VK_NULL_HANDLE || indexBufferSize != mesh->StagingIndexBuffer.Size)
@@ -147,6 +148,7 @@ void Rendering::Update()
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingIndexBuffer, mesh->IndexBuffer);
         }
+        
         //uniform
         if (mesh->UniformBufferPool.size() != cameraInfos.size())
         {
@@ -174,41 +176,45 @@ void Rendering::Update()
             Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(descriptorSet, {uniformBuffer});
           }
         }
-        //lights
-        if (mesh->StagingLightBuffer.Buffer == VK_NULL_HANDLE)
-        {
-          mesh->StagingLightBuffer = Graphics::Vulkan::Buffer::CreateHostSrc(device, sizeof(glm::vec4) + (sizeof(LightInfo) * MAX_LIGHT_NUM));
-          mesh->LightBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(glm::vec4) + (sizeof(LightInfo) * MAX_LIGHT_NUM), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
-          Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(mesh->LightBufferSets, {mesh->LightBuffer});
-        }
-        auto lights = mesh->GetLights();
-        std::vector<LightInfo> lightInfos(lights.size());
-        uint32_t totalLights = 0;
-        for (uint32_t i = 0; i < lights.size(); i++)
-        {
-          if (totalLights >= MAX_LIGHT_NUM)
-            break;
 
-          auto light = lights[i]->GetComponent<Component::Light>();
-          if (!light)
-            continue;
-          if (light->IsEnabled == false)
-            continue;
-          auto transform = lights[i]->GetComponent<Component::Transform>();
-          if (transform != nullptr)
+        //lights
+        {
+          if (mesh->StagingLightBuffer.Buffer == VK_NULL_HANDLE)
           {
-            lightInfos[i].Position = glm::vec4(transform->Position, 1.0f);
-            lightInfos[i].Forward = glm::vec4(transform->GetForward(), 1.0f);
+            mesh->StagingLightBuffer = Graphics::Vulkan::Buffer::CreateHostSrc(device, sizeof(glm::vec4) + (sizeof(LightInfo) * MAX_LIGHT_NUM));
+            mesh->LightBuffer = Graphics::Vulkan::Buffer::Create(device, sizeof(glm::vec4) + (sizeof(LightInfo) * MAX_LIGHT_NUM), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+            Graphics::Vulkan::DescriptorSet::UpdateDescriptorSets(mesh->LightBufferSets, {mesh->LightBuffer});
           }
-          lightInfos[i].Intensity = light->Intensity;
-          lightInfos[i].Range = light->Range;
-          lightInfos[i].Color = light->Color;
-          totalLights++;
+          auto lights = mesh->GetLights();
+          std::vector<LightInfo> lightInfos(lights.size());
+          uint32_t totalLights = 0;
+          for (uint32_t i = 0; i < lights.size(); i++)
+          {
+            if (totalLights >= MAX_LIGHT_NUM)
+              break;
+
+            auto light = lights[i]->GetComponent<Component::Light>();
+            if (!light)
+              continue;
+            if (light->IsEnabled == false)
+              continue;
+            auto transform = lights[i]->GetComponent<Component::Transform>();
+            if (transform != nullptr)
+            {
+              lightInfos[i].Position = glm::vec4(transform->Position, 1.0f);
+              lightInfos[i].Forward = glm::vec4(transform->GetForward(), 1.0f);
+            }
+            lightInfos[i].Intensity = light->Intensity;
+            lightInfos[i].Range = light->Range;
+            lightInfos[i].Color = light->Color;
+            totalLights++;
+          }
+          Graphics::Vulkan::Buffer::SetData(mesh->StagingLightBuffer, &totalLights, sizeof(uint32_t));
+          Graphics::Vulkan::Buffer::SetData(mesh->StagingLightBuffer, lightInfos.data(), lightInfos.size() * sizeof(LightInfo), sizeof(glm::vec4));
+          Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingLightBuffer, mesh->LightBuffer);
         }
-        Graphics::Vulkan::Buffer::SetData(mesh->StagingLightBuffer, &totalLights, sizeof(uint32_t));
-        Graphics::Vulkan::Buffer::SetData(mesh->StagingLightBuffer, lightInfos.data(), lightInfos.size() * sizeof(LightInfo), sizeof(glm::vec4));
-        Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingLightBuffer, mesh->LightBuffer);
-        //for each camera
+
+        //record render commands for each camera
         for (uint32_t i = 0; i < cameraInfos.size(); i++)
         {
           auto camera = cameraInfos[i];
