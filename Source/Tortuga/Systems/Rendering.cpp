@@ -374,7 +374,6 @@ void AutoFetchLightsForMesh(Component::Mesh *mesh, Component::Transform *transfo
     if (lightsToUse.size() >= MAX_LIGHT_NUM)
       break;
 
-    const auto light = lightE->GetComponent<Component::Light>();
     lightsToUse.push_back(lightE);
   }
 
