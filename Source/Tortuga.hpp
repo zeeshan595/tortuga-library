@@ -9,7 +9,7 @@
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
-//Internal Graphics API
+//Vulkan library
 #include "./Tortuga/Graphics/Vulkan/ErrorCheck.hpp"
 #include "./Tortuga/Graphics/Vulkan/Instance.hpp"
 #include "./Tortuga/Graphics/Vulkan/Device.hpp"
@@ -26,6 +26,9 @@
 #include "./Tortuga/Graphics/Vulkan/DescriptorPool.hpp"
 #include "./Tortuga/Graphics/Vulkan/DescriptorSet.hpp"
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
+
+//imgui
+#include "./Tortuga/Graphics/Imgui/imgui.h"
 
 //Core
 #include "./Tortuga/Core/GUID.hpp"
