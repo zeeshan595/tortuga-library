@@ -13,32 +13,27 @@ Instance Create(bool enableWindowSupport)
   Instance data = {};
   data.ShaderCompiler = shaderc_compiler_initialize();
 
-  if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
-  {
-    Console::Fatal("Failed to initialize SDL");
-  }
+  if (!glfwInit())
+    Console::Fatal("Failed to initialize GLFW");
 
-  std::vector<const char *> extensions(0);
-  SDL_Window *window = nullptr;
+  std::vector<const char *> extensions;
+  GLFWwindow *window = nullptr;
   if (enableWindowSupport)
   {
-    window = SDL_CreateWindow("Vulkan Helper", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 200, SDL_WINDOW_VULKAN | SDL_WINDOW_BORDERLESS);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    window = glfwCreateWindow(400, 200, "Vulkan Helper", nullptr, nullptr);
     if (window == nullptr)
     {
       Console::Fatal("Failed to create SDL Window");
     }
     uint32_t extensionsCount = 0;
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, nullptr))
-    {
-      Console::Fatal("Failed to get window extensions required for vulkan init");
-    }
-    extensions.resize(extensionsCount);
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsCount, extensions.data()))
-    {
-      Console::Fatal("Failed to get window extensions required for vulkan init");
-    }
+    auto windowExtensions = glfwGetRequiredInstanceExtensions(&extensionsCount);
+    uint32_t currentExtensionSize = extensions.size();
+    extensions.resize(currentExtensionSize + extensionsCount);
+    for (uint32_t i = 0; i < extensions.size(); i++)
+      extensions[i + currentExtensionSize] = windowExtensions[i];
   }
-  std::vector<const char*> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
+  std::vector<const char *> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
   extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
   extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
@@ -67,10 +62,7 @@ Instance Create(bool enableWindowSupport)
   VkSurfaceKHR surface = VK_NULL_HANDLE;
   if (enableWindowSupport)
   {
-    if (!SDL_Vulkan_CreateSurface(window, data.Instance, &surface))
-    {
-      Console::Fatal("Failed to create vulkan surface for a window");
-    }
+    ErrorCheck::Callback(glfwCreateWindowSurface(data.Instance, window, nullptr, &surface));
   }
 
   uint32_t deviceCount = 0;
@@ -90,7 +82,8 @@ Instance Create(bool enableWindowSupport)
   if (enableWindowSupport)
   {
     vkDestroySurfaceKHR(data.Instance, surface, nullptr);
-    SDL_DestroyWindow(window);
+    glfwSetWindowShouldClose(window, true);
+    while (!glfwWindowShouldClose(window)){}
   }
 
   return data;
@@ -105,7 +98,7 @@ void Destroy(Instance data)
 
   vkDestroyInstance(data.Instance, nullptr);
   shaderc_compiler_release(data.ShaderCompiler);
-  SDL_Quit();
+  glfwTerminate();
 }
 } // namespace Instance
 } // namespace Vulkan

@@ -11,7 +11,7 @@ namespace Core
 {
 namespace Screen
 {
-SDL_Event PollEvents();
+bool PollEvents();
 void SetWindowTitle(std::string title);
 void ResizeWindow(uint32_t width, uint32_t height);
 std::vector<int32_t> GetWindowSize();

@@ -59,15 +59,8 @@ int main()
   float yRotation = 0.0f;
 
   //Main Loop
-  bool shouldClose = false;
-  while (!shouldClose)
+  while (!Core::Screen::PollEvents())
   {
-    //Window events
-    auto event = Core::Screen::PollEvents();
-    //Quit on close pressed
-    if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-      shouldClose = true;
-
     dragon->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
 
     //iterate through all system and execute update functions

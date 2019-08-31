@@ -20,8 +20,8 @@ struct Window
   }
   ~Window()
   {
-    Graphics::Vulkan::Window::Destroy(VulkanWindow);
     Graphics::Vulkan::Swapchain::Destroy(Swapchain);
+    Graphics::Vulkan::Window::Destroy(VulkanWindow);
   }
 
   void ResizeWindow(uint32_t width, uint32_t height)
@@ -34,13 +34,13 @@ struct Window
 };
 auto window = Window("Tortuga", 800, 600);
 
-SDL_Event PollEvents()
+bool PollEvents()
 {
   return Graphics::Vulkan::Window::PollEvents(window.VulkanWindow);
 }
 void SetWindowTitle(std::string title)
 {
-  SDL_SetWindowTitle(window.VulkanWindow.Window, title.c_str());
+  glfwSetWindowTitle(window.VulkanWindow.Window, title.c_str());
   window.Title = title.c_str();
 }
 void ResizeWindow(uint32_t width, uint32_t height)
@@ -59,7 +59,7 @@ std::vector<int32_t> GetWindowSize()
 {
   int32_t width = 0;
   int32_t height = 0;
-  SDL_GetWindowSize(window.VulkanWindow.Window, &width, &height);
+  glfwGetWindowSize(window.VulkanWindow.Window, &width, &height);
   return {width, height};
 }
 } // namespace Screen

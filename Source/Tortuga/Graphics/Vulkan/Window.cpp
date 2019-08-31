@@ -16,33 +16,27 @@ Window Create(Instance::Instance instance, const char *title, uint32_t width, ui
   data.VulkanInstance = instance;
   data.Title = title;
 
-  data.Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_VULKAN);
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  data.Window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (data.Window == nullptr)
+  {
     Console::Fatal("Failed to create window");
-
-  if (!SDL_Vulkan_CreateSurface(data.Window, instance.Instance, &data.Surface))
-    Console::Fatal("Failed to create window surface");
+    return data;
+  }
+  ErrorCheck::Callback(glfwCreateWindowSurface(instance.Instance, data.Window, nullptr, &data.Surface));
 
   return data;
 }
 void Destroy(Window data)
 {
-  SDL_DestroyWindow(data.Window);
+  vkDestroySurfaceKHR(data.VulkanInstance.Instance, data.Surface, nullptr);
+  glfwSetWindowShouldClose(data.Window, true);
 }
 
-SDL_Event PollEvents(Window window)
+bool PollEvents(Window window)
 {
-  SDL_Event event;
-  SDL_PollEvent(&event);
-  return event;
-}
-Window UpdateWindowSize(Window data)
-{
-  int width, height;
-  SDL_GetWindowSize(data.Window, &width, &height);
-  data.Width = width;
-  data.Height = height;
-  return data;
+  glfwPollEvents();
+  return glfwWindowShouldClose(window.Window);
 }
 } // namespace Window
 } // namespace Vulkan

@@ -1,11 +1,11 @@
 #ifndef _VULKAN_INSTANCE
 #define _VULKAN_INSTANCE
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_vulkan.h>
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <shaderc/shaderc.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 #include "./ErrorCheck.hpp"
 #include "./Device.hpp"
