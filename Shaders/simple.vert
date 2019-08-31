@@ -18,16 +18,18 @@ layout(set = 1, binding = 0) uniform Light {
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
-layout(location = 2) in vec3 inTexture;
+layout(location = 2) in vec2 inTexture;
 
 layout(location = 0) out vec3 surfaceNormal;
 layout(location = 1) out vec3 cameraVector;
-layout(location = 2) out vec3 lightVectors[LIGHTS_AMOUNT];
+layout(location = 2) out vec2 texture;
+layout(location = 3) out vec3 lightVectors[LIGHTS_AMOUNT];
 
 void main() {
   vec4 worldPosition = ubo.model * vec4(inPosition, 1.0);
   surfaceNormal = (ubo.model * vec4(inNormal, 0.0)).xyz;
   cameraVector = (inverse(ubo.view) * vec4(0., 0., 0., 1.)).xyz - worldPosition.xyz;
+  texture = inTexture;
 
   for (uint i = 0; i < LightsSize; i++)
   {

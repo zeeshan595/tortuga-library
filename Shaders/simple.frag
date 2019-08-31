@@ -12,7 +12,8 @@ layout(set = 1, binding = 0) uniform Light {
 
 layout(location = 0) in vec3 surfaceNormal;
 layout(location = 1) in vec3 cameraVector;
-layout(location = 2) in vec3 lightVectors[LIGHTS_AMOUNT];
+layout(location = 2) in vec2 texture;
+layout(location = 3) in vec3 lightVectors[LIGHTS_AMOUNT];
 
 layout(location = 0) out vec4 outColor;
 
