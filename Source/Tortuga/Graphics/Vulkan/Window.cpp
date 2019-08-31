@@ -17,6 +17,8 @@ Window Create(Instance::Instance instance, const char *title, uint32_t width, ui
   data.Title = title;
 
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+  glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
   data.Window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (data.Window == nullptr)
   {

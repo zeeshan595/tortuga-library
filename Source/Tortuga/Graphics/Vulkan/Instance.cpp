@@ -21,6 +21,7 @@ Instance Create(bool enableWindowSupport)
   if (enableWindowSupport)
   {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     window = glfwCreateWindow(400, 200, "Vulkan Helper", nullptr, nullptr);
     if (window == nullptr)
     {
@@ -83,7 +84,9 @@ Instance Create(bool enableWindowSupport)
   {
     vkDestroySurfaceKHR(data.Instance, surface, nullptr);
     glfwSetWindowShouldClose(window, true);
-    while (!glfwWindowShouldClose(window)){}
+    while (!glfwWindowShouldClose(window))
+    {
+    }
   }
 
   return data;
