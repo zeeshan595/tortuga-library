@@ -75,6 +75,9 @@ RenderPass Create(Device::Device device, VkFormat imageFormat)
 }
 void Destroy(RenderPass data)
 {
+  if (data.RenderPass == VK_NULL_HANDLE)
+    return;
+
   vkDestroyRenderPass(data.Device, data.RenderPass, nullptr);
 }
 } // namespace RenderPass

@@ -97,6 +97,8 @@ Instance Create(bool enableWindowSupport)
 }
 void Destroy(Instance data)
 {
+  if (data.Instance == VK_NULL_HANDLE)
+    return;
 
   for (uint32_t i = 0; i < data.Devices.size(); i++)
     Device::Destroy(data.Devices[i]);

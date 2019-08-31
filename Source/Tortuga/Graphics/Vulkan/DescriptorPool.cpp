@@ -37,6 +37,9 @@ DescriptorPool Create(Device::Device device, std::vector<DescriptorLayout::Descr
 }
 void Destroy(DescriptorPool data)
 {
+  if (data.Pool == VK_NULL_HANDLE)
+    return;
+
   vkDestroyDescriptorPool(data.Device, data.Pool, nullptr);
 }
 } // namespace DescriptorPool

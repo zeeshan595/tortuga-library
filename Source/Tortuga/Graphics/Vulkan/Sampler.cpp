@@ -37,6 +37,9 @@ Sampler Create(Device::Device device)
 }
 void Destroy(Sampler data)
 {
+  if (data.Sampler == VK_NULL_HANDLE)
+    return;
+
   vkDestroySampler(data.Device, data.Sampler, nullptr);
 }
 } // namespace Sampler

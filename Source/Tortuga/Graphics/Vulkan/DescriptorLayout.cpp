@@ -54,6 +54,9 @@ DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount, VkShader
 }
 void Destroy(DescriptorLayout data)
 {
+  if (data.Layouts == VK_NULL_HANDLE)
+    return;
+
   vkDestroyDescriptorSetLayout(data.Device, data.Layouts, nullptr);
 }
 } // namespace DescriptorLayout

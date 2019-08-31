@@ -53,9 +53,7 @@ int main()
     const auto mesh = dragon->AddComponent<Component::Mesh>();
     mesh->SetVertices(model.Vertices);
     mesh->SetIndices(model.Indices);
-    //can give a mesh 16 or less lights
-    //mesh->SetLights({light});
-    mesh->AutoFetchLights();
+    mesh->AutoFetchLights(true);
   }
 
   float yRotation = 0.0f;

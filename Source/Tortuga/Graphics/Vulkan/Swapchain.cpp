@@ -143,6 +143,9 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
 }
 void Destroy(Swapchain data)
 {
+  if (data.Swapchain == VK_NULL_HANDLE)
+    return;
+
   vkDestroyFence(data.Device, data.Fence, nullptr);
   vkDestroySwapchainKHR(data.Device, data.Swapchain, nullptr);
   for (uint32_t i = 0; i < data.ImageCount; i++)

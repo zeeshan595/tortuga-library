@@ -66,6 +66,9 @@ ImageView Create(VkDevice device, VkImage image, VkFormat format, VkImageAspectF
 }
 void Destroy(ImageView data)
 {
+  if (data.View == VK_NULL_HANDLE)
+    return;
+
   vkDestroyImageView(data.Device, data.View, nullptr);
 }
 } // namespace ImageView

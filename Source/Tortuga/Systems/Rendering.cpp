@@ -87,11 +87,8 @@ void Rendering::Update()
       if (transform != nullptr)
         modelMatrix = transform->GetModelMatrix();
 
-      if (mesh->AutoGetLightsFromScene)
-      {
+      if (mesh->IsAutoFetchLightsEnabled())
         AutoFetchLightsForMesh(mesh, transform);
-        mesh->AutoGetLightsFromScene = false;
-      }
 
       const auto pipeline = Pipeline;
       const auto renderPass = RenderPass;
@@ -347,7 +344,17 @@ void AutoFetchLightsForMesh(Component::Mesh *mesh, Component::Transform *transfo
   if (transform != nullptr)
     lightPos = transform->Position;
 
-  auto lights = Core::Entity::GetAllEntitiesWithComponent<Component::Light>();
+  const auto totalLights = Core::Entity::GetAllEntitiesWithComponent<Component::Light>();
+  std::vector<Core::Entity::Entity *> lights;
+  for (auto tempLightE : totalLights)
+  {
+    auto tempLight = tempLightE->GetComponent<Component::Light>();
+    if (tempLight->IsEnabled == false)
+      continue;
+
+    lights.push_back(tempLightE);
+  }
+
   std::sort(lights.begin(), lights.end(), [lightPos](Core::Entity::Entity *a, Core::Entity::Entity *b) {
     const auto transformA = a->GetComponent<Component::Transform>();
     const auto transformB = b->GetComponent<Component::Transform>();
@@ -368,9 +375,6 @@ void AutoFetchLightsForMesh(Component::Mesh *mesh, Component::Transform *transfo
       break;
 
     const auto light = lightE->GetComponent<Component::Light>();
-    if (light->IsEnabled == false)
-      continue;
-
     lightsToUse.push_back(lightE);
   }
 

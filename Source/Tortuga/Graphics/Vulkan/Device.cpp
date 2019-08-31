@@ -260,6 +260,9 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
 }
 void Destroy(Device data)
 {
+  if (data.Device == VK_NULL_HANDLE)
+    return;
+
   vkDestroyDevice(data.Device, nullptr);
 }
 

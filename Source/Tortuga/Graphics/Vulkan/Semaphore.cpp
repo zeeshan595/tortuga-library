@@ -23,6 +23,9 @@ Semaphore Create(Device::Device device)
 }
 void Destroy(Semaphore data)
 {
+  if (data.Semaphore == VK_NULL_HANDLE)
+    return;
+
   vkDestroySemaphore(data.device, data.Semaphore, nullptr);
 }
 } // namespace Semaphore

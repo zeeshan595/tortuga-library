@@ -92,6 +92,9 @@ Shader Create(Device::Device device, std::vector<char> compiled)
 
 void Destroy(Shader data)
 {
+  if (data.Shader == VK_NULL_HANDLE)
+    return;
+
   vkDestroyShaderModule(data.Device, data.Shader, nullptr);
 }
 } // namespace Shader

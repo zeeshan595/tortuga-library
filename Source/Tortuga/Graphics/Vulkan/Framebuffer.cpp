@@ -36,6 +36,9 @@ Framebuffer Create(Device::Device device, uint32_t width, uint32_t height, Rende
 }
 void Destroy(Framebuffer data)
 {
+  if (data.Framebuffer == VK_NULL_HANDLE)
+    return;
+
   vkDestroyFramebuffer(data.Device, data.Framebuffer, nullptr);
 }
 } // namespace Image

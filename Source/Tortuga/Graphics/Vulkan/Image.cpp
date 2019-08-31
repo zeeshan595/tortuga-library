@@ -86,6 +86,9 @@ Image Create(Device::Device device, uint32_t width, uint32_t height, VkFormat im
 }
 void Destroy(Image data)
 {
+  if (data.Image == VK_NULL_HANDLE)
+    return;
+
   vkDestroyImage(data.Device, data.Image, nullptr);
   vkFreeMemory(data.Device, data.Memory, nullptr);
 }

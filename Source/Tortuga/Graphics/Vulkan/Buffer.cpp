@@ -66,7 +66,7 @@ void Destroy(Buffer data)
     return;
   if (data.Device == VK_NULL_HANDLE)
     return;
-  if (data.Memory = VK_NULL_HANDLE)
+  if (data.Memory == VK_NULL_HANDLE)
     return;
   vkDestroyBuffer(data.Device, data.Buffer, nullptr);
   vkFreeMemory(data.Device, data.Memory, nullptr);

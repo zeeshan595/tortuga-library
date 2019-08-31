@@ -25,6 +25,9 @@ Fence Create(Device::Device device, bool signaled)
 
 void Destroy(Fence data)
 {
+  if (data.Fence == VK_NULL_HANDLE)
+    return;
+
   vkDestroyFence(data.Device, data.Fence, nullptr);
 }
 

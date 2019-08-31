@@ -23,10 +23,10 @@ private:
   std::vector<uint32_t> Indices;
   uint32_t VerticesByteSize = 0;
   uint32_t IndicesByteSize = 0;
+  bool AutoFetchLightsFromScene = false;
 
 public:
   //gpu commands
-  bool AutoGetLightsFromScene = false;
   Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool RenderCommandPool;
   Graphics::Vulkan::Command::Command RenderCommand;
@@ -88,9 +88,9 @@ public:
   {
     Lights = lights;
   }
-  void AutoFetchLights()
+  void AutoFetchLights(bool isEnabled)
   {
-    AutoGetLightsFromScene = true;
+    AutoFetchLightsFromScene = isEnabled;
   }
   std::vector<Graphics::Vertex> GetVertices()
   {
@@ -103,6 +103,10 @@ public:
   std::vector<Core::Entity::Entity *> GetLights()
   {
     return Lights;
+  }
+  bool IsAutoFetchLightsEnabled()
+  {
+    return AutoFetchLightsFromScene;
   }
   uint32_t GetVerticesByteSize()
   {

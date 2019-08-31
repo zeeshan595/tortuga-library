@@ -234,6 +234,9 @@ Pipeline CreateComputePipeline(Device::Device device, Shader::Shader shader, std
 }
 void Destroy(Pipeline data)
 {
+  if (data.Pipeline == VK_NULL_HANDLE)
+    return;
+
   vkDestroyPipeline(data.Device, data.Pipeline, nullptr);
   vkDestroyPipelineLayout(data.Device, data.Layout, nullptr);
   vkDestroyPipelineCache(data.Device, data.Cache, nullptr);
