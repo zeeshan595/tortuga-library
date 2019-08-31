@@ -9,6 +9,10 @@ layout(set = 0, binding = 0) uniform UniformBufferObject {
 } ubo;
 
 layout(set = 1, binding = 0) uniform Light {
+  uint LightsSize;
+  uint LightsReserved1;
+  uint LightsReserved2;
+  uint LightsReserved3;
   LightInfo lights[LIGHTS_AMOUNT];
 };
 
@@ -25,7 +29,7 @@ void main() {
   surfaceNormal = (ubo.model * vec4(inNormal, 0.0)).xyz;
   cameraVector = (inverse(ubo.view) * vec4(0., 0., 0., 1.)).xyz - worldPosition.xyz;
 
-  for (uint i = 0; i < LIGHTS_AMOUNT; i++)
+  for (uint i = 0; i < LightsSize; i++)
   {
     if (lights[i].forward != vec4(0.))
       lightVectors[i] = lights[i].position.xyz - inPosition;

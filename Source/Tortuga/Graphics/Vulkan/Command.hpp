@@ -39,7 +39,7 @@ struct Command
 Command Create(Device::Device device, CommandPool::CommandPool pool, Type type);
 std::vector<Command> Create(Device::Device device, CommandPool::CommandPool pool, Type type, uint32_t amount);
 
-void Begin(Command data, VkCommandBufferUsageFlags usage, RenderPass::RenderPass renderPass = {VK_NULL_HANDLE, VK_NULL_HANDLE, {}}, Framebuffer::Framebuffer framebuffer = {VK_NULL_HANDLE, VK_NULL_HANDLE});
+void Begin(Command data, VkCommandBufferUsageFlags usage, RenderPass::RenderPass renderPass = {VK_NULL_HANDLE, VK_NULL_HANDLE, {}}, uint32_t subPass = 0, Framebuffer::Framebuffer framebuffer = {VK_NULL_HANDLE, VK_NULL_HANDLE});
 void End(Command data);
 void BeginRenderPass(Command data, RenderPass::RenderPass renderPass, Framebuffer::Framebuffer framebuffer, uint32_t width, uint32_t height);
 void EndRenderPass(Command data);

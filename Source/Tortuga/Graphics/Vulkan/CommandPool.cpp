@@ -26,6 +26,10 @@ CommandPool Create(Device::Device device, uint32_t queueFamilyIndex)
 
 void Destroy(CommandPool data)
 {
+  if (data.CommandPool == VK_NULL_HANDLE)
+    return;
+  if (data.Device == VK_NULL_HANDLE)
+    return;
   vkDestroyCommandPool(data.Device, data.CommandPool, nullptr);
 }
 } // namespace CommandPool

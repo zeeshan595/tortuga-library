@@ -3,6 +3,10 @@
 #include "./Partial/lightInfo.comp"
 
 layout(set = 1, binding = 0) uniform Light {
+  uint LightsSize;
+  uint LightsReserved1;
+  uint LightsReserved2;
+  uint LightsReserved3;
   LightInfo lights[LIGHTS_AMOUNT];
 };
 
@@ -19,7 +23,7 @@ void main() {
   vec3 diffuse = vec3(0.02);
   vec3 specular = vec3(0.);
 
-  for (uint i = 0; i < LIGHTS_AMOUNT; i++)
+  for (uint i = 0; i < LightsSize; i++)
   {
     if (lightVectors[i] != vec3(0.))
     {

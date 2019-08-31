@@ -34,19 +34,19 @@ Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags 
 void Destroy(Buffer data);
 
 template <typename T>
-void GetData(Buffer buffer, T *data, uint32_t size)
+void GetData(Buffer buffer, T *data, uint32_t size, uint32_t offset = 0)
 {
   void *temp;
-  ErrorCheck::Callback(vkMapMemory(buffer.Device, buffer.Memory, 0, buffer.MemoryRequirements.size, VK_NULL_HANDLE, &temp));
+  ErrorCheck::Callback(vkMapMemory(buffer.Device, buffer.Memory, offset, size, VK_NULL_HANDLE, &temp));
   memcpy(data, temp, size);
   vkUnmapMemory(buffer.Device, buffer.Memory);
 }
 
 template <typename T>
-void SetData(Buffer buffer, T *data, uint32_t size)
+void SetData(Buffer buffer, T *data, uint32_t size, uint32_t offset = 0)
 {
   void *temp;
-  ErrorCheck::Callback(vkMapMemory(buffer.Device, buffer.Memory, 0, buffer.MemoryRequirements.size, VK_NULL_HANDLE, &temp));
+  ErrorCheck::Callback(vkMapMemory(buffer.Device, buffer.Memory, offset, size, VK_NULL_HANDLE, &temp));
   memcpy(temp, data, size);
   vkUnmapMemory(buffer.Device, buffer.Memory);
 }

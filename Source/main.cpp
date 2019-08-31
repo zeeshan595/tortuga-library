@@ -53,6 +53,7 @@ int main()
     const auto mesh = dragon->AddComponent<Component::Mesh>();
     mesh->SetVertices(model.Vertices);
     mesh->SetIndices(model.Indices);
+    mesh->SetLights({light});
   }
 
   float yRotation = 0.0f;

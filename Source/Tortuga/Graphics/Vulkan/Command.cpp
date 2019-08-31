@@ -56,13 +56,13 @@ std::vector<Command> Create(Device::Device device, CommandPool::CommandPool pool
   return data;
 }
 
-void Begin(Command data, VkCommandBufferUsageFlags usage, RenderPass::RenderPass renderPass, Framebuffer::Framebuffer framebuffer)
+void Begin(Command data, VkCommandBufferUsageFlags usage, RenderPass::RenderPass renderPass, uint32_t subPass, Framebuffer::Framebuffer framebuffer)
 {
   VkCommandBufferInheritanceInfo inheritanceInfo = {};
   {
     inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
     inheritanceInfo.renderPass = renderPass.RenderPass;
-    inheritanceInfo.subpass = 0;
+    inheritanceInfo.subpass = subPass;
     inheritanceInfo.framebuffer = framebuffer.Framebuffer;
   }
 

@@ -62,6 +62,12 @@ Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags 
 }
 void Destroy(Buffer data)
 {
+  if (data.Buffer == VK_NULL_HANDLE)
+    return;
+  if (data.Device == VK_NULL_HANDLE)
+    return;
+  if (data.Memory = VK_NULL_HANDLE)
+    return;
   vkDestroyBuffer(data.Device, data.Buffer, nullptr);
   vkFreeMemory(data.Device, data.Memory, nullptr);
 }

@@ -1,6 +1,8 @@
 #ifndef _LIGHT
 #define _LIGHT
 
+#define MAX_LIGHT_NUM 16
+
 #include <glm/glm.hpp>
 
 #include "../Graphics/Vulkan/DescriptorPool.hpp"
@@ -18,6 +20,7 @@ enum LightType
 };
 struct Light
 {
+  bool IsEnabled;
   Graphics::Vulkan::Buffer::Buffer StagingLightBuffer;
   LightType Type;
   glm::vec4 Color;
@@ -26,6 +29,7 @@ struct Light
 
   Light()
   {
+    IsEnabled = true;
     Type = LightType::POINT;
     Color = glm::vec4(1, 1, 1, 1);
     Intensity = 1.0f;
