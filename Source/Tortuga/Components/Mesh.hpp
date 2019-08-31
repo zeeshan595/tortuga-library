@@ -26,6 +26,7 @@ private:
 
 public:
   //gpu commands
+  bool AutoGetLightsFromScene = false;
   Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool RenderCommandPool;
   Graphics::Vulkan::Command::Command RenderCommand;
@@ -78,18 +79,19 @@ public:
     Vertices = vertices;
     VerticesByteSize = vertices.size() * sizeof(Graphics::Vertex);
   }
-
   void SetIndices(std::vector<uint32_t> indices)
   {
     Indices = indices;
     IndicesByteSize = indices.size() * sizeof(uint32_t);
   }
-
   void SetLights(std::vector<Core::Entity::Entity *> lights)
   {
     Lights = lights;
   }
-
+  void AutoFetchLights()
+  {
+    AutoGetLightsFromScene = true;
+  }
   std::vector<Graphics::Vertex> GetVertices()
   {
     return Vertices;

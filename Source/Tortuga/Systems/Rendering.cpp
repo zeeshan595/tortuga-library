@@ -34,6 +34,7 @@ struct LightInfo
     Forward = glm::vec4(0, 0, 1, 1);
   }
 };
+void AutoFetchLightsForMesh(Component::Mesh *mesh, Component::Transform *transform);
 void Rendering::Update()
 {
   //check if rendering is already in progress
@@ -85,6 +86,12 @@ void Rendering::Update()
       auto modelMatrix = glm::mat4(1.0);
       if (transform != nullptr)
         modelMatrix = transform->GetModelMatrix();
+
+      if (mesh->AutoGetLightsFromScene)
+      {
+        AutoFetchLightsForMesh(mesh, transform);
+        mesh->AutoGetLightsFromScene = false;
+      }
 
       const auto pipeline = Pipeline;
       const auto renderPass = RenderPass;
@@ -148,7 +155,7 @@ void Rendering::Update()
           //data needs to be copied by transfer command
           Graphics::Vulkan::Command::CopyBuffer(mesh->TransferCommand, mesh->StagingIndexBuffer, mesh->IndexBuffer);
         }
-        
+
         //uniform
         if (mesh->UniformBufferPool.size() != cameraInfos.size())
         {
@@ -332,6 +339,32 @@ Rendering::~Rendering()
   Graphics::Vulkan::RenderPass::Destroy(RenderPass);
   Graphics::Vulkan::Shader::Destroy(FragmentShader);
   Graphics::Vulkan::Shader::Destroy(VertexShader);
+}
+
+void AutoFetchLightsForMesh(Component::Mesh *mesh, Component::Transform *transform)
+{
+  auto lightPos = glm::vec3(0, 0, 0);
+  if (transform != nullptr)
+    lightPos = transform->Position;
+
+  auto lights = Core::Entity::GetAllEntitiesWithComponent<Component::Light>();
+  std::sort(lights.begin(), lights.end(), [lightPos](Core::Entity::Entity *a, Core::Entity::Entity *b) {
+    const auto transformA = a->GetComponent<Component::Transform>();
+    const auto transformB = b->GetComponent<Component::Transform>();
+    auto positionA = glm::vec3(0, 0, 0);
+    auto positionB = glm::vec3(0, 0, 0);
+    if (transformA != nullptr)
+      positionA = transformA->Position;
+    if (transformB != nullptr)
+      positionB = transformB->Position;
+
+    return glm::distance(lightPos, positionA) - glm::distance(lightPos, positionB);
+  });
+
+  if (lights.size() > MAX_LIGHT_NUM)
+    lights.resize(MAX_LIGHT_NUM);
+
+  mesh->SetLights(lights);
 }
 } // namespace Systems
 } // namespace Tortuga

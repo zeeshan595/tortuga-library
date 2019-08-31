@@ -54,7 +54,8 @@ int main()
     mesh->SetVertices(model.Vertices);
     mesh->SetIndices(model.Indices);
     //can give a mesh 16 or less lights
-    mesh->SetLights({light});
+    //mesh->SetLights({light});
+    mesh->AutoFetchLights();
   }
 
   float yRotation = 0.0f;
