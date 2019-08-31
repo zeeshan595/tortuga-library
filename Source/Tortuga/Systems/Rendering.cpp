@@ -361,10 +361,20 @@ void AutoFetchLightsForMesh(Component::Mesh *mesh, Component::Transform *transfo
     return glm::distance(lightPos, positionA) - glm::distance(lightPos, positionB);
   });
 
-  if (lights.size() > MAX_LIGHT_NUM)
-    lights.resize(MAX_LIGHT_NUM);
+  std::vector<Core::Entity::Entity *> lightsToUse;
+  for (auto lightE : lights)
+  {
+    if (lightsToUse.size() >= MAX_LIGHT_NUM)
+      break;
 
-  mesh->SetLights(lights);
+    const auto light = lightE->GetComponent<Component::Light>();
+    if (light->IsEnabled == false)
+      continue;
+
+    lightsToUse.push_back(lightE);
+  }
+
+  mesh->SetLights(lightsToUse);
 }
 } // namespace Systems
 } // namespace Tortuga
