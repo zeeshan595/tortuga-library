@@ -15,7 +15,7 @@ struct Window
   Window(const char *title, uint32_t width, uint32_t height)
   {
     this->Title = title;
-    VulkanWindow = Graphics::Vulkan::Window::Create(Engine::GetVulkan(), title, width, height);
+    VulkanWindow = Graphics::Vulkan::Window::Create(Engine::GetVulkan(), title, 1024, 768);
     Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
   }
   ~Window()
@@ -29,6 +29,14 @@ struct Window
     Graphics::Vulkan::Swapchain::Destroy(Swapchain);
     Graphics::Vulkan::Window::Destroy(VulkanWindow);
     VulkanWindow = Graphics::Vulkan::Window::Create(Engine::GetVulkan(), VulkanWindow.Title.c_str(), width, height);
+    Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
+  }
+
+  void SetFullScreen()
+  {
+    Graphics::Vulkan::Swapchain::Destroy(Swapchain);
+    Graphics::Vulkan::Window::Destroy(VulkanWindow);
+    VulkanWindow = Graphics::Vulkan::Window::Create(Engine::GetVulkan(), VulkanWindow.Title.c_str());
     Swapchain = Graphics::Vulkan::Swapchain::Create(Engine::GetMainDevice(), VulkanWindow);
   }
 };
@@ -46,6 +54,10 @@ void SetWindowTitle(std::string title)
 void ResizeWindow(uint32_t width, uint32_t height)
 {
   window.ResizeWindow(width, height);
+}
+void SetFullScreen()
+{
+  window.SetFullScreen();
 }
 Graphics::Vulkan::Window::Window GetWindow()
 {
