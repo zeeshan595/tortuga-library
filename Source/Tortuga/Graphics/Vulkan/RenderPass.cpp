@@ -29,7 +29,7 @@ RenderPass Create(Device::Device device, VkFormat imageFormat)
 
   VkAttachmentDescription depthAttachment = {};
   {
-    depthAttachment.format = Image::findDepthFormat(device.PhysicalDevice);
+    depthAttachment.format = Image::FindDepthFormat(device.PhysicalDevice);
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;

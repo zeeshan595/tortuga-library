@@ -119,17 +119,17 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
 
   //initialize depth buffer
   {
-    auto depthFormat = Image::findDepthFormat(device.PhysicalDevice);
+    auto depthFormat = Image::FindDepthFormat(device.PhysicalDevice);
     data.DepthImage = Image::Create(device, data.Extent.width, data.Extent.height, depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
     data.DepthImageView = ImageView::Create(device, data.DepthImage, VK_IMAGE_ASPECT_DEPTH_BIT);
 
-    auto depthCommandPool = CommandPool::Create(device, device.QueueFamilies.Transfer.Index);
+    auto depthCommandPool = CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
     auto depthCommand = Command::Create(device, depthCommandPool, Command::PRIMARY);
     Command::Begin(depthCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
     Command::TransferImageLayout(depthCommand, data.DepthImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
     Command::End(depthCommand);
-    Command::Submit({depthCommand}, device.Queues.Transfer[0]);
-    Device::WaitForQueue(device.Queues.Transfer[0]);
+    Command::Submit({depthCommand}, device.Queues.Graphics[0]);
+    Device::WaitForQueue(device.Queues.Graphics[0]);
     CommandPool::Destroy(depthCommandPool);
   }
 

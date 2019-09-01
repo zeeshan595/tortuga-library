@@ -221,6 +221,64 @@ void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Sem
 }
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout)
 {
+  //aspect flags
+  VkImageAspectFlags aspect = 0;
+  if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+  {
+    aspect = VK_IMAGE_ASPECT_DEPTH_BIT;
+    if (Image::HasStencilComponent(image.Format))
+      aspect |= VK_IMAGE_ASPECT_STENCIL_BIT;
+  }
+  else
+  {
+    aspect = VK_IMAGE_ASPECT_COLOR_BIT;
+  }
+
+  //source
+  VkAccessFlags sourceAccess = 0;
+  VkPipelineStageFlags source = 0;
+  if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+  {
+    source = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    sourceAccess = VK_ACCESS_TRANSFER_WRITE_BIT;
+  }
+  else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED)
+  {
+    source = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+  }
+  else
+  {
+    Console::Fatal("image transition not supported");
+  }
+
+  //destination
+  VkAccessFlags destinationAccess = 0;
+  VkPipelineStageFlags destination = 0;
+  if (newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+  {
+    destination = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    destinationAccess = VK_ACCESS_SHADER_READ_BIT;
+  }
+  else if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+  {
+    destination = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    destinationAccess = VK_ACCESS_SHADER_WRITE_BIT;
+  }
+  else if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+  {
+    destination = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    destinationAccess = VK_ACCESS_SHADER_READ_BIT;
+  }
+  else if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+  {
+    destination = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    destinationAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+  }
+  else
+  {
+    Console::Fatal("image transition not supported");
+  }
+
   auto barrier = VkImageMemoryBarrier();
   {
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -229,26 +287,15 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.image = image.Image;
-    if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
-    {
-      barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-      if (Image::hasStencilComponent(image.Format))
-      {
-        barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
-      }
-    }
-    else
-    {
-      barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    }
+    barrier.subresourceRange.aspectMask = aspect;
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = 1;
     barrier.subresourceRange.baseArrayLayer = 0;
     barrier.subresourceRange.layerCount = 1;
-    barrier.srcAccessMask = 0;
-    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.srcAccessMask = sourceAccess;
+    barrier.dstAccessMask = destinationAccess;
   }
-  vkCmdPipelineBarrier(data.Command, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+  vkCmdPipelineBarrier(data.Command, source, destination, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 }
 void BufferToImage(Command data, Buffer::Buffer buffer, Image::Image image, glm::vec2 offset, glm::vec2 size)
 {

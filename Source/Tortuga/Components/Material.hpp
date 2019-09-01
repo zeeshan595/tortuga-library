@@ -57,16 +57,12 @@ struct Material
       AlbedoImageSampler = Graphics::Vulkan::Sampler::Create(device);
     }
     Graphics::Vulkan::Buffer::SetData(StagingAlbedo, image.Pixels, image.ByteSize);
-
-    auto transferCommand = TransferCommand;
-    auto stagingAlbedo = StagingAlbedo;
-    auto albedoImage = AlbedoImage;
-    std::async(std::launch::async, [device, image, transferCommand, stagingAlbedo, albedoImage] {
-      Graphics::Vulkan::Command::Begin(transferCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-      Graphics::Vulkan::Command::BufferToImage(transferCommand, stagingAlbedo, albedoImage, {0, 0}, {image.Width, image.Height});
-      Graphics::Vulkan::Command::End(transferCommand);
-      Graphics::Vulkan::Command::Submit({transferCommand}, device.Queues.Transfer[0]);
-    });
+    Graphics::Vulkan::Command::Begin(TransferCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    Graphics::Vulkan::Command::TransferImageLayout(TransferCommand, AlbedoImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    Graphics::Vulkan::Command::BufferToImage(TransferCommand, StagingAlbedo, AlbedoImage, {0, 0}, {image.Width, image.Height});
+    Graphics::Vulkan::Command::TransferImageLayout(TransferCommand, AlbedoImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    Graphics::Vulkan::Command::End(TransferCommand);
+    Graphics::Vulkan::Command::Submit({TransferCommand}, device.Queues.Transfer[0]);
   }
 };
 } // namespace Component

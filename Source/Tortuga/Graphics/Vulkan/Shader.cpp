@@ -38,7 +38,7 @@ std::vector<char> CompileShader(Instance::Instance instance, ShaderType type, st
       [](void *user_data, const char *requested_source, int type, const char *requesting_source, size_t include_depth) {
         const auto requested = std::string(requested_source);
         const auto requestedName = requested.substr(requested.find_last_of('/') + 1);
-        const auto contentTemp = Utils::IO::GetFileContents(std::string("Shaders/") + requested);
+        const auto contentTemp = Utils::IO::GetFileContents(std::string("Assets/Shaders/") + requested);
 
         uint32_t sourceCountentSize = sizeof(char) * contentTemp.size();
         const auto sourceContent = malloc(sourceCountentSize);
