@@ -262,12 +262,12 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
   else if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
   {
     destination = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    destinationAccess = VK_ACCESS_SHADER_WRITE_BIT;
+    destinationAccess = VK_ACCESS_TRANSFER_WRITE_BIT;
   }
   else if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
   {
     destination = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    destinationAccess = VK_ACCESS_SHADER_READ_BIT;
+    destinationAccess = VK_ACCESS_TRANSFER_READ_BIT;
   }
   else if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
   {

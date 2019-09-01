@@ -58,7 +58,7 @@ int main()
     //material
     const auto albedo = Utils::IO::LoadImageFile("Assets/Textures/sample.jpg");
     const auto material = dragon->AddComponent<Component::Material>();
-    
+    material->SetAlbedo(albedo);
   }
 
   float yRotation = 0.0f;

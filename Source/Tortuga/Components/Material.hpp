@@ -26,7 +26,7 @@ struct Material
   Material()
   {
     auto device = Core::Engine::GetMainDevice();
-    TransferPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Transfer.Index);
+    TransferPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
     TransferCommand = Graphics::Vulkan::Command::Create(device, TransferPool, Graphics::Vulkan::Command::PRIMARY);
   }
   ~Material()
@@ -49,7 +49,7 @@ struct Material
       if (AlbedoImage.Width != image.Width || AlbedoImage.Height != image.Height)
         Graphics::Vulkan::Image::Destroy(AlbedoImage);
       if (AlbedoImage.Image == VK_NULL_HANDLE)
-        Graphics::Vulkan::Image::Create(device, image.Width, image.Height, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+        AlbedoImage = Graphics::Vulkan::Image::Create(device, image.Width, image.Height, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 
       Graphics::Vulkan::ImageView::Destroy(AlbedoImageView);
       AlbedoImageView = Graphics::Vulkan::ImageView::Create(device, AlbedoImage, VK_IMAGE_ASPECT_COLOR_BIT);
@@ -62,7 +62,7 @@ struct Material
     Graphics::Vulkan::Command::BufferToImage(TransferCommand, StagingAlbedo, AlbedoImage, {0, 0}, {image.Width, image.Height});
     Graphics::Vulkan::Command::TransferImageLayout(TransferCommand, AlbedoImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Graphics::Vulkan::Command::End(TransferCommand);
-    Graphics::Vulkan::Command::Submit({TransferCommand}, device.Queues.Transfer[0]);
+    Graphics::Vulkan::Command::Submit({TransferCommand}, device.Queues.Graphics[0]);
   }
 };
 } // namespace Component

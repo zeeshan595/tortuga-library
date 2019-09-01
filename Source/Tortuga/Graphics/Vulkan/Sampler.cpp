@@ -34,6 +34,7 @@ Sampler Create(Device::Device device)
   }
 
   ErrorCheck::Callback(vkCreateSampler(device.Device, &createInfo, nullptr, &data.Sampler));
+  return data;
 }
 void Destroy(Sampler data)
 {
