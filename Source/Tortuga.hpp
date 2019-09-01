@@ -4,6 +4,11 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
+#define GLFW_INCLUDE_VULKAN
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
+
+//debug console
 #include "./Tortuga/Console.hpp"
 
 //Utils
@@ -26,9 +31,6 @@
 #include "./Tortuga/Graphics/Vulkan/DescriptorPool.hpp"
 #include "./Tortuga/Graphics/Vulkan/DescriptorSet.hpp"
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
-
-//imgui
-#include "./Tortuga/Graphics/Imgui/imgui.h"
 
 //Core
 #include "./Tortuga/Core/GUID.hpp"
