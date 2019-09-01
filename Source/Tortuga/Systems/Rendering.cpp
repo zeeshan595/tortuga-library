@@ -292,9 +292,9 @@ Rendering::Rendering()
   GraphicsCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
 
   //shader
-  auto vertexCode = Utils::IO::GetFileContents("Shaders/simple.vert");
+  auto vertexCode = Utils::IO::GetFileContents("Assets/Shaders/simple.vert");
   auto vertexCompile = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::VERTEX, vertexCode);
-  auto fragmentCode = Utils::IO::GetFileContents("Shaders/simple.frag");
+  auto fragmentCode = Utils::IO::GetFileContents("Assets/Shaders/simple.frag");
   auto fragmentCompile = Graphics::Vulkan::Shader::CompileShader(vulkan, Graphics::Vulkan::Shader::FRAGMENT, fragmentCode);
 
   //pipeline & render pass

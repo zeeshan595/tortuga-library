@@ -49,11 +49,16 @@ int main()
     transform->Scale = glm::vec3(1, 1, 1);
 
     //mesh data
-    const auto model = Utils::IO::LoadObjFile("Models/Dragon.obj");
+    const auto model = Utils::IO::LoadObjFile("Assets/Models/Dragon.obj");
     const auto mesh = dragon->AddComponent<Component::Mesh>();
     mesh->SetVertices(model.Vertices);
     mesh->SetIndices(model.Indices);
     mesh->AutoFetchLights(true);
+
+    //material
+    const auto albedo = Utils::IO::LoadImageFile("Assets/Textures/sample.jpg");
+    const auto material = dragon->AddComponent<Component::Material>();
+    
   }
 
   float yRotation = 0.0f;

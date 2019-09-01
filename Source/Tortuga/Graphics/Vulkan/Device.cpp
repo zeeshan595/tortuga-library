@@ -179,6 +179,9 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
   }
 
   VkPhysicalDeviceFeatures deviceFeatures = {};
+  {
+    deviceFeatures.samplerAnisotropy = VK_TRUE;
+  }
 
   VkDeviceCreateInfo deviceInfo = {};
   {
