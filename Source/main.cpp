@@ -1,9 +1,12 @@
 #include "./Tortuga.hpp"
+#include "./Tortuga/Graphics/DisplayServer/Wayland/Display.hpp"
 
 using namespace Tortuga;
 
 int main()
 {
+  Graphics::DisplayServer::Wayland::CreateWayland();
+
   Core::Screen::SetWindowTitle("Hello World");
   Core::Screen::ResizeWindow(1920, 1080);
 

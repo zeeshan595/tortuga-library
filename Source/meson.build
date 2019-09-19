@@ -1,6 +1,8 @@
 sourceCppFiles = [
   './Source/Tortuga/Utils/IO.cpp',
   './Source/Tortuga/Console.cpp',
+  './Source/Tortuga/Graphics/DisplayServer/Wayland/Display.cpp',
+  './Source/Tortuga/Graphics/DisplayServer/Wayland/Buffer.cpp',
   './Source/Tortuga/Graphics/Vulkan/Window.cpp',
   './Source/Tortuga/Graphics/Vulkan/Fence.cpp',
   './Source/Tortuga/Graphics/Vulkan/Semaphore.cpp',

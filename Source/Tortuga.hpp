@@ -14,6 +14,10 @@
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
+//Display Servers
+#include "./Tortuga/Graphics/DisplayServer/Wayland/Display.hpp"
+#include "./Tortuga/Graphics/DisplayServer/Wayland/Buffer.hpp"
+
 //Vulkan library
 #include "./Tortuga/Graphics/Vulkan/ErrorCheck.hpp"
 #include "./Tortuga/Graphics/Vulkan/Instance.hpp"
