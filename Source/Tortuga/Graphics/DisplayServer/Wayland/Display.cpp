@@ -23,7 +23,7 @@ wl_touch *touch = nullptr;
 
 void PointerEnter(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *surface, wl_fixed_t surface_x, wl_fixed_t surface_y)
 {
-  std::cout << surface_x << std::endl;
+  
 }
 
 void PointerLeave(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *wl_surface)
@@ -72,9 +72,9 @@ void RegistryGlobal(void *data, wl_registry *registry, uint32_t name, const char
     pointer = wl_seat_get_pointer(seat);
     keyboard = wl_seat_get_keyboard(seat);
     touch = wl_seat_get_touch(seat);
-    wl_pointer_add_listener(pointer, &PointerListener, NULL);
-    //wl_keyboard_add_listener(keyboard, &KeyboardListener, NULL);
-    //wl_touch_add_listener(touch, &TouchListener, NULL);
+    wl_pointer_add_listener(pointer, &PointerListener, nullptr);
+    //wl_keyboard_add_listener(keyboard, &KeyboardListener, nullptr);
+    //wl_touch_add_listener(touch, &TouchListener, nullptr);
   }
 }
 void RegistryGlobalRemove(void *a, wl_registry *b, uint32_t c)
@@ -90,7 +90,7 @@ Display CreateWayland()
   auto data = Display();
 
   data.Display = wl_display_connect(nullptr);
-  if (data.Display == NULL)
+  if (data.Display == nullptr)
   {
     perror("failed to connect to wayland display server");
     exit(EXIT_FAILURE);
