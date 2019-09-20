@@ -38,7 +38,8 @@ Surface CreateSurface(Display wayland)
 
   wl_shell_surface_add_listener(data.ShellSurface, &shell_surface_listener, 0);
   wl_shell_surface_set_toplevel(data.ShellSurface);
-  wl_shell_surface_set_user_data(data.ShellSurface, data.Surface);
+  wl_shell_surface_set_user_data(data.ShellSurface, nullptr);
+  wl_surface_set_user_data(data.Surface, nullptr);
 
   return data;
 }
