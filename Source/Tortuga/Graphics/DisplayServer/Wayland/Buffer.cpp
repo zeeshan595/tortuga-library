@@ -19,7 +19,7 @@ Buffer CreateBuffer(MemoryPool pool, uint32_t width, uint32_t height)
   data.Height = height;
   data.Pool = pool.Pool;
 
-  data.Buffer = wl_shm_pool_create_buffer(pool.Pool, pool.Size, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  data.Buffer = wl_shm_pool_create_buffer(pool.Pool, 0, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   if (data.Buffer == nullptr)
   {
     perror("failed to create wayland buffer");

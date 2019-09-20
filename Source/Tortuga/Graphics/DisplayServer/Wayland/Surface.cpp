@@ -1,13 +1,16 @@
 #include "./Surface.hpp"
 
-static void shell_surface_ping(void *data, struct wl_shell_surface *shell_surface, uint32_t serial)
+void shell_surface_ping(void *data, struct wl_shell_surface *shell_surface, uint32_t serial)
 {
   wl_shell_surface_pong(shell_surface, serial);
 }
 
-static void shell_surface_configure(void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height) {}
+void shell_surface_configure(void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height)
+{
+  
+}
 
-static const struct wl_shell_surface_listener shell_surface_listener = {
+const struct wl_shell_surface_listener shell_surface_listener = {
     .ping = shell_surface_ping,
     .configure = shell_surface_configure,
 };
@@ -38,8 +41,6 @@ Surface CreateSurface(Display wayland)
 
   wl_shell_surface_add_listener(data.ShellSurface, &shell_surface_listener, 0);
   wl_shell_surface_set_toplevel(data.ShellSurface);
-  wl_shell_surface_set_user_data(data.ShellSurface, nullptr);
-  wl_surface_set_user_data(data.Surface, nullptr);
 
   return data;
 }

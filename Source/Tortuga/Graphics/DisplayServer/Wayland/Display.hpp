@@ -24,6 +24,7 @@ struct Display
   wl_seat *Seat = nullptr;
   wl_pointer *Pointer = nullptr;
   wl_keyboard *Keyboard = nullptr;
+  wl_touch *Touch = nullptr;
 };
 Display CreateWayland();
 void DestroyWayland(Display data);

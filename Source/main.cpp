@@ -9,7 +9,14 @@ int main()
   const auto displayPool = Graphics::DisplayServer::Wayland::CreatePool(wayland, 1920, 1080);
   const auto displayBuffer = Graphics::DisplayServer::Wayland::CreateBuffer(displayPool, 1920, 1080);
   Graphics::DisplayServer::Wayland::BindSurfaceWithBuffer(surface, displayBuffer);
-  wl_display_dispatch(wayland.Display);
+  while(true)
+  {
+    if (wl_display_dispatch(wayland.Display) < 0)
+    {
+      perror("wayland error");
+      break;
+    }
+  }
   Graphics::DisplayServer::Wayland::DestroyBuffer(displayBuffer);
   Graphics::DisplayServer::Wayland::DestroyPool(displayPool);
   Graphics::DisplayServer::Wayland::DestroySurface(surface);

@@ -17,7 +17,7 @@ namespace DisplayServer
 {
 namespace Wayland
 {
-void SetupFile(std::string path, uint32_t size)
+void CreateImage(std::string path, uint32_t size)
 {
   unlink(path.c_str());
   auto file = creat(path.c_str(), S_IRUSR | S_IWUSR);
@@ -33,7 +33,7 @@ MemoryPool CreatePool(Display wayland, uint32_t maxWidth, uint32_t maxHeight)
   struct stat stat;
   uint32_t size = maxWidth * maxHeight * 4;
 
-  SetupFile(data.FilePath, size);
+  CreateImage(data.FilePath, size);
   const auto file = open(data.FilePath.c_str(), O_RDWR, S_IRUSR | S_IWUSR);
   if (file < 0)
   {
