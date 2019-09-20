@@ -48,11 +48,6 @@ void DestroySurface(Surface data)
   wl_shell_surface_destroy(data.ShellSurface);
   wl_surface_destroy(data.Surface);
 }
-void BindSurfaceWithBuffer(Surface data, Buffer buffer)
-{
-  wl_surface_attach(data.Surface, buffer.Buffer, 0, 0);
-  wl_surface_commit(data.Surface);
-}
 void SetTitle(Surface data, const char *title)
 {
   wl_shell_surface_set_title(data.ShellSurface, title);

@@ -7,8 +7,6 @@
 
 #if __unix__
 #include "./DisplayServer/Wayland/Display.hpp"
-#include "./DisplayServer/Wayland/MemoryPool.hpp"
-#include "./DisplayServer/Wayland/Buffer.hpp"
 #include "./DisplayServer/Wayland/Surface.hpp"
 #endif
 
@@ -28,8 +26,6 @@ struct DisplaySurface
 #if __unix__
   DisplayServer::Wayland::Display Wayland;
   DisplayServer::Wayland::Surface WaylandSurface;
-  DisplayServer::Wayland::MemoryPool WaylandMemoryPool;
-  DisplayServer::Wayland::Buffer WaylandBuffer;
 #endif
 };
 DisplaySurface Create(Vulkan::Instance::Instance instance);
@@ -37,7 +33,6 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
 void Destroy(DisplaySurface data);
 std::vector<const char*> GetVulkanExtensions();
 void SetTitle(DisplaySurface data, std::string title);
-void HandleEvents(DisplaySurface data);
 struct DisplaySize
 {
   uint32_t width;

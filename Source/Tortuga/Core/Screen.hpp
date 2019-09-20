@@ -13,8 +13,6 @@ namespace Screen
 {
 void SetWindowTitle(std::string title);
 Graphics::Vulkan::Swapchain::Swapchain GetSwapchain();
-Graphics::DisplaySurface::DisplaySize GetDisplaySize();
-void HandleEvents();
 } // namespace Screen
 } // namespace Core
 } // namespace Tortuga

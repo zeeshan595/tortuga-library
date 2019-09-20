@@ -1,5 +1,7 @@
 #include "./Display.hpp"
 
+#include <future>
+
 namespace Tortuga
 {
 namespace Graphics
@@ -121,10 +123,6 @@ void DestroyWayland(Display data)
   wl_shm_destroy(data.Shm);
   wl_compositor_destroy(data.Compositor);
   wl_display_disconnect(data.Display);
-}
-void HandleEvents(Display data)
-{
-  wl_display_dispatch(data.Display);
 }
 } // namespace Wayland
 } // namespace DisplayServer
