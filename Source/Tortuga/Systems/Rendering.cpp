@@ -51,7 +51,7 @@ void Rendering::Update()
   const auto renderFence = RenderFence;
   const auto descriptorLayouts = DescriptorLayouts;
 
-  std::async(std::launch::async, [renderer, renderPass, framebuffers, renderSemaphore, presentSemaphore, renderFence, descriptorLayouts, pipeline] {
+  const auto task = std::async(std::launch::async, [renderer, renderPass, framebuffers, renderSemaphore, presentSemaphore, renderFence, descriptorLayouts, pipeline] {
     const auto device = Core::Engine::GetMainDevice();
     const auto swapchain = Core::Screen::GetSwapchain();
 
@@ -275,6 +275,9 @@ void Rendering::Update()
     //present the image
     Graphics::Vulkan::Swapchain::PresentImage(swapchain, swapchainIndex, device.Queues.Graphics[0], {presentSemaphore});
   });
+  if (task.valid() == false) {
+    Console::Error("Could not start rendering task");
+  }
 }
 
 Rendering::Rendering()

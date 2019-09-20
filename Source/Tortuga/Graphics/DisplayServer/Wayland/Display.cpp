@@ -19,6 +19,43 @@ wl_pointer *pointer = nullptr;
 wl_keyboard *keyboard = nullptr;
 wl_touch *touch = nullptr;
 
+void PointerEnter(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *surface, wl_fixed_t surface_x, wl_fixed_t surface_y)
+{
+  //std::cout << surface_x << std::endl;
+}
+
+void PointerLeave(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *wl_surface)
+{
+}
+
+void PointerMotion(void *data, wl_pointer *wl_pointer, uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y)
+{
+  //std::cout << surface_x << std::endl;
+}
+
+void PointerButton(void *data, wl_pointer *wl_pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
+{
+}
+
+void PointerAxis(void *data, wl_pointer *wl_pointer, uint32_t time, uint32_t axis, wl_fixed_t value)
+{
+}
+
+wl_pointer_listener PointerListener = {
+    .enter = PointerEnter,
+    .leave = PointerLeave,
+    .motion = PointerMotion,
+    .button = PointerButton,
+    .axis = PointerAxis};
+
+wl_keyboard_listener KeyboardListener = {
+
+};
+
+wl_touch_listener TouchListener = {
+
+};
+
 void RegistryGlobal(void *data, wl_registry *registry, uint32_t name, const char *interface, uint32_t version)
 {
   if (strcmp(interface, wl_compositor_interface.name) == 0)
@@ -33,7 +70,9 @@ void RegistryGlobal(void *data, wl_registry *registry, uint32_t name, const char
     pointer = wl_seat_get_pointer(seat);
     keyboard = wl_seat_get_keyboard(seat);
     touch = wl_seat_get_touch(seat);
-    //wl_pointer_add_listener(pointer, &pointer_listener, NULL);
+    wl_pointer_add_listener(pointer, &PointerListener, NULL);
+    //wl_keyboard_add_listener(keyboard, &KeyboardListener, NULL);
+    //wl_touch_add_listener(touch, &TouchListener, NULL);
   }
 }
 void RegistryGlobalRemove(void *a, wl_registry *b, uint32_t c)
@@ -82,6 +121,10 @@ void DestroyWayland(Display data)
   wl_shm_destroy(data.Shm);
   wl_compositor_destroy(data.Compositor);
   wl_display_disconnect(data.Display);
+}
+void HandleEvents(Display data)
+{
+  wl_display_dispatch(data.Display);
 }
 } // namespace Wayland
 } // namespace DisplayServer

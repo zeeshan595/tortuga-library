@@ -22,6 +22,10 @@ Graphics::DisplaySurface::DisplaySize GetDisplaySize()
 {
   return Graphics::DisplaySurface::GetDisplaySize(displaySurface);
 }
+void HandleEvents()
+{
+  Graphics::DisplaySurface::HandleEvents(displaySurface);
+}
 } // namespace Screen
 } // namespace Core
 } // namespace Tortuga

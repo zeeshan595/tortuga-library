@@ -37,7 +37,7 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
 void Destroy(DisplaySurface data);
 std::vector<const char*> GetVulkanExtensions();
 void SetTitle(DisplaySurface data, std::string title);
-
+void HandleEvents(DisplaySurface data);
 struct DisplaySize
 {
   uint32_t width;

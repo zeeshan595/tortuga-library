@@ -63,6 +63,12 @@ std::vector<const char *> GetVulkanExtensions()
 
   return extensions;
 }
+void HandleEvents(DisplaySurface data)
+{
+#if __unix__
+  DisplayServer::Wayland::HandleEvents(data.Wayland);
+#endif
+}
 void SetTitle(DisplaySurface data, std::string title)
 {
 #if __unix__
