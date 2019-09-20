@@ -1,11 +1,22 @@
 #include "./Tortuga.hpp"
-#include "./Tortuga/Graphics/DisplayServer/Wayland/Display.hpp"
 
 using namespace Tortuga;
 
 int main()
 {
-  Graphics::DisplayServer::Wayland::CreateWayland();
+  const auto wayland = Graphics::DisplayServer::Wayland::CreateWayland();
+  const auto surface = Graphics::DisplayServer::Wayland::CreateSurface(wayland);
+  const auto displayPool = Graphics::DisplayServer::Wayland::CreatePool(wayland, 1920 * 1080 * sizeof(uint32_t));
+  const auto displayBuffer = Graphics::DisplayServer::Wayland::CreateBuffer(displayPool, 1920, 1080, sizeof(uint32_t));
+  Graphics::DisplayServer::Wayland::BindSurfaceWithBuffer(surface, displayBuffer);
+
+  while (true)
+  {
+    if (wl_display_dispatch(wayland.Display) < 0)
+    {
+      perror("Main loop error");
+    }
+  }
 
   Core::Screen::SetWindowTitle("Hello World");
   Core::Screen::ResizeWindow(1920, 1080);

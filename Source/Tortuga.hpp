@@ -16,7 +16,9 @@
 
 //Display Servers
 #include "./Tortuga/Graphics/DisplayServer/Wayland/Display.hpp"
+#include "./Tortuga/Graphics/DisplayServer/Wayland/MemoryPool.hpp"
 #include "./Tortuga/Graphics/DisplayServer/Wayland/Buffer.hpp"
+#include "./Tortuga/Graphics/DisplayServer/Wayland/Surface.hpp"
 
 //Vulkan library
 #include "./Tortuga/Graphics/Vulkan/ErrorCheck.hpp"
