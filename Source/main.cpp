@@ -9,14 +9,12 @@ int main()
   const auto displayPool = Graphics::DisplayServer::Wayland::CreatePool(wayland, 1920 * 1080 * sizeof(uint32_t));
   const auto displayBuffer = Graphics::DisplayServer::Wayland::CreateBuffer(displayPool, 1920, 1080, sizeof(uint32_t));
   Graphics::DisplayServer::Wayland::BindSurfaceWithBuffer(surface, displayBuffer);
-
-  while (true)
-  {
-    if (wl_display_dispatch(wayland.Display) < 0)
-    {
-      perror("Main loop error");
-    }
-  }
+  wl_display_dispatch(wayland.Display);
+  Graphics::DisplayServer::Wayland::DestroyBuffer(displayBuffer);
+  Graphics::DisplayServer::Wayland::DestroyPool(displayPool);
+  Graphics::DisplayServer::Wayland::DestroySurface(surface);
+  Graphics::DisplayServer::Wayland::DestroyWayland(wayland);
+  return 0;
 
   Core::Screen::SetWindowTitle("Hello World");
   Core::Screen::ResizeWindow(1920, 1080);
@@ -106,5 +104,5 @@ int main()
   //destroy systems
   Core::DestroySystem<Systems::Rendering>();
 
-  return 0;
+  return EXIT_SUCCESS;
 }

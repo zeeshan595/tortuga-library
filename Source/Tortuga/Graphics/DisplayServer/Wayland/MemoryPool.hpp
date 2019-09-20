@@ -13,7 +13,8 @@ namespace Wayland
 {
 struct MemoryPool
 {
-  int8_t *Memory;
+  int32_t fd;
+  uint8_t *Memory;
   uint32_t Size;
   wl_shm_pool *Pool;
 };

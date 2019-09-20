@@ -5,7 +5,6 @@ wl_shm *shm = nullptr;
 wl_shell *shell = nullptr;
 wl_seat *seat = nullptr;
 wl_pointer *pointer = nullptr;
-wl_keyboard *keyboard = nullptr;
 
 void RegistryGlobal(void *data, wl_registry *registry, uint32_t name, const char *interface, uint32_t version)
 {
@@ -19,8 +18,6 @@ void RegistryGlobal(void *data, wl_registry *registry, uint32_t name, const char
     seat = (wl_seat *)wl_registry_bind(registry, name, &wl_seat_interface, version);
   else if (strcmp(interface, wl_pointer_interface.name))
     pointer = (wl_pointer *)wl_registry_bind(registry, name, &wl_pointer_interface, version);
-  else if (strcmp(interface, wl_keyboard_interface.name))
-    keyboard = (wl_keyboard *)wl_registry_bind(registry, name, &wl_keyboard_interface, version);
 }
 void RegistryGlobalRemove(void *a, wl_registry *b, uint32_t c)
 {
@@ -61,13 +58,11 @@ Display CreateWayland()
   data.Shell = shell;
   data.Seat = seat;
   data.Pointer = pointer;
-  data.Keyboard = keyboard;
 
   return data;
 }
 void DestroyWayland(Display data)
 {
-  wl_keyboard_destroy(data.Keyboard);
   wl_pointer_destroy(data.Pointer);
   wl_seat_destroy(data.Seat);
   wl_shell_destroy(data.Shell);
