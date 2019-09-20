@@ -12,14 +12,14 @@ namespace DisplayServer
 {
 namespace Wayland
 {
-Buffer CreateBuffer(MemoryPool pool, uint32_t width, uint32_t height, uint32_t pixelSize, uint32_t pixelFormat)
+Buffer CreateBuffer(MemoryPool pool, uint32_t width, uint32_t height)
 {
   auto data = Buffer();
   data.Width = width;
   data.Height = height;
   data.Pool = pool.Pool;
 
-  data.Buffer = wl_shm_pool_create_buffer(pool.Pool, pool.Size, width, height, width * pixelSize, pixelFormat);
+  data.Buffer = wl_shm_pool_create_buffer(pool.Pool, pool.Size, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   if (data.Buffer == nullptr)
   {
     perror("failed to create wayland buffer");
