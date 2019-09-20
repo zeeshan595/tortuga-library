@@ -6,8 +6,8 @@ int main()
 {
   const auto wayland = Graphics::DisplayServer::Wayland::CreateWayland();
   const auto surface = Graphics::DisplayServer::Wayland::CreateSurface(wayland);
-  const auto displayPool = Graphics::DisplayServer::Wayland::CreatePool(wayland, 1920 * 1080 * sizeof(uint32_t));
-  const auto displayBuffer = Graphics::DisplayServer::Wayland::CreateBuffer(displayPool, 1920, 1080, sizeof(uint32_t));
+  const auto displayPool = Graphics::DisplayServer::Wayland::CreatePool(wayland, 320 * 400 * sizeof(uint32_t));
+  const auto displayBuffer = Graphics::DisplayServer::Wayland::CreateBuffer(displayPool, 320, 400, sizeof(uint32_t));
   Graphics::DisplayServer::Wayland::BindSurfaceWithBuffer(surface, displayBuffer);
   wl_display_dispatch(wayland.Display);
   Graphics::DisplayServer::Wayland::DestroyBuffer(displayBuffer);
