@@ -8,21 +8,21 @@ namespace Vulkan
 {
 namespace Swapchain
 {
-SwapChainSupportDetails GetSupportDetails(Device::Device device, Window::Window window)
+SwapChainSupportDetails GetSupportDetails(Device::Device device, VkSurfaceKHR surface)
 {
   SwapChainSupportDetails data = {};
 
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.PhysicalDevice, window.Surface, &data.Capabilities));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.PhysicalDevice, surface, &data.Capabilities));
 
   uint32_t formatCount;
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceFormatsKHR(device.PhysicalDevice, window.Surface, &formatCount, nullptr));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceFormatsKHR(device.PhysicalDevice, surface, &formatCount, nullptr));
   data.Formats.resize(formatCount);
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceFormatsKHR(device.PhysicalDevice, window.Surface, &formatCount, data.Formats.data()));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceFormatsKHR(device.PhysicalDevice, surface, &formatCount, data.Formats.data()));
 
   uint32_t presentModeCount;
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfacePresentModesKHR(device.PhysicalDevice, window.Surface, &presentModeCount, nullptr));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfacePresentModesKHR(device.PhysicalDevice, surface, &presentModeCount, nullptr));
   data.PresentModes.resize(presentModeCount);
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfacePresentModesKHR(device.PhysicalDevice, window.Surface, &presentModeCount, data.PresentModes.data()));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfacePresentModesKHR(device.PhysicalDevice, surface, &presentModeCount, data.PresentModes.data()));
 
   return data;
 }
@@ -69,19 +69,19 @@ VkExtent2D ChooseExtent(VkSurfaceCapabilitiesKHR capabilities, uint32_t width, u
   return actualExtent;
 }
 
-Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR oldSwapchain)
+Swapchain Create(Device::Device device, uint32_t width, uint32_t height, VkSurfaceKHR surface, VkSwapchainKHR oldSwapchain)
 {
   Swapchain data = {};
   data.Device = device.Device;
-  data.SupportDetails = GetSupportDetails(device, window);
+  data.SupportDetails = GetSupportDetails(device, surface);
   data.SurfaceFormat = ChooseSurfaceFormat(data.SupportDetails.Formats);
   data.PresentMode = ChoosePresentMode(data.SupportDetails.PresentModes);
-  data.Extent = ChooseExtent(data.SupportDetails.Capabilities, window.Width, window.Height);
+  data.Extent = ChooseExtent(data.SupportDetails.Capabilities, width, height);
 
   VkBool32 isComputeSupported = false;
   VkBool32 isGraphicsSupported = false;
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Compute.Index, window.Surface, &isComputeSupported));
-  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Graphics.Index, window.Surface, &isGraphicsSupported));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Compute.Index, surface, &isComputeSupported));
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Graphics.Index, surface, &isGraphicsSupported));
   if (!isComputeSupported && !isGraphicsSupported)
     Console::Fatal("This device does not have any present queues");
 
@@ -94,7 +94,7 @@ Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR ol
   {
     swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    swapchainInfo.surface = window.Surface;
+    swapchainInfo.surface = surface;
     swapchainInfo.minImageCount = data.ImageCount;
     swapchainInfo.imageFormat = data.SurfaceFormat.format;
     swapchainInfo.imageColorSpace = data.SurfaceFormat.colorSpace;

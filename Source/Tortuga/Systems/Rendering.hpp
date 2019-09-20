@@ -15,7 +15,6 @@
 #include "../Graphics/Vulkan/CommandPool.hpp"
 #include "../Graphics/Vulkan/Command.hpp"
 #include "../Graphics/Vulkan/Instance.hpp"
-#include "../Graphics/Vulkan/Window.hpp"
 #include "../Graphics/Vulkan/Semaphore.hpp"
 #include "../Graphics/Vulkan/Fence.hpp"
 #include "../Graphics/UniformBuffer.hpp"

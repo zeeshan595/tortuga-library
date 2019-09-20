@@ -22,6 +22,10 @@ void CreateImage(std::string path, uint32_t size)
   unlink(path.c_str());
   auto file = creat(path.c_str(), S_IRUSR | S_IWUSR);
   std::vector<char> temp(size);
+  {//todo remove this, it is just here for testing
+    for (uint32_t i = 3; i < size; i+= 4)
+    temp[i] = 255;
+  }
   write(file, temp.data(), size);
   close(file);
 }

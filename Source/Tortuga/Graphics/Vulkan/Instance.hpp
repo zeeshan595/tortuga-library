@@ -4,8 +4,6 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <shaderc/shaderc.h>
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
 
 #include "./ErrorCheck.hpp"
 #include "./Device.hpp"

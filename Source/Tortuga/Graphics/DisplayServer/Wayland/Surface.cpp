@@ -7,7 +7,6 @@ void shell_surface_ping(void *data, struct wl_shell_surface *shell_surface, uint
 
 void shell_surface_configure(void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height)
 {
-  
 }
 
 const struct wl_shell_surface_listener shell_surface_listener = {
@@ -53,6 +52,10 @@ void BindSurfaceWithBuffer(Surface data, Buffer buffer)
 {
   wl_surface_attach(data.Surface, buffer.Buffer, 0, 0);
   wl_surface_commit(data.Surface);
+}
+void SetTitle(Surface data, const char *title)
+{
+  wl_shell_surface_set_title(data.ShellSurface, title);
 }
 } // namespace Wayland
 } // namespace DisplayServer

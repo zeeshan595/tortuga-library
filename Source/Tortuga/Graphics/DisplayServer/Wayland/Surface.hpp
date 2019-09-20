@@ -20,6 +20,7 @@ struct Surface
 Surface CreateSurface(Display wayland);
 void DestroySurface(Surface data);
 void BindSurfaceWithBuffer(Surface data, Buffer buffer);
+void SetTitle(Surface data, const char *title);
 } // namespace Wayland
 } // namespace DisplayServer
 } // namespace Graphics

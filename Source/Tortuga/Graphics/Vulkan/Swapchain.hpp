@@ -4,7 +4,6 @@
 #include <vulkan/vulkan.h>
 
 #include "./Device.hpp"
-#include "./Window.hpp"
 #include "./Image.hpp"
 #include "./Semaphore.hpp"
 #include "./ImageView.hpp"
@@ -41,13 +40,13 @@ struct Swapchain
   VkFence Fence;
 };
 
-Swapchain Create(Device::Device device, Window::Window window, VkSwapchainKHR oldSwapchain = VK_NULL_HANDLE);
+Swapchain Create(Device::Device device, uint32_t width, uint32_t height, VkSurfaceKHR surface, VkSwapchainKHR oldSwapchain = VK_NULL_HANDLE);
 void Destroy(Swapchain data);
 uint32_t AquireNextImage(Swapchain data);
 Image::Image GetImage(Swapchain data, uint32_t index);
 void PresentImage(Swapchain data, uint32_t imageIndex, VkQueue Queue, std::vector<Semaphore::Semaphore> waitSemaphores = {});
 
-SwapChainSupportDetails GetSupportDetails(Device::Device device, Window::Window window);
+SwapChainSupportDetails GetSupportDetails(Device::Device device, VkSurfaceKHR surface);
 VkSurfaceFormatKHR ChooseSurfaceFormat(std::vector<VkSurfaceFormatKHR> formats);
 VkPresentModeKHR ChoosePresentMode(std::vector<VkPresentModeKHR> presentModes);
 VkExtent2D ChooseExtent(VkSurfaceCapabilitiesKHR capabilities, uint32_t width, uint32_t height);

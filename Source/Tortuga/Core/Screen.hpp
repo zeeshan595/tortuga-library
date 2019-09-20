@@ -2,7 +2,7 @@
 #define _SCREEN
 
 #include "./Engine.hpp"
-#include "../Graphics/Vulkan/Window.hpp"
+#include "../Graphics/DisplaySurface.hpp"
 #include "../Graphics/Vulkan/Swapchain.hpp"
 
 namespace Tortuga
@@ -11,13 +11,9 @@ namespace Core
 {
 namespace Screen
 {
-bool PollEvents();
 void SetWindowTitle(std::string title);
-void SetFullScreen();
-void ResizeWindow(uint32_t width, uint32_t height);
-std::vector<int32_t> GetWindowSize();
-Graphics::Vulkan::Window::Window GetWindow();
 Graphics::Vulkan::Swapchain::Swapchain GetSwapchain();
+Graphics::DisplaySurface::DisplaySize GetDisplaySize();
 } // namespace Screen
 } // namespace Core
 } // namespace Tortuga

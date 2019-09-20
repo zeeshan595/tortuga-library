@@ -4,7 +4,6 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
-#define GLFW_INCLUDE_VULKAN
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 
@@ -14,17 +13,10 @@
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
-//Display Servers
-#include "./Tortuga/Graphics/DisplayServer/Wayland/Display.hpp"
-#include "./Tortuga/Graphics/DisplayServer/Wayland/MemoryPool.hpp"
-#include "./Tortuga/Graphics/DisplayServer/Wayland/Buffer.hpp"
-#include "./Tortuga/Graphics/DisplayServer/Wayland/Surface.hpp"
-
 //Vulkan library
 #include "./Tortuga/Graphics/Vulkan/ErrorCheck.hpp"
 #include "./Tortuga/Graphics/Vulkan/Instance.hpp"
 #include "./Tortuga/Graphics/Vulkan/Device.hpp"
-#include "./Tortuga/Graphics/Vulkan/Window.hpp"
 #include "./Tortuga/Graphics/Vulkan/Swapchain.hpp"
 #include "./Tortuga/Graphics/Vulkan/Shader.hpp"
 #include "./Tortuga/Graphics/Vulkan/Image.hpp"

@@ -1,5 +1,7 @@
 #include "./Instance.hpp"
 
+#include "../DisplaySurface.hpp"
+
 namespace Tortuga
 {
 namespace Graphics
@@ -13,26 +15,12 @@ Instance Create(bool enableWindowSupport)
   Instance data = {};
   data.ShaderCompiler = shaderc_compiler_initialize();
 
-  if (!glfwInit())
-    Console::Fatal("Failed to initialize GLFW");
-
   std::vector<const char *> extensions;
-  GLFWwindow *window = nullptr;
   if (enableWindowSupport)
   {
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-    window = glfwCreateWindow(400, 200, "Vulkan Helper", nullptr, nullptr);
-    if (window == nullptr)
-    {
-      Console::Fatal("Failed to create SDL Window");
-    }
-    uint32_t extensionsCount = 0;
-    auto windowExtensions = glfwGetRequiredInstanceExtensions(&extensionsCount);
-    uint32_t currentExtensionSize = extensions.size();
-    extensions.resize(currentExtensionSize + extensionsCount);
-    for (uint32_t i = 0; i < extensions.size(); i++)
-      extensions[i + currentExtensionSize] = windowExtensions[i];
+    const auto windowExtensions = DisplaySurface::GetVulkanExtensions();
+    for (auto e : windowExtensions)
+      extensions.push_back(e);
   }
   std::vector<const char *> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
   extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
@@ -60,11 +48,9 @@ Instance Create(bool enableWindowSupport)
 
   ErrorCheck::Callback(vkCreateInstance(&createInfo, nullptr, &data.Instance));
 
-  VkSurfaceKHR surface = VK_NULL_HANDLE;
+  DisplaySurface::DisplaySurface queryDisplaySurface;
   if (enableWindowSupport)
-  {
-    ErrorCheck::Callback(glfwCreateWindowSurface(data.Instance, window, nullptr, &surface));
-  }
+    queryDisplaySurface = DisplaySurface::Create(data);
 
   uint32_t deviceCount = 0;
   ErrorCheck::Callback(vkEnumeratePhysicalDevices(data.Instance, &deviceCount, nullptr));
@@ -75,19 +61,13 @@ Instance Create(bool enableWindowSupport)
 
   for (uint32_t i = 0; i < deviceCount; i++)
   {
-    auto device = Device::Create(physicalDevices[i], surface);
+    auto device = Device::Create(physicalDevices[i], queryDisplaySurface.Surface);
     if (device.IsDeviceCompatible)
       data.Devices.push_back(device);
   }
 
   if (enableWindowSupport)
-  {
-    vkDestroySurfaceKHR(data.Instance, surface, nullptr);
-    glfwSetWindowShouldClose(window, true);
-    while (!glfwWindowShouldClose(window))
-    {
-    }
-  }
+    Destroy(queryDisplaySurface);
 
   return data;
 }
@@ -101,7 +81,6 @@ void Destroy(Instance data)
 
   vkDestroyInstance(data.Instance, nullptr);
   shaderc_compiler_release(data.ShaderCompiler);
-  glfwTerminate();
 }
 } // namespace Instance
 } // namespace Vulkan

@@ -1,8 +1,6 @@
 # tortuga-library
 
-Tortuga is a open source Game Engine built in C++ 17. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. Tortuga is built in Linux and currently does not have support for other platforms. For editing the source code & building the project, a `Linux` system is recommended with a copy of `vs code` or `gnome-builder`.
-
-UPDATE: currently the glfw library is being removed from the project
+Tortuga is a open source Game Engine built in C++ 17. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. Tortuga is built for Linux (Wayland) and currently does NOT have support for any other platforms. For editing the source code & building the project, a `Linux` system is recommended with a copy of `vs code` or `gnome-builder`.
 
 **Key Features**
 
