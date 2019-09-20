@@ -15,7 +15,7 @@ struct MemoryPool
 {
   std::string FilePath;
   int32_t fd;
-  uint8_t *Memory;
+  char *Memory;
   uint32_t Size;
   wl_shm_pool *Pool;
 };

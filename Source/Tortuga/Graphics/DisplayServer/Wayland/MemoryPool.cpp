@@ -17,28 +17,46 @@ namespace DisplayServer
 {
 namespace Wayland
 {
+void SetupFile(std::string path, uint32_t size)
+{
+  unlink(path.c_str());
+  auto file = creat(path.c_str(), S_IRUSR | S_IWUSR);
+  std::vector<char> temp(size);
+  write(file, temp.data(), size);
+  close(file);
+}
+
 MemoryPool CreatePool(Display wayland, uint32_t maxWidth, uint32_t maxHeight)
 {
   auto data = MemoryPool();
-  data.FilePath = "/tmp/tortuga-wayland-session-" + Core::GUID::GenerateGUID(32) + ".bin";
+  data.FilePath = "/tmp/tortuga-wayland-session-" + Core::GUID::GenerateGUID(8) + ".bin";
   struct stat stat;
   uint32_t size = maxWidth * maxHeight * 4;
 
-  unlink(data.FilePath.c_str());
-  const auto file = creat(data.FilePath.c_str(), O_TMPFILE);
-  std::vector<char> temp(size);
-  write(file, temp.data(), size);
+  SetupFile(data.FilePath, size);
+  const auto file = open(data.FilePath.c_str(), O_RDWR, S_IRUSR | S_IWUSR);
+  if (file < 0)
+  {
+    perror("failed to create wayland memory pool");
+    return data;
+  }
   if (fstat(file, &stat) != 0)
   {
     perror("failed to create wayland memory pool");
     return data;
   }
+  if (stat.st_size != size)
+  {
+    std::cout << "something is wrong" << std::endl;
+    return data;
+  }
 
   data.fd = file;
   data.Size = stat.st_size;
-  mmap(data.Memory, data.Size, PROT_READ, MAP_SHARED, data.fd, 0);
+  data.Memory = (char *)mmap(0, data.Size, PROT_READ | PROT_WRITE, MAP_SHARED, data.fd, 0);
   if (data.Memory == MAP_FAILED)
   {
+    close(data.fd);
     perror("failed to map wayland memory pool");
     return data;
   }
