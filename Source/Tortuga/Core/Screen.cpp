@@ -18,6 +18,10 @@ Graphics::Vulkan::Swapchain::Swapchain GetSwapchain()
 {
   return displaySurface.Swapchain;
 }
+void Dispatch()
+{
+  Graphics::DisplaySurface::Dispatch(displaySurface);
+}
 } // namespace Screen
 } // namespace Core
 } // namespace Tortuga

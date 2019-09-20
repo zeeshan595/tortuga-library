@@ -28,6 +28,7 @@ struct Display
 };
 Display CreateWayland();
 void DestroyWayland(Display data);
+void Dispatch(Display data);
 } // namespace Wayland
 } // namespace DisplayServer
 } // namespace Graphics

@@ -23,7 +23,7 @@ wl_touch *touch = nullptr;
 
 void PointerEnter(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *surface, wl_fixed_t surface_x, wl_fixed_t surface_y)
 {
-  //std::cout << surface_x << std::endl;
+  std::cout << surface_x << std::endl;
 }
 
 void PointerLeave(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *wl_surface)
@@ -32,7 +32,7 @@ void PointerLeave(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surfac
 
 void PointerMotion(void *data, wl_pointer *wl_pointer, uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y)
 {
-  //std::cout << surface_x << std::endl;
+  std::cout << surface_x << std::endl;
 }
 
 void PointerButton(void *data, wl_pointer *wl_pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
@@ -123,6 +123,11 @@ void DestroyWayland(Display data)
   wl_shm_destroy(data.Shm);
   wl_compositor_destroy(data.Compositor);
   wl_display_disconnect(data.Display);
+}
+
+void Dispatch(Display data)
+{
+  wl_display_dispatch(data.Display);
 }
 } // namespace Wayland
 } // namespace DisplayServer

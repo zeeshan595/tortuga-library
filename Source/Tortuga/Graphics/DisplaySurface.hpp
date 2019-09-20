@@ -39,6 +39,7 @@ struct DisplaySize
   uint32_t height;
 };
 DisplaySize GetDisplaySize(DisplaySurface data);
+void Dispatch(DisplaySurface data);
 } // namespace Window
 } // namespace Graphics
 } // namespace Tortuga

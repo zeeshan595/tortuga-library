@@ -16,7 +16,7 @@ namespace DisplaySurface
 DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Device device)
 {
   auto data = Create(instance);
-  data.Swapchain = Vulkan::Swapchain::Create(device, 1027, 768, data.Surface);
+  data.Swapchain = Vulkan::Swapchain::Create(device, 1920, 1080, data.Surface);
   return data;
 }
 DisplaySurface Create(Vulkan::Instance::Instance instance)
@@ -63,6 +63,12 @@ void SetTitle(DisplaySurface data, std::string title)
 {
 #if __unix__
   DisplayServer::Wayland::SetTitle(data.WaylandSurface, title.c_str());
+#endif
+}
+void Dispatch(DisplaySurface data)
+{
+#if __unix__
+  DisplayServer::Wayland::Dispatch(data.Wayland);
 #endif
 }
 } // namespace DisplaySurface

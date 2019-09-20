@@ -41,6 +41,7 @@ void Rendering::Update()
   if (!Graphics::Vulkan::Fence::IsFenceSignaled(RenderFence))
     return;
   Graphics::Vulkan::Fence::ResetFences({RenderFence});
+  Core::Screen::Dispatch();
 
   const auto renderer = Renderer;
   const auto renderPass = RenderPass;
