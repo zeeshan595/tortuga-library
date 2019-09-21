@@ -2,7 +2,8 @@ project(
 	'tortuga-library',
 	['c','cpp'],
 	version: '0.1.0',
-	meson_version: '>= 0.42.0'
+	meson_version: '>= 0.51.0',
+	default_options: ['cpp_std=c++17']
 )
 
 add_project_arguments(
@@ -10,7 +11,8 @@ add_project_arguments(
 	'-std=c++17',
 	'-DDEBUG_MODE',
 	'-Wno-narrowing',
-	language: 'cpp')
+	language: 'cpp'
+)
 
 thread_dep = dependency('threads')
 vulkan_dep = dependency('vulkan')
