@@ -14,6 +14,7 @@ namespace Screen
 void SetWindowTitle(std::string title);
 Graphics::Vulkan::Swapchain::Swapchain GetSwapchain();
 void Dispatch();
+bool ShouldClose();
 } // namespace Screen
 } // namespace Core
 } // namespace Tortuga

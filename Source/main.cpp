@@ -63,7 +63,7 @@ int main()
   float yRotation = 0.0f;
 
   //Main Loop
-  while (true)
+  while (!Core::Screen::ShouldClose())
   {
     dragon->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
 

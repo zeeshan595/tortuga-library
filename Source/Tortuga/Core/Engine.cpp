@@ -6,7 +6,7 @@ namespace Core
 {
 namespace Engine
 {
-Graphics::Vulkan::Instance::Instance VulkanInstance = Graphics::Vulkan::Instance::Create(true);
+Graphics::Vulkan::Instance::Instance VulkanInstance = Graphics::Vulkan::Instance::Create();
 
 Graphics::Vulkan::Instance::Instance GetVulkan()
 {

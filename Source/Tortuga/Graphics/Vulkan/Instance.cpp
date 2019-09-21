@@ -1,6 +1,7 @@
 #include "./Instance.hpp"
 
 #include "../DisplaySurface.hpp"
+#include "GLFW/glfw3.h"
 
 namespace Tortuga
 {
@@ -10,18 +11,13 @@ namespace Vulkan
 {
 namespace Instance
 {
-Instance Create(bool enableWindowSupport)
+Instance Create()
 {
+  glfwInit();
   Instance data = {};
   data.ShaderCompiler = shaderc_compiler_initialize();
 
-  std::vector<const char *> extensions;
-  if (enableWindowSupport)
-  {
-    const auto windowExtensions = DisplaySurface::GetVulkanExtensions();
-    for (auto e : windowExtensions)
-      extensions.push_back(e);
-  }
+  std::vector<const char *> extensions = DisplaySurface::GetVulkanExtensions();
   std::vector<const char *> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
   extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
   extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -48,9 +44,11 @@ Instance Create(bool enableWindowSupport)
 
   ErrorCheck::Callback(vkCreateInstance(&createInfo, nullptr, &data.Instance));
 
-  DisplaySurface::DisplaySurface queryDisplaySurface;
-  if (enableWindowSupport)
-    queryDisplaySurface = DisplaySurface::Create(data);
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+  const auto setupWindow = glfwCreateWindow(800, 600, "Tortuga", nullptr, nullptr);
+  VkSurfaceKHR surface = VK_NULL_HANDLE;
+  ErrorCheck::Callback(glfwCreateWindowSurface(data.Instance, setupWindow, nullptr, &surface));
 
   uint32_t deviceCount = 0;
   ErrorCheck::Callback(vkEnumeratePhysicalDevices(data.Instance, &deviceCount, nullptr));
@@ -61,13 +59,13 @@ Instance Create(bool enableWindowSupport)
 
   for (uint32_t i = 0; i < deviceCount; i++)
   {
-    auto device = Device::Create(physicalDevices[i], queryDisplaySurface.Surface);
+    auto device = Device::Create(physicalDevices[i], surface);
     if (device.IsDeviceCompatible)
       data.Devices.push_back(device);
   }
 
-  if (enableWindowSupport)
-    Destroy(queryDisplaySurface);
+  vkDestroySurfaceKHR(data.Instance, surface, nullptr);
+  glfwDestroyWindow(setupWindow);
 
   return data;
 }
@@ -81,6 +79,7 @@ void Destroy(Instance data)
 
   vkDestroyInstance(data.Instance, nullptr);
   shaderc_compiler_release(data.ShaderCompiler);
+  glfwTerminate();
 }
 } // namespace Instance
 } // namespace Vulkan

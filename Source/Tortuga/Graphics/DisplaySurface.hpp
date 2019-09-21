@@ -1,14 +1,12 @@
 #ifndef _GRAPHICS_WINDOW
 #define _GRAPHICS_WINDOW
 
+#include "./Vulkan/ErrorCheck.hpp"
 #include "./Vulkan/Swapchain.hpp"
-
 #include "vulkan/vulkan.h"
 
-#if __unix__
-#include "./DisplayServer/Wayland/Display.hpp"
-#include "./DisplayServer/Wayland/Surface.hpp"
-#endif
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 struct Instance;
 struct Device;
@@ -21,17 +19,13 @@ namespace DisplaySurface
 struct DisplaySurface
 {
   VkInstance Instance;
+  GLFWwindow *Window;
   VkSurfaceKHR Surface;
   Vulkan::Swapchain::Swapchain Swapchain;
-#if __unix__
-  DisplayServer::Wayland::Display Wayland;
-  DisplayServer::Wayland::Surface WaylandSurface;
-#endif
 };
-DisplaySurface Create(Vulkan::Instance::Instance instance);
 DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Device device);
 void Destroy(DisplaySurface data);
-std::vector<const char*> GetVulkanExtensions();
+std::vector<const char *> GetVulkanExtensions();
 void SetTitle(DisplaySurface data, std::string title);
 struct DisplaySize
 {
@@ -40,7 +34,8 @@ struct DisplaySize
 };
 DisplaySize GetDisplaySize(DisplaySurface data);
 void Dispatch(DisplaySurface data);
-} // namespace Window
+bool ShouldClose(DisplaySurface data);
+} // namespace DisplaySurface
 } // namespace Graphics
 } // namespace Tortuga
 

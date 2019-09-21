@@ -25,7 +25,7 @@ struct Instance
   VkDebugReportCallbackEXT DebugCallbackReport = VK_NULL_HANDLE;
 };
 
-Instance Create(bool enableWindowSupport = true);
+Instance Create();
 void Destroy(Instance data);
 } // namespace Instance
 } // namespace Vulkan

@@ -22,6 +22,10 @@ void Dispatch()
 {
   Graphics::DisplaySurface::Dispatch(displaySurface);
 }
+bool ShouldClose()
+{
+  return Graphics::DisplaySurface::ShouldClose(displaySurface);
+}
 } // namespace Screen
 } // namespace Core
 } // namespace Tortuga
