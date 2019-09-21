@@ -6,7 +6,21 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "rm -rf Build && meson Build && cd Build && ninja",
+            "command": "cd Build && ninja",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Configure",
+            "type": "shell",
+            "command": [
+                "rm -rf Build && meson Build && ",
+                "cp -r Assets/ Build/"
+            ],
+            "problemMatcher": []
         }
     ]
 }
