@@ -1,6 +1,6 @@
 # tortuga-library
 
-Tortuga is a open source Game Engine built in C++ 17. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. Tortuga is built for Linux (Wayland) and currently does NOT have support for any other platforms. For editing the source code & building the project, a `Linux` system is recommended with a copy of `vs code` or `gnome-builder`.
+Tortuga is a open source Game Engine built in C++ 17. Tortuga ONLY uses vulkan for its graphics API with NO plans of using any other graphics API. Tortuga is built for linux but should be compatible on Mac OS X and Windows. For editing the source code & building the project a copy of `vs code` or `gnome-builder` is recomended.
 
 **Key Features**
 
@@ -16,12 +16,13 @@ Tortuga is a open source Game Engine built in C++ 17. Tortuga ONLY uses vulkan f
 * vulkan https://www.khronos.org/vulkan/
 * vulkan-validation-layers (This is an extra vulkan package for debugging)
 * shaderc https://github.com/google/shaderc
+* glfw https://www.glfw.org/
 * glm https://github.com/g-truc/glm
 * meson https://mesonbuild.com/
 
 *Linux*
 
-Use your package manager to install `libglm`, `libvulkan` and `meson`
+Use your package manager to install `libglm`, `libglfw`, `libvulkan` and `meson`
 
 You can download `shaderc` from github and place the extracted folders (`bin`, `include`, `lib`, `share`) inside `/usr/`
 
