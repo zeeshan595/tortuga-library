@@ -21,25 +21,24 @@ wl_pointer *pointer = nullptr;
 wl_keyboard *keyboard = nullptr;
 wl_touch *touch = nullptr;
 
-void PointerEnter(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *surface, wl_fixed_t surface_x, wl_fixed_t surface_y)
-{
-  
-}
-
-void PointerLeave(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *wl_surface)
+void PointerEnter(void *data, wl_pointer *pointer, uint32_t serial, wl_surface *surface, wl_fixed_t x, wl_fixed_t y)
 {
 }
 
-void PointerMotion(void *data, wl_pointer *wl_pointer, uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y)
-{
-  std::cout << surface_x << std::endl;
-}
-
-void PointerButton(void *data, wl_pointer *wl_pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
+void PointerLeave(void *data, wl_pointer *pointer, uint32_t serial, wl_surface *surface)
 {
 }
 
-void PointerAxis(void *data, wl_pointer *wl_pointer, uint32_t time, uint32_t axis, wl_fixed_t value)
+void PointerMotion(void *data, wl_pointer *pointer, uint32_t time, wl_fixed_t x, wl_fixed_t y)
+{
+  std::cout << x << std::endl;
+}
+
+void PointerButton(void *data, wl_pointer *pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
+{
+}
+
+void PointerAxis(void *data, wl_pointer *pointer, uint32_t time, uint32_t axis, wl_fixed_t value)
 {
 }
 
@@ -48,14 +47,72 @@ wl_pointer_listener PointerListener = {
     .leave = PointerLeave,
     .motion = PointerMotion,
     .button = PointerButton,
-    .axis = PointerAxis};
-
-wl_keyboard_listener KeyboardListener = {
-
+    .axis = PointerAxis,
 };
 
-wl_touch_listener TouchListener = {
+void KeyMap(void *data, wl_keyboard *keyboard, uint32_t format, int32_t fd, uint32_t size)
+{
+}
 
+void KeyboardFocusEnter(void *data, wl_keyboard *keyboard, uint32_t serial, wl_surface *surface, wl_array *keys)
+{
+}
+void KeyboardFocusLeave(void *data, wl_keyboard *keyboard, uint32_t serial, wl_surface *surface)
+{
+}
+
+void KeyboardEvent(void *data, wl_keyboard *keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
+{
+}
+
+void ModifiersEvent(void *data, wl_keyboard *keyboard, uint32_t serial, uint32_t modsDepressed, uint32_t modsLatched, uint32_t modsLocked, uint32_t group)
+{
+}
+
+void RepeatEvent(void *data, wl_keyboard *keyboard, int32_t rate, int32_t delay)
+{
+}
+
+wl_keyboard_listener KeyboardListener = {
+    .keymap = KeyMap,
+    .enter = KeyboardFocusEnter,
+    .leave = KeyboardFocusLeave,
+    .key = KeyboardEvent,
+    .modifiers = ModifiersEvent,
+    .repeat_info = RepeatEvent,
+};
+
+void TouchStart(void *data, wl_touch *touch, uint32_t serial, uint32_t time, wl_surface *surface, int32_t id, wl_fixed_t x, wl_fixed_t y)
+{
+}
+void TouchEnd(void *data, wl_touch *touch, uint32_t serial, uint32_t time, int32_t id)
+{
+}
+void TouchMotion(void *data, wl_touch *touch, uint32_t time, int32_t id, wl_fixed_t x, wl_fixed_t y)
+{
+}
+void TouchFrame(void *data, struct wl_touch *wl_touch)
+{
+}
+void TouchCancel(void *data, wl_touch *touch)
+{
+}
+void TouchShape(void *data, wl_touch *touch, int32_t id, wl_fixed_t major, wl_fixed_t minor)
+{
+}
+
+void Orientation(void *data, wl_touch *touch, int32_t id, wl_fixed_t orientation)
+{
+}
+
+wl_touch_listener TouchListener = {
+    .down = TouchStart,
+    .up = TouchEnd,
+    .motion = TouchMotion,
+    .frame = TouchFrame,
+    .cancel = TouchCancel,
+    .shape = TouchShape,
+    .orientation = Orientation,
 };
 
 void RegistryGlobal(void *data, wl_registry *registry, uint32_t name, const char *interface, uint32_t version)
@@ -73,8 +130,8 @@ void RegistryGlobal(void *data, wl_registry *registry, uint32_t name, const char
     keyboard = wl_seat_get_keyboard(seat);
     touch = wl_seat_get_touch(seat);
     wl_pointer_add_listener(pointer, &PointerListener, nullptr);
-    //wl_keyboard_add_listener(keyboard, &KeyboardListener, nullptr);
-    //wl_touch_add_listener(touch, &TouchListener, nullptr);
+    wl_keyboard_add_listener(keyboard, &KeyboardListener, nullptr);
+    wl_touch_add_listener(touch, &TouchListener, nullptr);
   }
 }
 void RegistryGlobalRemove(void *a, wl_registry *b, uint32_t c)
