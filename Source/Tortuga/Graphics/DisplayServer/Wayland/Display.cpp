@@ -31,7 +31,7 @@ void PointerLeave(void *data, wl_pointer *pointer, uint32_t serial, wl_surface *
 
 void PointerMotion(void *data, wl_pointer *pointer, uint32_t time, wl_fixed_t x, wl_fixed_t y)
 {
-  std::cout << x << std::endl;
+  //std::cout << x << std::endl;
 }
 
 void PointerButton(void *data, wl_pointer *pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
@@ -63,6 +63,7 @@ void KeyboardFocusLeave(void *data, wl_keyboard *keyboard, uint32_t serial, wl_s
 
 void KeyboardEvent(void *data, wl_keyboard *keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
 {
+  std::cout << key << std::endl;
 }
 
 void ModifiersEvent(void *data, wl_keyboard *keyboard, uint32_t serial, uint32_t modsDepressed, uint32_t modsLatched, uint32_t modsLocked, uint32_t group)
@@ -184,7 +185,10 @@ void DestroyWayland(Display data)
 
 void Dispatch(Display data)
 {
-  wl_display_dispatch(data.Display);
+  while (wl_display_prepare_read(data.Display) != 0)
+    wl_display_dispatch_pending(data.Display);
+
+  wl_display_read_events(data.Display);
 }
 } // namespace Wayland
 } // namespace DisplayServer

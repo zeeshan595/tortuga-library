@@ -37,11 +37,11 @@ struct LightInfo
 void AutoFetchLightsForMesh(Component::Mesh *mesh, Component::Transform *transform);
 void Rendering::Update()
 {
+  Core::Screen::Dispatch();
   //check if rendering is already in progress
   if (!Graphics::Vulkan::Fence::IsFenceSignaled(RenderFence))
     return;
   Graphics::Vulkan::Fence::ResetFences({RenderFence});
-  Core::Screen::Dispatch();
 
   const auto renderer = Renderer;
   const auto renderPass = RenderPass;
