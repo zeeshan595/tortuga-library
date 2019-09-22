@@ -2,14 +2,14 @@
 #extension GL_ARB_separate_shader_objects : enable
 #include "./Partial/lightInfo.comp"
 
-layout(set = 1, binding = 0) uniform Light {
+layout(set = 2, binding = 0) uniform Light {
   uint LightsSize;
   uint LightsReserved1;
   uint LightsReserved2;
   uint LightsReserved3;
   LightInfo lights[LIGHTS_AMOUNT];
 };
-layout(set = 2, binding = 0) uniform sampler2D albedo;
+layout(set = 3, binding = 0) uniform sampler2D albedo;
 
 layout(location = 0) in vec3 surfaceNormal;
 layout(location = 1) in vec3 cameraVector;
@@ -43,5 +43,5 @@ void main() {
     }
   }
 
-  outColor = texture(albedo, textureCoords);//vec4(diffuse + specular, 1.);
+  outColor = texture(albedo, textureCoords) * vec4(diffuse + specular, 1.);
 }

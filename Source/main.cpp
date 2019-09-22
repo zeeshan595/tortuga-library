@@ -12,29 +12,29 @@ int main()
   const auto camera = Core::Entity::Create();
   {
     const auto transform = camera->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 10, 30);
-    transform->Rotation = glm::vec4(0, 0, 0, 1);
+    transform->SetPosition({0, 10, 30});
+    transform->SetRotation({0, 0, 0, 1});
 
     const auto comp = camera->AddComponent<Component::Camera>();
-    comp->ViewportOffset = glm::vec2(0, 0);
-    comp->ViewportSize = glm::vec2(0.5f, 1.0f);
+    comp->SetViewportOffset({0, 0});
+    comp->SetViewportSize({0.5, 1.0});
   }
 
   const auto camera2 = Core::Entity::Create();
   {
     const auto transform = camera2->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 3, 15);
-    transform->Rotation = glm::vec4(0, 0, 0, 1);
+    transform->SetPosition({0, 3, 15});
+    transform->SetRotation({0, 0, 0, 1});
 
     const auto comp = camera2->AddComponent<Component::Camera>();
-    comp->ViewportOffset = glm::vec2(0.5f, 0);
-    comp->ViewportSize = glm::vec2(0.5f, 1.0f);
+    comp->SetViewportOffset({0.5, 0});
+    comp->SetViewportSize({0.5, 1.0});
   }
 
   const auto light = Core::Entity::Create();
   {
     const auto transform = light->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(3, 5, 3);
+    transform->SetPosition({3, 5, 3});
 
     light->AddComponent<Component::Light>();
   }
@@ -43,16 +43,16 @@ int main()
   {
     //transform data
     const auto transform = dragon->AddComponent<Component::Transform>();
-    transform->Position = glm::vec3(0, 0, 0);
-    transform->Rotation = glm::vec4(0, 0, 0, 1);
-    transform->Scale = glm::vec3(1, 1, 1);
+    transform->SetPosition({0, 0, 0});
+    transform->SetRotation({0, 0, 0, 1});
+    transform->SetScale({1, 1, 1});
 
     //mesh data
     const auto model = Utils::IO::LoadObjFile("Assets/Models/Dragon.obj");
     const auto mesh = dragon->AddComponent<Component::Mesh>();
     mesh->SetVertices(model.Vertices);
     mesh->SetIndices(model.Indices);
-    mesh->AutoFetchLights(true);
+    mesh->SetLights({light});
 
     //material
     const auto material = dragon->AddComponent<Component::Material>();
@@ -64,7 +64,7 @@ int main()
   //Main Loop
   while (!Core::Screen::ShouldClose())
   {
-    dragon->GetComponent<Component::Transform>()->Rotation = glm::vec4(0, yRotation, 0, 1);
+    dragon->GetComponent<Component::Transform>()->SetRotation(glm::vec4(0, yRotation, 0, 1));
 
     //iterate through all system and execute update functions
     Core::IterateSystemLoop();

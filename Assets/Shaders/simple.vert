@@ -2,13 +2,16 @@
 #extension GL_ARB_separate_shader_objects : enable
 #include "./Partial/lightInfo.comp"
 
-layout(set = 0, binding = 0) uniform UniformBufferObject {
+layout(set = 0, binding = 0) uniform MeshModel {
   mat4 model;
+};
+
+layout(set = 1, binding = 0) uniform CameraProperties {
   mat4 view;
   mat4 projection;
-} ubo;
+};
 
-layout(set = 1, binding = 0) uniform Light {
+layout(set = 2, binding = 0) uniform Light {
   uint LightsSize;
   uint LightsReserved1;
   uint LightsReserved2;
@@ -26,9 +29,9 @@ layout(location = 2) out vec2 texture;
 layout(location = 3) out vec3 lightVectors[LIGHTS_AMOUNT];
 
 void main() {
-  vec4 worldPosition = ubo.model * vec4(inPosition, 1.0);
-  surfaceNormal = (ubo.model * vec4(inNormal, 0.0)).xyz;
-  cameraVector = (inverse(ubo.view) * vec4(0., 0., 0., 1.)).xyz - worldPosition.xyz;
+  vec4 worldPosition = model * vec4(inPosition, 1.0);
+  surfaceNormal = (model * vec4(inNormal, 0.0)).xyz;
+  cameraVector = (inverse(view) * vec4(0., 0., 0., 1.)).xyz - worldPosition.xyz;
   texture = inTexture;
 
   for (uint i = 0; i < LightsSize; i++)
@@ -37,5 +40,5 @@ void main() {
       lightVectors[i] = lights[i].position.xyz - inPosition;
   }
 
-  gl_Position = ubo.projection * ubo.view * worldPosition;
+  gl_Position = projection * view * worldPosition;
 }

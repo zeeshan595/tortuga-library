@@ -6,8 +6,12 @@ namespace Core
 {
 namespace Engine
 {
-Graphics::Vulkan::Instance::Instance VulkanInstance = Graphics::Vulkan::Instance::Create();
-uint32_t BestDevice = -1;
+const auto VulkanInstance = Graphics::Vulkan::Instance::Create();
+const auto VertexUniformBufferLayout = Graphics::Vulkan::DescriptorLayout::Create(GetMainDevice(), 1, VK_SHADER_STAGE_VERTEX_BIT);
+const auto VertexAndFragmentUniformBufferLayout = Graphics::Vulkan::DescriptorLayout::Create(GetMainDevice(), 1, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+const auto FragmentCombinedImageSampleLayout = Graphics::Vulkan::DescriptorLayout::Create(GetMainDevice(), 1, VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+
+int32_t BestDevice = -1;
 void UpdateBestDevice()
 {
   if (BestDevice != -1)
@@ -38,6 +42,18 @@ uint32_t GetMainDeviceIndex()
 {
   UpdateBestDevice();
   return BestDevice;
+}
+Graphics::Vulkan::DescriptorLayout::DescriptorLayout GetVertexUniformBufferLayout()
+{
+  return VertexUniformBufferLayout;
+}
+Graphics::Vulkan::DescriptorLayout::DescriptorLayout GetVertexAndFragmentUniformBufferLayout()
+{
+  return VertexAndFragmentUniformBufferLayout;
+}
+Graphics::Vulkan::DescriptorLayout::DescriptorLayout GetFragmentCombinedImageSampleLayout()
+{
+  return FragmentCombinedImageSampleLayout;
 }
 } // namespace Engine
 } // namespace Core

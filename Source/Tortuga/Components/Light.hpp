@@ -1,8 +1,6 @@
 #ifndef _LIGHT
 #define _LIGHT
 
-#define MAX_LIGHT_NUM 16
-
 #include <glm/glm.hpp>
 
 #include "../Graphics/Vulkan/DescriptorPool.hpp"
@@ -20,6 +18,7 @@ enum LightType
 };
 struct Light
 {
+  const static uint32_t MAX_LIGHT_NUM = 16;
   bool IsEnabled;
   Graphics::Vulkan::Buffer::Buffer StagingLightBuffer;
   LightType Type;
