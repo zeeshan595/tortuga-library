@@ -8,6 +8,9 @@
 #include "./DescriptorLayout.hpp"
 #include "./DescriptorPool.hpp"
 #include "./Buffer.hpp"
+#include "./Image.hpp"
+#include "./ImageView.hpp"
+#include "./Sampler.hpp"
 
 namespace Tortuga
 {
@@ -27,6 +30,7 @@ struct DescriptorSet
 
 DescriptorSet Create(Device::Device device, DescriptorPool::DescriptorPool pool, DescriptorLayout::DescriptorLayout layout);
 void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> content);
+void UpdateDescriptorSets(DescriptorSet data, std::vector<ImageView::ImageView> content, std::vector<Sampler::Sampler> samplers);
 } // namespace DescriptorSet
 } // namespace Vulkan
 } // namespace Graphics

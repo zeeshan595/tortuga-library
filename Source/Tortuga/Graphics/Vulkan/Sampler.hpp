@@ -1,5 +1,5 @@
 #ifndef _VULKAN_SAMPLER
-#define _VUKAN_SAMPLER
+#define _VULKAN_SAMPLER
 
 #include <vulkan/vulkan.h>
 

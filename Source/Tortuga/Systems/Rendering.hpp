@@ -28,6 +28,7 @@
 #include "../Components/Mesh.hpp"
 #include "../Components/Camera.hpp"
 #include "../Components/Light.hpp"
+#include "../Components/Material.hpp"
 
 namespace Tortuga
 {
@@ -46,7 +47,8 @@ private:
   std::vector<Graphics::Vulkan::Framebuffer::Framebuffer> Framebuffers;
   Graphics::Vulkan::Command::Command Renderer;
   Graphics::Vulkan::Fence::Fence RenderFence;
-  Graphics::Vulkan::Semaphore::Semaphore RenderSemaphore;
+  Graphics::Vulkan::Semaphore::Semaphore TransferSemaphore;
+  Graphics::Vulkan::Semaphore::Semaphore GraphicsProcessSemaphore;
   Graphics::Vulkan::Semaphore::Semaphore PresentSemaphore;
 
 public:

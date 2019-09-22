@@ -29,7 +29,7 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> conten
 {
   if (data.Layout.BindingsAmount != content.size())
   {
-    Console::Error("Provided Content does not match this descriptor set size");
+    Console::Error("provided Content does not match this descriptor set size");
     return;
   }
 
@@ -53,6 +53,44 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> conten
 
     writeInfos[i].pBufferInfo = &(bufferInfos[i]);
     writeInfos[i].pImageInfo = VK_NULL_HANDLE;
+    writeInfos[i].pTexelBufferView = VK_NULL_HANDLE;
+  }
+  vkUpdateDescriptorSets(data.Device, writeInfos.size(), writeInfos.data(), 0, 0);
+}
+
+void UpdateDescriptorSets(DescriptorSet data, std::vector<ImageView::ImageView> content, std::vector<Sampler::Sampler> samplers)
+{
+  if (content.size() != samplers.size())
+  {
+    Console::Error("content size does not match sampler size");
+    return;
+  }
+  if (data.Layout.BindingsAmount != content.size())
+  {
+    Console::Error("provided Content does not match this descriptor set size");
+    return;
+  }
+
+  std::vector<VkDescriptorImageInfo> imageInfo(content.size());
+  std::vector<VkWriteDescriptorSet> writeInfos(data.Layout.BindingsAmount);
+  for (uint32_t i = 0; i < data.Layout.BindingsAmount; i++)
+  {
+    {
+      imageInfo[i] = {};
+      imageInfo[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+      imageInfo[i].imageView = content[i].View;
+      imageInfo[i].sampler = samplers[i].Sampler;
+    }
+
+    writeInfos[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writeInfos[i].dstSet = data.set;
+    writeInfos[i].dstBinding = i;
+    writeInfos[i].dstArrayElement = 0;
+    writeInfos[i].descriptorCount = 1;
+    writeInfos[i].descriptorType = data.Layout.Type;
+
+    writeInfos[i].pBufferInfo = VK_NULL_HANDLE;
+    writeInfos[i].pImageInfo = &(imageInfo[i]);
     writeInfos[i].pTexelBufferView = VK_NULL_HANDLE;
   }
   vkUpdateDescriptorSets(data.Device, writeInfos.size(), writeInfos.data(), 0, 0);

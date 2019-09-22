@@ -80,13 +80,14 @@ Graphics::Image LoadImageFile(std::string filePath)
   auto pixels = stbi_load(filePath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
   if (pixels == nullptr)
     Console::Error("Failed to load image file {0}", filePath);
-  
+
   Graphics::Image data = {};
   data.Width = width;
   data.Height = height;
   data.Channels = channels;
-  data.Pixels = pixels;
   data.ByteSize = width * height * 4.0f;
+  data.Pixels.resize(width * height);
+  memcpy(data.Pixels.data(), pixels, data.ByteSize);
   return data;
 }
 std::vector<char> GetFileContents(std::string filePath)
