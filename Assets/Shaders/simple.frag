@@ -9,10 +9,11 @@ layout(set = 1, binding = 0) uniform Light {
   uint LightsReserved3;
   LightInfo lights[LIGHTS_AMOUNT];
 };
+layout(set = 2, binding = 0) uniform sampler2D albedo;
 
 layout(location = 0) in vec3 surfaceNormal;
 layout(location = 1) in vec3 cameraVector;
-layout(location = 2) in vec2 texture;
+layout(location = 2) in vec2 textureCoords;
 layout(location = 3) in vec3 lightVectors[LIGHTS_AMOUNT];
 
 layout(location = 0) out vec4 outColor;
@@ -42,5 +43,5 @@ void main() {
     }
   }
 
-  outColor = vec4(diffuse + specular, 1.);
+  outColor = texture(albedo, textureCoords);//vec4(diffuse + specular, 1.);
 }
