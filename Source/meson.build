@@ -21,10 +21,5 @@ sourceCppFiles = [
   './Source/Tortuga/Graphics/Vulkan/CommandPool.cpp',
   './Source/Tortuga/Graphics/Vulkan/ErrorCheck.cpp',
   './Source/Tortuga/Graphics/DisplaySurface.cpp',
-  './Source/Tortuga/Core/Engine.cpp',
-  './Source/Tortuga/Core/System.cpp',
-  './Source/Tortuga/Core/Screen.cpp',
-  './Source/Tortuga/Core/GUID.cpp',
-  './Source/Tortuga/Core/Entity.cpp',
-  './Source/Tortuga/Systems/Rendering.cpp'
+  './Source/Tortuga/Core/GUID.cpp'
 ]

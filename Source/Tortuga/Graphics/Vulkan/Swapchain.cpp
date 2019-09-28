@@ -150,6 +150,9 @@ void Destroy(Swapchain data)
   vkDestroySwapchainKHR(data.Device, data.Swapchain, nullptr);
   for (uint32_t i = 0; i < data.ImageCount; i++)
     ImageView::Destroy(data.Views[i]);
+
+  ImageView::Destroy(data.DepthImageView);
+  Image::Destroy(data.DepthImage);
 }
 uint32_t AquireNextImage(Swapchain data)
 {
