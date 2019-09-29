@@ -14,6 +14,7 @@ struct Engine
   std::vector<ECS::Entity *> entities;
   std::unordered_map<std::type_index, std::vector<ECS::Component *>> Components;
 
+  Engine(){}
   ~Engine()
   {
     for (auto i = Systems.begin(); i != Systems.end(); ++i)

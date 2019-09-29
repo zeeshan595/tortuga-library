@@ -23,6 +23,27 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
   }
   Vulkan::ErrorCheck::Callback(glfwCreateWindowSurface(instance.Instance, data.Window, nullptr, &data.Surface));
   data.Swapchain = Vulkan::Swapchain::Create(device, defaultWidth, defaultHeight, data.Surface);
+  glfwSetWindowCloseCallback(data.Window, [](GLFWwindow *windw) {
+    Core::Input::TriggerWindowClose();
+  });
+  glfwSetKeyCallback(data.Window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+    Core::Input::TriggerKeyEvent((Core::Input::KeyCode::KeyCode)key, (Core::Input::KeyAction::KeyAction)action);
+  });
+  glfwSetMouseButtonCallback(data.Window, [](GLFWwindow *window, int button, int action, int mods) {
+    Core::Input::TriggerKeyEvent((Core::Input::KeyCode::KeyCode)button, (Core::Input::KeyAction::KeyAction)action);
+  });
+  glfwSetCursorPosCallback(data.Window, [](GLFWwindow *window, double x, double y) {
+    Core::Input::TriggerMouseEvent(x, y);
+  });
+  glfwSetScrollCallback(data.Window, [](GLFWwindow *window, double x, double y) {
+    Core::Input::TriggerScrollEvent(x, y);
+  });
+  glfwSetDropCallback(data.Window, [](GLFWwindow *window, int count, const char **paths) {
+    std::vector<std::string> data(count);
+    for (uint32_t i = 0; i < count; i++)
+      data[i] = paths[i];
+    Core::Input::TriggerFileDrop(data);
+  });
   return data;
 }
 void Destroy(DisplaySurface data)

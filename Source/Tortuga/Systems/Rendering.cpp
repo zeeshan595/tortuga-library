@@ -16,27 +16,57 @@ void Rendering::Update()
   Graphics::Vulkan::Fence::ResetFences({PresentFence});
 
   const auto device = VulkanInstance.Devices[0];
-  //render image
-  Graphics::Vulkan::Command::Begin(RenderCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-  Graphics::Vulkan::Command::BindPipeline(RenderCommand, VK_PIPELINE_BIND_POINT_COMPUTE, RenderPipeline, {RenderOptionsDescriptorSet, RenderDescriptorSet});
-  Graphics::Vulkan::Command::Compute(RenderCommand, RENDER_WIDTH / 8, RENDER_HEIGHT / 8, 1);
-  Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, RenderedImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-  Graphics::Vulkan::Command::BufferToImage(RenderCommand, RenderingBuffer, RenderedImage, {0, 0}, {RenderedImage.Width, RenderedImage.Height});
-  Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, RenderedImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-  Graphics::Vulkan::Command::End(RenderCommand);
-  Graphics::Vulkan::Command::Submit({RenderCommand}, device.Queues.Compute[0], {}, {RenderSemaphore});
-  Graphics::Vulkan::Device::WaitForQueue(device.Queues.Compute[0]);
+  const auto renderCommand = RenderCommand;
+  const auto renderPipeline = RenderPipeline;
+  const auto renderOptionsDescriptorSet = RenderOptionsDescriptorSet;
+  const auto renderDescriptorSet = RenderDescriptorSet;
+  const auto renderingBuffer = RenderingBuffer;
+  const auto renderImage = RenderedImage;
+  const auto renderSemaphore = RenderSemaphore;
 
-  //present image
-  const auto presentImageIndex = Graphics::Vulkan::Swapchain::AquireNextImage(DisplaySurface.Swapchain);
-  const auto presentImage = Graphics::Vulkan::Swapchain::GetImage(DisplaySurface.Swapchain, presentImageIndex);
-  Graphics::Vulkan::Command::Begin(PresentCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-  Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, presentImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-  Graphics::Vulkan::Command::BlitImage(PresentCommand, RenderedImage, presentImage);
-  Graphics::Vulkan::Command::TransferImageLayout(PresentCommand, presentImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-  Graphics::Vulkan::Command::End(PresentCommand);
-  Graphics::Vulkan::Command::Submit({PresentCommand}, device.Queues.Graphics[0], {RenderSemaphore}, {PresentSemaphore}, PresentFence);
-  Graphics::Vulkan::Swapchain::PresentImage(DisplaySurface.Swapchain, presentImageIndex, device.Queues.Present, {PresentSemaphore});
+  const auto swapchain = DisplaySurface.Swapchain;
+  const auto presentCommand = PresentCommand;
+  const auto presentSemaphore = PresentSemaphore;
+  const auto presentFence = PresentFence;
+  const auto task = std::async(
+      std::launch::async, [device,
+                           renderCommand,
+                           renderPipeline,
+                           renderOptionsDescriptorSet,
+                           renderDescriptorSet,
+                           renderingBuffer,
+                           renderImage,
+                           renderSemaphore,
+                           swapchain,
+                           presentCommand,
+                           presentSemaphore,
+                           presentFence]() {
+        //render image
+        Graphics::Vulkan::Command::Begin(renderCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        Graphics::Vulkan::Command::BindPipeline(renderCommand, VK_PIPELINE_BIND_POINT_COMPUTE, renderPipeline, {renderOptionsDescriptorSet, renderDescriptorSet});
+        Graphics::Vulkan::Command::Compute(renderCommand, RENDER_WIDTH / 8, RENDER_HEIGHT / 8, 1);
+        Graphics::Vulkan::Command::TransferImageLayout(renderCommand, renderImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        Graphics::Vulkan::Command::BufferToImage(renderCommand, renderingBuffer, renderImage, {0, 0}, {renderImage.Width, renderImage.Height});
+        Graphics::Vulkan::Command::TransferImageLayout(renderCommand, renderImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        Graphics::Vulkan::Command::End(renderCommand);
+        Graphics::Vulkan::Command::Submit({renderCommand}, device.Queues.Compute[0], {}, {renderSemaphore});
+        Graphics::Vulkan::Device::WaitForQueue(device.Queues.Compute[0]);
+
+        //present image
+        const auto presentImageIndex = Graphics::Vulkan::Swapchain::AquireNextImage(swapchain);
+        const auto presentImage = Graphics::Vulkan::Swapchain::GetImage(swapchain, presentImageIndex);
+        Graphics::Vulkan::Command::Begin(presentCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        Graphics::Vulkan::Command::TransferImageLayout(presentCommand, presentImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        Graphics::Vulkan::Command::BlitImage(presentCommand, renderImage, presentImage);
+        Graphics::Vulkan::Command::TransferImageLayout(presentCommand, presentImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+        Graphics::Vulkan::Command::End(presentCommand);
+        Graphics::Vulkan::Command::Submit({presentCommand}, device.Queues.Graphics[0], {renderSemaphore}, {presentSemaphore}, presentFence);
+        Graphics::Vulkan::Swapchain::PresentImage(swapchain, presentImageIndex, device.Queues.Present, {presentSemaphore});
+      });
+  if (!task.valid())
+  {
+    Console::Error("failed to validate render task");
+  }
 }
 Rendering::Rendering()
 {
@@ -99,6 +129,8 @@ Rendering::Rendering()
 }
 Rendering::~Rendering()
 {
+  auto device = VulkanInstance.Devices[0];
+  Graphics::Vulkan::Device::WaitForDevice(device);
   Graphics::Vulkan::Semaphore::Destroy(RenderSemaphore);
   Graphics::Vulkan::Semaphore::Destroy(PresentSemaphore);
   Graphics::Vulkan::Fence::Destroy(PresentFence);

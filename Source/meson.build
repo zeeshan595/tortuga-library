@@ -23,5 +23,6 @@ sourceCppFiles = [
   './Source/Tortuga/Graphics/DisplaySurface.cpp',
   './Source/Tortuga/Core/GUID.cpp',
   './Source/Tortuga/Core/Engine.cpp',
+  './Source/Tortuga/Core/Input.cpp',
   './Source/Tortuga/Systems/Rendering.cpp'
 ]
