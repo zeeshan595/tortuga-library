@@ -13,7 +13,8 @@ namespace ECS
 struct Entity;
 struct Component
 {
-  Entity *object;
+public:
+  Entity *Root;
 
   virtual ~Component() {} //allow proper inheritance
 };

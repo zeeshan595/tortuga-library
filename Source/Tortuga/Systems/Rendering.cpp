@@ -7,15 +7,73 @@ namespace Tortuga
 {
 namespace Systems
 {
+Rendering::MeshView CreateMeshBuffers(Graphics::Vulkan::Device::Device device, const Components::Mesh *mesh)
+{
+  auto data = Rendering::MeshView();
+  //vertex
+  data.StagingVertexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Vertices.size() * sizeof(glm::vec4), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.VertexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, data.StagingVertexBuffer.Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.StagingVertexIndicesBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->VertexIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.VertexIndicesBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, data.StagingVertexIndicesBuffer.Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  //texture
+  data.StagingTextureBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Textures.size() * sizeof(glm::vec2), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.TextureBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, data.StagingTextureBuffer.Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.StagingTextureIndicesBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->TextureIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.TextureIndicesBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, data.StagingTextureIndicesBuffer.Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  //normals
+  data.StagingNormalBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Normals.size() * sizeof(glm::vec4), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.NormalBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, data.StagingNormalBuffer.Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.StagingNormalIndicesBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->NormalIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+  data.NormalIndicesBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, data.StagingNormalIndicesBuffer.Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+
+  return data;
+}
+void DestroyMeshBuffers(Rendering::MeshView *data)
+{
+  Graphics::Vulkan::Buffer::Destroy(data->StagingVertexBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->VertexBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->StagingVertexIndicesBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->VertexIndicesBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->StagingTextureBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->TextureBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->StagingTextureIndicesBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->TextureIndicesBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->StagingNormalBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->NormalBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->StagingNormalIndicesBuffer);
+  Graphics::Vulkan::Buffer::Destroy(data->NormalIndicesBuffer);
+}
 void Rendering::Update()
 {
   Graphics::DisplaySurface::Dispatch(DisplaySurface);
+  const auto device = VulkanInstance.Devices[0];
 
   if (!Graphics::Vulkan::Fence::IsFenceSignaled(PresentFence))
     return;
   Graphics::Vulkan::Fence::ResetFences({PresentFence});
 
-  const auto device = VulkanInstance.Devices[0];
+  //auto cleanup
+  const auto meshViews = Core::Engine::GetComponents<MeshView>();
+  for (const auto view : meshViews)
+  {
+    if (Core::Engine::GetComponent<Components::Mesh>(view->Root) == nullptr)
+    {
+      DestroyMeshBuffers(view);
+      Core::Engine::RemoveComponent<MeshView>(view->Root);
+    }
+  }
+  //generate mesh buffer objects for vulkan
+  const auto meshes = Core::Engine::GetComponents<Components::Mesh>();
+  for (const auto mesh : meshes)
+  {
+    auto meshView = Core::Engine::GetComponent<MeshView>(mesh->Root);
+    if (meshView == nullptr)
+    {
+      const auto data = CreateMeshBuffers(device, mesh);
+      Core::Engine::AddComponent<MeshView>(mesh->Root, data);
+    }
+  }
+
   const auto renderCommand = RenderCommand;
   const auto renderPipeline = RenderPipeline;
   const auto renderOptionsDescriptorSet = RenderOptionsDescriptorSet;
@@ -40,7 +98,7 @@ void Rendering::Update()
                            swapchain,
                            presentCommand,
                            presentSemaphore,
-                           presentFence]() {
+                           presentFence] {
         //render image
         Graphics::Vulkan::Command::Begin(renderCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
         Graphics::Vulkan::Command::BindPipeline(renderCommand, VK_PIPELINE_BIND_POINT_COMPUTE, renderPipeline, {renderOptionsDescriptorSet, renderDescriptorSet});
@@ -131,6 +189,12 @@ Rendering::~Rendering()
 {
   auto device = VulkanInstance.Devices[0];
   Graphics::Vulkan::Device::WaitForDevice(device);
+  const auto meshes = Core::Engine::GetComponents<MeshView>();
+  for (const auto mesh : meshes)
+  {
+    DestroyMeshBuffers(mesh);
+    Core::Engine::RemoveComponent<MeshView>(mesh->Root);
+  }
   Graphics::Vulkan::Semaphore::Destroy(RenderSemaphore);
   Graphics::Vulkan::Semaphore::Destroy(PresentSemaphore);
   Graphics::Vulkan::Fence::Destroy(PresentFence);

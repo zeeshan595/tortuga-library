@@ -115,7 +115,7 @@ void DestroyEntity(ECS::Entity *entity)
         auto comp = engine->Components[(*j).first];
         for (auto k = comp.begin(); k != comp.end(); ++k)
         {
-          if ((*k)->object == entity)
+          if ((*k)->Root == entity)
           {
             comp.erase(k);
             engine->Components[(*j).first] = comp;
@@ -137,7 +137,7 @@ void AddComponent(ECS::Entity *entity, std::type_index type, ECS::Component *dat
     return;
   }
 
-  data->object = entity;
+  data->Root = entity;
   entity->Components.insert(std::pair(type, data));
   if (engine->Components.find(type) == engine->Components.end())
   {
@@ -168,7 +168,7 @@ void RemoveComponent(ECS::Entity *entity, std::type_index type)
   auto comp = engine->Components[type];
   for (auto k = comp.begin(); k != comp.end(); ++k)
   {
-    if ((*k)->object == entity)
+    if ((*k)->Root == entity)
     {
       comp.erase(k);
       engine->Components[type] = comp;

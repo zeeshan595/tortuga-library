@@ -15,6 +15,8 @@
 #include "../Graphics/Vulkan/Buffer.hpp"
 #include "../Graphics/Vulkan/CommandPool.hpp"
 #include "../Graphics/Vulkan/Command.hpp"
+#include "../Core/Engine.hpp"
+#include "../Components/Mesh.hpp"
 
 namespace Tortuga
 {
@@ -54,6 +56,22 @@ private:
   Graphics::Vulkan::Fence::Fence PresentFence;
 
 public:
+  struct MeshView : public Core::ECS::Component
+  {
+    Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
+    Graphics::Vulkan::Buffer::Buffer VertexBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingTextureBuffer;
+    Graphics::Vulkan::Buffer::Buffer TextureBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingNormalBuffer;
+    Graphics::Vulkan::Buffer::Buffer NormalBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingVertexIndicesBuffer;
+    Graphics::Vulkan::Buffer::Buffer VertexIndicesBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingTextureIndicesBuffer;
+    Graphics::Vulkan::Buffer::Buffer TextureIndicesBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingNormalIndicesBuffer;
+    Graphics::Vulkan::Buffer::Buffer NormalIndicesBuffer;
+  };
+  
   void Update() override;
   Rendering();
   ~Rendering();
