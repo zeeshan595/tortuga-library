@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <future>
 
+#include "../Core/ECS/System.hpp"
 #include "../Graphics/Vulkan/Instance.hpp"
 #include "../Graphics/DisplaySurface.hpp"
 #include "../Graphics/Vulkan/DescriptorSet.hpp"
@@ -19,7 +20,7 @@ namespace Tortuga
 {
 namespace Systems
 {
-struct Rendering
+struct Rendering : public Core::ECS::System
 {
 private:
   struct RenderOptions
@@ -53,7 +54,7 @@ private:
   Graphics::Vulkan::Fence::Fence PresentFence;
 
 public:
-  void Update() const;
+  void Update() override;
   Rendering();
   ~Rendering();
 };

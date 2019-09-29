@@ -4,9 +4,10 @@ using namespace Tortuga;
 
 int main()
 {
-  const auto temp = Systems::Rendering();
-  while (true) {
-    temp.Update();
+  Core::Engine::AddSystem<Systems::Rendering>();
+  while (true)
+  {
+    Core::Engine::IterateSystems();
   }
   return EXIT_SUCCESS;
 }

@@ -36,6 +36,7 @@
 
 //Core
 #include "./Tortuga/Core/GUID.hpp"
+#include "./Tortuga/Core/Engine.hpp"
 
 //Systems
 #include "./Tortuga/Systems/Rendering.hpp"

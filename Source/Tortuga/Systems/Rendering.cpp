@@ -7,7 +7,7 @@ namespace Tortuga
 {
 namespace Systems
 {
-void Rendering::Update() const
+void Rendering::Update()
 {
   Graphics::DisplaySurface::Dispatch(DisplaySurface);
 
