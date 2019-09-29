@@ -7,9 +7,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 
-//debug console
-#include "./Tortuga/Console.hpp"
-
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
@@ -35,6 +32,7 @@
 #include "./Tortuga/Graphics/DisplaySurface.hpp"
 
 //Core
+#include "./Tortuga/Core/Console.hpp"
 #include "./Tortuga/Core/GUID.hpp"
 #include "./Tortuga/Core/Engine.hpp"
 

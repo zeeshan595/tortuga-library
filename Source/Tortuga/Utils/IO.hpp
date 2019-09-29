@@ -10,7 +10,7 @@
 #include <glm/glm.hpp>
 #include <cstring>
 
-#include "../Console.hpp"
+#include "../Core/Console.hpp"
 #include "../Graphics/Vertex.hpp"
 #include "../Graphics/Image.hpp"
 

@@ -40,7 +40,7 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
   });
   glfwSetDropCallback(data.Window, [](GLFWwindow *window, int count, const char **paths) {
     std::vector<std::string> data(count);
-    for (uint32_t i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
       data[i] = paths[i];
     Core::Input::TriggerFileDrop(data);
   });

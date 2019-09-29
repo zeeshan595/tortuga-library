@@ -12,6 +12,8 @@ namespace Core
 {
 namespace Engine
 {
+void Create();
+void Destroy();
 //systems
 void AddSystem(std::type_index type, ECS::System *data);
 void RemoveSystem(std::type_index type);
