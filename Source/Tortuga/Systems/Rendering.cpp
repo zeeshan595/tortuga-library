@@ -76,7 +76,6 @@ void Rendering::Update()
 
   const auto renderCommand = RenderCommand;
   const auto renderPipeline = RenderPipeline;
-  const auto renderOptionsDescriptorSet = RenderOptionsDescriptorSet;
   const auto renderDescriptorSet = RenderDescriptorSet;
   const auto renderingBuffer = RenderingBuffer;
   const auto renderImage = RenderedImage;
@@ -90,7 +89,6 @@ void Rendering::Update()
       std::launch::async, [device,
                            renderCommand,
                            renderPipeline,
-                           renderOptionsDescriptorSet,
                            renderDescriptorSet,
                            renderingBuffer,
                            renderImage,
@@ -101,7 +99,7 @@ void Rendering::Update()
                            presentFence] {
         //render image
         Graphics::Vulkan::Command::Begin(renderCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        Graphics::Vulkan::Command::BindPipeline(renderCommand, VK_PIPELINE_BIND_POINT_COMPUTE, renderPipeline, {renderOptionsDescriptorSet, renderDescriptorSet});
+        Graphics::Vulkan::Command::BindPipeline(renderCommand, VK_PIPELINE_BIND_POINT_COMPUTE, renderPipeline, {renderDescriptorSet});
         Graphics::Vulkan::Command::Compute(renderCommand, RENDER_WIDTH / 8, RENDER_HEIGHT / 8, 1);
         Graphics::Vulkan::Command::TransferImageLayout(renderCommand, renderImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         Graphics::Vulkan::Command::BufferToImage(renderCommand, renderingBuffer, renderImage, {0, 0}, {renderImage.Width, renderImage.Height});
@@ -137,8 +135,10 @@ Rendering::Rendering()
 
   //layout information
   DescriptorLayouts.clear();
-  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, 1, VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, 1, VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(
+      device,
+      {VK_SHADER_STAGE_COMPUTE_BIT, VK_SHADER_STAGE_COMPUTE_BIT},
+      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER}));
 
   //shader code
   const auto shaderCode = Utils::IO::GetFileContents("Assets/Shaders/Renderer.comp");
@@ -146,8 +146,9 @@ Rendering::Rendering()
   RenderShader = Graphics::Vulkan::Shader::Create(device, compiledShaderCode);
   RenderPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, RenderShader, {}, DescriptorLayouts);
 
-  //rendering options
+  //rendering buffers
   RenderOptionsBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, sizeof(RenderOptions), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+  RenderingBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, sizeof(glm::vec4) * RENDER_WIDTH * RENDER_HEIGHT, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   {
     const auto stagingRenderOptionsBuffer = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(RenderOptions), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     RenderOptions data = {};
@@ -164,15 +165,9 @@ Rendering::Rendering()
     Graphics::Vulkan::Device::WaitForQueue(device.Queues.Transfer[0]);
     Graphics::Vulkan::Buffer::Destroy(stagingRenderOptionsBuffer);
   }
-  RenderOptionsDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, {DescriptorLayouts[0]});
-  RenderOptionsDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderOptionsDescriptorPool, DescriptorLayouts[0]);
-  Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(RenderOptionsDescriptorSet, {RenderOptionsBuffer});
-
-  //rendering buffer
-  RenderingBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, sizeof(glm::vec4) * RENDER_WIDTH * RENDER_HEIGHT, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
-  RenderDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, {DescriptorLayouts[1]});
-  RenderDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderDescriptorPool, {DescriptorLayouts[1]});
-  Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(RenderDescriptorSet, {RenderingBuffer});
+  RenderDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, {DescriptorLayouts});
+  RenderDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderDescriptorPool, DescriptorLayouts[0]);
+  Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(RenderDescriptorSet, {RenderOptionsBuffer, RenderingBuffer});
 
   //rendered image
   RenderedImage = Graphics::Vulkan::Image::Create(device, RENDER_WIDTH, RENDER_HEIGHT, VK_FORMAT_R32G32B32A32_SFLOAT, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
@@ -200,7 +195,6 @@ Rendering::~Rendering()
   Graphics::Vulkan::Fence::Destroy(PresentFence);
 
   Graphics::Vulkan::DescriptorPool::Destroy(RenderDescriptorPool);
-  Graphics::Vulkan::DescriptorPool::Destroy(RenderOptionsDescriptorPool);
   Graphics::Vulkan::Buffer::Destroy(RenderOptionsBuffer);
   Graphics::Vulkan::Buffer::Destroy(RenderingBuffer);
   Graphics::Vulkan::Image::Destroy(RenderedImage);

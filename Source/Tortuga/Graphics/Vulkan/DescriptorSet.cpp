@@ -49,7 +49,7 @@ void UpdateDescriptorSet(DescriptorSet data, std::vector<Buffer::Buffer> content
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = 0;
     writeInfos[i].descriptorCount = 1;
-    writeInfos[i].descriptorType = data.Layout.Type;
+    writeInfos[i].descriptorType = data.Layout.Types[i];
 
     writeInfos[i].pBufferInfo = &(bufferInfos[i]);
     writeInfos[i].pImageInfo = VK_NULL_HANDLE;
@@ -87,7 +87,7 @@ void UpdateDescriptorSet(DescriptorSet data, std::vector<ImageView::ImageView> c
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = 0;
     writeInfos[i].descriptorCount = 1;
-    writeInfos[i].descriptorType = data.Layout.Type;
+    writeInfos[i].descriptorType = data.Layout.Types[i];
 
     writeInfos[i].pBufferInfo = VK_NULL_HANDLE;
     writeInfos[i].pImageInfo = &(imageInfo[i]);
@@ -95,7 +95,7 @@ void UpdateDescriptorSet(DescriptorSet data, std::vector<ImageView::ImageView> c
   }
   vkUpdateDescriptorSets(data.Device, writeInfos.size(), writeInfos.data(), 0, 0);
 }
-} // namespace DescriptorSets
+} // namespace DescriptorSet
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Tortuga

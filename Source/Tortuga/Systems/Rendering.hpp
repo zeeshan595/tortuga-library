@@ -42,9 +42,7 @@ private:
   Graphics::Vulkan::Pipeline::Pipeline RenderPipeline;
   Graphics::Vulkan::Buffer::Buffer RenderOptionsBuffer;
   Graphics::Vulkan::Buffer::Buffer RenderingBuffer;
-  Graphics::Vulkan::DescriptorPool::DescriptorPool RenderOptionsDescriptorPool;
   Graphics::Vulkan::DescriptorPool::DescriptorPool RenderDescriptorPool;
-  Graphics::Vulkan::DescriptorSet::DescriptorSet RenderOptionsDescriptorSet;
   Graphics::Vulkan::DescriptorSet::DescriptorSet RenderDescriptorSet;
   Graphics::Vulkan::Image::Image RenderedImage;
   Graphics::Vulkan::Command::Command RenderCommand;

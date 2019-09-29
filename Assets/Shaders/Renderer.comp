@@ -8,7 +8,7 @@ layout(set = 0, binding = 0) uniform RenderInfo {
   uint renderWidth;
   uint renderHeight;
 };
-layout(set = 1, binding = 0) buffer Render {
+layout(set = 0, binding = 1) buffer Render {
   vec4 pixels[];
 };
 
