@@ -1,0 +1,21 @@
+#version 450
+#define LOCAL_INVOCATION 8
+layout(local_size_x = LOCAL_INVOCATION) in;
+layout(local_size_y = LOCAL_INVOCATION) in;
+layout(local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform RenderInfo {
+  uint renderWidth;
+  uint renderHeight;
+};
+layout(set = 1, binding = 0) buffer Render {
+  vec4 pixels[];
+};
+
+void main() {
+  uint index = (gl_GlobalInvocationID.y * renderWidth) + gl_GlobalInvocationID.x;
+  if (index >= renderWidth * renderHeight)
+    return;
+    
+  pixels[index] = vec4(1.);
+}

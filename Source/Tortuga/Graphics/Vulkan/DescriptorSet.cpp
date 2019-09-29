@@ -25,7 +25,7 @@ DescriptorSet Create(Device::Device device, DescriptorPool::DescriptorPool pool,
   ErrorCheck::Callback(vkAllocateDescriptorSets(device.Device, &info, &data.set));
   return data;
 }
-void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> content)
+void UpdateDescriptorSet(DescriptorSet data, std::vector<Buffer::Buffer> content)
 {
   if (data.Layout.BindingsAmount != content.size())
   {
@@ -58,7 +58,7 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> conten
   vkUpdateDescriptorSets(data.Device, writeInfos.size(), writeInfos.data(), 0, 0);
 }
 
-void UpdateDescriptorSets(DescriptorSet data, std::vector<ImageView::ImageView> content, std::vector<Sampler::Sampler> samplers)
+void UpdateDescriptorSet(DescriptorSet data, std::vector<ImageView::ImageView> content, std::vector<Sampler::Sampler> samplers)
 {
   if (content.size() != samplers.size())
   {

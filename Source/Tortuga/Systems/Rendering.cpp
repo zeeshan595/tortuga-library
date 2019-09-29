@@ -25,6 +25,7 @@ void Rendering::Update() const
   Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, RenderedImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
   Graphics::Vulkan::Command::End(RenderCommand);
   Graphics::Vulkan::Command::Submit({RenderCommand}, device.Queues.Compute[0], {}, {RenderSemaphore});
+  Graphics::Vulkan::Device::WaitForQueue(device.Queues.Compute[0]);
 
   //present image
   const auto presentImageIndex = Graphics::Vulkan::Swapchain::AquireNextImage(DisplaySurface.Swapchain);
@@ -37,7 +38,6 @@ void Rendering::Update() const
   Graphics::Vulkan::Command::Submit({PresentCommand}, device.Queues.Graphics[0], {RenderSemaphore}, {PresentSemaphore}, PresentFence);
   Graphics::Vulkan::Swapchain::PresentImage(DisplaySurface.Swapchain, presentImageIndex, device.Queues.Present, {PresentSemaphore});
 }
-
 Rendering::Rendering()
 {
   VulkanInstance = Graphics::Vulkan::Instance::Create();
@@ -59,14 +59,22 @@ Rendering::Rendering()
   RenderPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, RenderShader, {}, DescriptorLayouts);
 
   //rendering options
-  RenderOptionsBuffer = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(RenderOptions), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+  RenderOptionsBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, sizeof(RenderOptions), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   {
+    const auto stagingRenderOptionsBuffer = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(RenderOptions), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     RenderOptions data = {};
     {
       data.renderWidth = RENDER_WIDTH;
       data.renderHeight = RENDER_HEIGHT;
     }
-    Graphics::Vulkan::Buffer::SetData(RenderOptionsBuffer, &data, RenderOptionsBuffer.Size);
+    Graphics::Vulkan::Buffer::SetData(stagingRenderOptionsBuffer, &data, stagingRenderOptionsBuffer.Size);
+    const auto command = Graphics::Vulkan::Command::Create(device, TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    Graphics::Vulkan::Command::Begin(command, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    Graphics::Vulkan::Command::CopyBuffer(command, stagingRenderOptionsBuffer, RenderOptionsBuffer);
+    Graphics::Vulkan::Command::End(command);
+    Graphics::Vulkan::Command::Submit({command}, device.Queues.Transfer[0]);
+    Graphics::Vulkan::Device::WaitForQueue(device.Queues.Transfer[0]);
+    Graphics::Vulkan::Buffer::Destroy(stagingRenderOptionsBuffer);
   }
   RenderOptionsDescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, {DescriptorLayouts[0]});
   RenderOptionsDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, RenderOptionsDescriptorPool, DescriptorLayouts[0]);
