@@ -183,8 +183,22 @@ ECS::Component *GetComponent(ECS::Entity *entity, std::type_index type)
     Console::Error("You need to create an engine first");
     return nullptr;
   }
+  if (entity->Components.find(type) == entity->Components.end())
+    return nullptr;
 
   return entity->Components[type];
+}
+void SetComponent(ECS::Entity *entity, std::type_index type, ECS::Component *data)
+{
+  if (engine == nullptr)
+  {
+    Console::Error("You need to create an engine first");
+    return;
+  }
+  if (entity->Components.find(type) == entity->Components.end())
+    return;
+  
+  entity->Components[type] = data;
 }
 std::vector<ECS::Component *> GetComponents(std::type_index type)
 {

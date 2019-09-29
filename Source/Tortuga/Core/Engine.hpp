@@ -25,6 +25,7 @@ void DestroyEntity(ECS::Entity *entity);
 void AddComponent(ECS::Entity *entity, std::type_index type, ECS::Component *data);
 void RemoveComponent(ECS::Entity *entity, std::type_index type);
 ECS::Component *GetComponent(ECS::Entity *entity, std::type_index type);
+void SetComponent(ECS::Entity *entity, std::type_index type, ECS::Component *data);
 std::vector<ECS::Component *> GetComponents(std::type_index type);
 
 //templates
@@ -49,11 +50,11 @@ T *GetSystem()
   return static_cast<T *>(data);
 }
 template <typename T>
-void AddComponent(ECS::Entity *entity)
+void AddComponent(ECS::Entity *entity, T data = T())
 {
   auto type = std::type_index(typeid(T));
-  auto data = new T();
-  AddComponent(entity, type, data);
+  auto temp = new T(data);
+  AddComponent(entity, type, temp);
 }
 template <typename T>
 void RemoveComponent(ECS::Entity *entity)
@@ -68,6 +69,13 @@ T *GetComponent(ECS::Entity *entity)
   auto type = std::type_index(typeid(T));
   const auto data = GetComponent(entity, type);
   return static_cast<T *>(data);
+}
+template <typename T>
+void SetComponent(ECS::Entity *entity, T data)
+{
+  auto type = std::type_index(typeid(T));
+  T *temp = new T(data);
+  SetComponent(entity, type, temp);
 }
 template <typename T>
 std::vector<T *> GetComponents()
