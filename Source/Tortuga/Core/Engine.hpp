@@ -60,7 +60,6 @@ template <typename T>
 void RemoveComponent(ECS::Entity *entity)
 {
   auto type = std::type_index(typeid(T));
-  auto data = new T();
   RemoveComponent(entity, type);
 }
 template <typename T>

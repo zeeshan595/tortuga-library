@@ -22,8 +22,12 @@ namespace IO
 {
 struct ObjExport
 {
-  std::vector<Graphics::Vertex> Vertices;
-  std::vector<uint32_t> Indices;
+  std::vector<glm::vec4> Vertices;
+  std::vector<glm::vec2> Textures;
+  std::vector<glm::vec4> Normals;
+  std::vector<uint32_t> VertexIndices;
+  std::vector<uint32_t> TextureIndices;
+  std::vector<uint32_t> NormalIndices;
 };
 
 ObjExport LoadObjFile(std::string filePath);

@@ -7,6 +7,7 @@
 
 #include "../Graphics/Vulkan/Buffer.hpp"
 #include "../Core/Engine.hpp"
+#include "../Utils/IO.hpp"
 
 namespace Tortuga
 {
@@ -20,6 +21,17 @@ struct Mesh : public Core::ECS::Component
   std::vector<uint32_t> VertexIndices;
   std::vector<uint32_t> TextureIndices;
   std::vector<uint32_t> NormalIndices;
+
+  Mesh() {}
+  Mesh(Utils::IO::ObjExport obj)
+  {
+    Vertices = obj.Vertices;
+    Textures = obj.Textures;
+    Normals = obj.Normals;
+    VertexIndices = obj.VertexIndices;
+    TextureIndices = obj.TextureIndices;
+    NormalIndices = obj.NormalIndices;
+  }
 };
 } // namespace Components
 } // namespace Tortuga
