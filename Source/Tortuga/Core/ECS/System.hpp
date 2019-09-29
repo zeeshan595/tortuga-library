@@ -11,7 +11,7 @@ struct System
 {
 public:
   System(){}
-  virtual ~System() {} //Allow proper inheritance
+  virtual ~System() {} //allow proper inheritance
   virtual void Update() {}
 };
 } // namespace ECS

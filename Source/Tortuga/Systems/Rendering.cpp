@@ -107,6 +107,7 @@ Rendering::~Rendering()
   Graphics::Vulkan::DescriptorPool::Destroy(RenderOptionsDescriptorPool);
   Graphics::Vulkan::Buffer::Destroy(RenderOptionsBuffer);
   Graphics::Vulkan::Buffer::Destroy(RenderingBuffer);
+  Graphics::Vulkan::Image::Destroy(RenderedImage);
 
   Graphics::Vulkan::Pipeline::Destroy(RenderPipeline);
   Graphics::Vulkan::Shader::Destroy(RenderShader);
