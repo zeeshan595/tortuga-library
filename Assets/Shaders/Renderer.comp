@@ -1,8 +1,11 @@
 #version 450
+#extension GL_GOOGLE_include_directive: enable
 #define LOCAL_INVOCATION 8
 layout(local_size_x = LOCAL_INVOCATION) in;
 layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
+
+#include "./Partial/triangleIntersection.comp"
 
 layout(set = 0, binding = 0) uniform RenderInfo {
   uint renderWidth;
@@ -12,22 +15,22 @@ layout(set = 0, binding = 1) buffer Render {
   vec4 pixels[];
 };
 
-layout(set = 1, binding = 0) uniform Vertex {
+layout(set = 1, binding = 0) readonly buffer Vertex {
   vec4 vertices[];
 };
-layout(set = 1, binding = 1) uniform Texture {
+layout(set = 1, binding = 1) readonly buffer Texture {
   vec2 textures[];
 };
-layout(set = 1, binding = 2) uniform Normal {
+layout(set = 1, binding = 2) readonly buffer Normal {
   vec4 normals[];
 };
-layout(set = 1, binding = 3) uniform VertexIndex {
+layout(set = 1, binding = 3) readonly buffer VertexIndex {
   uint vertexIndices[];
 };
-layout(set = 1, binding = 4) uniform TextureIndex {
+layout(set = 1, binding = 4) readonly buffer TextureIndex {
   uint textureIndices[];
 };
-layout(set = 1, binding = 5) uniform NormalIndex {
+layout(set = 1, binding = 5) readonly buffer NormalIndex {
   uint normalIndices[];
 };
 
@@ -35,6 +38,22 @@ void main() {
   uint index = (gl_GlobalInvocationID.y * renderWidth) + gl_GlobalInvocationID.x;
   if (index >= renderWidth * renderHeight)
     return;
-    
+  
+  vec2 uv = ((vec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y)) - .5 * vec2(renderWidth, renderHeight)) / renderHeight;
+  vec3 rayOrigin = vec3(0, 0, -10);
+  vec3 rayDirection = normalize(vec3(uv, -9.));
+  for (uint i = 0; i < vertexIndices.length(); i+=3)
+  {
+    vec4 v[3];
+    v[0] = vertices[vertexIndices[i]];
+    v[1] = vertices[vertexIndices[i]];
+    v[2] = vertices[vertexIndices[i]];
+    bool intersect = triangleIntersection(rayOrigin, rayDirection, v);
+    if (intersect) {
+      pixels[index] = vec4(0., 0., 0., 1.);
+      return;
+    }
+  }
+
   pixels[index] = vec4(1.);
 }

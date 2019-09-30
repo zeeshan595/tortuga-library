@@ -183,12 +183,12 @@ void Rendering::SetupLayoutInformation(Graphics::Vulkan::Device::Device device)
        VK_SHADER_STAGE_COMPUTE_BIT,
        VK_SHADER_STAGE_COMPUTE_BIT,
        VK_SHADER_STAGE_COMPUTE_BIT},
-      {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER});
+      {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER});
 }
 void Rendering::ProcessMeshBuffers(Graphics::Vulkan::Device::Device device)
 {
@@ -245,37 +245,37 @@ void Rendering::ProcessMeshBuffers(Graphics::Vulkan::Device::Device device)
   {
     Graphics::Vulkan::Buffer::Destroy(MeshVertexBuffer);
     if (vertexByteSize > 0)
-      MeshVertexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, vertexByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+      MeshVertexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, vertexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   }
   if (MeshTextureBuffer.Buffer == VK_NULL_HANDLE || MeshTextureBuffer.Size != textureByteSize)
   {
     Graphics::Vulkan::Buffer::Destroy(MeshTextureBuffer);
     if (textureByteSize > 0)
-      MeshTextureBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, textureByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+      MeshTextureBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, textureByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   }
   if (MeshNormalBuffer.Buffer == VK_NULL_HANDLE || MeshNormalBuffer.Size != normalByteSize)
   {
     Graphics::Vulkan::Buffer::Destroy(MeshNormalBuffer);
     if (normalByteSize > 0)
-      MeshNormalBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, normalByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+      MeshNormalBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, normalByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   }
   if (MeshVertexIndexBuffer.Buffer == VK_NULL_HANDLE || MeshVertexIndexBuffer.Size != vertexIndexByteSize)
   {
     Graphics::Vulkan::Buffer::Destroy(MeshVertexIndexBuffer);
     if (vertexIndexByteSize > 0)
-      MeshVertexIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, vertexIndexByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+      MeshVertexIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, vertexIndexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   }
   if (MeshTextureIndexBuffer.Buffer == VK_NULL_HANDLE || MeshTextureIndexBuffer.Size != textureIndexByteSize)
   {
     Graphics::Vulkan::Buffer::Destroy(MeshTextureIndexBuffer);
     if (textureIndexByteSize > 0)
-      MeshTextureIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, textureIndexByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+      MeshTextureIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, textureIndexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   }
   if (MeshNormalIndexBuffer.Buffer == VK_NULL_HANDLE || MeshNormalIndexBuffer.Size != normalIndexByteSize)
   {
     Graphics::Vulkan::Buffer::Destroy(MeshNormalIndexBuffer);
     if (normalIndexByteSize > 0)
-      MeshNormalIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, normalIndexByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+      MeshNormalIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, normalIndexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   }
   //update descriptor set
   if (vertexByteSize > 0 && textureByteSize > 0 && normalByteSize > 0 && vertexIndexByteSize > 0 && textureIndexByteSize > 0 && normalIndexByteSize > 0)
