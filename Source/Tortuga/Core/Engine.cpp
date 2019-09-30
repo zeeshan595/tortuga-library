@@ -136,6 +136,8 @@ void AddComponent(ECS::Entity *entity, std::type_index type, ECS::Component *dat
     Console::Error("You need to create an engine first");
     return;
   }
+  if (entity->Components.find(type) != entity->Components.end())
+    return;
 
   data->Root = entity;
   entity->Components.insert(std::pair(type, data));
@@ -148,6 +150,7 @@ void AddComponent(ECS::Entity *entity, std::type_index type, ECS::Component *dat
   {
     engine->Components[type].push_back(data);
   }
+  entity->Components[type]->OnCreate();
 }
 void RemoveComponent(ECS::Entity *entity, std::type_index type)
 {
@@ -160,6 +163,7 @@ void RemoveComponent(ECS::Entity *entity, std::type_index type)
   if (entity->Components.find(type) == entity->Components.end())
     return;
 
+  entity->Components[type]->OnDestroy();
   delete entity->Components[type];
   entity->Components.erase(type);
   if (engine->Components.find(type) == engine->Components.end())
@@ -197,7 +201,7 @@ void SetComponent(ECS::Entity *entity, std::type_index type, ECS::Component *dat
   }
   if (entity->Components.find(type) == entity->Components.end())
     return;
-  
+
   entity->Components[type] = data;
 }
 std::vector<ECS::Component *> GetComponents(std::type_index type)

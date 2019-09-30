@@ -72,6 +72,7 @@ private:
 public:
   struct MeshView : public Core::ECS::Component
   {
+    Graphics::Vulkan::Device::Device DeviceInUse;
     Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
     Graphics::Vulkan::Buffer::Buffer StagingTextureBuffer;
     Graphics::Vulkan::Buffer::Buffer StagingNormalBuffer;
@@ -79,7 +80,30 @@ public:
     Graphics::Vulkan::Buffer::Buffer StagingTextureIndexBuffer;
     Graphics::Vulkan::Buffer::Buffer StagingNormalIndexBuffer;
 
-    void CleanUp()
+    void OnCreate() override
+    {
+      const auto device = DeviceInUse;
+      const auto mesh = Core::Engine::GetComponent<Components::Mesh>(Root);
+      //vertex
+      StagingVertexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Vertices.size() * sizeof(glm::vec4), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      StagingVertexIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->VertexIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      //texture
+      StagingTextureBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Textures.size() * sizeof(glm::vec2), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      StagingTextureIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->TextureIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      //normals
+      StagingNormalBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Normals.size() * sizeof(glm::vec4), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      StagingNormalIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->NormalIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+
+      //copy data to staging buffers
+      Graphics::Vulkan::Buffer::SetData(StagingVertexBuffer, mesh->Vertices.data(), StagingVertexBuffer.Size);
+      Graphics::Vulkan::Buffer::SetData(StagingTextureBuffer, mesh->Textures.data(), StagingTextureBuffer.Size);
+      Graphics::Vulkan::Buffer::SetData(StagingNormalBuffer, mesh->Normals.data(), StagingNormalBuffer.Size);
+      Graphics::Vulkan::Buffer::SetData(StagingVertexIndexBuffer, mesh->VertexIndices.data(), StagingVertexIndexBuffer.Size);
+      Graphics::Vulkan::Buffer::SetData(StagingTextureIndexBuffer, mesh->TextureIndices.data(), StagingTextureIndexBuffer.Size);
+      Graphics::Vulkan::Buffer::SetData(StagingNormalIndexBuffer, mesh->NormalIndices.data(), StagingNormalIndexBuffer.Size);
+    }
+
+    void OnDestroy() override
     {
       Graphics::Vulkan::Buffer::Destroy(StagingVertexBuffer);
       Graphics::Vulkan::Buffer::Destroy(StagingVertexIndexBuffer);

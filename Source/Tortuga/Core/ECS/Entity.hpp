@@ -16,7 +16,9 @@ struct Component
 public:
   Entity *Root;
 
-  virtual ~Component() {} //allow proper inheritance
+  virtual void OnCreate() {} //is called when attached to an entity
+  virtual void OnDestroy() {} //is called when removed from an entity
+  virtual ~Component() {}     //allow proper inheritance
 };
 struct Entity
 {
@@ -25,7 +27,10 @@ struct Entity
   ~Entity()
   {
     for (auto i = Components.begin(); i != Components.end(); ++i)
+    {
+      i->second->OnDestroy();
       delete i->second;
+    }
   }
 };
 } // namespace ECS
