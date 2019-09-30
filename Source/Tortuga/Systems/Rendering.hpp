@@ -32,16 +32,28 @@ private:
   };
   Graphics::Vulkan::Instance::Instance VulkanInstance;
   Graphics::DisplaySurface::DisplaySurface DisplaySurface;
-  std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> DescriptorLayouts;
   Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool ComputeCommandPool;
   Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
+
+  //mesh
+  Graphics::Vulkan::DescriptorLayout::DescriptorLayout MeshDescriptorLayout;
+  Graphics::Vulkan::DescriptorPool::DescriptorPool MeshDescriptorPool;
+  Graphics::Vulkan::DescriptorSet::DescriptorSet MeshDescriptorSet;
+  Graphics::Vulkan::Buffer::Buffer MeshVertexBuffer;
+  Graphics::Vulkan::Buffer::Buffer MeshTextureBuffer;
+  Graphics::Vulkan::Buffer::Buffer MeshNormalBuffer;
+  Graphics::Vulkan::Buffer::Buffer MeshVertexIndexBuffer;
+  Graphics::Vulkan::Buffer::Buffer MeshTextureIndexBuffer;
+  Graphics::Vulkan::Buffer::Buffer MeshNormalIndexBuffer;
+  Graphics::Vulkan::Command::Command MeshCopyCommand;
 
   //renderer
   Graphics::Vulkan::Shader::Shader RenderShader;
   Graphics::Vulkan::Pipeline::Pipeline RenderPipeline;
   Graphics::Vulkan::Buffer::Buffer RenderOptionsBuffer;
   Graphics::Vulkan::Buffer::Buffer RenderingBuffer;
+  Graphics::Vulkan::DescriptorLayout::DescriptorLayout RenderingDescriptorLayout;
   Graphics::Vulkan::DescriptorPool::DescriptorPool RenderDescriptorPool;
   Graphics::Vulkan::DescriptorSet::DescriptorSet RenderDescriptorSet;
   Graphics::Vulkan::Image::Image RenderedImage;
@@ -49,27 +61,35 @@ private:
   Graphics::Vulkan::Command::Command PresentCommand;
 
   //sync
+  Graphics::Vulkan::Semaphore::Semaphore MeshSemaphore;
   Graphics::Vulkan::Semaphore::Semaphore RenderSemaphore;
   Graphics::Vulkan::Semaphore::Semaphore PresentSemaphore;
   Graphics::Vulkan::Fence::Fence PresentFence;
+
+  void SetupLayoutInformation(Graphics::Vulkan::Device::Device device);
+  void ProcessMeshBuffers(Graphics::Vulkan::Device::Device device);
 
 public:
   struct MeshView : public Core::ECS::Component
   {
     Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
-    Graphics::Vulkan::Buffer::Buffer VertexBuffer;
     Graphics::Vulkan::Buffer::Buffer StagingTextureBuffer;
-    Graphics::Vulkan::Buffer::Buffer TextureBuffer;
     Graphics::Vulkan::Buffer::Buffer StagingNormalBuffer;
-    Graphics::Vulkan::Buffer::Buffer NormalBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingVertexIndicesBuffer;
-    Graphics::Vulkan::Buffer::Buffer VertexIndicesBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingTextureIndicesBuffer;
-    Graphics::Vulkan::Buffer::Buffer TextureIndicesBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingNormalIndicesBuffer;
-    Graphics::Vulkan::Buffer::Buffer NormalIndicesBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingVertexIndexBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingTextureIndexBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingNormalIndexBuffer;
+
+    void CleanUp()
+    {
+      Graphics::Vulkan::Buffer::Destroy(StagingVertexBuffer);
+      Graphics::Vulkan::Buffer::Destroy(StagingVertexIndexBuffer);
+      Graphics::Vulkan::Buffer::Destroy(StagingTextureBuffer);
+      Graphics::Vulkan::Buffer::Destroy(StagingTextureIndexBuffer);
+      Graphics::Vulkan::Buffer::Destroy(StagingNormalBuffer);
+      Graphics::Vulkan::Buffer::Destroy(StagingNormalIndexBuffer);
+    }
   };
-  
+
   void Update() override;
   Rendering();
   ~Rendering();

@@ -12,6 +12,25 @@ layout(set = 0, binding = 1) buffer Render {
   vec4 pixels[];
 };
 
+layout(set = 1, binding = 0) uniform Vertex {
+  vec4 vertices[];
+};
+layout(set = 1, binding = 1) uniform Texture {
+  vec2 textures[];
+};
+layout(set = 1, binding = 2) uniform Normal {
+  vec4 normals[];
+};
+layout(set = 1, binding = 3) uniform VertexIndex {
+  uint vertexIndices[];
+};
+layout(set = 1, binding = 4) uniform TextureIndex {
+  uint textureIndices[];
+};
+layout(set = 1, binding = 5) uniform NormalIndex {
+  uint normalIndices[];
+};
+
 void main() {
   uint index = (gl_GlobalInvocationID.y * renderWidth) + gl_GlobalInvocationID.x;
   if (index >= renderWidth * renderHeight)
