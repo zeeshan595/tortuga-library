@@ -5,6 +5,10 @@ layout(local_size_x = LOCAL_INVOCATION) in;
 layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
 
+#define MAX_STEPS 100
+#define MAX_DIST 100.
+#define SURF_DIST .01
+
 layout(set = 0, binding = 0) uniform RenderInfo {
   uint renderWidth;
   uint renderHeight;
@@ -69,10 +73,43 @@ vec3 GetNormal(uint meshId, uint index)
   return vec3(meshData[offset + 0], meshData[offset + 1], meshData[offset + 2]);
 }
 
+float SphereDist(vec3 position, float radius, vec3 point) {
+  return length(point - position) - radius;
+}
+float GetMinDistance(vec3 point) {
+  float rtn = 1 / 0.;
+  for (uint i = 0; i < 1; i++) {
+    uint nodesLen = meshNodes.length() - 1;
+    float dist = SphereDist(vec3(0.), 1., point);
+    if (rtn > dist) {
+      rtn = dist;
+    }
+  }
+  return rtn;
+}
+float RayMarch(vec3 rayOrigin, vec3 rayDirection) {
+  float rayTravelDist = 0.;
+  for (int i = 0; i < MAX_STEPS; i++) {
+    vec3 rayLocation = rayOrigin + (rayTravelDist * rayDirection);
+    float dist = GetMinDistance(rayLocation);
+    rayTravelDist += dist;
+    if (dist < SURF_DIST || rayTravelDist > MAX_DIST)
+      break;
+  }
+  return rayTravelDist;
+}
+
 void main() {
   uint index = (gl_GlobalInvocationID.y * renderWidth) + gl_GlobalInvocationID.x;
   if (index >= renderWidth * renderHeight)
     return;
 
-  pixels[index] = vec4(1.);
+  vec2 uv = vec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+  uv.x = uv.x / renderWidth - .5;
+  uv.y = uv.y / renderHeight - .5;
+  vec3 rayOrigin = vec3(0, 0, -3);
+  vec3 rayDirection = normalize(vec3(uv, 1.));
+  float dist = RayMarch(rayOrigin, rayDirection);
+  vec3 col = vec3(dist / 3.);
+  pixels[index] = vec4(col, 1.);
 }
