@@ -17,7 +17,7 @@ layout(set = 1, binding = 0) readonly buffer MeshCounts {
   uint meshCounts[];  
 };
 layout(set = 1, binding = 1) readonly buffer MeshData {
-  float meshData;
+  float meshData[];
 };
 struct IndexStruct {
   uint position;
@@ -46,6 +46,22 @@ struct Node {
 layout(set = 1, binding = 4) readonly buffer MeshNodes {
   Node meshNodes[];
 };
+
+vec3 GetPosition(uint index)
+{
+  uint offset = 0 + (index * 3);
+  return vec3(meshData[index + 0], meshData[index + 1], meshData[index + 2]);
+}
+vec2 GetTexture(uint index)
+{
+  uint offset = meshCounts[0] + (index * 2);
+  return vec2(meshData[offset + 0], meshData[offset + 1]);
+}
+vec3 GetNormal(uint index)
+{
+  uint offset = meshCounts[0] + meshCounts[1] + (index * 3);
+  return vec3(meshData[offset + 0], meshData[offset + 1], meshData[offset + 2]);
+}
 
 void main() {
   uint index = (gl_GlobalInvocationID.y * renderWidth) + gl_GlobalInvocationID.x;
