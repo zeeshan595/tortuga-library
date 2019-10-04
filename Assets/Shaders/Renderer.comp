@@ -50,21 +50,21 @@ layout(set = 1, binding = 4) readonly buffer MeshNodes {
 vec3 GetPosition(uint meshId, uint index)
 {
   uint offset = 0 + (index * 3);
-  for (uint i = 0; i < meshId * 6; i++)
+  for (uint i = 0; i < meshId * 5; i++)
     offset += meshCounts[i];
   return vec3(meshData[index + 0], meshData[index + 1], meshData[index + 2]);
 }
 vec2 GetTexture(uint meshId, uint index)
 {
   uint offset = meshCounts[0] + (index * 2);
-  for (uint i = 0; i < meshId * 6; i++)
+  for (uint i = 0; i < meshId * 5; i++)
     offset += meshCounts[i];
   return vec2(meshData[offset + 0], meshData[offset + 1]);
 }
 vec3 GetNormal(uint meshId, uint index)
 {
   uint offset = meshCounts[0] + meshCounts[1] + (index * 3);
-  for (uint i = 0; i < meshId * 6; i++)
+  for (uint i = 0; i < meshId * 5; i++)
     offset += meshCounts[i];
   return vec3(meshData[offset + 0], meshData[offset + 1], meshData[offset + 2]);
 }
