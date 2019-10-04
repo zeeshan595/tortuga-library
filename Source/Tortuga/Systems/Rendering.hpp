@@ -16,6 +16,7 @@
 #include "../Graphics/Vulkan/CommandPool.hpp"
 #include "../Graphics/Vulkan/Command.hpp"
 #include "../Core/Engine.hpp"
+#include "../Graphics/AcceleratedMesh.hpp"
 #include "../Components/Mesh.hpp"
 
 namespace Tortuga
@@ -40,12 +41,11 @@ private:
   Graphics::Vulkan::DescriptorLayout::DescriptorLayout MeshDescriptorLayout;
   Graphics::Vulkan::DescriptorPool::DescriptorPool MeshDescriptorPool;
   Graphics::Vulkan::DescriptorSet::DescriptorSet MeshDescriptorSet;
-  Graphics::Vulkan::Buffer::Buffer MeshVertexBuffer;
-  Graphics::Vulkan::Buffer::Buffer MeshTextureBuffer;
-  Graphics::Vulkan::Buffer::Buffer MeshNormalBuffer;
-  Graphics::Vulkan::Buffer::Buffer MeshVertexIndexBuffer;
-  Graphics::Vulkan::Buffer::Buffer MeshTextureIndexBuffer;
-  Graphics::Vulkan::Buffer::Buffer MeshNormalIndexBuffer;
+  Graphics::Vulkan::Buffer::Buffer MeshBufferCounts;
+  Graphics::Vulkan::Buffer::Buffer MeshBufferData;
+  Graphics::Vulkan::Buffer::Buffer MeshBufferIndices;
+  Graphics::Vulkan::Buffer::Buffer MeshBufferFaces;
+  Graphics::Vulkan::Buffer::Buffer MeshBufferNodes;
   Graphics::Vulkan::Command::Command MeshCopyCommand;
 
   //renderer
@@ -73,44 +73,49 @@ public:
   struct MeshView : public Core::ECS::Component
   {
     Graphics::Vulkan::Device::Device DeviceInUse;
-    Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingTextureBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingNormalBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingVertexIndexBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingTextureIndexBuffer;
-    Graphics::Vulkan::Buffer::Buffer StagingNormalIndexBuffer;
+    Graphics::Vulkan::Buffer::Buffer StagingMeshCounts;
+    Graphics::Vulkan::Buffer::Buffer StagingMeshData;
+    Graphics::Vulkan::Buffer::Buffer StagingIndices;
+    Graphics::Vulkan::Buffer::Buffer StagingFaces;
+    Graphics::Vulkan::Buffer::Buffer StagingNodes;
 
     void OnCreate() override
     {
       const auto device = DeviceInUse;
-      const auto mesh = Core::Engine::GetComponent<Components::Mesh>(Root);
-      //vertex
-      StagingVertexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Vertices.size() * sizeof(glm::vec4), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-      StagingVertexIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->VertexIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-      //texture
-      StagingTextureBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Textures.size() * sizeof(glm::vec2), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-      StagingTextureIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->TextureIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-      //normals
-      StagingNormalBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->Normals.size() * sizeof(glm::vec4), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-      StagingNormalIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, mesh->NormalIndices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      const auto meshComp = Core::Engine::GetComponent<Components::Mesh>(Root);
+      const auto mesh = meshComp->GetMesh();
+      StagingMeshData = Graphics::Vulkan::Buffer::CreateHost(device, mesh.MeshDataByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      uint32_t offset = 0;
+      Graphics::Vulkan::Buffer::SetData(StagingMeshData, mesh.Positions.data(), sizeof(glm::vec3) * mesh.Positions.size(), offset);
+      offset += sizeof(glm::vec3) * mesh.Positions.size();
+      Graphics::Vulkan::Buffer::SetData(StagingMeshData, mesh.Textures.data(), sizeof(glm::vec2) * mesh.Textures.size(), offset);
+      offset += sizeof(glm::vec2) * mesh.Textures.size();
+      Graphics::Vulkan::Buffer::SetData(StagingMeshData, mesh.Normals.data(), sizeof(glm::vec3) * mesh.Normals.size(), offset);
+      StagingIndices = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(Graphics::AcceleratedMesh::IndexStruct) * mesh.Indices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      Graphics::Vulkan::Buffer::SetData(StagingIndices, mesh.Indices.data(), sizeof(Graphics::AcceleratedMesh::IndexStruct) * mesh.Indices.size());
+      StagingFaces = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(Graphics::AcceleratedMesh::Face) * mesh.Faces.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      Graphics::Vulkan::Buffer::SetData(StagingFaces, mesh.Faces.data(), sizeof(Graphics::AcceleratedMesh::Face) * mesh.Faces.size());
+      StagingNodes = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(Graphics::AcceleratedMesh::Node) * mesh.Nodes.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      Graphics::Vulkan::Buffer::SetData(StagingNodes, mesh.Nodes.data(), sizeof(Graphics::AcceleratedMesh::Node) * mesh.Nodes.size());
 
-      //copy data to staging buffers
-      Graphics::Vulkan::Buffer::SetData(StagingVertexBuffer, mesh->Vertices.data(), StagingVertexBuffer.Size);
-      Graphics::Vulkan::Buffer::SetData(StagingTextureBuffer, mesh->Textures.data(), StagingTextureBuffer.Size);
-      Graphics::Vulkan::Buffer::SetData(StagingNormalBuffer, mesh->Normals.data(), StagingNormalBuffer.Size);
-      Graphics::Vulkan::Buffer::SetData(StagingVertexIndexBuffer, mesh->VertexIndices.data(), StagingVertexIndexBuffer.Size);
-      Graphics::Vulkan::Buffer::SetData(StagingTextureIndexBuffer, mesh->TextureIndices.data(), StagingTextureIndexBuffer.Size);
-      Graphics::Vulkan::Buffer::SetData(StagingNormalIndexBuffer, mesh->NormalIndices.data(), StagingNormalIndexBuffer.Size);
+      std::vector<uint32_t> meshCounts;
+      meshCounts.push_back(mesh.Positions.size());
+      meshCounts.push_back(mesh.Textures.size());
+      meshCounts.push_back(mesh.Normals.size());
+      meshCounts.push_back(mesh.Faces.size());
+      meshCounts.push_back(mesh.Nodes.size());
+      StagingMeshCounts = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(uint32_t) * meshCounts.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      Graphics::Vulkan::Buffer::SetData(StagingMeshCounts, meshCounts.data(), sizeof(uint32_t) * meshCounts.size());
+      meshComp->IsDirty = false;
     }
 
     void OnDestroy() override
     {
-      Graphics::Vulkan::Buffer::Destroy(StagingVertexBuffer);
-      Graphics::Vulkan::Buffer::Destroy(StagingVertexIndexBuffer);
-      Graphics::Vulkan::Buffer::Destroy(StagingTextureBuffer);
-      Graphics::Vulkan::Buffer::Destroy(StagingTextureIndexBuffer);
-      Graphics::Vulkan::Buffer::Destroy(StagingNormalBuffer);
-      Graphics::Vulkan::Buffer::Destroy(StagingNormalIndexBuffer);
+      Graphics::Vulkan::Buffer::Destroy(StagingMeshCounts);
+      Graphics::Vulkan::Buffer::Destroy(StagingMeshData);
+      Graphics::Vulkan::Buffer::Destroy(StagingIndices);
+      Graphics::Vulkan::Buffer::Destroy(StagingFaces);
+      Graphics::Vulkan::Buffer::Destroy(StagingNodes);
     }
   };
 

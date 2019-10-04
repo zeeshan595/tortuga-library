@@ -31,6 +31,7 @@ void Rendering::Update()
   const auto presentCommand = PresentCommand;
   const auto presentSemaphore = PresentSemaphore;
   const auto presentFence = PresentFence;
+  //start rendering in another thread
   const auto task = std::async(
       std::launch::async, [device,
                            meshSemaphore,
@@ -68,9 +69,7 @@ void Rendering::Update()
         Graphics::Vulkan::Swapchain::PresentImage(swapchain, presentImageIndex, device.Queues.Present, {presentSemaphore});
       });
   if (!task.valid())
-  {
     Console::Error("failed to validate render task");
-  }
 }
 Rendering::Rendering()
 {
@@ -139,12 +138,11 @@ Rendering::~Rendering()
   for (const auto mesh : meshes)
     Core::Engine::RemoveComponent<MeshView>(mesh->Root);
 
-  Graphics::Vulkan::Buffer::Destroy(MeshVertexBuffer);
-  Graphics::Vulkan::Buffer::Destroy(MeshTextureBuffer);
-  Graphics::Vulkan::Buffer::Destroy(MeshNormalBuffer);
-  Graphics::Vulkan::Buffer::Destroy(MeshVertexIndexBuffer);
-  Graphics::Vulkan::Buffer::Destroy(MeshTextureIndexBuffer);
-  Graphics::Vulkan::Buffer::Destroy(MeshNormalIndexBuffer);
+  Graphics::Vulkan::Buffer::Destroy(MeshBufferCounts);
+  Graphics::Vulkan::Buffer::Destroy(MeshBufferData);
+  Graphics::Vulkan::Buffer::Destroy(MeshBufferIndices);
+  Graphics::Vulkan::Buffer::Destroy(MeshBufferFaces);
+  Graphics::Vulkan::Buffer::Destroy(MeshBufferNodes);
   Graphics::Vulkan::DescriptorPool::Destroy(MeshDescriptorPool);
 
   Graphics::Vulkan::Semaphore::Destroy(MeshSemaphore);
@@ -181,10 +179,8 @@ void Rendering::SetupLayoutInformation(Graphics::Vulkan::Device::Device device)
        VK_SHADER_STAGE_COMPUTE_BIT,
        VK_SHADER_STAGE_COMPUTE_BIT,
        VK_SHADER_STAGE_COMPUTE_BIT,
-       VK_SHADER_STAGE_COMPUTE_BIT,
        VK_SHADER_STAGE_COMPUTE_BIT},
       {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -192,138 +188,88 @@ void Rendering::SetupLayoutInformation(Graphics::Vulkan::Device::Device device)
 }
 void Rendering::ProcessMeshBuffers(Graphics::Vulkan::Device::Device device)
 {
-  //generate mesh buffer objects for vulkan
   const auto meshes = Core::Engine::GetComponents<Components::Mesh>();
+  if (meshes.size() == 0)
+    return;
   for (const auto mesh : meshes)
   {
-    auto meshView = Core::Engine::GetComponent<MeshView>(mesh->Root);
-    if (meshView == nullptr)
+    if (Core::Engine::GetComponent<MeshView>(mesh->Root) == nullptr)
     {
-      MeshView data = {};
-      data.DeviceInUse = device;
-      Core::Engine::AddComponent<MeshView>(mesh->Root, data);
+      MeshView viewData = {};
+      viewData.DeviceInUse = device;
+      Core::Engine::AddComponent<MeshView>(mesh->Root, viewData);
     }
   }
 
-  std::vector<Graphics::Vulkan::Buffer::Buffer> VertexBuffers;
-  std::vector<Graphics::Vulkan::Buffer::Buffer> TextureBuffers;
-  std::vector<Graphics::Vulkan::Buffer::Buffer> NormalBuffers;
-  std::vector<Graphics::Vulkan::Buffer::Buffer> VertexIndexBuffers;
-  std::vector<Graphics::Vulkan::Buffer::Buffer> TextureIndexBuffers;
-  std::vector<Graphics::Vulkan::Buffer::Buffer> NormalIndexBuffers;
-  uint32_t vertexByteSize = 0;
-  uint32_t textureByteSize = 0;
-  uint32_t normalByteSize = 0;
-  uint32_t vertexIndexByteSize = 0;
-  uint32_t textureIndexByteSize = 0;
-  uint32_t normalIndexByteSize = 0;
-
+  uint32_t meshCountsSize = 0;
+  uint32_t meshDataSize = 0;
+  uint32_t meshIndicesSize = 0;
+  uint32_t meshFacesSize = 0;
+  uint32_t meshNodesSize = 0;
   for (const auto view : Core::Engine::GetComponents<MeshView>())
   {
-    if (Core::Engine::GetComponent<Components::Mesh>(view->Root) != nullptr)
+    if (Core::Engine::GetComponent<Components::Mesh>(view->Root) == nullptr)
     {
-      VertexBuffers.push_back(view->StagingVertexBuffer);
-      TextureBuffers.push_back(view->StagingTextureBuffer);
-      NormalBuffers.push_back(view->StagingNormalBuffer);
-      VertexIndexBuffers.push_back(view->StagingVertexIndexBuffer);
-      TextureIndexBuffers.push_back(view->StagingTextureIndexBuffer);
-      NormalIndexBuffers.push_back(view->StagingNormalIndexBuffer);
-
-      vertexByteSize += view->StagingVertexBuffer.Size;
-      textureByteSize += view->StagingTextureBuffer.Size;
-      normalByteSize += view->StagingNormalBuffer.Size;
-      vertexIndexByteSize += view->StagingVertexIndexBuffer.Size;
-      textureIndexByteSize += view->StagingTextureIndexBuffer.Size;
-      normalIndexByteSize += view->StagingNormalIndexBuffer.Size;
+      Core::Engine::RemoveComponent<Components::Mesh>(view->Root);
+      continue;
     }
-    else //auto cleanup meshes not being used
-      Core::Engine::RemoveComponent<MeshView>(view->Root);
+
+    meshCountsSize += view->StagingMeshCounts.Size;
+    meshDataSize += view->StagingMeshData.Size;
+    meshIndicesSize += view->StagingIndices.Size;
+    meshFacesSize += view->StagingFaces.Size;
+    meshNodesSize += view->StagingNodes.Size;
   }
 
-  //update full buffers
-  if (MeshVertexBuffer.Buffer == VK_NULL_HANDLE || MeshVertexBuffer.Size != vertexByteSize)
+  if (MeshBufferCounts.Buffer == VK_NULL_HANDLE || MeshBufferCounts.Size != meshCountsSize)
   {
-    Graphics::Vulkan::Buffer::Destroy(MeshVertexBuffer);
-    if (vertexByteSize > 0)
-      MeshVertexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, vertexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    Graphics::Vulkan::Buffer::Destroy(MeshBufferCounts);
+    MeshBufferCounts = Graphics::Vulkan::Buffer::CreateDevice(device, meshCountsSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   }
-  if (MeshTextureBuffer.Buffer == VK_NULL_HANDLE || MeshTextureBuffer.Size != textureByteSize)
+  if (MeshBufferData.Buffer == VK_NULL_HANDLE || MeshBufferData.Size != meshDataSize)
   {
-    Graphics::Vulkan::Buffer::Destroy(MeshTextureBuffer);
-    if (textureByteSize > 0)
-      MeshTextureBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, textureByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    Graphics::Vulkan::Buffer::Destroy(MeshBufferData);
+    MeshBufferData = Graphics::Vulkan::Buffer::CreateDevice(device, meshDataSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   }
-  if (MeshNormalBuffer.Buffer == VK_NULL_HANDLE || MeshNormalBuffer.Size != normalByteSize)
+  if (MeshBufferIndices.Buffer == VK_NULL_HANDLE || MeshBufferIndices.Size != meshIndicesSize)
   {
-    Graphics::Vulkan::Buffer::Destroy(MeshNormalBuffer);
-    if (normalByteSize > 0)
-      MeshNormalBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, normalByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    Graphics::Vulkan::Buffer::Destroy(MeshBufferIndices);
+    MeshBufferIndices = Graphics::Vulkan::Buffer::CreateDevice(device, meshIndicesSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   }
-  if (MeshVertexIndexBuffer.Buffer == VK_NULL_HANDLE || MeshVertexIndexBuffer.Size != vertexIndexByteSize)
+  if (MeshBufferFaces.Buffer == VK_NULL_HANDLE || MeshBufferFaces.Size != meshFacesSize)
   {
-    Graphics::Vulkan::Buffer::Destroy(MeshVertexIndexBuffer);
-    if (vertexIndexByteSize > 0)
-      MeshVertexIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, vertexIndexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    Graphics::Vulkan::Buffer::Destroy(MeshBufferFaces);
+    MeshBufferFaces = Graphics::Vulkan::Buffer::CreateDevice(device, meshFacesSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   }
-  if (MeshTextureIndexBuffer.Buffer == VK_NULL_HANDLE || MeshTextureIndexBuffer.Size != textureIndexByteSize)
+  if (MeshBufferNodes.Buffer == VK_NULL_HANDLE || MeshBufferNodes.Size != meshNodesSize)
   {
-    Graphics::Vulkan::Buffer::Destroy(MeshTextureIndexBuffer);
-    if (textureIndexByteSize > 0)
-      MeshTextureIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, textureIndexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    Graphics::Vulkan::Buffer::Destroy(MeshBufferNodes);
+    MeshBufferNodes = Graphics::Vulkan::Buffer::CreateDevice(device, meshNodesSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   }
-  if (MeshNormalIndexBuffer.Buffer == VK_NULL_HANDLE || MeshNormalIndexBuffer.Size != normalIndexByteSize)
-  {
-    Graphics::Vulkan::Buffer::Destroy(MeshNormalIndexBuffer);
-    if (normalIndexByteSize > 0)
-      MeshNormalIndexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, normalIndexByteSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
-  }
-  //update descriptor set
-  if (vertexByteSize > 0 && textureByteSize > 0 && normalByteSize > 0 && vertexIndexByteSize > 0 && textureIndexByteSize > 0 && normalIndexByteSize > 0)
-    Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(MeshDescriptorSet, {MeshVertexBuffer, MeshTextureBuffer, MeshNormalBuffer, MeshVertexIndexBuffer, MeshTextureIndexBuffer, MeshNormalIndexBuffer});
 
-  //setup mesh copy command
-  uint32_t vertexOffset = 0;
-  uint32_t textureOffset = 0;
-  uint32_t normalOffset = 0;
-  uint32_t vertexIndexOffset = 0;
-  uint32_t textureIndexOffset = 0;
-  uint32_t normalIndexOffset = 0;
+  uint32_t meshCountsOffset = 0;
+  uint32_t meshDataOffset = 0;
+  uint32_t meshIndicesOffset = 0;
+  uint32_t meshFaceOffset = 0;
+  uint32_t meshNodesOffset = 0;
   Graphics::Vulkan::Command::Begin(MeshCopyCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
   for (const auto view : Core::Engine::GetComponents<MeshView>())
   {
-    if (vertexByteSize > 0)
-    {
-      Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingVertexBuffer, MeshVertexBuffer, 0, vertexOffset);
-      vertexOffset += view->StagingVertexBuffer.Size;
-    }
-    if (textureByteSize > 0)
-    {
-      Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingTextureBuffer, MeshTextureBuffer, 0, textureOffset);
-      textureOffset += view->StagingTextureBuffer.Size;
-    }
-    if (normalByteSize > 0)
-    {
-      Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingNormalBuffer, MeshNormalBuffer, 0, normalOffset);
-      normalOffset += view->StagingNormalBuffer.Size;
-    }
-    if (vertexIndexByteSize > 0)
-    {
-      Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingVertexIndexBuffer, MeshVertexIndexBuffer, 0, vertexIndexOffset);
-      vertexIndexOffset += view->StagingVertexIndexBuffer.Size;
-    }
-    if (textureIndexByteSize > 0)
-    {
-      Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingTextureIndexBuffer, MeshTextureIndexBuffer, 0, textureIndexOffset);
-      textureIndexOffset += view->StagingTextureIndexBuffer.Size;
-    }
-    if (normalIndexByteSize > 0)
-    {
-      Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingNormalIndexBuffer, MeshNormalIndexBuffer, 0, normalIndexOffset);
-      normalIndexOffset += view->StagingNormalIndexBuffer.Size;
-    }
+    Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingMeshCounts, MeshBufferCounts, 0, meshCountsOffset);
+    meshCountsOffset += view->StagingMeshCounts.Size;
+    Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingMeshData, MeshBufferData, 0, meshDataOffset);
+    meshDataOffset += view->StagingMeshData.Size;
+    Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingIndices, MeshBufferIndices, 0, meshIndicesOffset);
+    meshIndicesOffset += view->StagingIndices.Size;
+    Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingFaces, MeshBufferFaces, 0, meshFaceOffset);
+    meshFaceOffset += view->StagingFaces.Size;
+    Graphics::Vulkan::Command::CopyBuffer(MeshCopyCommand, view->StagingNodes, MeshBufferNodes, 0, meshNodesOffset);
+    meshNodesOffset += view->StagingNodes.Size;
   }
   Graphics::Vulkan::Command::End(MeshCopyCommand);
-  Graphics::Vulkan::Command::Submit({MeshCopyCommand}, device.Queues.Compute[0], {}, {MeshSemaphore});
+  Graphics::Vulkan::Command::Submit({MeshCopyCommand}, device.Queues.Transfer[0], {}, {MeshSemaphore});
+
+  Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(MeshDescriptorSet, {MeshBufferCounts, MeshBufferData, MeshBufferIndices, MeshBufferFaces, MeshBufferNodes});
 }
 } // namespace Systems
 } // namespace Tortuga

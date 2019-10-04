@@ -11,8 +11,8 @@
 #include <cstring>
 
 #include "../Core/Console.hpp"
-#include "../Graphics/Vertex.hpp"
 #include "../Graphics/Image.hpp"
+#include "../Graphics/AcceleratedMesh.hpp"
 
 namespace Tortuga
 {
@@ -20,17 +20,7 @@ namespace Utils
 {
 namespace IO
 {
-struct ObjExport
-{
-  std::vector<glm::vec4> Vertices;
-  std::vector<glm::vec2> Textures;
-  std::vector<glm::vec4> Normals;
-  std::vector<uint32_t> VertexIndices;
-  std::vector<uint32_t> TextureIndices;
-  std::vector<uint32_t> NormalIndices;
-};
-
-ObjExport LoadObjFile(std::string filePath);
+Graphics::AcceleratedMesh LoadObjFile(std::string filePath);
 Graphics::Image LoadImageFile(std::string filePath);
 std::vector<char> GetFileContents(std::string filePath);
 void SetFileContents(std::string filePath, std::vector<char> data);

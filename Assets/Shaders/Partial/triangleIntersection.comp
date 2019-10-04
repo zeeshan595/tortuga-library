@@ -1,4 +1,25 @@
+bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec4 vertices[3], vec3 normal);
+
+bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec4 vertices[3], vec4 normals[3]) {
+  vec3 N = normalize((normals[0].xyz + normals[1].xyz + normals[2].xyz) / 3);
+  return triangleIntersection(rayOrigin, rayDirection, vertices, N);
+}
 bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec4 vertices[3]) {
+  //triangle points
+  vec3 v0 = vertices[0].xyz;
+  vec3 v1 = vertices[1].xyz;
+  vec3 v2 = vertices[2].xyz;
+
+  // compute plane's normal
+  vec3 v0v1 = v1 - v0;
+  vec3 v0v2 = v2 - v0;
+  // no need to normalize
+  vec3 N = cross(v0v1, v0v2);
+  return triangleIntersection(rayOrigin, rayDirection, vertices, N);
+}
+
+bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec4 vertices[3], vec3 normal)
+{
   //ray origin
   vec3 orig = rayOrigin;
   
@@ -10,11 +31,7 @@ bool triangleIntersection(vec3 rayOrigin, vec3 rayDirection, vec4 vertices[3]) {
   vec3 v1 = vertices[1].xyz;
   vec3 v2 = vertices[2].xyz;
 
-  // compute plane's normal
-  vec3 v0v1 = v1 - v0;
-  vec3 v0v2 = v2 - v0;
-  // no need to normalize
-  vec3 N = cross(v0v1, v0v2);// normalize((normals[0].xyz + normals[1].xyz + normals[2].xyz) / 3);
+  vec3 N = normal;
   //float area2 = length(N);
    
   //check if ray is parallel to the triangle

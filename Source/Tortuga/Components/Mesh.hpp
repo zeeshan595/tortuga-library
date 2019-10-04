@@ -5,9 +5,8 @@
 #include <cstring>
 #include <glm/glm.hpp>
 
-#include "../Graphics/Vulkan/Buffer.hpp"
 #include "../Core/Engine.hpp"
-#include "../Utils/IO.hpp"
+#include "../Graphics/AcceleratedMesh.hpp"
 
 namespace Tortuga
 {
@@ -15,22 +14,24 @@ namespace Components
 {
 struct Mesh : public Core::ECS::Component
 {
-  std::vector<glm::vec4> Vertices;
-  std::vector<glm::vec2> Textures;
-  std::vector<glm::vec4> Normals;
-  std::vector<uint32_t> VertexIndices;
-  std::vector<uint32_t> TextureIndices;
-  std::vector<uint32_t> NormalIndices;
+private:
+  Graphics::AcceleratedMesh MeshObject;
 
-  Mesh() {}
-  Mesh(Utils::IO::ObjExport obj)
+public:
+  bool IsDirty = false;
+
+  Mesh()
   {
-    Vertices = obj.Vertices;
-    Textures = obj.Textures;
-    Normals = obj.Normals;
-    VertexIndices = obj.VertexIndices;
-    TextureIndices = obj.TextureIndices;
-    NormalIndices = obj.NormalIndices;
+  }
+  Mesh(Graphics::AcceleratedMesh mesh)
+  {
+    MeshObject = mesh;
+    IsDirty = true;
+  }
+
+  const Graphics::AcceleratedMesh GetMesh() const
+  {
+    return MeshObject;
   }
 };
 } // namespace Components

@@ -82,6 +82,8 @@
     "cfenv": "cpp",
     "cinttypes": "cpp",
     "variant": "cpp",
-    "forward_list": "cpp"
+    "forward_list": "cpp",
+    "regex": "cpp",
+    "shared_mutex": "cpp"
   }
 }

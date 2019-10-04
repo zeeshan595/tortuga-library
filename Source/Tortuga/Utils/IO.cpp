@@ -6,9 +6,10 @@ namespace Utils
 {
 namespace IO
 {
-ObjExport LoadObjFile(std::string filePath)
+Graphics::AcceleratedMesh LoadObjFile(std::string filePath)
 {
-  auto data = ObjExport();
+
+  Graphics::AcceleratedMesh data = {};
 
   FILE *file = fopen(filePath.c_str(), "r");
   if (file == NULL)
@@ -29,7 +30,7 @@ ObjExport LoadObjFile(std::string filePath)
     {
       glm::vec3 vertex;
       fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-      data.Vertices.push_back(glm::vec4(vertex, 1.0f));
+      data.Positions.push_back(vertex);
     }
     else if (strcmp(lineHeader, "vt") == 0)
     {
@@ -41,7 +42,7 @@ ObjExport LoadObjFile(std::string filePath)
     {
       glm::vec3 normal;
       fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-      data.Normals.push_back(glm::vec4(normal, 1.0f));
+      data.Normals.push_back(normal);
     }
     else if (strcmp(lineHeader, "f") == 0)
     {
@@ -56,12 +57,15 @@ ObjExport LoadObjFile(std::string filePath)
 
       for (uint32_t i = 0; i < 3; i++)
       {
-        data.VertexIndices.push_back(vertexIndex[i]);
-        data.TextureIndices.push_back(uvIndex[i]);
-        data.NormalIndices.push_back(normalIndex[i]);
+        auto index = Graphics::AcceleratedMesh::IndexStruct();
+        index.Position = vertexIndex[i];
+        index.Texture = uvIndex[i];
+        index.Normal = normalIndex[i];
+        data.Indices.push_back(index);
       }
     }
   }
+  data = Graphics::AcceleratedMeshRecalculateVolumes(data);
   return data;
 }
 Graphics::Image LoadImageFile(std::string filePath)
