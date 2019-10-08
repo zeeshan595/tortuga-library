@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/Source/**",
+                "${workspaceFolder}/submodules/includes/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
