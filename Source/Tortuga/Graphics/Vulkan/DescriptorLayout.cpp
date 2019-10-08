@@ -26,21 +26,27 @@ namespace Vulkan
 {
 namespace DescriptorLayout
 {
-DescriptorLayout Create(Device::Device device, uint32_t bindingsAmount, VkShaderStageFlags shaderStage, VkDescriptorType type)
+DescriptorLayout Create(Device::Device device, std::vector<VkShaderStageFlags> shaderStages, std::vector<VkDescriptorType> types)
 {
   DescriptorLayout data = {};
-  data.Device = device.Device;
-  data.BindingsAmount = bindingsAmount;
-  data.Type = type;
+  if (shaderStages.size() != types.size())
+  {
+    Console::Error("shader stages and types must be the same length");
+    return data;
+  }
 
-  std::vector<VkDescriptorSetLayoutBinding> pBindings(bindingsAmount);
-  for (uint32_t i = 0; i < bindingsAmount; i++)
+  data.Device = device.Device;
+  data.BindingsAmount = types.size();
+  data.Types = types;
+
+  std::vector<VkDescriptorSetLayoutBinding> pBindings(types.size());
+  for (uint32_t i = 0; i < types.size(); i++)
   {
     //bindings
     pBindings[i].binding = i;
-    pBindings[i].descriptorType = type;
+    pBindings[i].descriptorType = types[i];
     pBindings[i].descriptorCount = 1;
-    pBindings[i].stageFlags = shaderStage;
+    pBindings[i].stageFlags = shaderStages[i];
     pBindings[i].pImmutableSamplers = VK_NULL_HANDLE;
   }
   VkDescriptorSetLayoutCreateInfo createInfo = {};

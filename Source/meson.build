@@ -1,6 +1,5 @@
 sourceCppFiles = [
   './Source/Tortuga/Utils/IO.cpp',
-  './Source/Tortuga/Console.cpp',
   './Source/Tortuga/Graphics/Vulkan/Fence.cpp',
   './Source/Tortuga/Graphics/Vulkan/Semaphore.cpp',
   './Source/Tortuga/Graphics/Vulkan/Swapchain.cpp',
@@ -20,11 +19,11 @@ sourceCppFiles = [
   './Source/Tortuga/Graphics/Vulkan/DescriptorSet.cpp',
   './Source/Tortuga/Graphics/Vulkan/CommandPool.cpp',
   './Source/Tortuga/Graphics/Vulkan/ErrorCheck.cpp',
+  './Source/Tortuga/Graphics/AcceleratedMesh.cpp',
   './Source/Tortuga/Graphics/DisplaySurface.cpp',
-  './Source/Tortuga/Core/Engine.cpp',
-  './Source/Tortuga/Core/System.cpp',
-  './Source/Tortuga/Core/Screen.cpp',
   './Source/Tortuga/Core/GUID.cpp',
-  './Source/Tortuga/Core/Entity.cpp',
+  './Source/Tortuga/Core/Engine.cpp',
+  './Source/Tortuga/Core/Input.cpp',
+  './Source/Tortuga/Core/Console.cpp',
   './Source/Tortuga/Systems/Rendering.cpp'
 ]

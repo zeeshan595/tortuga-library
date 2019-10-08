@@ -24,12 +24,8 @@ struct Buffer
   uint32_t Size;
 };
 
-Buffer CreateHost(Device::Device device, uint32_t bufferSize);
-Buffer CreateDeviceOnly(Device::Device device, uint32_t bufferSize);
-Buffer CreateHostSrc(Device::Device device, uint32_t bufferSize);
-Buffer CreateDeviceOnlySrc(Device::Device device, uint32_t bufferSize);
-Buffer CreateHostDest(Device::Device device, uint32_t bufferSize);
-Buffer CreateDeviceOnlyDest(Device::Device device, uint32_t bufferSize);
+Buffer CreateHost(Device::Device device, uint32_t bufferSize, VkBufferUsageFlags usageFlags);
+Buffer CreateDevice(Device::Device device, uint32_t bufferSize, VkBufferUsageFlags usageFlags);
 Buffer Create(Device::Device device, uint32_t bufferSize, VkMemoryPropertyFlags memoryProperties, VkBufferUsageFlags usageFlags);
 void Destroy(Buffer data);
 

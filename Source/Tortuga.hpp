@@ -7,9 +7,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 
-//debug console
-#include "./Tortuga/Console.hpp"
-
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
@@ -29,22 +26,17 @@
 #include "./Tortuga/Graphics/Vulkan/DescriptorPool.hpp"
 #include "./Tortuga/Graphics/Vulkan/DescriptorSet.hpp"
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
+#include "./Tortuga/Graphics/Pixel.hpp"
+#include "./Tortuga/Graphics/Image.hpp"
+#include "./Tortuga/Graphics/AcceleratedMesh.hpp"
+#include "./Tortuga/Graphics/DisplaySurface.hpp"
 
 //Core
+#include "./Tortuga/Core/Console.hpp"
 #include "./Tortuga/Core/GUID.hpp"
-#include "./Tortuga/Core/Entity.hpp"
-#include "./Tortuga/Core/System.hpp"
 #include "./Tortuga/Core/Engine.hpp"
-#include "./Tortuga/Core/Screen.hpp"
 
 //Systems
 #include "./Tortuga/Systems/Rendering.hpp"
-
-//Components
-#include "./Tortuga/Components/Transform.hpp"
-#include "./Tortuga/Components/Camera.hpp"
-#include "./Tortuga/Components/Mesh.hpp"
-#include "./Tortuga/Components/Light.hpp"
-#include "./Tortuga/Components/Material.hpp"
 
 #endif

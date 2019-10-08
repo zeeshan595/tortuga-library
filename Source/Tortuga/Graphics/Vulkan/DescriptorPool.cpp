@@ -16,7 +16,8 @@ DescriptorPool Create(Device::Device device, std::vector<DescriptorLayout::Descr
 
   std::unordered_map<VkDescriptorType, uint> BindingCounts;
   for (auto layout : layouts)
-    BindingCounts[layout.Type] += layout.BindingsAmount;
+    for (auto type : layout.Types)
+      BindingCounts[type]++;
 
   std::vector<VkDescriptorPoolSize> poolSizes;
   for (auto binding : BindingCounts)

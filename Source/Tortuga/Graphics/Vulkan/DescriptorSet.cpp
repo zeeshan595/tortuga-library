@@ -25,7 +25,7 @@ DescriptorSet Create(Device::Device device, DescriptorPool::DescriptorPool pool,
   ErrorCheck::Callback(vkAllocateDescriptorSets(device.Device, &info, &data.set));
   return data;
 }
-void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> content)
+void UpdateDescriptorSet(DescriptorSet data, std::vector<Buffer::Buffer> content)
 {
   if (data.Layout.BindingsAmount != content.size())
   {
@@ -49,7 +49,7 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> conten
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = 0;
     writeInfos[i].descriptorCount = 1;
-    writeInfos[i].descriptorType = data.Layout.Type;
+    writeInfos[i].descriptorType = data.Layout.Types[i];
 
     writeInfos[i].pBufferInfo = &(bufferInfos[i]);
     writeInfos[i].pImageInfo = VK_NULL_HANDLE;
@@ -58,7 +58,7 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<Buffer::Buffer> conten
   vkUpdateDescriptorSets(data.Device, writeInfos.size(), writeInfos.data(), 0, 0);
 }
 
-void UpdateDescriptorSets(DescriptorSet data, std::vector<ImageView::ImageView> content, std::vector<Sampler::Sampler> samplers)
+void UpdateDescriptorSet(DescriptorSet data, std::vector<ImageView::ImageView> content, std::vector<Sampler::Sampler> samplers)
 {
   if (content.size() != samplers.size())
   {
@@ -87,7 +87,7 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<ImageView::ImageView> 
     writeInfos[i].dstBinding = i;
     writeInfos[i].dstArrayElement = 0;
     writeInfos[i].descriptorCount = 1;
-    writeInfos[i].descriptorType = data.Layout.Type;
+    writeInfos[i].descriptorType = data.Layout.Types[i];
 
     writeInfos[i].pBufferInfo = VK_NULL_HANDLE;
     writeInfos[i].pImageInfo = &(imageInfo[i]);
@@ -95,7 +95,7 @@ void UpdateDescriptorSets(DescriptorSet data, std::vector<ImageView::ImageView> 
   }
   vkUpdateDescriptorSets(data.Device, writeInfos.size(), writeInfos.data(), 0, 0);
 }
-} // namespace DescriptorSets
+} // namespace DescriptorSet
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Tortuga

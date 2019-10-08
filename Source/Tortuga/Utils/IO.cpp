@@ -6,13 +6,10 @@ namespace Utils
 {
 namespace IO
 {
-ObjExport LoadObjFile(std::string filePath)
+Graphics::AcceleratedMesh LoadObjFile(std::string filePath)
 {
-  std::vector<glm::vec3> temp_positions, temp_normals;
-  std::vector<glm::vec2> temp_textures;
 
-  std::vector<uint32_t> indices;
-  std::vector<Graphics::Vertex> vertices;
+  Graphics::AcceleratedMesh data = {};
 
   FILE *file = fopen(filePath.c_str(), "r");
   if (file == NULL)
@@ -33,19 +30,19 @@ ObjExport LoadObjFile(std::string filePath)
     {
       glm::vec3 vertex;
       fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-      temp_positions.push_back(vertex);
+      data.Positions.push_back(vertex);
     }
     else if (strcmp(lineHeader, "vt") == 0)
     {
       glm::vec2 uv;
       fscanf(file, "%f %f\n", &uv.x, &uv.y);
-      temp_textures.push_back(uv);
+      data.Textures.push_back(uv);
     }
     else if (strcmp(lineHeader, "vn") == 0)
     {
       glm::vec3 normal;
       fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-      temp_normals.push_back(normal);
+      data.Normals.push_back(normal);
     }
     else if (strcmp(lineHeader, "f") == 0)
     {
@@ -57,22 +54,19 @@ ObjExport LoadObjFile(std::string filePath)
         printf("File can't be read by our simple parser : ( Try exporting with other options\n");
         return {};
       }
-      if (vertices.size() != temp_positions.size())
-        vertices.resize(temp_positions.size());
 
       for (uint32_t i = 0; i < 3; i++)
       {
-        uint vertIndex = vertexIndex[i] - 1;
-        indices.push_back(vertIndex);
-        glm::vec2 currentTexture = temp_textures[uvIndex[i] - 1];
-        glm::vec3 currentNorm = temp_normals[normalIndex[i] - 1];
-        vertices[vertIndex].Position = temp_positions[vertIndex];
-        vertices[vertIndex].Normal = currentNorm;
-        vertices[vertIndex].Texture = currentTexture;
+        auto index = Graphics::AcceleratedMesh::IndexStruct();
+        index.Position = vertexIndex[i];
+        index.Texture = uvIndex[i];
+        index.Normal = normalIndex[i];
+        data.Indices.push_back(index);
       }
     }
   }
-  return {vertices, indices};
+  data = Graphics::AcceleratedMeshRecalculateVolumes(data);
+  return data;
 }
 Graphics::Image LoadImageFile(std::string filePath)
 {

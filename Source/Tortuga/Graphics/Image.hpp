@@ -2,19 +2,15 @@
 #define _GRAPHICS_IMAGE
 
 #include <cstdint>
+#include <vector>
 #include <vulkan/vulkan.h>
+
+#include "./Pixel.hpp"
 
 namespace Tortuga
 {
 namespace Graphics
 {
-struct Pixel
-{
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-  uint8_t a;
-};
 struct Image
 {
   uint32_t Width;

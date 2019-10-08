@@ -4,6 +4,7 @@
 #include "./Vulkan/ErrorCheck.hpp"
 #include "./Vulkan/Swapchain.hpp"
 #include "vulkan/vulkan.h"
+#include "../Core/Input.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>

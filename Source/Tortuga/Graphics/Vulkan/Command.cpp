@@ -242,6 +242,11 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
     source = VK_PIPELINE_STAGE_TRANSFER_BIT;
     sourceAccess = VK_ACCESS_TRANSFER_WRITE_BIT;
   }
+  else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+  {
+    source = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    sourceAccess = VK_ACCESS_TRANSFER_READ_BIT;
+  }
   else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED)
   {
     source = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -273,6 +278,11 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
   {
     destination = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     destinationAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+  }
+  else if (newLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+  {
+    destination = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    destinationAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
   }
   else
   {
@@ -342,7 +352,7 @@ void CopyImage(Command data, Image::Image source, Image::Image destination)
   }
   vkCmdCopyImage(data.Command, source.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
 }
-void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec2 size, glm::vec2 destinationOffset, glm::vec2 sourceOffset)
+void BlitImage(Command data, Image::Image source, Image::Image destination)
 {
   auto subResource = VkImageSubresourceLayers();
   {
@@ -355,11 +365,11 @@ void BlitImage(Command data, Image::Image source, Image::Image destination, glm:
   auto blitInfo = VkImageBlit();
   {
     blitInfo.srcSubresource = subResource;
-    blitInfo.srcOffsets[0] = {sourceOffset.x, sourceOffset.y, 0};
-    blitInfo.srcOffsets[1] = {size.x, size.y, 1};
+    blitInfo.srcOffsets[0] = {0, 0, 0};
+    blitInfo.srcOffsets[1] = {source.Width, source.Height, 1};
     blitInfo.dstSubresource = subResource;
-    blitInfo.dstOffsets[0] = {destinationOffset.x, destinationOffset.y, 0};
-    blitInfo.dstOffsets[1] = {size.x, size.y, 1};
+    blitInfo.dstOffsets[0] = {0, 0, 0};
+    blitInfo.dstOffsets[1] = {destination.Width, destination.Height, 1};
   }
   vkCmdBlitImage(data.Command, source.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blitInfo, VK_FILTER_LINEAR);
 }
