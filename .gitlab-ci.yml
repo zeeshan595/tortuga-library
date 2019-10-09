@@ -2,9 +2,10 @@
 # use the official gcc image, based on debian
 # can use verions as well, like gcc:5.2
 # see https://hub.docker.com/_/gcc/
-image: waylandyu/get-started
+image: ubuntu
 
 build:
   stage: build
   script:
+    - apt install g++
     - make
