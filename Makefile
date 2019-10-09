@@ -5,8 +5,7 @@ TARGET = tortuga
 COMPILER = g++
 FLAGS = -g -std=c++17 -pthread -Wall -DDEBUG_MODE -Wno-narrowing
 INCLUDE = -Isubmodules/includes/
-LIBS = -Lsubmodules/libs/ -lshaderc_shared -lvulkan -lglfw -lwayland-client
-LIBS_A = submodules/libs/libshaderc.a
+LIBS = -Lsubmodules/libs/ -lshaderc_shared -lvulkan -lglfw -lwayland-client -lglslang
 
 #important paths
 SRC_DIR = Source
@@ -21,7 +20,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 #link and create executable
 all: $(OBJ_FILES)
 	cp -r Assets $(OBJ_DIR)/Assets
-	$(COMPILER) -o $(OBJ_DIR)/$(TARGET) $(SRC_EXECUTABLE) $(FLAGS) $(INCLUDE) $(LIBS) $(OBJ_FILES) $(LIBS_A)
+	$(COMPILER) -o $(OBJ_DIR)/$(TARGET) $(SRC_EXECUTABLE) $(FLAGS) $(INCLUDE) $(LIBS) $(OBJ_FILES)
 
 #create obj files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
