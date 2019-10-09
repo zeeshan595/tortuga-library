@@ -3,9 +3,9 @@ TARGET = tortuga
 
 #compiler options
 COMPILER = g++
-FLAGS = -std=c++17 -Wall -DDEBUG_MODE -Wno-narrowing -g
+FLAGS = -g -std=c++17 -pthread -Wall -DDEBUG_MODE -Wno-narrowing
 INCLUDE = -Isubmodules/includes/
-LIBS = -Lsubmodules/libs/ -lshaderc_shared -lvulkan -lglfw -pthread
+LIBS = -Lsubmodules/libs/ -lshaderc_shared -lvulkan -lglfw
 
 #important paths
 SRC_DIR = Source
