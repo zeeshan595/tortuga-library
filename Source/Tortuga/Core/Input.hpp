@@ -18,10 +18,10 @@ void RemoveOnWindowClose(OnWindowClose callback);
 void TriggerWindowClose();
 
 //key events
-typedef void (*OnKeyEvent)(KeyCode::KeyCode, KeyAction::KeyAction);
+typedef void (*OnKeyEvent)(KeyCode, KeyAction);
 void NotifyOnKeyEvent(OnKeyEvent callback);
 void RemoveOnKeyEvent(OnKeyEvent callback);
-void TriggerKeyEvent(KeyCode::KeyCode key, KeyAction::KeyAction action);
+void TriggerKeyEvent(KeyCode key, KeyAction action);
 
 //mouse events
 typedef void (*OnMouseEvent)(double x, double y);

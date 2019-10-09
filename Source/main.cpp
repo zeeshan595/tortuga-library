@@ -12,7 +12,7 @@ int main()
   Core::Input::NotifyOnWindowClose([] {
     ShouldClose = true;
   });
-  Core::Input::NotifyOnKeyEvent([](const auto key, const auto event) {
+  Core::Input::NotifyOnKeyEvent([](Core::Input::KeyCode key, Core::Input::KeyAction event) {
     if (key == Core::Input::KeyCode::Space)
       ShouldClose = true;
   });

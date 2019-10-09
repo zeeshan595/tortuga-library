@@ -46,7 +46,7 @@ void RemoveOnKeyEvent(OnKeyEvent callback)
     }
   }
 }
-void TriggerKeyEvent(KeyCode::KeyCode key, KeyAction::KeyAction action)
+void TriggerKeyEvent(KeyCode key, KeyAction action)
 {
   for (const auto e : keyEvents)
     e(key, action);

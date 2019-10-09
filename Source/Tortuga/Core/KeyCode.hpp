@@ -7,17 +7,12 @@ namespace Core
 {
 namespace Input
 {
-namespace KeyAction
-{
 enum KeyAction
 {
   Released = 0,
   Pressed = 1,
-  Down = 2
+  HeldDown = 2
 };
-};
-namespace KeyCode
-{
 enum KeyCode
 {
   Unknown = -1,
@@ -150,7 +145,6 @@ enum KeyCode
   RightAlt = 346,
   RightSuper = 347,
   KeyMenu = 348
-};
 };
 } // namespace Input
 } // namespace Core
