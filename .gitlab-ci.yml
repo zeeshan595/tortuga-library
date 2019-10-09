@@ -6,9 +6,12 @@ image: gcc
 
 build:
   stage: build
-  apt install wayland
-  apt install wayland-libs-client
-  apt install wayland-libs-cursor
-  apt install wayland-libs-egl
+  # instead of calling g++ directly you can also use some build toolkit like make
+  # install the necessary build tools when needed
+  # before_script:
+  #   - apt update && apt -y install make autoconf
+  - apt install wayland-libs-client
+  - apt install wayland-libs-cursor
+  - apt install wayland-libs-egl
   script:
     - make
