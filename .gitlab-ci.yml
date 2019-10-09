@@ -2,16 +2,9 @@
 # use the official gcc image, based on debian
 # can use verions as well, like gcc:5.2
 # see https://hub.docker.com/_/gcc/
-image: gcc
+image: waylandyu/get-started
 
 build:
   stage: build
-  # instead of calling g++ directly you can also use some build toolkit like make
-  # install the necessary build tools when needed
-  # before_script:
-  #   - apt update && apt -y install make autoconf
   script:
-    - apt install wayland-libs-client
-    - apt install wayland-libs-cursor
-    - apt install wayland-libs-egl
     - make
