@@ -18,7 +18,8 @@
     {
       "label": "clean",
       "type": "shell",
-      "command": "make clean"
+      "command": "make clean",
+      "problemMatcher": []
     }
   ]
 }

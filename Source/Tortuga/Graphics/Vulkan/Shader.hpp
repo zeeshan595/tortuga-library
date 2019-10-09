@@ -28,7 +28,11 @@ struct Shader
   VkShaderModule Shader = VK_NULL_HANDLE;
 };
 
-std::vector<char> CompileShader(Instance::Instance instance, ShaderType type, std::vector<char> code);
+std::vector<char> CompileShader(
+    Instance::Instance instance,
+    ShaderType type,
+    std::vector<char> code,
+    std::string location = "Assets/Shaders/");
 Shader Create(Device::Device device, std::vector<char> compiled);
 void Destroy(Shader data);
 } // namespace Shader

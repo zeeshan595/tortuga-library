@@ -1,5 +1,4 @@
 #version 460
-#extension GL_GOOGLE_include_directive: enable
 #define LOCAL_INVOCATION 8
 layout(local_size_x = LOCAL_INVOCATION) in;
 layout(local_size_y = LOCAL_INVOCATION) in;
