@@ -4,9 +4,8 @@ TARGET = tortuga
 #compiler options
 COMPILER = g++
 FLAGS = -g -std=c++17 -pthread -Wall -Wno-narrowing
-INCLUDE = -Isubmodules/includes/
-LIBS = -Lsubmodules/libs/ -lvulkan -lglfw -lwayland-client
-LIBS_A = submodules/libs/libm.a
+PATHS = -Isubmodules/includes/ -Lsubmodules/libs/
+LIBS = -lvulkan -lglfw -lwayland-client -lm
 
 #important paths
 SRC_DIR = Source
@@ -21,12 +20,12 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 #link and create executable
 all: $(OBJ_FILES)
 	cp -r Assets $(OBJ_DIR)/Assets
-	$(COMPILER) -o $(OBJ_DIR)/$(TARGET) $(SRC_EXECUTABLE) $(FLAGS) $(INCLUDE) $(LIBS) $(OBJ_FILES) $(LIBS_A)
+	$(COMPILER) -o $(OBJ_DIR)/$(TARGET) $(SRC_EXECUTABLE) $(FLAGS) $(PATHS) $(LIBS) $(OBJ_FILES) $(LIBS_A)
 
 #create obj files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p "$(@D)"
-	$(COMPILER) -c -o $@ $< $(FLAGS) $(INCLUDE) $(LIBS) $(LIBS_A)
+	$(COMPILER) -c -o $@ $< $(FLAGS) $(PATHS) $(LIBS) $(LIBS_A)
 
 clean:
 	rm -rf Build
