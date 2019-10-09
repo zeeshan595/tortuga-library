@@ -3,9 +3,9 @@ TARGET = tortuga
 
 #compiler options
 COMPILER = g++
-FLAGS = -g -std=c++17 -pthread -Wall -lm -Wno-narrowing
+FLAGS = -g -std=c++17 -pthread -Wall -Wno-narrowing
 INCLUDE = -Isubmodules/includes/
-LIBS = -Lsubmodules/libs/ -lvulkan -lglfw -lwayland-client
+LIBS = -Lsubmodules/libs/ -lvulkan -lglfw -lwayland-client -lm
 
 #important paths
 SRC_DIR = Source
