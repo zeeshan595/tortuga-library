@@ -4,8 +4,8 @@ TARGET = tortuga
 #compiler options
 COMPILER = g++
 FLAGS = -std=c++17 -Wall -DDEBUG_MODE -Wno-narrowing -g
-INCLUDE = -I/submodules/includes/
-LIBS = -L/submodules/libs/ -lshaderc_shared -lvulkan -lglfw -pthread
+INCLUDE = -Isubmodules/includes/
+LIBS = -Lsubmodules/libs/ -lshaderc_shared -lvulkan -lglfw -pthread
 
 #important paths
 SRC_DIR = Source
@@ -25,7 +25,7 @@ all: $(OBJ_FILES)
 #create obj files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p "$(@D)"
-	$(COMPILER) -c -o $@ $< $(FLAGS)
+	$(COMPILER) -c -o $@ $< $(FLAGS) $(INCLUDE) $(LIBS)
 
 clean:
 	rm -rf Build
