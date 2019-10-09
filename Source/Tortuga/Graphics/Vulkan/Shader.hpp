@@ -2,7 +2,6 @@
 #define _VULKAN_SHADER
 
 #include <vulkan/vulkan.h>
-#include <shaderc/shaderc.h>
 
 #include "./ErrorCheck.hpp"
 #include "./Instance.hpp"

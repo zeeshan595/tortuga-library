@@ -18,7 +18,6 @@ Instance Create()
 {
   glfwInit();
   Instance data = {};
-  data.ShaderCompiler = shaderc_compiler_initialize();
 
   std::vector<const char *> extensions = DisplaySurface::GetVulkanExtensions();
   std::vector<const char *> validationLayers = {"VK_LAYER_LUNARG_standard_validation"};
@@ -81,7 +80,6 @@ void Destroy(Instance data)
     Device::Destroy(data.Devices[i]);
 
   vkDestroyInstance(data.Instance, nullptr);
-  shaderc_compiler_release(data.ShaderCompiler);
   glfwTerminate();
 }
 } // namespace Instance
