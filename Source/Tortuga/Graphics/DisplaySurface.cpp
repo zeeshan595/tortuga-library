@@ -27,10 +27,10 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
     Core::Input::TriggerWindowClose();
   });
   glfwSetKeyCallback(data.Window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-    Core::Input::TriggerKeyEvent((Core::Input::KeyCode::KeyCode)key, (Core::Input::KeyAction::KeyAction)action);
+    Core::Input::TriggerKeyEvent((Core::Input::KeyCode)key, (Core::Input::KeyAction)action);
   });
   glfwSetMouseButtonCallback(data.Window, [](GLFWwindow *window, int button, int action, int mods) {
-    Core::Input::TriggerKeyEvent((Core::Input::KeyCode::KeyCode)button, (Core::Input::KeyAction::KeyAction)action);
+    Core::Input::TriggerKeyEvent((Core::Input::KeyCode)button, (Core::Input::KeyAction)action);
   });
   glfwSetCursorPosCallback(data.Window, [](GLFWwindow *window, double x, double y) {
     Core::Input::TriggerMouseEvent(x, y);
