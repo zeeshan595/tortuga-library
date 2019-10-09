@@ -1,9 +1,6 @@
-image: ubuntu
+image: khronosgroup/docker-images
 
 build:
   stage: build
   script:
-    - apt install g++
-    - apt install make
-    - apt install wayland
     - make
