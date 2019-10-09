@@ -1,4 +1,4 @@
-image: khronosgroup/docker-images
+image: x11docker/xwayland
 
 build:
   stage: build
