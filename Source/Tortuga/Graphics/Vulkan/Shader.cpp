@@ -1,7 +1,9 @@
 #include "./Shader.hpp"
 
 #include <regex>
+#include <vector>
 #include "../../Utils/IO.hpp"
+#include "../../Core/GUID.hpp"
 
 namespace Tortuga
 {
@@ -42,8 +44,26 @@ std::vector<char> CompileShader(
     std::string location)
 {
   const auto fullShaderCode = GetFullShaderCode(location, code.data());
-  Console::Info(fullShaderCode);
-  return {};
+  std::string typeString = "";
+  switch (type)
+  {
+  case ShaderType::COMPUTE:
+    typeString = "comp";
+    break;
+  }
+  auto fullShaderChar = std::vector<char>(fullShaderCode.length());
+  memcpy(fullShaderChar.data(), fullShaderCode.c_str(), fullShaderCode.length());
+  const auto tempShaderPath = location + Core::GUID::GenerateGUID(1) + "." + typeString;
+  Utils::IO::SetFileContents(tempShaderPath, fullShaderChar);
+
+  const std::string cmd = "glslangValidator -V " + tempShaderPath + " -o " + tempShaderPath + ".spv";
+  system(cmd.c_str());
+  const auto compiledShader = Utils::IO::GetFileContents(tempShaderPath + ".spv");
+  const std::string cleanUpCommand = "rm " + tempShaderPath + " && rm " + tempShaderPath + ".spv";
+  system(cleanUpCommand.c_str());
+
+  //todo compile shader
+  return compiledShader;
 }
 Shader Create(Device::Device device, std::vector<char> compiled)
 {
