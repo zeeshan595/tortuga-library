@@ -38,26 +38,26 @@ init:
 	git submodule init
 	git submodule update --recursive --init
 	#vulkan headers
-	mkdir -p submodules/Vulkan-Headers/build
-	cd submodules/Vulkan-Headers/build && cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
-	make install -C submodules/Vulkan-Headers/build
+	mkdir -p Submodules/Vulkan-Headers/build
+	cd Submodules/Vulkan-Headers/build && cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
+	make install -C Submodules/Vulkan-Headers/build
 	#vulkan loader
-	mkdir -p submodules/Vulkan-Loader/build
-	echo 'set(VULKAN_HEADERS_INSTALL_DIR "$(PWD)/usr" CACHE STRING "" FORCE)' > $(PWD)/submodules/Vulkan-Loader/build/helper.cmake
-	cd submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
-	make install -C submodules/Vulkan-Loader/build
+	mkdir -p Submodules/Vulkan-Loader/build
+	echo 'set(VULKAN_HEADERS_INSTALL_DIR "$(PWD)/usr" CACHE STRING "" FORCE)' > $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
+	cd Submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
+	make install -C Submodules/Vulkan-Loader/build
 	#glfw
-	mkdir -p submodules/glfw/build
-	cd submodules/glfw/build && cmake -DBUILD_SHARED_LIBS=ON ..
-	make -C submodules/glfw/build
-	ln -f -s ../../submodules/glfw/include/GLFW usr/include/GLFW
-	ln -f -s ../../submodules/glfw/build/src/libglfw.so usr/lib64/libglfw.so
+	mkdir -p Submodules/glfw/build
+	cd Submodules/glfw/build && cmake -DBUILD_SHARED_LIBS=ON ..
+	make -C Submodules/glfw/build
+	ln -f -s ../../Submodules/glfw/include/GLFW usr/include/GLFW
+	ln -f -s ../../Submodules/glfw/build/src/libglfw.so usr/lib64/libglfw.so
 	#stb
-	ln -f -s ../../submodules/stb/ usr/include/stb
+	ln -f -s ../../Submodules/stb/ usr/include/stb
 	#glm
-	ln -f -s ../../submodules/glm/glm usr/include/glm
+	ln -f -s ../../Submodules/glm/glm usr/include/glm
 	#glslang
-	mkdir -p submodules/glslang/build
-	cd submodules/glslang/build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
-	make -C submodules/glslang/build
-	make install -C submodules/glslang/build
+	mkdir -p Submodules/glslang/build
+	cd Submodules/glslang/build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
+	make -C Submodules/glslang/build
+	make install -C Submodules/glslang/build
