@@ -4,7 +4,7 @@ TARGET = tortuga
 #compiler options
 COMPILER = g++
 FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing
-PATHS = -Isubmodules/includes/ -Lsubmodules/libs/
+PATHS = -Iusr/includes/ -Lusr/libs/
 LIBS = -lvulkan -lglfw -lwayland-client -lm
 
 #important paths
@@ -29,3 +29,26 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 clean:
 	rm -rf Build
+
+submodule:
+	mkdir -p usr
+	#init
+	git submodule init
+	git submodule update --recursive --init
+	#vulkan headers
+	mkdir -p submodules/Vulkan-Headers/build
+	cd submodules/Vulkan-Headers/build && cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
+	make install -C submodules/Vulkan-Headers/build
+	#vulkan loader
+	mkdir -p submodules/Vulkan-Loader/build
+	echo 'set(VULKAN_HEADERS_INSTALL_DIR "$(PWD)/usr" CACHE STRING "" FORCE)' > $(PWD)/submodules/Vulkan-Loader/build/helper.cmake
+	cd submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
+	make -C submodules/Vulkan-Loader/build
+	make install -C submodules/Vulkan-Loader/build
+	#glslang
+	
+
+	#glfw
+	#mkdir -p submodules/glfw/build
+	#cd submodules/glfw/build && cmake ..
+	#make -C submodules/glfw/build
