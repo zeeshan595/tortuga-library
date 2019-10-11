@@ -1,18 +1,18 @@
-[submodule "submodules/glfw"]
+[submodule "Submodules/glfw"]
 	path = Submodules/glfw
 	url = git@github.com:glfw/glfw.git
-[submodule "submodules/glm"]
+[submodule "Submodules/glm"]
 	path = Submodules/glm
 	url = git@github.com:g-truc/glm.git
-[submodule "submodules/glslang"]
+[submodule "Submodules/glslang"]
 	path = Submodules/glslang
 	url = git@github.com:KhronosGroup/glslang.git
-[submodule "submodules/stb"]
+[submodule "Submodules/stb"]
 	path = Submodules/stb
 	url = git@github.com:nothings/stb.git
-[submodule "submodules/Vulkan-Headers"]
+[submodule "Submodules/Vulkan-Headers"]
 	path = Submodules/Vulkan-Headers
 	url = git@github.com:KhronosGroup/Vulkan-Headers.git
-[submodule "submodules/Vulkan-Loader"]
+[submodule "Submodules/Vulkan-Loader"]
 	path = Submodules/Vulkan-Loader
 	url = git@github.com:KhronosGroup/Vulkan-Loader.git
