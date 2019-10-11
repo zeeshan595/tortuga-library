@@ -4,8 +4,8 @@ TARGET = tortuga
 #compiler options
 COMPILER = g++
 FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing
-PATHS = -Iusr/includes/ -Lusr/libs/
-LIBS = -lvulkan -lglfw -lwayland-client -lm
+PATHS = -Iusr/include/ -Lusr/lib64/
+LIBS = -lvulkan -lglfw
 
 #important paths
 SRC_DIR = Source
@@ -16,6 +16,8 @@ SRC_EXECUTABLE = Source/main.cpp
 SRC_FILES := $(shell find $(SRC_DIR)/ -type f -name '*.cpp' ! -path '$(SRC_EXECUTABLE)')
 #get a list of all obj files
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+#lib a files
+LIBS_A := $(shell find usr/lib64/ -type f -name '*.a')
 
 #link and create executable
 all: $(OBJ_FILES)
@@ -30,7 +32,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	rm -rf Build
 
-submodule:
+init:
 	mkdir -p usr
 	#init
 	git submodule init
@@ -43,12 +45,19 @@ submodule:
 	mkdir -p submodules/Vulkan-Loader/build
 	echo 'set(VULKAN_HEADERS_INSTALL_DIR "$(PWD)/usr" CACHE STRING "" FORCE)' > $(PWD)/submodules/Vulkan-Loader/build/helper.cmake
 	cd submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
-	make -C submodules/Vulkan-Loader/build
 	make install -C submodules/Vulkan-Loader/build
-	#glslang
-	
-
 	#glfw
-	#mkdir -p submodules/glfw/build
-	#cd submodules/glfw/build && cmake ..
-	#make -C submodules/glfw/build
+	mkdir -p submodules/glfw/build
+	cd submodules/glfw/build && cmake -DBUILD_SHARED_LIBS=ON ..
+	make -C submodules/glfw/build
+	ln -f -s ../../submodules/glfw/include/GLFW usr/include/GLFW
+	ln -f -s ../../submodules/glfw/build/src/libglfw.so usr/lib64/libglfw.so
+	#stb
+	ln -f -s ../../submodules/stb/ usr/include/stb
+	#glm
+	ln -f -s ../../submodules/glm/glm usr/include/glm
+	#glslang
+	mkdir -p submodules/glslang/build
+	cd submodules/glslang/build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
+	make -C submodules/glslang/build
+	make install -C submodules/glslang/build
