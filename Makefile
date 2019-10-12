@@ -37,6 +37,10 @@ init:
 	#init
 	git submodule init
 	git submodule update --recursive --init
+	#wayland
+	cd Submodules/wayland && sh autogen.sh --disable-documentation --prefix=$(PWD)/usr
+	make -C Submodules/wayland
+	make install -C Submodules/wayland
 	#vulkan headers
 	mkdir -p Submodules/Vulkan-Headers/build
 	cd Submodules/Vulkan-Headers/build && cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
@@ -44,6 +48,7 @@ init:
 	#vulkan loader
 	mkdir -p Submodules/Vulkan-Loader/build
 	echo 'set(VULKAN_HEADERS_INSTALL_DIR "$(PWD)/usr" CACHE STRING "" FORCE)' > $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
+	echo 'set(WAYLAND_CLIENT_INCLUDE_DIR "$(PWD)/usr" CACHE STRING "" FORCE)' >> $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
 	cd Submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/usr ..
 	make install -C Submodules/Vulkan-Loader/build
 	#glfw
