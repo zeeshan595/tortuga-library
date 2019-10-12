@@ -4,7 +4,7 @@ TARGET = tortuga
 #compiler options
 COMPILER = g++
 FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing
-PATHS = -Iusr/include/ -Lusr/lib64/
+PATHS = -Iusr/include/ -Lusr/lib64/ -Lusr/lib/
 LIBS = -lvulkan -lglfw
 
 #important paths

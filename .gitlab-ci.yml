@@ -3,4 +3,5 @@ image: gcc
 build:
   stage: build
   script:
+    - make init
     - make
