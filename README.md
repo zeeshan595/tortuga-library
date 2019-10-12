@@ -14,14 +14,15 @@ Tortuga is a open source Game Engine built in C++ 17. Tortuga ONLY uses vulkan f
 
 ## Building the library
 
-##### With Makefile
+##### Makefile
 
 1. Download the project `git clone https://github.com/zeeshan595/tortuga-library`
 2. Change Directory `cd tortuga-library`
 3. Setup required dependencies `make init`
 4. Build project `make`
+5. Run the application `./Build/tortuga`
 
-##### With VS Code
+##### Visual Studio Code
 
 1. Download the project `git clone https://github.com/zeeshan595/tortuga-library`
 2. Open project with vs code

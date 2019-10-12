@@ -21,7 +21,6 @@ LIBS_A :=
 
 #link and create executable
 all: $(OBJ_FILES)
-	cp -r Assets $(OBJ_DIR)/Assets
 	$(COMPILER) -o $(OBJ_DIR)/$(TARGET) $(SRC_EXECUTABLE) $(FLAGS) $(PATHS) $(LIBS) $(OBJ_FILES) $(LIBS_A)
 
 #create obj files
