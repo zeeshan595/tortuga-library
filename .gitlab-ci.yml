@@ -5,6 +5,6 @@ build:
   script:
     - apt-get update
     - apt-get -y install cmake protobuf-compiler
-    - apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
+    - apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
     - make init
     - make
