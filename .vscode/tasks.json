@@ -20,6 +20,12 @@
       "type": "shell",
       "command": "make clean",
       "problemMatcher": []
+    },
+    {
+      "label": "init",
+      "type": "shell",
+      "command": "make init",
+      "problemMatcher": []
     }
   ]
 }
