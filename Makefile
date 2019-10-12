@@ -56,7 +56,7 @@ init:
 	cd Submodules/glfw/build && cmake -DBUILD_SHARED_LIBS=ON ..
 	make -C Submodules/glfw/build
 	ln -f -s ../../Submodules/glfw/include/GLFW usr/include/GLFW
-	ln -f -s ../../Submodules/glfw/build/src/libglfw.so usr/lib64/libglfw.so
+	cp Submodules/glfw/build/src/libglfw.so.3.4 usr/lib64/libglfw.so
 	#stb
 	ln -f -s ../../Submodules/stb/ usr/include/stb
 	#glm
