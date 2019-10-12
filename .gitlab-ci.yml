@@ -3,5 +3,6 @@ image: gcc
 build:
   stage: build
   script:
+    - apt-get update && apt-get -y install cmake protobuf-compiler
     - make init
     - make
