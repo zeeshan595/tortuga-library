@@ -17,7 +17,7 @@ SRC_FILES := $(shell find $(SRC_DIR)/ -type f -name '*.cpp' ! -path '$(SRC_EXECU
 #get a list of all obj files
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 #lib a files
-LIBS_A := $(shell find usr/lib64/ -type f -name '*.a')
+LIBS_A := 
 
 #link and create executable
 all: $(OBJ_FILES)
@@ -56,7 +56,7 @@ init:
 	cd Submodules/glfw/build && cmake -DBUILD_SHARED_LIBS=ON ..
 	make -C Submodules/glfw/build
 	ln -f -s ../../Submodules/glfw/include/GLFW usr/include/GLFW
-	cp Submodules/glfw/build/src/libglfw.so.3.4 usr/lib64/libglfw.so
+	cp Submodules/glfw/build/src/libglfw.so.3.4 usr/lib/libglfw.so
 	#stb
 	ln -f -s ../../Submodules/stb/ usr/include/stb
 	#glm
