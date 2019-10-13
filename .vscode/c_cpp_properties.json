@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/Source/**",
-                "${workspaceFolder}/submodules/stb/**"
+                "${workspaceFolder}/Build/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
