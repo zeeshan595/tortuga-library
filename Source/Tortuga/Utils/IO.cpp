@@ -8,7 +8,6 @@ namespace IO
 {
 Graphics::AcceleratedMesh LoadObjFile(std::string filePath)
 {
-
   Graphics::AcceleratedMesh data = {};
 
   FILE *file = fopen(filePath.c_str(), "r");

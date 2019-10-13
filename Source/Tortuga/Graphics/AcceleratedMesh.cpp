@@ -61,6 +61,7 @@ AcceleratedMesh AcceleratedMeshRecalculateVolumes(AcceleratedMesh data)
     face.Indices[0] = i + 0;
     face.Indices[1] = i + 1;
     face.Indices[2] = i + 2;
+    face.Indices[3] = 0;
     const auto v0 = data.Positions[data.Indices[face.Indices[0]].Position];
     const auto v1 = data.Positions[data.Indices[face.Indices[1]].Position];
     const auto v2 = data.Positions[data.Indices[face.Indices[2]].Position];
