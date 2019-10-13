@@ -77,8 +77,8 @@ float SphereDist(vec3 position, float radius, vec3 point) {
 }
 float GetMinDistance(vec3 point) {
   float rtn = 1 / 0.;
-  for (uint i = 0; i < 1; i++) {
-    Node node = meshNodes[22];
+  for (uint i = 0; i < meshCounts.length(); i += 5) {
+    Node node = meshNodes[meshCounts[i + 4] - 1];
     float dist = SphereDist(vec3(node.center), node.radius, point);
     if (rtn > dist) {
       rtn = dist;
