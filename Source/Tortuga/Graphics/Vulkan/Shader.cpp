@@ -61,7 +61,7 @@ std::string CompileShader(std::string fullShaderCode, std::string location, std:
   //compile
   const auto tempShaderPath = location + "/" + Core::GUID::GenerateGUID(1) + "." + type;
   Utils::IO::SetFileContents(tempShaderPath, fullShaderCode);
-  const std::string cmd = "Build/bin/glslangValidator -V " + tempShaderPath + " -o " + tempShaderPath + ".spv";
+  const std::string cmd = "Build/bin/glslangValidator -s -V " + tempShaderPath + " -o " + tempShaderPath + ".spv";
   system(cmd.c_str());
   const auto compiledShader = Utils::IO::GetFileContents(tempShaderPath + ".spv");
   const std::string cleanUpCommand = "rm " + tempShaderPath + " && rm " + tempShaderPath + ".spv";

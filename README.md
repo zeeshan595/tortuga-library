@@ -14,6 +14,8 @@ Tortuga is a open source Game Engine built in C++ 17. Tortuga ONLY uses vulkan f
 
 ## Building the library
 
+You may require X Org libraries `apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev`
+
 ##### Makefile
 
 1. Download the project `git clone https://github.com/zeeshan595/tortuga-library`

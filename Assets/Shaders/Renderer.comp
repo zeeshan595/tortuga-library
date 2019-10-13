@@ -102,10 +102,8 @@ void main() {
   uint index = (gl_GlobalInvocationID.y * renderWidth) + gl_GlobalInvocationID.x;
   if (index >= renderWidth * renderHeight)
     return;
-
-  vec2 uv = vec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
-  uv.x = uv.x / renderWidth - .5;
-  uv.y = uv.y / renderHeight - .5;
+  vec2 iResolution = vec2(renderWidth, renderHeight);
+  vec2 uv = (gl_GlobalInvocationID.xy-.5*iResolution.xy)/iResolution.y;
   vec3 rayOrigin = vec3(0, 0, -3);
   vec3 rayDirection = normalize(vec3(uv, 1.));
   float dist = RayMarch(rayOrigin, rayDirection);

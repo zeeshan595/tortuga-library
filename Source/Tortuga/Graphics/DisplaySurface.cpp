@@ -9,7 +9,7 @@ namespace DisplaySurface
 DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Device device)
 {
   const uint32_t defaultWidth = 800;
-  const uint32_t defaultHeight = 600;
+  const uint32_t defaultHeight = 450;
 
   auto data = DisplaySurface();
   data.Instance = instance.Instance;
