@@ -22,8 +22,8 @@ namespace IO
 {
 Graphics::AcceleratedMesh LoadObjFile(std::string filePath);
 Graphics::Image LoadImageFile(std::string filePath);
-std::vector<char> GetFileContents(std::string filePath);
-void SetFileContents(std::string filePath, std::vector<char> data);
+std::string GetFileContents(std::string filePath);
+void SetFileContents(std::string filePath, std::string data);
 void SetFileContents(std::string filePath, const char *data, uint32_t size);
 } // namespace IO
 } // namespace Utils

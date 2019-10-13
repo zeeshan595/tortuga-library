@@ -84,7 +84,7 @@ Graphics::Image LoadImageFile(std::string filePath)
   memcpy(data.Pixels.data(), pixels, data.ByteSize);
   return data;
 }
-std::vector<char> GetFileContents(std::string filePath)
+std::string GetFileContents(std::string filePath)
 {
   std::ifstream file(filePath, std::ios::ate | std::ios::binary);
   if (!file.is_open())
@@ -94,14 +94,14 @@ std::vector<char> GetFileContents(std::string filePath)
   }
 
   size_t fileSize = (size_t)file.tellg();
-  std::vector<char> buffer(fileSize);
+  std::string buffer;
+  buffer.resize(fileSize);
   file.seekg(0);
   file.read(buffer.data(), fileSize);
   file.close();
-
   return buffer;
 }
-void SetFileContents(std::string filePath, std::vector<char> data)
+void SetFileContents(std::string filePath, std::string data)
 {
   SetFileContents(filePath, data.data(), data.size());
 }

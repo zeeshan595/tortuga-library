@@ -13,13 +13,20 @@ namespace Vulkan
 {
 namespace Shader
 {
+//private
+std::string GetFileType(std::string file)
+{
+  size_t found;
+  found = file.find_last_of(".");
+  return file.substr(found + 1, file.size() - found - 1);
+}
 std::string GetFileLocation(std::string file)
 {
   size_t found;
   found = file.find_last_of("/");
   return file.substr(0, found);
 }
-std::string GetFullShaderCode(std::string location, std::string code)
+std::string ResolveShaderIncludes(std::string location, std::string code)
 {
   std::string fullShader = code;
   std::regex pattern("#include[ ]*\"([a-zA-Z0-9./]+)\"");
@@ -31,41 +38,38 @@ std::string GetFullShaderCode(std::string location, std::string code)
     const auto fullMatch = matches[0].str();
     const auto includeFile = matches[1].str();
     const auto includedShader = Utils::IO::GetFileContents(location + includeFile).data();
-    const auto includeCode = GetFullShaderCode(GetFileLocation(location + includeFile), includedShader);
+    const auto includeCode = ResolveShaderIncludes(GetFileLocation(location + includeFile), includedShader);
     const auto includeIndex = fullShader.find(fullMatch);
     fullShader.replace(includeIndex, fullMatch.length(), includeCode);
   }
   return fullShader;
 }
-std::vector<char> CompileShader(
-    Instance::Instance instance,
-    ShaderType type,
-    std::vector<char> code,
-    std::string location)
+//public
+FullShaderCode GetFullShaderCode(std::string file)
 {
-  const auto fullShaderCode = GetFullShaderCode(location, code.data());
-  std::string typeString = "";
-  switch (type)
-  {
-  case ShaderType::COMPUTE:
-    typeString = "comp";
-    break;
-  }
-  auto fullShaderChar = std::vector<char>(fullShaderCode.length());
-  memcpy(fullShaderChar.data(), fullShaderCode.c_str(), fullShaderCode.length());
-  const auto tempShaderPath = location + Core::GUID::GenerateGUID(1) + "." + typeString;
-  Utils::IO::SetFileContents(tempShaderPath, fullShaderChar);
-
+  const auto location = GetFileLocation(file);
+  const auto fullShaderCode = ResolveShaderIncludes(location, Utils::IO::GetFileContents(file).data());
+  auto data = FullShaderCode();
+  data.code = fullShaderCode;
+  data.file = file;
+  data.location = location;
+  data.type = GetFileType(file);
+  return data;
+}
+std::string CompileShader(std::string fullShaderCode, std::string location, std::string type)
+{
+  //compile
+  const auto tempShaderPath = location + "/" + Core::GUID::GenerateGUID(1) + "." + type;
+  Utils::IO::SetFileContents(tempShaderPath, fullShaderCode);
   const std::string cmd = "Build/bin/glslangValidator -V " + tempShaderPath + " -o " + tempShaderPath + ".spv";
   system(cmd.c_str());
   const auto compiledShader = Utils::IO::GetFileContents(tempShaderPath + ".spv");
   const std::string cleanUpCommand = "rm " + tempShaderPath + " && rm " + tempShaderPath + ".spv";
   system(cleanUpCommand.c_str());
 
-  //todo compile shader
   return compiledShader;
 }
-Shader Create(Device::Device device, std::vector<char> compiled)
+Shader Create(Device::Device device, std::string compiled)
 {
   Shader data = {};
   data.Device = device.Device;
@@ -80,7 +84,6 @@ Shader Create(Device::Device device, std::vector<char> compiled)
 
   return data;
 }
-
 void Destroy(Shader data)
 {
   if (data.Shader == VK_NULL_HANDLE)

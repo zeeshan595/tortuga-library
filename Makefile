@@ -3,7 +3,7 @@ TARGET = tortuga
 
 #compiler options
 COMPILER = g++
-FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing
+FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing -Wno-unused
 PATHS = -IBuild/include/ -LBuild/lib64/ -LBuild/lib/
 LIBS = -lvulkan -lglfw
 

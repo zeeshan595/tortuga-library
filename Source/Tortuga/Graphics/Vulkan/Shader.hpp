@@ -2,6 +2,7 @@
 #define _VULKAN_SHADER
 
 #include <vulkan/vulkan.h>
+#include <string>
 
 #include "./ErrorCheck.hpp"
 #include "./Instance.hpp"
@@ -16,24 +17,22 @@ namespace Vulkan
 {
 namespace Shader
 {
-enum ShaderType
-{
-  COMPUTE,
-  VERTEX,
-  FRAGMENT
-};
 struct Shader
 {
   VkDevice Device = VK_NULL_HANDLE;
   VkShaderModule Shader = VK_NULL_HANDLE;
 };
 
-std::vector<char> CompileShader(
-    Instance::Instance instance,
-    ShaderType type,
-    std::vector<char> code,
-    std::string location = "Assets/Shaders/");
-Shader Create(Device::Device device, std::vector<char> compiled);
+struct FullShaderCode
+{
+  std::string code;
+  std::string location;
+  std::string type;
+  std::string file;
+};
+FullShaderCode GetFullShaderCode(std::string file);
+std::string CompileShader(std::string fullShaderCode, std::string location, std::string type);
+Shader Create(Device::Device device, std::string compiled);
 void Destroy(Shader data);
 } // namespace Shader
 } // namespace Vulkan

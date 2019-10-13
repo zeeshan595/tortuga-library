@@ -83,8 +83,8 @@ Rendering::Rendering()
   SetupLayoutInformation(device);
 
   //shader code
-  const auto shaderCode = Utils::IO::GetFileContents("Assets/Shaders/Renderer.comp");
-  const auto compiledShaderCode = Graphics::Vulkan::Shader::CompileShader(VulkanInstance, Graphics::Vulkan::Shader::COMPUTE, shaderCode);
+  const auto shaderCode = Graphics::Vulkan::Shader::GetFullShaderCode("Assets/Shaders/Renderer.comp");
+  const auto compiledShaderCode = Graphics::Vulkan::Shader::CompileShader(shaderCode.code, shaderCode.location, shaderCode.type);
   RenderShader = Graphics::Vulkan::Shader::Create(device, compiledShaderCode);
   RenderPipeline = Graphics::Vulkan::Pipeline::CreateComputePipeline(device, RenderShader, {}, {RenderingDescriptorLayout, MeshDescriptorLayout});
 
