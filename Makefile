@@ -42,6 +42,7 @@ init:
 	mkdir -p Submodules/Vulkan-Headers/build
 	cd Submodules/Vulkan-Headers/build && cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/Build ..
 	make install -C Submodules/Vulkan-Headers/build
+	rm -rf Submodules/glslang/build
 	#vulkan loader
 	mkdir -p Submodules/Vulkan-Loader/build
 	rm -rf $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
@@ -49,12 +50,14 @@ init:
 	echo 'set(WAYLAND_CLIENT_INCLUDE_DIR "$(PWD)/Build" CACHE STRING "" FORCE)' >> $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
 	cd Submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/Build ..
 	make install -C Submodules/Vulkan-Loader/build
+	rm -rf Submodules/Vulkan-Loader/build
 	#glfw
 	mkdir -p Submodules/glfw/build
 	cd Submodules/glfw/build && cmake -DBUILD_SHARED_LIBS=ON ..
 	make -C Submodules/glfw/build
 	ln -f -s ../../Submodules/glfw/include/GLFW Build/include/GLFW
 	cp Submodules/glfw/build/src/libglfw.so.3.4 Build/lib/libglfw.so
+	rm -rf Submodules/glfw/build
 	#stb
 	ln -f -s ../../Submodules/stb/ Build/include/stb
 	#glm
@@ -64,3 +67,4 @@ init:
 	cd Submodules/glslang/build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PWD)/Build ..
 	make -C Submodules/glslang/build
 	make install -C Submodules/glslang/build
+	rm -rf Submodules/glslang/build
