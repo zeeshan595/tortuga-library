@@ -3,7 +3,7 @@
 layout(local_size_x = LOCAL_INVOCATION) in;
 layout(local_size_y = LOCAL_INVOCATION) in;
 layout(local_size_z = 1) in;
-
+//test comment
 #define MAX_STEPS 100
 #define MAX_DIST 100.
 #define SURF_DIST .01
