@@ -8,10 +8,11 @@ layout(local_size_z = 1) in;
 #define MAX_DIST 100.
 #define SURF_DIST .01
 
-layout(set = 0, binding = 0) uniform RenderInfo {
+layout(set = 0, binding = 0) readonly uniform RenderInfo {
   uint renderWidth;
   uint renderHeight;
-};
+  //view matrix
+} renderInfo;
 layout(set = 0, binding = 1) buffer Render {
   vec4 pixels[];
 };
@@ -33,7 +34,7 @@ layout(set = 1, binding = 2) readonly buffer MeshIndices {
 struct Face
 {
   vec4 center;
-  uint indices[3];
+  uint indices[4];
 };
 layout(set = 1, binding = 3) readonly buffer MeshFaces {
   Face meshFaces[];
@@ -43,8 +44,7 @@ struct Node {
   float radius;
   uint left;
   uint right;
-  uint index;
-  int isEnd;
+  int index;
 };
 layout(set = 1, binding = 4) readonly buffer MeshNodes {
   Node meshNodes[];
@@ -78,8 +78,8 @@ float SphereDist(vec3 position, float radius, vec3 point) {
 float GetMinDistance(vec3 point) {
   float rtn = 1 / 0.;
   for (uint i = 0; i < 1; i++) {
-    uint nodesLen = meshNodes.length() - 1;
-    float dist = SphereDist(vec3(0.), 1., point);
+    Node node = meshNodes[22];
+    float dist = SphereDist(vec3(node.center), node.radius, point);
     if (rtn > dist) {
       rtn = dist;
     }
@@ -97,14 +97,14 @@ float RayMarch(vec3 rayOrigin, vec3 rayDirection) {
   }
   return rayTravelDist;
 }
-
 void main() {
-  uint index = (gl_GlobalInvocationID.y * renderWidth) + gl_GlobalInvocationID.x;
-  if (index >= renderWidth * renderHeight)
+  vec2 iResolution = vec2(renderInfo.renderWidth, renderInfo.renderHeight);
+  uint index = uint((gl_GlobalInvocationID.y * iResolution.x) + gl_GlobalInvocationID.x);
+  if (index >= iResolution.x * iResolution.y)
     return;
-  vec2 iResolution = vec2(renderWidth, renderHeight);
-  vec2 uv = (gl_GlobalInvocationID.xy-.5*iResolution.xy)/iResolution.y;
-  vec3 rayOrigin = vec3(0, 0, -3);
+
+  vec2 uv = (gl_GlobalInvocationID.xy - .5 * iResolution.xy) / iResolution.y;
+  vec3 rayOrigin = vec3(0, 0, -3.);//renderInfo.rayOrigin.xyz;
   vec3 rayDirection = normalize(vec3(uv, 1.));
   float dist = RayMarch(rayOrigin, rayDirection);
   vec3 col = vec3(dist / 3.);

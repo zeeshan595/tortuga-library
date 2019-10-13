@@ -58,9 +58,9 @@ Graphics::AcceleratedMesh LoadObjFile(std::string filePath)
       for (uint32_t i = 0; i < 3; i++)
       {
         auto index = Graphics::AcceleratedMesh::IndexStruct();
-        index.Position = vertexIndex[i];
-        index.Texture = uvIndex[i];
-        index.Normal = normalIndex[i];
+        index.Position = vertexIndex[i] - 1;
+        index.Texture = uvIndex[i] - 1;
+        index.Normal = normalIndex[i] - 1;
         data.Indices.push_back(index);
       }
     }

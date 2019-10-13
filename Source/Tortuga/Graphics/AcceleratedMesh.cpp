@@ -1,5 +1,7 @@
 #include "./AcceleratedMesh.hpp"
 
+#include "../Core/Console.hpp"
+
 namespace Tortuga
 {
 namespace Graphics
@@ -38,8 +40,7 @@ void FindMinNodes(std::vector<AcceleratedMesh::Node> nodes, uint32_t &left, uint
         continue;
 
       const auto rightNode = nodes[j];
-      const auto redius = leftNode.Radius - rightNode.Radius;
-      const auto newDist = glm::distance(leftNode.Center, rightNode.Center) - redius;
+      const auto newDist = glm::distance(leftNode.Center, rightNode.Center);
       if (newDist < dist)
       {
         left = i;
@@ -69,7 +70,6 @@ AcceleratedMesh AcceleratedMeshRecalculateVolumes(AcceleratedMesh data)
     //setup nodes
     auto node = AcceleratedMesh::Node();
     node.Index = data.Faces.size() - 1;
-    node.IsEnd = 1;
     node.Center = face.Center;
     node.Radius = std::numeric_limits<uint32_t>::max();
     for (const auto p : face.Indices)
@@ -92,12 +92,22 @@ AcceleratedMesh AcceleratedMeshRecalculateVolumes(AcceleratedMesh data)
     auto node = AcceleratedMesh::Node();
     node.Center = (nodesToProcesses[left].Center + nodesToProcesses[right].Center) / 2.0f;
     const auto dist = glm::distance(nodesToProcesses[left].Center, nodesToProcesses[right].Center);
-    node.Radius = dist + nodesToProcesses[left].Radius + nodesToProcesses[right].Radius;
-    node.IsEnd = -1;
+    node.Radius = dist + glm::max(glm::distance(nodesToProcesses[left].Center, node.Center), glm::distance(nodesToProcesses[right].Center, node.Center));
+    node.Index = -1;
     node.Left = data.Nodes.size() - 2;
     node.Right = data.Nodes.size() - 1;
-    nodesToProcesses.erase(nodesToProcesses.begin() + left);
-    nodesToProcesses.erase(nodesToProcesses.begin() + right);
+    const auto leftItr = nodesToProcesses.begin() + left;
+    const auto rightItr = nodesToProcesses.begin() + right;
+    if (left > right)
+    {
+      nodesToProcesses.erase(leftItr);
+      nodesToProcesses.erase(rightItr);
+    }
+    else
+    {
+      nodesToProcesses.erase(rightItr);
+      nodesToProcesses.erase(leftItr);
+    }
     nodesToProcesses.push_back(node);
   }
   data.Nodes.push_back(nodesToProcesses[0]);

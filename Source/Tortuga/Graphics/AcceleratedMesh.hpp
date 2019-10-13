@@ -18,8 +18,7 @@ public:
     float Radius;
     uint32_t Left;
     uint32_t Right;
-    uint32_t Index;
-    int32_t IsEnd;
+    int32_t Index;
   };
   struct IndexStruct
   {
@@ -30,7 +29,7 @@ public:
   struct Face
   {
     glm::vec4 Center;
-    uint32_t Indices[3];
+    uint32_t Indices[4];
   };
   //provided by user
   std::vector<glm::vec3> Positions;
