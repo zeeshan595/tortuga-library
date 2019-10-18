@@ -27,7 +27,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(COMPILER) -c -o $@ $< $(FLAGS) $(PATHS) $(LIBS)
 
 clean:
-	rm -rf Build
+	rm -rf Build/Tortuga
+	rm -rf Build/tortuga
 
 init:
 	mkdir -p Build
