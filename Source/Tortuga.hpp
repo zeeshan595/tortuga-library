@@ -7,6 +7,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 
+#define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_VULKAN
+
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
