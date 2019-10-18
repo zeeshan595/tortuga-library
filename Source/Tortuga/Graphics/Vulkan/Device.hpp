@@ -2,6 +2,8 @@
 #define _VULKAN_DEVICE
 
 #include <vulkan/vulkan.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 #include <set>
 
 #include "./ErrorCheck.hpp"
@@ -50,9 +52,9 @@ struct Device
 };
 
 float GetDeviceScore(VkPhysicalDeviceProperties properties, VkPhysicalDeviceFeatures features);
-DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice, VkSurfaceKHR &surface);
+DeviceQueueFamilies FindDeviceQueueIndices(VkInstance instance, VkPhysicalDevice physicalDevice);
 bool IsExtensionsSupported(VkPhysicalDevice physicalDevice, std::vector<const char *> extensions);
-Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
+Device Create(VkInstance instance, VkPhysicalDevice physicalDevice);
 void Destroy(Device data);
 uint32_t FindMemoryType(Device device, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 void WaitForQueue(VkQueue queue);

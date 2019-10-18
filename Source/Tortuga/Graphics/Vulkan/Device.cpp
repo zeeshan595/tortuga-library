@@ -44,7 +44,7 @@ float GetDeviceScore(VkPhysicalDeviceProperties properties, VkPhysicalDeviceFeat
   return score;
 }
 
-DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice, VkSurfaceKHR &surface)
+DeviceQueueFamilies FindDeviceQueueIndices(VkInstance instance, VkPhysicalDevice physicalDevice)
 {
   uint32_t queueFamilyCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
@@ -66,9 +66,7 @@ DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice, VkSu
     if (queueFamily.queueCount <= 0)
       continue;
 
-    VkBool32 isSupported = false;
-    if (surface != VK_NULL_HANDLE)
-      ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &isSupported));
+    const auto isSupported = glfwGetPhysicalDevicePresentationSupport(instance, physicalDevice, i);
 
     if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT)
     {
@@ -134,7 +132,7 @@ bool IsExtensionsSupported(VkPhysicalDevice physicalDevice, std::vector<const ch
   return requiredExtensions.empty();
 }
 
-Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
+Device Create(VkInstance instance, VkPhysicalDevice physicalDevice)
 {
   Device data = {};
   data.PhysicalDevice = physicalDevice;
@@ -156,7 +154,7 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
     return data;
   }
 
-  data.QueueFamilies = FindDeviceQueueIndices(physicalDevice, surface);
+  data.QueueFamilies = FindDeviceQueueIndices(instance, physicalDevice);
 
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
   auto familyIndices = DeviceQueueFamilies::GetIndices(data.QueueFamilies);
@@ -201,8 +199,8 @@ Device Create(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
     Console::Warning("Could not create device queues: {0}", data.Properties.deviceName);
     return data;
   }
-
-  ErrorCheck::Callback(vkCreateDevice(physicalDevice, &deviceInfo, nullptr, &data.Device));
+  PFN_vkCreateDevice pfnCreateDevice = (PFN_vkCreateDevice)glfwGetInstanceProcAddress(instance, "vkCreateDevice");
+  ErrorCheck::Callback(pfnCreateDevice(physicalDevice, &deviceInfo, nullptr, &data.Device));
   bool presentSetup = false;
 
   for (uint32_t i = 0; i < data.QueueFamilies.Compute.Count; i++)

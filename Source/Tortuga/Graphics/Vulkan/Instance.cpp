@@ -2,10 +2,6 @@
 
 #include "../DisplaySurface.hpp"
 
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 namespace Tortuga
 {
 namespace Graphics
@@ -22,6 +18,10 @@ Instance Create()
 {
   glfwSetErrorCallback(&glfwError);
   glfwInit();
+  if (!glfwVulkanSupported())
+  {
+    Console::Fatal("vulkan support is not avaliable for glfw on this machine");
+  }
   Instance data = {};
 
   std::vector<const char *> extensions = DisplaySurface::GetVulkanExtensions();
@@ -48,14 +48,12 @@ Instance Create()
     createInfo.enabledExtensionCount = extensions.size();
     createInfo.ppEnabledExtensionNames = extensions.data();
   }
-
-  ErrorCheck::Callback(vkCreateInstance(&createInfo, nullptr, &data.Instance));
+  const auto pfnCreateInstance = (PFN_vkCreateInstance) glfwGetInstanceProcAddress(NULL, "vkCreateInstance");
+  ErrorCheck::Callback(pfnCreateInstance(&createInfo, nullptr, &data.Instance));
 
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-  const auto setupWindow = glfwCreateWindow(800, 600, "Tortuga", nullptr, nullptr);
-  VkSurfaceKHR surface = VK_NULL_HANDLE;
-  ErrorCheck::Callback(glfwCreateWindowSurface(data.Instance, setupWindow, nullptr, &surface));
+  const auto setupWindow = glfwCreateWindow(800, 600, "Tortuga", glfwGetPrimaryMonitor(), nullptr);
 
   uint32_t deviceCount = 0;
   ErrorCheck::Callback(vkEnumeratePhysicalDevices(data.Instance, &deviceCount, nullptr));
@@ -66,12 +64,11 @@ Instance Create()
 
   for (uint32_t i = 0; i < deviceCount; i++)
   {
-    auto device = Device::Create(physicalDevices[i], surface);
+    auto device = Device::Create(data.Instance, physicalDevices[i]);
     if (device.IsDeviceCompatible)
       data.Devices.push_back(device);
   }
 
-  vkDestroySurfaceKHR(data.Instance, surface, nullptr);
   glfwDestroyWindow(setupWindow);
 
   return data;

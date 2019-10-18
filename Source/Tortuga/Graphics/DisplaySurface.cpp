@@ -14,8 +14,11 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
   auto data = DisplaySurface();
   data.Instance = instance.Instance;
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  glfwWindowHint(GLFW_REFRESH_RATE, 100);
   glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
-  data.Window = glfwCreateWindow(defaultWidth, defaultHeight, "Tortuga", nullptr, nullptr);
+  glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+  glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+  data.Window = glfwCreateWindow(defaultWidth, defaultHeight, "Tortuga", glfwGetPrimaryMonitor(), nullptr);
   if (data.Window == nullptr)
   {
     Console::Fatal("failed to create window");
