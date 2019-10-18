@@ -28,13 +28,15 @@
 #include "./Tortuga/Graphics/Vulkan/Pipeline.hpp"
 #include "./Tortuga/Graphics/Pixel.hpp"
 #include "./Tortuga/Graphics/Image.hpp"
-#include "./Tortuga/Graphics/AcceleratedMesh.hpp"
 #include "./Tortuga/Graphics/DisplaySurface.hpp"
 
 //Core
 #include "./Tortuga/Core/Console.hpp"
 #include "./Tortuga/Core/GUID.hpp"
 #include "./Tortuga/Core/Engine.hpp"
+
+//Components
+#include "./Tortuga/Components/Mesh.hpp"
 
 //Systems
 #include "./Tortuga/Systems/Rendering.hpp"

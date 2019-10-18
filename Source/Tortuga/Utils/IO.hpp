@@ -12,7 +12,6 @@
 
 #include "../Core/Console.hpp"
 #include "../Graphics/Image.hpp"
-#include "../Graphics/AcceleratedMesh.hpp"
 
 namespace Tortuga
 {
@@ -20,7 +19,22 @@ namespace Utils
 {
 namespace IO
 {
-Graphics::AcceleratedMesh LoadObjFile(std::string filePath);
+struct OBJ
+{
+  struct Index
+  {
+    uint32_t Position;
+    uint32_t Texture;
+    uint32_t Normal;
+  };
+
+  std::vector<glm::vec3> Positions;
+  std::vector<glm::vec2> Textures;
+  std::vector<glm::vec3> Normals;
+  std::vector<Index> Indices;
+};
+
+OBJ LoadObjFile(std::string filePath);
 Graphics::Image LoadImageFile(std::string filePath);
 std::string GetFileContents(std::string filePath);
 void SetFileContents(std::string filePath, std::string data);

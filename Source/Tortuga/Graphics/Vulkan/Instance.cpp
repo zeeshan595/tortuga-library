@@ -14,8 +14,13 @@ namespace Vulkan
 {
 namespace Instance
 {
+void glfwError(int id, const char* description)
+{
+  Console::Error("glfw error: {0}", description);
+}
 Instance Create()
 {
+  glfwSetErrorCallback(&glfwError);
   glfwInit();
   Instance data = {};
 

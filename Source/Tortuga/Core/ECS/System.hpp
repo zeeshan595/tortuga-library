@@ -7,7 +7,7 @@ namespace Core
 {
 namespace ECS
 {
-struct System
+class System
 {
 public:
   System(){}

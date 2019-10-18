@@ -6,15 +6,14 @@ namespace Utils
 {
 namespace IO
 {
-Graphics::AcceleratedMesh LoadObjFile(std::string filePath)
+OBJ LoadObjFile(std::string filePath)
 {
-  Graphics::AcceleratedMesh data = {};
-
+  auto data = OBJ();
   FILE *file = fopen(filePath.c_str(), "r");
   if (file == NULL)
   {
     printf("Impossible to open the file !\n");
-    return {};
+    return data;
   }
   while (true)
   {
@@ -51,12 +50,12 @@ Graphics::AcceleratedMesh LoadObjFile(std::string filePath)
       if (matches != 9)
       {
         printf("File can't be read by our simple parser : ( Try exporting with other options\n");
-        return {};
+        return data;
       }
 
       for (uint32_t i = 0; i < 3; i++)
       {
-        auto index = Graphics::AcceleratedMesh::IndexStruct();
+        auto index = OBJ::Index();
         index.Position = vertexIndex[i] - 1;
         index.Texture = uvIndex[i] - 1;
         index.Normal = normalIndex[i] - 1;
@@ -64,7 +63,6 @@ Graphics::AcceleratedMesh LoadObjFile(std::string filePath)
       }
     }
   }
-  data = Graphics::AcceleratedMeshRecalculateVolumes(data);
   return data;
 }
 Graphics::Image LoadImageFile(std::string filePath)

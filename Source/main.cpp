@@ -20,7 +20,7 @@ int main()
   //create a cube with a mesh component
   const auto cube = Core::Engine::CreateEntity();
   const auto mesh = Utils::IO::LoadObjFile("Assets/Models/Cube.obj");
-  Core::Engine::AddComponent<Components::Mesh>(cube, Components::Mesh(mesh));
+  //Core::Engine::AddComponent<Components::Mesh>(cube, Components::Mesh(mesh));
 
   //add a rendering system to the engine
   Core::Engine::AddSystem<Systems::Rendering>();

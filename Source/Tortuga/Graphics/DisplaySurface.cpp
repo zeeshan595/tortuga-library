@@ -9,12 +9,12 @@ namespace DisplaySurface
 DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Device device)
 {
   const uint32_t defaultWidth = 800;
-  const uint32_t defaultHeight = 450;
+  const uint32_t defaultHeight = 600;
 
   auto data = DisplaySurface();
   data.Instance = instance.Instance;
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+  glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
   data.Window = glfwCreateWindow(defaultWidth, defaultHeight, "Tortuga", nullptr, nullptr);
   if (data.Window == nullptr)
   {

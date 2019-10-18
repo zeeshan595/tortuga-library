@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 
 #include "../Core/Engine.hpp"
-#include "../Graphics/AcceleratedMesh.hpp"
 
 namespace Tortuga
 {
@@ -14,25 +13,17 @@ namespace Components
 {
 struct Mesh : public Core::ECS::Component
 {
-private:
-  Graphics::AcceleratedMesh MeshObject;
-
-public:
-  bool IsDirty = false;
-
-  Mesh()
+  struct Index
   {
-  }
-  Mesh(Graphics::AcceleratedMesh mesh)
-  {
-    MeshObject = mesh;
-    IsDirty = true;
-  }
+    uint32_t Position;
+    uint32_t Texture;
+    uint32_t Normal;
+  };
 
-  const Graphics::AcceleratedMesh GetMesh() const
-  {
-    return MeshObject;
-  }
+  std::vector<glm::vec4> Positions;
+  std::vector<glm::vec4> Textures;
+  std::vector<glm::vec4> Normals;
+  std::vector<Index> Indices;
 };
 } // namespace Components
 } // namespace Tortuga
