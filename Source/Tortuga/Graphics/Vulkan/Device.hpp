@@ -2,8 +2,6 @@
 #define _VULKAN_DEVICE
 
 #include <vulkan/vulkan.h>
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
 #include <set>
 
 #include "./ErrorCheck.hpp"
