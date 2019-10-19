@@ -13,68 +13,46 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
 
   auto data = DisplaySurface();
   data.Instance = instance.Instance;
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  glfwWindowHint(GLFW_REFRESH_RATE, 100);
-  glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
-  glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-  glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
-  data.Window = glfwCreateWindow(defaultWidth, defaultHeight, "Tortuga", glfwGetPrimaryMonitor(), nullptr);
-  if (data.Window == nullptr)
-  {
-    Console::Fatal("failed to create window");
-    return data;
-  }
-  Vulkan::ErrorCheck::Callback(glfwCreateWindowSurface(instance.Instance, data.Window, nullptr, &data.Surface));
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+  data.PlatformSurface = new Surface::WaylandSurface();
+#elif VK_USE_PLATFORM_WIN32_KHR
+#elif VK_USE_PLATFORM_XCB_KHR
+#elif VK_USE_PLATFORM_ANDROID_KHR
+  Console::Fatal("This platform does not have any supported display server");
+#else
+  Console::Fatal("This platform does not have any supported display server");
+#endif
+
+  data.Surface = data.PlatformSurface->CreateSurface(instance.Instance);
   data.Swapchain = Vulkan::Swapchain::Create(device, defaultWidth, defaultHeight, data.Surface);
-  glfwSetWindowCloseCallback(data.Window, [](GLFWwindow *windw) {
-    Core::Input::TriggerWindowClose();
-  });
-  glfwSetKeyCallback(data.Window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-    Core::Input::TriggerKeyEvent((Core::Input::KeyCode)key, (Core::Input::KeyAction)action);
-  });
-  glfwSetMouseButtonCallback(data.Window, [](GLFWwindow *window, int button, int action, int mods) {
-    Core::Input::TriggerKeyEvent((Core::Input::KeyCode)button, (Core::Input::KeyAction)action);
-  });
-  glfwSetCursorPosCallback(data.Window, [](GLFWwindow *window, double x, double y) {
-    Core::Input::TriggerMouseEvent(x, y);
-  });
-  glfwSetScrollCallback(data.Window, [](GLFWwindow *window, double x, double y) {
-    Core::Input::TriggerScrollEvent(x, y);
-  });
-  glfwSetDropCallback(data.Window, [](GLFWwindow *window, int count, const char **paths) {
-    std::vector<std::string> data(count);
-    for (int i = 0; i < count; i++)
-      data[i] = paths[i];
-    Core::Input::TriggerFileDrop(data);
-  });
+
   return data;
 }
 void Destroy(DisplaySurface data)
 {
   Vulkan::Swapchain::Destroy(data.Swapchain);
   vkDestroySurfaceKHR(data.Instance, data.Surface, nullptr);
-  glfwDestroyWindow(data.Window);
+  delete data.PlatformSurface;
 }
 std::vector<const char *> GetVulkanExtensions()
 {
-  uint32_t extensionsCount;
-  const auto extensionsArr = glfwGetRequiredInstanceExtensions(&extensionsCount);
-  std::vector<const char *> extensions(extensionsCount);
-  for (uint32_t i = 0; i < extensionsCount; i++)
-    extensions[i] = extensionsArr[i];
-  return extensions;
+  return Surface::SurfaceInterface::GetVulkanExtensions();
 }
 void SetTitle(DisplaySurface data, std::string title)
 {
-  glfwSetWindowTitle(data.Window, title.c_str());
 }
 void Dispatch(DisplaySurface data)
 {
-  glfwPollEvents();
+  data.PlatformSurface->Dispatch();
 }
 bool ShouldClose(DisplaySurface data)
 {
-  return glfwWindowShouldClose(data.Window);
+  return false;
+}
+bool HasPresentSupport(VkPhysicalDevice device, uint32_t familyIndex)
+{
+  return Surface::SurfaceInterface::HasPresentSupport(device, familyIndex);
 }
 } // namespace DisplaySurface
 } // namespace Graphics

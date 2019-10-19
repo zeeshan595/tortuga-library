@@ -3,11 +3,6 @@
 using namespace Tortuga;
 bool ShouldClose = false;
 
-void glfwErrorCallback(int type, const char *message)
-{
-  Console::Error(message);
-}
-
 int main()
 {
   //setup engine

@@ -1,14 +1,16 @@
 {
   "search.exclude": {
-    "**/Build": true,
-    ".github": true
+    "Build": true,
+    ".github": true,
+    "Submodules": true
   },
   "files.watcherExclude": {
-    "**/Build/**": true,
-    ".github": true
+    "Build/**": true,
+    ".github": true,
+    "Submodules": true
   },
   "files.exclude": {
-    "**/Build": true,
+    "Build": true,
     ".github": true
   },
   "files.associations": {

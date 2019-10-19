@@ -70,6 +70,7 @@ void Fatal(std::string message, Arguments args)
 {
   ProcessLog(LEVEL_FATAL, message, args);
   std::runtime_error("Console fatal triggered!");
+  exit(-1);
 }
 }; // namespace Console
 }; // namespace Tortuga

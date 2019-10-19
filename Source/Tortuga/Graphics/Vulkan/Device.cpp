@@ -1,4 +1,5 @@
 #include "./Device.hpp"
+#include "../DisplaySurface.hpp"
 
 namespace Tortuga
 {
@@ -44,7 +45,7 @@ float GetDeviceScore(VkPhysicalDeviceProperties properties, VkPhysicalDeviceFeat
   return score;
 }
 
-DeviceQueueFamilies FindDeviceQueueIndices(VkInstance instance, VkPhysicalDevice physicalDevice)
+DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice)
 {
   uint32_t queueFamilyCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
@@ -66,7 +67,7 @@ DeviceQueueFamilies FindDeviceQueueIndices(VkInstance instance, VkPhysicalDevice
     if (queueFamily.queueCount <= 0)
       continue;
 
-    const auto isSupported = glfwGetPhysicalDevicePresentationSupport(instance, physicalDevice, i);
+    const auto isSupported = DisplaySurface::HasPresentSupport(physicalDevice, i);
 
     if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT)
     {
@@ -132,7 +133,7 @@ bool IsExtensionsSupported(VkPhysicalDevice physicalDevice, std::vector<const ch
   return requiredExtensions.empty();
 }
 
-Device Create(VkInstance instance, VkPhysicalDevice physicalDevice)
+Device Create(VkPhysicalDevice physicalDevice)
 {
   Device data = {};
   data.PhysicalDevice = physicalDevice;
@@ -147,14 +148,14 @@ Device Create(VkInstance instance, VkPhysicalDevice physicalDevice)
   }
 
   //Device extensions required
-  std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME};
+  std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
   if (!IsExtensionsSupported(physicalDevice, deviceExtensions))
   {
     Console::Warning("Device does not support required extensions: {0}", data.Properties.deviceName);
     return data;
   }
 
-  data.QueueFamilies = FindDeviceQueueIndices(instance, physicalDevice);
+  data.QueueFamilies = FindDeviceQueueIndices(physicalDevice);
 
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
   auto familyIndices = DeviceQueueFamilies::GetIndices(data.QueueFamilies);
@@ -199,8 +200,7 @@ Device Create(VkInstance instance, VkPhysicalDevice physicalDevice)
     Console::Warning("Could not create device queues: {0}", data.Properties.deviceName);
     return data;
   }
-  PFN_vkCreateDevice pfnCreateDevice = (PFN_vkCreateDevice)glfwGetInstanceProcAddress(instance, "vkCreateDevice");
-  ErrorCheck::Callback(pfnCreateDevice(physicalDevice, &deviceInfo, nullptr, &data.Device));
+  ErrorCheck::Callback(vkCreateDevice(physicalDevice, &deviceInfo, nullptr, &data.Device));
   bool presentSetup = false;
 
   for (uint32_t i = 0; i < data.QueueFamilies.Compute.Count; i++)

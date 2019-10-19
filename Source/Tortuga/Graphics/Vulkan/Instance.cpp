@@ -10,18 +10,8 @@ namespace Vulkan
 {
 namespace Instance
 {
-void glfwError(int id, const char* description)
-{
-  Console::Error("glfw error: {0}", description);
-}
 Instance Create()
 {
-  glfwSetErrorCallback(&glfwError);
-  glfwInit();
-  if (!glfwVulkanSupported())
-  {
-    Console::Fatal("vulkan support is not avaliable for glfw on this machine");
-  }
   Instance data = {};
 
   std::vector<const char *> extensions = DisplaySurface::GetVulkanExtensions();
@@ -48,13 +38,8 @@ Instance Create()
     createInfo.enabledExtensionCount = extensions.size();
     createInfo.ppEnabledExtensionNames = extensions.data();
   }
-  const auto pfnCreateInstance = (PFN_vkCreateInstance) glfwGetInstanceProcAddress(NULL, "vkCreateInstance");
-  ErrorCheck::Callback(pfnCreateInstance(&createInfo, nullptr, &data.Instance));
-
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-  const auto setupWindow = glfwCreateWindow(800, 600, "Tortuga", glfwGetPrimaryMonitor(), nullptr);
-
+  ErrorCheck::Callback(vkCreateInstance(&createInfo, nullptr, &data.Instance));
+  
   uint32_t deviceCount = 0;
   ErrorCheck::Callback(vkEnumeratePhysicalDevices(data.Instance, &deviceCount, nullptr));
   std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
@@ -64,12 +49,10 @@ Instance Create()
 
   for (uint32_t i = 0; i < deviceCount; i++)
   {
-    auto device = Device::Create(data.Instance, physicalDevices[i]);
+    auto device = Device::Create(physicalDevices[i]);
     if (device.IsDeviceCompatible)
       data.Devices.push_back(device);
   }
-
-  glfwDestroyWindow(setupWindow);
 
   return data;
 }
@@ -82,7 +65,6 @@ void Destroy(Instance data)
     Device::Destroy(data.Devices[i]);
 
   vkDestroyInstance(data.Instance, nullptr);
-  glfwTerminate();
 }
 } // namespace Instance
 } // namespace Vulkan

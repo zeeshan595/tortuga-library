@@ -1,14 +1,12 @@
-#ifndef _GRAPHICS_WINDOW
-#define _GRAPHICS_WINDOW
+#ifndef _GRAPHICS_SURFACE
+#define _GRAPHICS_SURFACE
 
 #include "./Vulkan/ErrorCheck.hpp"
 #include "./Vulkan/Swapchain.hpp"
 #include "vulkan/vulkan.h"
 #include "../Core/Input.hpp"
-
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include "./Surface/SurfaceInterface.hpp"
+#include "./Surface/WaylandSurface.hpp"
 
 struct Instance;
 struct Device;
@@ -21,7 +19,7 @@ namespace DisplaySurface
 struct DisplaySurface
 {
   VkInstance Instance;
-  GLFWwindow *Window;
+  Surface::SurfaceInterface *PlatformSurface;
   VkSurfaceKHR Surface;
   Vulkan::Swapchain::Swapchain Swapchain;
 };
@@ -29,14 +27,9 @@ DisplaySurface Create(Vulkan::Instance::Instance instance, Vulkan::Device::Devic
 void Destroy(DisplaySurface data);
 std::vector<const char *> GetVulkanExtensions();
 void SetTitle(DisplaySurface data, std::string title);
-struct DisplaySize
-{
-  uint32_t width;
-  uint32_t height;
-};
-DisplaySize GetDisplaySize(DisplaySurface data);
 void Dispatch(DisplaySurface data);
 bool ShouldClose(DisplaySurface data);
+bool HasPresentSupport(VkPhysicalDevice device, uint32_t familyIndex);
 } // namespace DisplaySurface
 } // namespace Graphics
 } // namespace Tortuga

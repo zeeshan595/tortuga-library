@@ -1,11 +1,31 @@
 #executable name
 TARGET = tortuga
 
+#os specific options
+ifeq ($(OS),Windows_NT)
+	#windows display servers
+	DISPLAY_SERVER = -DVK_USE_PLATFORM_WIN32_KHR
+else
+	UNAME_S := $(shell uname -s)
+	#linux display servers
+	ifeq ($(UNAME_S),Linux)
+		ifeq ($(XDG_SESSION_TYPE),wayland)
+			DISPLAY_SERVER = -DVK_USE_PLATFORM_WAYLAND_KHR
+		else
+			DISPLAY_SERVER = -DVK_USE_PLATFORM_XCB_KHR
+		endif
+	endif
+	#darwin display servers
+	ifeq ($(UNAME_S),Darwin)
+		#todo: mac display servers
+	endif
+endif
 #compiler options
 COMPILER = g++
-FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing -Wno-unused
+PRE_PROCESSOR = $(DISPLAY_SERVER) -DGLM_FORCE_RADIANS -DGLM_FORCE_DEPTH_ZERO_TO_ONE -DSTB_IMAGE_IMPLEMENTATION -DSTB_IMAGE_STATIC
+FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing -Wno-unused $(PRE_PROCESSOR)
 PATHS = -IBuild/include/ -LBuild/lib64/ -LBuild/lib/
-LIBS = -lvulkan -lglfw
+LIBS = -lvulkan -lwayland-client
 
 #important paths
 SRC_DIR = Source
@@ -52,13 +72,6 @@ init:
 	cd Submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/Build ..
 	make install -C Submodules/Vulkan-Loader/build
 	rm -rf Submodules/Vulkan-Loader/build
-	#glfw
-	mkdir -p Submodules/glfw/build
-	cd Submodules/glfw/build && cmake -DBUILD_SHARED_LIBS=ON ..
-	make -C Submodules/glfw/build
-	ln -f -s ../../Submodules/glfw/include/GLFW Build/include/GLFW
-	cp Submodules/glfw/build/src/libglfw.so.3.4 Build/lib/libglfw.so
-	rm -rf Submodules/glfw/build
 	#stb
 	ln -f -s ../../Submodules/stb/ Build/include/stb
 	#glm

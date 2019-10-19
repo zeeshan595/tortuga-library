@@ -1,15 +1,6 @@
 #ifndef _TORTUGA
 #define _TORTUGA
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_STATIC
-
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-
 //Utils
 #include "./Tortuga/Utils/IO.hpp"
 
