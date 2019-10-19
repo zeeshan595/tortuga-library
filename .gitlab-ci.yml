@@ -7,4 +7,4 @@ build:
     - apt-get -y install cmake protobuf-compiler
     - apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
     - make init
-    - XDG_SESSION_TYPE=wayland && make
+    - XDG_SESSION_TYPE=wayland make
