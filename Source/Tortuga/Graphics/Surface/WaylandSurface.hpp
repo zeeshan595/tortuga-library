@@ -7,6 +7,7 @@
 
 #include <wayland-client.h>
 #include <cstring>
+#include <vector>
 
 #include "../../Core/Console.hpp"
 #include "./SurfaceInterface.hpp"
@@ -19,6 +20,10 @@ namespace Surface
 {
 class WaylandSurface : public SurfaceInterface
 {
+private:
+  std::vector<wl_surface *> Surfaces;
+  std::vector<wl_shell_surface *>ShellSurfaces;
+
 public:
   WaylandSurface();
   ~WaylandSurface();

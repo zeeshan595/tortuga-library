@@ -21,6 +21,18 @@ public:
   Wayland() {}
   ~Wayland()
   {
+    if (touch != nullptr)
+      wl_touch_destroy(touch);
+    if (keyboard != nullptr)
+      wl_keyboard_destroy(keyboard);
+    if (pointer != nullptr)
+      wl_pointer_destroy(pointer);
+    if (seat != nullptr)
+      wl_seat_destroy(seat);
+    if (shell != nullptr)
+      wl_shell_destroy(shell);
+    if (compositor != nullptr)
+      wl_compositor_destroy(compositor);
     if (display != nullptr)
       wl_display_disconnect(display);
   }
@@ -106,7 +118,33 @@ WaylandSurface::WaylandSurface()
 }
 WaylandSurface::~WaylandSurface()
 {
+  for (const auto surf : ShellSurfaces)
+  {
+    if (surf != nullptr)
+      wl_shell_surface_destroy(surf);
+  }
+  for (const auto surf : Surfaces)
+  {
+    if (surf != nullptr)
+      wl_surface_destroy(surf);
+  }
+
+  ShellSurfaces.clear();
+  Surfaces.clear();
 }
+
+void shellSurfacePing(void *data, struct wl_shell_surface *shell_surface, uint32_t serial)
+{
+  wl_shell_surface_pong(shell_surface, serial);
+}
+
+void shellSurfaceConfigure(void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height)
+{
+}
+
+static const struct wl_shell_surface_listener shellSrfaceListener = {
+    shellSurfacePing,
+    shellSurfaceConfigure};
 
 VkSurfaceKHR WaylandSurface::CreateSurface(VkInstance instance)
 {
@@ -117,13 +155,18 @@ VkSurfaceKHR WaylandSurface::CreateSurface(VkInstance instance)
     wl_registry_add_listener(registry, &registryRistener, nullptr);
     Dispatch();
   }
-  const auto waylandSurface = wl_compositor_create_surface(_wayland.compositor);
+  const auto surf = wl_compositor_create_surface(_wayland.compositor);
+  const auto shellSurf = wl_shell_get_shell_surface(_wayland.shell, surf);
+  wl_shell_surface_add_listener(shellSurf, &shellSrfaceListener, nullptr);
+  wl_shell_surface_set_toplevel(shellSurf);
+  Surfaces.push_back(surf);
+  ShellSurfaces.push_back(shellSurf);
 
   auto createInfo = VkWaylandSurfaceCreateInfoKHR();
   {
     createInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
     createInfo.display = _wayland.display;
-    createInfo.surface = waylandSurface;
+    createInfo.surface = surf;
   }
   auto data = VkSurfaceKHR();
   if (vkCreateWaylandSurfaceKHR(instance, &createInfo, nullptr, &data) != VK_SUCCESS)
@@ -139,8 +182,10 @@ void WaylandSurface::Dispatch()
   if (_wayland.display == nullptr)
     Console::Fatal("Wayland: disconnected from display");
 
-  wl_display_dispatch(_wayland.display);
-  wl_display_roundtrip(_wayland.display);
+  if (wl_display_dispatch(_wayland.display) == -1)
+    Console::Error("Wayland: display error {0}", wl_display_get_error(_wayland.display));
+  if (wl_display_roundtrip(_wayland.display) == -1)
+    Console::Error("Wayland: display error {0}", wl_display_get_error(_wayland.display));
 }
 bool SurfaceInterface::HasPresentSupport(VkPhysicalDevice device, uint32_t familyIndex)
 {

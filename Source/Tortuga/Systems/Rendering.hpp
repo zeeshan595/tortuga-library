@@ -14,6 +14,8 @@ class Rendering : public Core::ECS::System
 private:
   Graphics::Vulkan::Instance::Instance VulkanInstance;
   Graphics::DisplaySurface::DisplaySurface DisplaySurface;
+  Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
+
 public:
   Rendering();
   ~Rendering();

@@ -1,8 +1,6 @@
 #ifndef _UTILS_INPUT_OUTPUT
 #define _UTILS_INPUT_OUTPUT
 
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_STATIC
 #include <stb/stb_image.h>
 #include <fstream>
 #include <string>
