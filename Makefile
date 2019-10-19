@@ -39,6 +39,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 #link and create executable
 all: $(OBJ_FILES)
+	echo $(XDG_SESSION_TYPE)
 	$(COMPILER) -o $(OBJ_DIR)/$(TARGET) $(SRC_EXECUTABLE) $(FLAGS) $(PATHS) $(LIBS) $(OBJ_FILES)
 
 #create obj files
