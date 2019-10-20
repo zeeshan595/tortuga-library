@@ -15,4 +15,7 @@
 	url = https://github.com/KhronosGroup/Vulkan-Loader.git
 [submodule "Submodules/wayland"]
 	path = Submodules/wayland
-	url = https://github.com/wayland-project/wayland.git
+	url = https://gitlab.freedesktop.org/wayland/wayland.git
+[submodule "Submodules/wayland-protocols"]
+	path = Submodules/wayland-protocols
+	url = https://gitlab.freedesktop.org/wayland/wayland-protocols.git

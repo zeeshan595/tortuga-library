@@ -62,6 +62,11 @@ init:
 	cd Submodules/wayland && sh autogen.sh --disable-documentation --prefix=$(PWD)/Build
 	make -C Submodules/wayland
 	make install -C Submodules/wayland
+	#wayland protocols
+	cd Submodules/wayland-protocols && sh autogen.sh --disable-documentation --prefix=$(PWD)/Build
+	make -C Submodules/wayland-protocols
+	make install -C Submodules/wayland-protocols
+	Build/bin/wayland-scanner client-header Build/share/wayland-protocols/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml Build/include/xdg-decoration.h
 	#vulkan headers
 	mkdir -p Submodules/Vulkan-Headers/build
 	cd Submodules/Vulkan-Headers/build && cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/Build ..
