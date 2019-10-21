@@ -7,7 +7,6 @@
                 "${workspaceFolder}/Build/include/"
             ],
             "defines": [
-                "VK_USE_PLATFORM_WAYLAND_KHR",
                 "GLM_FORCE_RADIANS",
                 "GLM_FORCE_DEPTH_ZERO_TO_ONE",
                 "STB_IMAGE_IMPLEMENTATION",

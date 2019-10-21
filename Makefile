@@ -6,34 +6,12 @@ SRC_DIR = Source
 OBJ_DIR = Build
 SRC_EXECUTABLE = Source/main.cpp
 
-#os specific options
-ifeq ($(OS),Windows_NT)
-	#windows display servers
-	DISPLAY_SERVER = -DVK_USE_PLATFORM_WIN32_KHR
-	DISPLAY_SERVER_LIB = 
-else
-	UNAME_S := $(shell uname -s)
-	#linux display servers
-	ifeq ($(UNAME_S),Linux)
-		ifeq ($(XDG_SESSION_TYPE),wayland)
-			DISPLAY_SERVER = -DVK_USE_PLATFORM_WAYLAND_KHR
-			DISPLAY_SERVER_LIB = -lwayland-client
-		else
-			DISPLAY_SERVER = -DVK_USE_PLATFORM_XCB_KHR
-			DISPLAY_SERVER_LIB = 
-		endif
-	endif
-	#darwin display servers
-	ifeq ($(UNAME_S),Darwin)
-		#todo: mac display servers
-	endif
-endif
 #compiler options
 COMPILER = g++
-PRE_PROCESSOR = $(DISPLAY_SERVER) -DGLM_FORCE_RADIANS -DGLM_FORCE_DEPTH_ZERO_TO_ONE -DSTB_IMAGE_IMPLEMENTATION -DSTB_IMAGE_STATIC
+PRE_PROCESSOR = -DGLM_FORCE_RADIANS -DGLM_FORCE_DEPTH_ZERO_TO_ONE -DSTB_IMAGE_IMPLEMENTATION -DSTB_IMAGE_STATIC
 FLAGS = -DDEBUG_MODE -g -std=c++17 -pthread -Wall -Wno-narrowing -Wno-unused $(PRE_PROCESSOR)
 PATHS = -IBuild/include/ -LBuild/lib64/ -LBuild/lib/
-LIBS = -lvulkan -lSDL2 $(DISPLAY_SERVER_LIB)
+LIBS = -lvulkan -lSDL2
 LIBS_A := $(shell find $(OBJ_DIR)/lib/ -type f -name '*.a') $(shell find $(OBJ_DIR)/lib/ -type f -name '*.o')
 
 #get a list of all cpp files excluding executable file
