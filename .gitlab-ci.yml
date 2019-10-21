@@ -6,6 +6,7 @@ build:
     - apt-get update
     - apt-get -y install cmake protobuf-compiler
     - apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
-    - apt-get -y install libwayland-client0 libwayland-dev
+    - apt-get -y install libwayland-bin libwayland-client0 libwayland-cursor0 libwayland-dev libwayland-egl1 libwayland-server0
+    - apt-get -y install libsdl2-2.0-0 libsdl2-dev
     - make init
-    - XDG_SESSION_TYPE=wayland make
+    - make
