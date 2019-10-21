@@ -50,7 +50,6 @@ init:
 	mkdir -p Submodules/Vulkan-Loader/build
 	rm -rf $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
 	echo 'set(VULKAN_HEADERS_INSTALL_DIR "$(PWD)/$(OBJ_DIR)" CACHE STRING "" FORCE)' > $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
-	echo 'set(WAYLAND_CLIENT_INCLUDE_DIR "$(PWD)/$(OBJ_DIR)" CACHE STRING "" FORCE)' >> $(PWD)/Submodules/Vulkan-Loader/build/helper.cmake
 	cd Submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/$(OBJ_DIR) ..
 	make install -C Submodules/Vulkan-Loader/build
 	rm -rf Submodules/Vulkan-Loader/build
