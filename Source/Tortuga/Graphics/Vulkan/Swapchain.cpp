@@ -78,11 +78,18 @@ Swapchain Create(Device::Device device, uint32_t width, uint32_t height, VkSurfa
   data.PresentMode = ChoosePresentMode(data.SupportDetails.PresentModes);
   data.Extent = ChooseExtent(data.SupportDetails.Capabilities, width, height);
 
+  if (!device.CanPresent) {
+    Console::Error("this device does not have present support");
+    return data;
+  }
+
+  VkBool32 isTransferSupported = false;
   VkBool32 isComputeSupported = false;
   VkBool32 isGraphicsSupported = false;
+  ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Transfer.Index, surface, &isTransferSupported));
   ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Compute.Index, surface, &isComputeSupported));
   ErrorCheck::Callback(vkGetPhysicalDeviceSurfaceSupportKHR(device.PhysicalDevice, device.QueueFamilies.Graphics.Index, surface, &isGraphicsSupported));
-  if (!isComputeSupported && !isGraphicsSupported)
+  if (!isComputeSupported && !isGraphicsSupported && !isTransferSupported)
     Console::Fatal("This device does not have any present queues");
 
   data.ImageCount = data.SupportDetails.Capabilities.minImageCount + 1;
@@ -110,6 +117,7 @@ Swapchain Create(Device::Device device, uint32_t width, uint32_t height, VkSurfa
 
   ErrorCheck::Callback(vkCreateSwapchainKHR(device.Device, &swapchainInfo, nullptr, &data.Swapchain));
 
+  ErrorCheck::Callback(vkGetSwapchainImagesKHR(device.Device, data.Swapchain, &data.ImageCount, nullptr));
   data.Images.resize(data.ImageCount);
   ErrorCheck::Callback(vkGetSwapchainImagesKHR(device.Device, data.Swapchain, &data.ImageCount, data.Images.data()));
 

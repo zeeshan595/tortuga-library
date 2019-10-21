@@ -29,6 +29,98 @@ void TriggerWindowClose()
     cb();
 }
 
+//window minimize
+std::vector<OnWindowMinimize> windowMinimize;
+void NotifyOnWindowMinimize(OnWindowMinimize callback)
+{
+  windowMinimize.push_back(callback);
+}
+void RemoveOnWindowMinimize(OnWindowMinimize callback)
+{
+  for (auto i = windowMinimize.begin(); i != windowMinimize.end(); ++i)
+  {
+    if ((*i) == callback)
+    {
+      windowMinimize.erase(i);
+      break;
+    }
+  }
+}
+void TriggerWindowMinimize(bool isMinimized)
+{
+  for (const auto cb : windowMinimize)
+    cb(isMinimized);
+}
+
+//window maxamized
+std::vector<OnWindowMaximized> windowMaximized;
+void NotifyOnWindowMaximized(OnWindowMaximized callback)
+{
+  windowMinimize.push_back(callback);
+}
+void RemoveOnWindowMaximized(OnWindowMaximized callback)
+{
+  for (auto i = windowMaximized.begin(); i != windowMaximized.end(); ++i)
+  {
+    if ((*i) == callback)
+    {
+      windowMaximized.erase(i);
+      break;
+    }
+  }
+}
+void TriggerWindowMaximized(bool isMaximized)
+{
+  for (const auto cb : windowMaximized)
+    cb(isMaximized);
+}
+
+//window focus
+std::vector<OnWindowFocus> windowFocus;
+void NotifyOnWindowFocus(OnWindowFocus callback)
+{
+  windowFocus.push_back(callback);
+}
+void RemoveOnWindowFocus(OnWindowFocus callback)
+{
+  for (auto i = windowFocus.begin(); i != windowFocus.end(); ++i)
+  {
+    if ((*i) == callback)
+    {
+      windowFocus.erase(i);
+      break;
+    }
+  }
+}
+void TriggerWindowFocus(bool isFocued)
+{
+  for (const auto cb : windowFocus)
+    cb(isFocued);
+}
+
+//window resize
+std::vector<OnWindowResize> windowResize;
+void NotifyOnWindowResize(OnWindowResize callback)
+{
+  windowResize.push_back(callback);
+}
+void RemoveOnWindowResize(OnWindowResize callback)
+{
+  for (auto i = windowResize.begin(); i != windowResize.end(); ++i)
+  {
+    if ((*i) == callback)
+    {
+      windowResize.erase(i);
+      break;
+    }
+  }
+}
+void TriggerWindowResize(uint32_t width, uint32_t height)
+{
+  for (const auto cb : windowResize)
+    cb(width, height);
+}
+
 //key events
 std::vector<OnKeyEvent> keyEvents;
 void NotifyOnKeyEvent(OnKeyEvent callback)

@@ -50,9 +50,9 @@ struct Device
 };
 
 float GetDeviceScore(VkPhysicalDeviceProperties properties, VkPhysicalDeviceFeatures features);
-DeviceQueueFamilies FindDeviceQueueIndices(VkPhysicalDevice physicalDevice);
+DeviceQueueFamilies FindDeviceQueueIndices(VkSurfaceKHR surface, VkPhysicalDevice physicalDevice);
 bool IsExtensionsSupported(VkPhysicalDevice physicalDevice, std::vector<const char *> extensions);
-Device Create(VkPhysicalDevice physicalDevice);
+Device Create(VkSurfaceKHR surface, VkPhysicalDevice physicalDevice);
 void Destroy(Device data);
 uint32_t FindMemoryType(Device device, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 void WaitForQueue(VkQueue queue);

@@ -39,8 +39,8 @@ Rendering::~Rendering()
 void Rendering::Update()
 {
   const auto device = VulkanInstance.Devices[0];
-  const auto nextImage = Graphics::Vulkan::Swapchain::AquireNextImage(DisplaySurface.Swapchain);
-  Graphics::Vulkan::Swapchain::PresentImage(DisplaySurface.Swapchain, nextImage, device.Queues.Present);
+  //const auto nextImage = Graphics::Vulkan::Swapchain::AquireNextImage(DisplaySurface.Swapchain);
+  //Graphics::Vulkan::Swapchain::PresentImage(DisplaySurface.Swapchain, nextImage, device.Queues.Present);
   Graphics::DisplaySurface::Dispatch(DisplaySurface);
 }
 } // namespace Systems

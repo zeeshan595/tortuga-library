@@ -17,6 +17,30 @@ void NotifyOnWindowClose(OnWindowClose callback);
 void RemoveOnWindowClose(OnWindowClose callback);
 void TriggerWindowClose();
 
+//window minimize
+typedef void (*OnWindowMinimize)(bool isMinimized);
+void NotifyOnWindowMinimize(OnWindowMinimize callback);
+void RemoveOnWindowMinimize(OnWindowMinimize callback);
+void TriggerWindowMinimize(bool isMinimized);
+
+//window maximized
+typedef void (*OnWindowMaximized)(bool isMaximized);
+void NotifyOnWindowMaximized(OnWindowMaximized callback);
+void RemoveOnWindowMaximized(OnWindowMaximized callback);
+void TriggerWindowMaximized(bool isMaximized);
+
+//window focus
+typedef void (*OnWindowFocus)(bool isFocused);
+void NotifyOnWindowFocus(OnWindowFocus callback);
+void RemoveOnWindowFocus(OnWindowFocus callback);
+void TriggerWindowFocus(bool isFocused);
+
+//window resized
+typedef void (*OnWindowResize)(uint32_t width, uint32_t height);
+void NotifyOnWindowResize(OnWindowResize callback);
+void RemoveOnWindowResize(OnWindowResize callback);
+void TriggerWindowResize(uint32_t width, uint32_t height);
+
 //key events
 typedef void (*OnKeyEvent)(KeyCode, KeyAction);
 void NotifyOnKeyEvent(OnKeyEvent callback);

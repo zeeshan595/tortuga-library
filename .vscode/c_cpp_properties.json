@@ -6,7 +6,9 @@
                 "${workspaceFolder}/Source/",
                 "${workspaceFolder}/Build/include/"
             ],
-            "defines": [],
+            "defines": [
+                "VK_USE_PLATFORM_WAYLAND_KHR"
+            ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++17",

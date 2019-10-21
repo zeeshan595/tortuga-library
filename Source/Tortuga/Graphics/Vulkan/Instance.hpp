@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 
+#include <SDL2/SDL.h>
 #include "./ErrorCheck.hpp"
 #include "./Device.hpp"
 
