@@ -63,20 +63,6 @@ init:
 	#init
 	git submodule init
 	git submodule update --recursive --init
-	#wayland
-	cd Submodules/wayland && sh autogen.sh --disable-documentation --prefix=$(PWD)/$(OBJ_DIR)
-	make -C Submodules/wayland
-	make install -C Submodules/wayland
-	#wayland protocols
-	cd Submodules/wayland-protocols && sh autogen.sh --disable-documentation --prefix=$(PWD)/$(OBJ_DIR)
-	make -C Submodules/wayland-protocols
-	make install -C Submodules/wayland-protocols
-	#wayland xdg shell v6 protocol
-	$(OBJ_DIR)/bin/wayland-scanner client-header $(OBJ_DIR)/share/wayland-protocols/unstable/xdg-shell/xdg-shell-unstable-v6.xml $(OBJ_DIR)/include/xdg-shell-client.h
-	$(OBJ_DIR)/bin/wayland-scanner server-header $(OBJ_DIR)/share/wayland-protocols/unstable/xdg-shell/xdg-shell-unstable-v6.xml $(OBJ_DIR)/include/xdg-shell-server.h
-	$(OBJ_DIR)/bin/wayland-scanner private-code $(OBJ_DIR)/share/wayland-protocols/unstable/xdg-shell/xdg-shell-unstable-v6.xml $(OBJ_DIR)/lib/xdg-shell.c
-	gcc -c -o $(OBJ_DIR)/lib/xdg-shell.a $(OBJ_DIR)/lib/xdg-shell.c -I$(OBJ_DIR)/include
-	rm -f $(OBJ_DIR)/lib/xdg-decoration.cpp
 	#vulkan headers
 	mkdir -p Submodules/Vulkan-Headers/build
 	cd Submodules/Vulkan-Headers/build && cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/$(OBJ_DIR) ..
