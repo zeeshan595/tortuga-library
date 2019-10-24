@@ -21,6 +21,7 @@ struct Shader
 {
   VkDevice Device = VK_NULL_HANDLE;
   VkShaderModule Shader = VK_NULL_HANDLE;
+  VkShaderStageFlagBits Type;
 };
 
 struct FullShaderCode
@@ -30,10 +31,10 @@ struct FullShaderCode
   std::string type;
   std::string file;
 };
-FullShaderCode GetFullShaderCode(std::string file);
-std::string CompileShader(std::string fullShaderCode, std::string location, std::string type);
-Shader Create(Device::Device device, std::string compiled);
-void Destroy(Shader data);
+FullShaderCode GetFullShaderCode(const std::string file);
+std::string CompileShader(const std::string fullShaderCode, const std::string location, const std::string type);
+Shader Create(const Device::Device device, const std::string compiled, const VkShaderStageFlagBits type);
+void Destroy(const Shader data);
 } // namespace Shader
 } // namespace Vulkan
 } // namespace Graphics

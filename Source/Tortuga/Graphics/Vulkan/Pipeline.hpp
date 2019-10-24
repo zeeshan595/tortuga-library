@@ -28,8 +28,7 @@ struct Pipeline
 
 Pipeline CreateGraphicsPipeline(
     Device::Device device,
-    Shader::Shader vertexShader,
-    Shader::Shader fragmentShader,
+    std::vector<Shader::Shader> shaders,
     RenderPass::RenderPass renderPass,
     std::vector<VkVertexInputBindingDescription> bindings = {},
     std::vector<VkVertexInputAttributeDescription> attributes = {},

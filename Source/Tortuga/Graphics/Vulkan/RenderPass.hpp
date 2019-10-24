@@ -22,7 +22,7 @@ struct RenderPass
   std::vector<VkAttachmentDescription> Attachments;
 };
 
-RenderPass Create(Device::Device device, VkFormat imageFormat);
+RenderPass Create(Device::Device device);
 void Destroy(RenderPass data);
 } // namespace Image
 } // namespace Vulkan

@@ -45,7 +45,7 @@ std::string ResolveShaderIncludes(std::string location, std::string code)
   return fullShader;
 }
 //public
-FullShaderCode GetFullShaderCode(std::string file)
+FullShaderCode GetFullShaderCode(const std::string file)
 {
   const auto location = GetFileLocation(file);
   const auto fullShaderCode = ResolveShaderIncludes(location, Utils::IO::GetFileContents(file).data());
@@ -56,7 +56,7 @@ FullShaderCode GetFullShaderCode(std::string file)
   data.type = GetFileType(file);
   return data;
 }
-std::string CompileShader(std::string fullShaderCode, std::string location, std::string type)
+std::string CompileShader(const std::string fullShaderCode, const std::string location, const std::string type)
 {
   //compile
   const auto tempShaderPath = location + "/" + Core::GUID::GenerateGUID(1) + "." + type;
@@ -69,9 +69,10 @@ std::string CompileShader(std::string fullShaderCode, std::string location, std:
 
   return compiledShader;
 }
-Shader Create(Device::Device device, std::string compiled)
+Shader Create(const Device::Device device, const std::string compiled, const VkShaderStageFlagBits type)
 {
   Shader data = {};
+  data.Type = type;
   data.Device = device.Device;
 
   VkShaderModuleCreateInfo createInfo = {};
@@ -84,7 +85,7 @@ Shader Create(Device::Device device, std::string compiled)
 
   return data;
 }
-void Destroy(Shader data)
+void Destroy(const Shader data)
 {
   if (data.Shader == VK_NULL_HANDLE)
     return;

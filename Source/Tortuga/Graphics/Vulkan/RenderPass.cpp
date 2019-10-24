@@ -8,7 +8,7 @@ namespace Vulkan
 {
 namespace RenderPass
 {
-RenderPass Create(Device::Device device, VkFormat imageFormat)
+RenderPass Create(Device::Device device)
 {
   RenderPass data = {};
   data.Device = device.Device;
@@ -16,20 +16,20 @@ RenderPass Create(Device::Device device, VkFormat imageFormat)
 
   VkAttachmentDescription colorAttachment = {};
   {
-    colorAttachment.format = imageFormat;
+    colorAttachment.format = VK_FORMAT_R32G32B32A32_SFLOAT;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
   }
   data.Attachments.push_back(colorAttachment);
 
   VkAttachmentDescription depthAttachment = {};
   {
-    depthAttachment.format = Image::FindDepthFormat(device.PhysicalDevice);
+    depthAttachment.format = VK_FORMAT_D32_SFLOAT;
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;

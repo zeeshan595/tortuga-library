@@ -251,6 +251,16 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
   {
     source = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
   }
+  else if (oldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+  {
+    source = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    sourceAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+  }
+  else if (oldLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+  {
+    source = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    sourceAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+  }
   else
   {
     Console::Fatal("image transition not supported");
@@ -283,6 +293,11 @@ void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayo
   {
     destination = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     destinationAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+  }
+  else if (newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+  {
+    destination = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    destinationAccess = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
   }
   else
   {

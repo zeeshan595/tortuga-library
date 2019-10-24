@@ -17,8 +17,7 @@ std::vector<VkDescriptorSetLayout> GetVulkanDescriptorLayouts(std::vector<Descri
 }
 Pipeline CreateGraphicsPipeline(
     Device::Device device,
-    Shader::Shader vertexShader,
-    Shader::Shader fragmentShader,
+    std::vector<Shader::Shader> shaders,
     RenderPass::RenderPass renderPass,
     std::vector<VkVertexInputBindingDescription> bindings,
     std::vector<VkVertexInputAttributeDescription> attributes,
@@ -76,7 +75,7 @@ Pipeline CreateGraphicsPipeline(
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = VK_CULL_MODE_NONE; //todo add culling
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional
@@ -155,24 +154,20 @@ Pipeline CreateGraphicsPipeline(
 
   ErrorCheck::Callback(vkCreatePipelineLayout(data.Device, &pipelineLayoutInfo, nullptr, &data.Layout));
 
-  std::vector<VkPipelineShaderStageCreateInfo> shaderModules(2);
+  std::vector<VkPipelineShaderStageCreateInfo> shaderInfos(shaders.size());
+  for (uint32_t i = 0; i < shaders.size(); ++i)
   {
-    shaderModules[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderModules[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-    shaderModules[0].module = vertexShader.Shader;
-    shaderModules[0].pName = "main";
-
-    shaderModules[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderModules[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    shaderModules[1].module = fragmentShader.Shader;
-    shaderModules[1].pName = "main";
+    shaderInfos[i].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderInfos[i].module = shaders[i].Shader;
+    shaderInfos[i].stage = shaders[i].Type;
+    shaderInfos[i].pName = "main";
   }
 
   VkGraphicsPipelineCreateInfo pipelineInfo = {};
   {
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = shaderModules.size();
-    pipelineInfo.pStages = shaderModules.data();
+    pipelineInfo.stageCount = shaderInfos.size();
+    pipelineInfo.pStages = shaderInfos.data();
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &inputAssembly;
     pipelineInfo.pViewportState = &viewportState;

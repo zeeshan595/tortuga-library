@@ -14,6 +14,7 @@ struct Engine
   std::unordered_map<std::type_index, ECS::System *> Systems;
   std::vector<ECS::Entity *> entities;
   std::unordered_map<std::type_index, std::vector<ECS::Component *>> Components;
+  std::vector<ECS::Component *> ComponentsToDestroy;
 
   Engine() {}
   ~Engine()
@@ -82,6 +83,13 @@ void IterateSystems()
     return;
   }
 
+  for (auto i = engine->ComponentsToDestroy.begin(); i != engine->ComponentsToDestroy.end(); ++i)
+  {
+    (*i)->OnDestroy();
+    delete (*i);
+  }
+  engine->ComponentsToDestroy.clear();
+
   for (auto i = engine->Systems.begin(); i != engine->Systems.end(); ++i)
     i->second->Update();
 }
@@ -117,6 +125,8 @@ void DestroyEntity(ECS::Entity *entity)
         {
           if ((*k)->Root == entity)
           {
+            if ((*k)->DestroyOnStartOfLoop)
+              engine->ComponentsToDestroy.push_back(*k);
             comp.erase(k);
             engine->Components[(*j).first] = comp;
             break;
