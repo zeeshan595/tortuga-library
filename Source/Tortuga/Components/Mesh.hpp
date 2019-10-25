@@ -27,7 +27,7 @@ struct Mesh : public Core::ECS::Component
     this->IsVerticesDirty = true;
   }
 
-  void SetVertices(std::vector<uint32_t> indices)
+  void SetIndices(std::vector<uint32_t> indices)
   {
     this->Indices = indices;
     this->IsIndicesDirty = true;

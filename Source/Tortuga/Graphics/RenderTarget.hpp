@@ -10,9 +10,9 @@ namespace Tortuga
 {
 namespace Graphics
 {
-namespace RenderTarget
+namespace CameraRender
 {
-struct RenderTarget
+struct CameraRender
 {
   uint32_t Width;
   uint32_t Height;
@@ -22,12 +22,8 @@ struct RenderTarget
   Vulkan::ImageView::ImageView DepthImageView;
   Vulkan::Framebuffer::Framebuffer Framebuffer;
 };
-RenderTarget Create(
-    Vulkan::Device::Device device,
-    Vulkan::RenderPass::RenderPass renderPass,
-    uint32_t width,
-    uint32_t height);
-void Destroy(RenderTarget data);
+CameraRender Create(Vulkan::Device::Device device, Vulkan::RenderPass::RenderPass renderPass, uint32_t width, uint32_t height);
+void Destroy(CameraRender data);
 } // namespace RenderTarget
 } // namespace Graphics
 } // namespace Tortuga

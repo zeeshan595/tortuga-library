@@ -34,34 +34,37 @@ private:
   //descriptor layouts
   std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> DescriptorLayouts;
 
-  //renderpass & pipeline
+  //rendering
   std::vector<Graphics::Vulkan::Shader::Shader> Shaders;
   Graphics::Vulkan::RenderPass::RenderPass RenderPass;
   Graphics::Vulkan::Pipeline::Pipeline Pipeline;
-
-  //render image
-  Graphics::Vulkan::Image::Image RenderImage;
-  Graphics::Vulkan::Image::Image RenderDepthImage;
-  Graphics::Vulkan::ImageView::ImageView RenderImageView;
-  Graphics::Vulkan::ImageView::ImageView RenderDepthImageView;
-  Graphics::Vulkan::Framebuffer::Framebuffer Framebuffer;
   Graphics::Vulkan::Command::Command RenderCommand;
+
+  //sync
+  std::vector<Graphics::Vulkan::Semaphore::Semaphore> TransferSemaphore;
+  std::vector<Graphics::Vulkan::Semaphore::Semaphore> RenderSemaphore;
+  std::vector<Graphics::Vulkan::Fence::Fence> RenderFence;
 
   struct MeshView : public Core::ECS::Component
   {
     bool IsStatic;
     uint32_t IndexCount;
+    Graphics::Vulkan::Device::Device DeviceInUse;
     Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
     Graphics::Vulkan::Buffer::Buffer VertexBuffer;
     Graphics::Vulkan::Buffer::Buffer StagingIndexBuffer;
     Graphics::Vulkan::Buffer::Buffer IndexBuffer;
-    Graphics::Vulkan::CommandPool::CommandPool CommandPool;
+    Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
+    Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
     Graphics::Vulkan::Command::Command RenderCommand;
+    Graphics::Vulkan::Command::Command TransferCommand;
     glm::mat4 Transform = glm::mat4(1.0f);
-    
+
     void Setup(Graphics::Vulkan::Device::Device device);
     void OnDestroy();
   };
+
+  void SetupSemaphores(uint32_t size);
 
 public:
   Rendering();

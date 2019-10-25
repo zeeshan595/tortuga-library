@@ -14,7 +14,6 @@ struct Entity;
 struct Component
 {
 public:
-  bool DestroyOnStartOfLoop = false;
   Entity *Root = nullptr;
 
   virtual void OnCreate() {}  //is called when attached to an entity
@@ -29,11 +28,8 @@ struct Entity
   {
     for (auto i = Components.begin(); i != Components.end(); ++i)
     {
-      if (i->second->DestroyOnStartOfLoop == false)
-      {
-        i->second->OnDestroy();
-        delete i->second;
-      }
+      i->second->OnDestroy();
+      delete i->second;
     }
   }
 };

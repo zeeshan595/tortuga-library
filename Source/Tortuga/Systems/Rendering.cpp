@@ -17,9 +17,9 @@ Rendering::Rendering()
   GraphicsCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
 
   //setup descriptor set layouts
-  //DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
+  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
 
-  //render pass & pipeline
+  //rendering
   {
     //vertex shader
     const auto vertexShader = Graphics::Vulkan::Shader::GetFullShaderCode("Assets/Shaders/simple.vert");
@@ -33,18 +33,20 @@ Rendering::Rendering()
   }
   RenderPass = Graphics::Vulkan::RenderPass::Create(device);
   Pipeline = Graphics::Vulkan::Pipeline::CreateGraphicsPipeline(device, Shaders, RenderPass, Graphics::Vertex::GetBindingDescription(), Graphics::Vertex::GetAttributeDescriptions());
-
-  //render image
-  RenderImage = Graphics::Vulkan::Image::Create(device, 1920, 1080, VK_FORMAT_R32G32B32A32_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
-  RenderImageView = Graphics::Vulkan::ImageView::Create(device, RenderImage, VK_IMAGE_ASPECT_COLOR_BIT);
-  RenderDepthImage = Graphics::Vulkan::Image::Create(device, RenderImage.Width, RenderImage.Height, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
-  RenderDepthImageView = Graphics::Vulkan::ImageView::Create(device, RenderDepthImage, VK_IMAGE_ASPECT_DEPTH_BIT);
-  Framebuffer = Graphics::Vulkan::Framebuffer::Create(device, RenderImage.Width, RenderImage.Height, RenderPass, {RenderImageView, RenderDepthImageView});
   RenderCommand = Graphics::Vulkan::Command::Create(device, GraphicsCommandPool, Graphics::Vulkan::Command::Type::PRIMARY);
 }
 Rendering::~Rendering()
 {
-  Graphics::Vulkan::Image::Destroy(RenderImage);
+  Graphics::Vulkan::Device::WaitForDevice(VulkanInstance.Devices[0]);
+
+  for (const auto fence : RenderFence)
+    Graphics::Vulkan::Fence::Destroy(fence);
+
+  for (const auto semaphore : RenderSemaphore)
+    Graphics::Vulkan::Semaphore::Destroy(semaphore);
+
+  for (const auto semaphore : TransferSemaphore)
+    Graphics::Vulkan::Semaphore::Destroy(semaphore);
 
   Graphics::Vulkan::Pipeline::Destroy(Pipeline);
   Graphics::Vulkan::RenderPass::Destroy(RenderPass);
@@ -59,64 +61,144 @@ Rendering::~Rendering()
   Graphics::DisplaySurface::Destroy(DisplaySurface);
   Graphics::Vulkan::Instance::Destroy(VulkanInstance);
 }
+void Rendering::SetupSemaphores(uint32_t size)
+{
+  const auto device = VulkanInstance.Devices[0];
+
+  if (size > RenderSemaphore.size())
+    RenderSemaphore.resize(size);
+  else if (size < RenderSemaphore.size())
+  {
+    for (uint32_t i = size; i < RenderSemaphore.size(); i++)
+      Graphics::Vulkan::Semaphore::Destroy(RenderSemaphore[i]);
+  }
+  for (uint32_t i = 0; i < size; i++)
+  {
+    if (RenderSemaphore[i].Semaphore == VK_NULL_HANDLE)
+      RenderSemaphore[i] = Graphics::Vulkan::Semaphore::Create(device);
+  }
+
+  if (size > TransferSemaphore.size())
+    TransferSemaphore.resize(size);
+  else if (size < TransferSemaphore.size())
+  {
+    for (uint32_t i = size; i < TransferSemaphore.size(); i++)
+      Graphics::Vulkan::Semaphore::Destroy(TransferSemaphore[i]);
+  }
+  for (uint32_t i = 0; i < size; i++)
+  {
+    if (TransferSemaphore[i].Semaphore == VK_NULL_HANDLE)
+      TransferSemaphore[i] = Graphics::Vulkan::Semaphore::Create(device);
+  }
+
+  if (size > RenderFence.size())
+    RenderFence.resize(size);
+  else if (size < RenderFence.size())
+  {
+    for (uint32_t i = size; i < RenderFence.size(); i++)
+      Graphics::Vulkan::Fence::Destroy(RenderFence[i]);
+  }
+  for (uint32_t i = 0; i < size; i++)
+  {
+    if (RenderFence[i].Fence == VK_NULL_HANDLE)
+      RenderFence[i] = Graphics::Vulkan::Fence::Create(device, true);
+  }
+}
 void Rendering::Update()
 {
+  const auto cameras = Core::Engine::GetComponents<Components::Camera>();
+  SetupSemaphores(cameras.size());
+  for (const auto fence : RenderFence)
+  {
+    if (!Graphics::Vulkan::Fence::IsFenceSignaled(fence))
+      return;
+  }
+  Graphics::Vulkan::Fence::ResetFences(RenderFence);
+
   const auto device = VulkanInstance.Devices[0];
   Graphics::DisplaySurface::Dispatch(DisplaySurface);
 
-  const auto cameras = Core::Engine::GetComponents<Components::Camera>();
-  for (const auto camera : cameras)
+  const auto swapchainImageIndex = Graphics::Vulkan::Swapchain::AquireNextImage(DisplaySurface.Swapchain);
+  const auto swapchainImage = Graphics::Vulkan::Swapchain::GetImage(DisplaySurface.Swapchain, swapchainImageIndex);
+
+  //make sure every mesh has a mesh view
+  const auto meshes = Core::Engine::GetComponents<Components::Mesh>();
+  for (const auto mesh : meshes)
   {
+    if (Core::Engine::GetComponent<MeshView>(mesh->Root) == nullptr)
+      Core::Engine::AddComponent<MeshView>(mesh->Root);
+  }
+  for (uint32_t cameraIndex = 0; cameraIndex < cameras.size(); cameraIndex++)
+  {
+    const auto camera = cameras[cameraIndex];
+    if (camera->Render.Framebuffer.Framebuffer == VK_NULL_HANDLE)
+      camera->Render = Graphics::CameraRender::Create(device, RenderPass, camera->ResolutionWidth, camera->ResolutionHeight);
+
     //record render commnad
     Graphics::Vulkan::Command::Begin(RenderCommand, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, RenderImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, RenderDepthImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+    Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, camera->Render.ColorImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, camera->Render.DepthImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
     //run all draw commands
-    Graphics::Vulkan::Command::BeginRenderPass(RenderCommand, RenderPass, Framebuffer, Framebuffer.Width, Framebuffer.Height);
+    Graphics::Vulkan::Command::BeginRenderPass(RenderCommand, RenderPass, camera->Render.Framebuffer, camera->Render.Framebuffer.Width, camera->Render.Framebuffer.Height);
 
     //draw command
-    std::vector<std::future<Graphics::Vulkan::Command::Command>> meshThreads;
+    std::vector<std::future<void>> meshThreads;
     const auto meshViews = Core::Engine::GetComponents<MeshView>();
     for (const auto meshView : meshViews)
     {
       const auto renderCommand = RenderCommand;
       const auto renderPass = RenderPass;
-      const auto framebuffer = Framebuffer;
+      const auto framebuffer = camera->Render.Framebuffer;
       const auto pipeline = Pipeline;
-      meshThreads.push_back(std::async(std::launch::async, [device, meshView, renderPass, framebuffer, pipeline] {
+      const auto viewport = camera->Viewport;
+      const auto resolutionWidth = camera->ResolutionWidth;
+      const auto resolutionHeight = camera->ResolutionHeight;
+      meshThreads.push_back(std::async(std::launch::async, [device, meshView, renderPass, framebuffer, pipeline, viewport, resolutionWidth, resolutionHeight] {
         meshView->Setup(device);
         Graphics::Vulkan::Command::Begin(meshView->RenderCommand, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, renderPass, 0, framebuffer);
-        Graphics::Vulkan::Command::CopyBuffer(meshView->RenderCommand, meshView->StagingVertexBuffer, meshView->VertexBuffer);
-        Graphics::Vulkan::Command::CopyBuffer(meshView->RenderCommand, meshView->StagingIndexBuffer, meshView->IndexBuffer);
         Graphics::Vulkan::Command::BindPipeline(meshView->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {});
-        Graphics::Vulkan::Command::SetViewport(meshView->RenderCommand, 0, 0, 1920, 1080);
+        Graphics::Vulkan::Command::SetViewport(meshView->RenderCommand, viewport.x * resolutionWidth, viewport.y * resolutionHeight, viewport.z * resolutionWidth, viewport.w * resolutionHeight);
         Graphics::Vulkan::Command::BindVertexBuffer(meshView->RenderCommand, {meshView->VertexBuffer});
         Graphics::Vulkan::Command::BindIndexBuffer(meshView->RenderCommand, meshView->IndexBuffer);
         Graphics::Vulkan::Command::DrawIndexed(meshView->RenderCommand, meshView->IndexCount);
         Graphics::Vulkan::Command::End(meshView->RenderCommand);
-        return meshView->RenderCommand;
       }));
     }
 
+    std::vector<Graphics::Vulkan::Command::Command> transferCommands;
     std::vector<Graphics::Vulkan::Command::Command> drawCommands;
     for (uint32_t i = 0; i < meshThreads.size(); i++)
-    {
       meshThreads[i].wait();
-      drawCommands.push_back(meshThreads[i].get());
+    for (const auto mesh : meshViews)
+    {
+      drawCommands.push_back(mesh->RenderCommand);
+      transferCommands.push_back(mesh->TransferCommand);
     }
+    Graphics::Vulkan::Command::Submit(transferCommands, device.Queues.Transfer[0], {}, {TransferSemaphore[cameraIndex]});
 
     Graphics::Vulkan::Command::ExecuteCommands(RenderCommand, drawCommands);
     Graphics::Vulkan::Command::EndRenderPass(RenderCommand);
-
+    if (camera->PresentToScreen)
+    {
+      Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, camera->Render.ColorImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+      Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+      Graphics::Vulkan::Command::BlitImage(RenderCommand, camera->Render.ColorImage, swapchainImage);
+      Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    }
     Graphics::Vulkan::Command::End(RenderCommand);
+    Graphics::Vulkan::Command::Submit({RenderCommand}, device.Queues.Graphics[0], {TransferSemaphore[cameraIndex]}, {RenderSemaphore[cameraIndex]}, RenderFence[cameraIndex]);
   }
-
-  Graphics::Vulkan::Device::WaitForQueue(device.Queues.Graphics[0]);
+  Graphics::Vulkan::Swapchain::PresentImage(DisplaySurface.Swapchain, swapchainImageIndex, device.Queues.Present, RenderSemaphore);
+  for (const auto mesh : meshes)
+  {
+    mesh->IsIndicesDirty = false;
+    mesh->IsVerticesDirty = false;
+  }
 }
-
 void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device)
 {
+  this->DeviceInUse = device;
   if (this->Root == nullptr)
     return;
 
@@ -142,9 +224,9 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device)
     {
       Graphics::Vulkan::Buffer::Destroy(this->StagingVertexBuffer);
       Graphics::Vulkan::Buffer::Destroy(this->VertexBuffer);
+      this->StagingVertexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, verticesSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      this->VertexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     }
-    this->StagingVertexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-    this->VertexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     Graphics::Vulkan::Buffer::SetData(this->StagingVertexBuffer, mesh->Vertices.data(), verticesSize);
     IsUpdated = true;
   }
@@ -155,9 +237,9 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device)
     {
       Graphics::Vulkan::Buffer::Destroy(this->StagingIndexBuffer);
       Graphics::Vulkan::Buffer::Destroy(this->IndexBuffer);
+      this->StagingIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, indicesSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+      this->IndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, indicesSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     }
-    this->StagingIndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, indicesSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-    this->IndexBuffer = Graphics::Vulkan::Buffer::CreateHost(device, indicesSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     Graphics::Vulkan::Buffer::SetData(this->StagingIndexBuffer, mesh->Indices.data(), indicesSize);
     this->IndexCount = mesh->Indices.size();
     IsUpdated = true;
@@ -166,10 +248,20 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device)
   if (!IsUpdated)
     return;
 
-  if (this->CommandPool.CommandPool == VK_NULL_HANDLE)
-    this->CommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
+  if (this->GraphicsCommandPool.CommandPool == VK_NULL_HANDLE)
+    this->GraphicsCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
   if (this->RenderCommand.Command == VK_NULL_HANDLE)
-    this->RenderCommand = Graphics::Vulkan::Command::Create(device, this->CommandPool, Graphics::Vulkan::Command::PRIMARY);
+    this->RenderCommand = Graphics::Vulkan::Command::Create(device, this->GraphicsCommandPool, Graphics::Vulkan::Command::SECONDARY);
+  if (this->TransferCommandPool.CommandPool == VK_NULL_HANDLE)
+    this->TransferCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Transfer.Index);
+  if (this->TransferCommand.Command == VK_NULL_HANDLE)
+  {
+    this->TransferCommand = Graphics::Vulkan::Command::Create(device, this->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    Graphics::Vulkan::Command::Begin(this->TransferCommand, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+    Graphics::Vulkan::Command::CopyBuffer(this->TransferCommand, this->StagingVertexBuffer, this->VertexBuffer);
+    Graphics::Vulkan::Command::CopyBuffer(this->TransferCommand, this->StagingIndexBuffer, this->IndexBuffer);
+    Graphics::Vulkan::Command::End(this->TransferCommand);
+  }
 }
 void Rendering::MeshView::OnDestroy()
 {
@@ -177,7 +269,8 @@ void Rendering::MeshView::OnDestroy()
   Graphics::Vulkan::Buffer::Destroy(VertexBuffer);
   Graphics::Vulkan::Buffer::Destroy(StagingIndexBuffer);
   Graphics::Vulkan::Buffer::Destroy(IndexBuffer);
-  Graphics::Vulkan::CommandPool::Destroy(CommandPool);
+  Graphics::Vulkan::CommandPool::Destroy(GraphicsCommandPool);
+  Graphics::Vulkan::CommandPool::Destroy(TransferCommandPool);
 }
 } // namespace Systems
 } // namespace Tortuga

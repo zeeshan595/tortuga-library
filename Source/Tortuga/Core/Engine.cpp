@@ -14,16 +14,20 @@ struct Engine
   std::unordered_map<std::type_index, ECS::System *> Systems;
   std::vector<ECS::Entity *> entities;
   std::unordered_map<std::type_index, std::vector<ECS::Component *>> Components;
-  std::vector<ECS::Component *> ComponentsToDestroy;
+  std::unordered_map<std::type_index, std::vector<OnComponentDeleted>> ComponentDeletedNotification;
 
   Engine() {}
   ~Engine()
   {
+    for (const auto entity : entities)
+    {
+      for (const auto component : entity->Components)
+        RemoveComponent(entity, component.first);
+      delete entity;
+    }
+
     for (auto i = Systems.begin(); i != Systems.end(); ++i)
       delete i->second;
-
-    for (const auto entity : entities)
-      delete entity;
   }
 };
 Engine *engine = nullptr;
@@ -83,13 +87,6 @@ void IterateSystems()
     return;
   }
 
-  for (auto i = engine->ComponentsToDestroy.begin(); i != engine->ComponentsToDestroy.end(); ++i)
-  {
-    (*i)->OnDestroy();
-    delete (*i);
-  }
-  engine->ComponentsToDestroy.clear();
-
   for (auto i = engine->Systems.begin(); i != engine->Systems.end(); ++i)
     i->second->Update();
 }
@@ -125,8 +122,6 @@ void DestroyEntity(ECS::Entity *entity)
         {
           if ((*k)->Root == entity)
           {
-            if ((*k)->DestroyOnStartOfLoop)
-              engine->ComponentsToDestroy.push_back(*k);
             comp.erase(k);
             engine->Components[(*j).first] = comp;
             break;
@@ -173,9 +168,13 @@ void RemoveComponent(ECS::Entity *entity, std::type_index type)
   if (entity->Components.find(type) == entity->Components.end())
     return;
 
+  for (const auto deletionNotifier : engine->ComponentDeletedNotification[type])
+    deletionNotifier(entity->Components[type]);
+
   entity->Components[type]->OnDestroy();
   delete entity->Components[type];
   entity->Components.erase(type);
+
   if (engine->Components.find(type) == engine->Components.end())
     return;
 
@@ -223,6 +222,21 @@ std::vector<ECS::Component *> GetComponents(std::type_index type)
   }
 
   return engine->Components[type];
+}
+void NotifyOnComponentDeleted(OnComponentDeleted callback, std::type_index type)
+{
+  engine->ComponentDeletedNotification[type].push_back(callback);
+}
+void RemoveOnComponentDeleted(OnComponentDeleted callback, std::type_index type)
+{
+  for (auto cb = engine->ComponentDeletedNotification[type].begin(); cb != engine->ComponentDeletedNotification[type].end(); ++cb)
+  {
+    if (*cb == callback)
+    {
+      engine->ComponentDeletedNotification[type].erase(cb);
+      break;
+    }
+  }
 }
 } // namespace Engine
 } // namespace Core

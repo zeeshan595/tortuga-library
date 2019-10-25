@@ -27,6 +27,9 @@ void RemoveComponent(ECS::Entity *entity, std::type_index type);
 ECS::Component *GetComponent(ECS::Entity *entity, std::type_index type);
 void SetComponent(ECS::Entity *entity, std::type_index type, ECS::Component *data);
 std::vector<ECS::Component *> GetComponents(std::type_index type);
+typedef void (*OnComponentDeleted)(Core::ECS::Component *component);
+void NotifyOnComponentDeleted(OnComponentDeleted callback, std::type_index type);
+void RemoveOnComponentDeleted(OnComponentDeleted callback, std::type_index type);
 
 //templates
 template <typename T>
@@ -86,6 +89,18 @@ std::vector<T *> GetComponents()
     data[i] = static_cast<T *>(temp[i]);
 
   return data;
+}
+template <typename T>
+void NotifyOnComponentDeleted(OnComponentDeleted callback)
+{
+  auto type = std::type_index(typeid(T));
+  NotifyOnComponentDeleted(callback, type);
+}
+template <typename T>
+void RemoveOnComponentDeleted(OnComponentDeleted callback)
+{
+  auto type = std::type_index(typeid(T));
+  RemoveOnComponentDeleted(callback, type);
 }
 } // namespace Engine
 } // namespace Core
