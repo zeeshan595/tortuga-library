@@ -12,10 +12,13 @@ pool:
 steps:
 - script: |
     sudo apt -y update
-    sudo apt -y upgrade
     sudo apt -y g++ git cmake
     sudo apt -y install libwayland-client0 libwayland-dev
     sudo apt -y install libsdl2-2.0-0 libsdl2-dev
+  displayName: 'Setup Environment'
+- script: |
     make init
+  displayName: 'Setup Dependencies'
+- script: |
     make
   displayName: 'Build'
