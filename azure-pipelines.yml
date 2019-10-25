@@ -11,10 +11,8 @@ pool:
 
 steps:
 - script: |
-    apt-get -y install cmake protobuf-compiler
-    apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
-    apt-get -y install libwayland-client0 libwayland-dev
-    apt-get -y install libsdl2-2.0-0 libsdl2-dev
+    sudo apt-get -y install libwayland-client0 libwayland-dev
+    sudo apt-get -y install libsdl2-2.0-0 libsdl2-dev
     make init
     make
-  displayName: 'make'
+  displayName: 'Build'
