@@ -53,6 +53,11 @@ init:
 	cd Submodules/Vulkan-Loader/build && cmake -C helper.cmake -DCMAKE_INSTALL_PREFIX=$(PWD)/$(OBJ_DIR) ..
 	make install -C Submodules/Vulkan-Loader/build
 	rm -rf Submodules/Vulkan-Loader/build
+	#SDL2
+	cd Submodules/SDL-mirror/ && sh autogen.sh --prefix=$(PWD)/$(OBJ_DIR) && sh configure --prefix=$(PWD)/$(OBJ_DIR)
+	make -C Submodules/SDL-mirror/
+	make install -C Submodules/SDL-mirror/
+	cd Submodules/SDL-mirror/ && git clean -f && git stash save --keep-index --include-untracked -f
 	#stb
 	ln -f -s ../../Submodules/stb/ $(OBJ_DIR)/include/stb
 	#glm
