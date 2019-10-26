@@ -57,7 +57,7 @@ init:
 	cd Submodules/SDL-mirror/ && sh autogen.sh --prefix=$(PWD)/$(OBJ_DIR) && sh configure --prefix=$(PWD)/$(OBJ_DIR)
 	make -C Submodules/SDL-mirror/
 	make install -C Submodules/SDL-mirror/
-	cd Submodules/SDL-mirror/ && git clean -f && git stash save --keep-index --include-untracked
+	cd Submodules/SDL-mirror/
 	#stb
 	ln -f -s ../../Submodules/stb/ $(OBJ_DIR)/include/stb
 	#glm
