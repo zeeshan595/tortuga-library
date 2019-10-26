@@ -7,6 +7,8 @@ build:
     - apt-get -y install cmake protobuf-compiler
     - apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libwayland-client0 libwayland-dev
   stage: Setup Dependencies
+  script:
     - make init
   stage: Build
+  script:
     - make
