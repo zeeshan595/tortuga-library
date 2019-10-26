@@ -1,10 +1,12 @@
 image: gcc
 
 build:
-  stage: build
+  stage: Setup Environment
   script:
     - apt-get update
     - apt-get -y install cmake protobuf-compiler
     - apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libwayland-client0 libwayland-dev
+  stage: Setup Dependencies
     - make init
+  stage: Build
     - make
