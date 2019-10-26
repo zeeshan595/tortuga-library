@@ -14,17 +14,12 @@ struct Engine
   std::unordered_map<std::type_index, ECS::System *> Systems;
   std::vector<ECS::Entity *> entities;
   std::unordered_map<std::type_index, std::vector<ECS::Component *>> Components;
-  std::unordered_map<std::type_index, std::vector<OnComponentDeleted>> ComponentDeletedNotification;
 
   Engine() {}
   ~Engine()
   {
     for (const auto entity : entities)
-    {
-      for (const auto component : entity->Components)
-        RemoveComponent(entity, component.first);
       delete entity;
-    }
 
     for (auto i = Systems.begin(); i != Systems.end(); ++i)
       delete i->second;
@@ -168,9 +163,6 @@ void RemoveComponent(ECS::Entity *entity, std::type_index type)
   if (entity->Components.find(type) == entity->Components.end())
     return;
 
-  for (const auto deletionNotifier : engine->ComponentDeletedNotification[type])
-    deletionNotifier(entity->Components[type]);
-
   entity->Components[type]->OnDestroy();
   delete entity->Components[type];
   entity->Components.erase(type);
@@ -222,21 +214,6 @@ std::vector<ECS::Component *> GetComponents(std::type_index type)
   }
 
   return engine->Components[type];
-}
-void NotifyOnComponentDeleted(OnComponentDeleted callback, std::type_index type)
-{
-  engine->ComponentDeletedNotification[type].push_back(callback);
-}
-void RemoveOnComponentDeleted(OnComponentDeleted callback, std::type_index type)
-{
-  for (auto cb = engine->ComponentDeletedNotification[type].begin(); cb != engine->ComponentDeletedNotification[type].end(); ++cb)
-  {
-    if (*cb == callback)
-    {
-      engine->ComponentDeletedNotification[type].erase(cb);
-      break;
-    }
-  }
 }
 } // namespace Engine
 } // namespace Core

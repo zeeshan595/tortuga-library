@@ -7,8 +7,6 @@ int main()
 {
   //setup engine
   Core::Engine::Create();
-  //add a rendering system to the engine
-  Core::Engine::AddSystem<Systems::Rendering>();
 
   //setup events (can use these anywhere)
   Core::Input::NotifyOnWindowClose([] {
@@ -30,9 +28,13 @@ int main()
   mesh.SetIndices({0, 1, 2});
   Core::Engine::AddComponent<Components::Mesh>(cube, mesh);
 
+  //add a rendering system to the engine
+  Core::Engine::AddSystem<Systems::Rendering>();
+
   //main loop
   while (!ShouldClose)
     Core::Engine::IterateSystems();
+  Core::Engine::GetSystem<Systems::Rendering>()->WaitForDevice();
 
   //auto destroys everything
   Core::Engine::Destroy();

@@ -71,6 +71,7 @@ public:
   ~Rendering();
 
   void Update();
+  void WaitForDevice();
 };
 } // namespace Systems
 } // namespace Tortuga

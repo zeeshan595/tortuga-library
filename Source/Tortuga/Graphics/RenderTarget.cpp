@@ -23,8 +23,9 @@ void Destroy(CameraRender data)
 {
   Vulkan::Image::Destroy(data.ColorImage);
   Vulkan::ImageView::Destroy(data.ColorImageView);
-  Vulkan::Image::Destroy(data.ColorImage);
+  Vulkan::Image::Destroy(data.DepthImage);
   Vulkan::ImageView::Destroy(data.DepthImageView);
+  Vulkan::Framebuffer::Destroy(data.Framebuffer);
 }
 } // namespace RenderTarget
 } // namespace Graphics

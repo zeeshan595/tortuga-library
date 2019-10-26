@@ -57,6 +57,8 @@ Rendering::~Rendering()
   for (const auto descriptorLayout : DescriptorLayouts)
     Graphics::Vulkan::DescriptorLayout::Destroy(descriptorLayout);
 
+  Graphics::Vulkan::CommandPool::Destroy(TransferCommandPool);
+  Graphics::Vulkan::CommandPool::Destroy(ComputeCommandPool);
   Graphics::Vulkan::CommandPool::Destroy(GraphicsCommandPool);
   Graphics::DisplaySurface::Destroy(DisplaySurface);
   Graphics::Vulkan::Instance::Destroy(VulkanInstance);
@@ -195,6 +197,11 @@ void Rendering::Update()
     mesh->IsIndicesDirty = false;
     mesh->IsVerticesDirty = false;
   }
+}
+void Rendering::WaitForDevice()
+{
+  const auto device = VulkanInstance.Devices[0];
+  Graphics::Vulkan::Device::WaitForDevice(device);
 }
 void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device)
 {
