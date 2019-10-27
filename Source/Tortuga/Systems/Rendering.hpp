@@ -14,6 +14,7 @@
 #include "../Components/Mesh.hpp"
 #include "../Components/Transform.hpp"
 #include "../Components/Camera.hpp"
+#include "../Graphics/RenderTarget.hpp"
 
 namespace Tortuga
 {
@@ -48,6 +49,8 @@ private:
   struct MeshView : public Core::ECS::Component
   {
     bool IsStatic;
+    bool IsTransformDirty;
+    bool IsUpdated;
     uint32_t IndexCount;
     Graphics::Vulkan::Device::Device DeviceInUse;
     Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
@@ -58,9 +61,27 @@ private:
     Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
     Graphics::Vulkan::Command::Command RenderCommand;
     Graphics::Vulkan::Command::Command TransferCommand;
-    glm::mat4 Transform = glm::mat4(1.0f);
+    Graphics::Vulkan::Buffer::Buffer StagingTransformBuffer;
+    Graphics::Vulkan::Buffer::Buffer TransformBuffer;
+    Graphics::Vulkan::Command::Command TransformTransferCommand;
+    Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
+    Graphics::Vulkan::DescriptorSet::DescriptorSet TransformDescriptorSet;
 
-    void Setup(Graphics::Vulkan::Device::Device device);
+    void Setup(Graphics::Vulkan::Device::Device device, std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> layouts);
+    void OnDestroy();
+  };
+
+  struct CameraView : public Core::ECS::Component
+  {
+    Graphics::CameraRender::CameraRender Render;
+    Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
+    Graphics::Vulkan::DescriptorSet::DescriptorSet DescriptorSet;
+    Graphics::Vulkan::Buffer::Buffer StagingCameraMatrix;
+    Graphics::Vulkan::Buffer::Buffer CameraMatrix;
+    Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
+    Graphics::Vulkan::Command::Command TransferCommand;
+
+    void Setup(Graphics::Vulkan::Device::Device device, Graphics::Vulkan::RenderPass::RenderPass renderPass, std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> descriptorLayouts);
     void OnDestroy();
   };
 

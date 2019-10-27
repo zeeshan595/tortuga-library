@@ -15,22 +15,43 @@ namespace Components
 {
 struct Mesh : public Core::ECS::Component
 {
-  bool IsStatic = false;
+private:
   std::vector<Graphics::Vertex> Vertices;
   std::vector<uint32_t> Indices;
   bool IsVerticesDirty = false;
   bool IsIndicesDirty = false;
 
+public:
+  std::vector<Graphics::Vertex> GetVertices()
+  {
+    return this->Vertices;
+  }
+  std::vector<uint32_t> GetIndices()
+  {
+    return this->Indices;
+  }
   void SetVertices(std::vector<Graphics::Vertex> vertices)
   {
     this->Vertices = vertices;
     this->IsVerticesDirty = true;
   }
-
   void SetIndices(std::vector<uint32_t> indices)
   {
     this->Indices = indices;
     this->IsIndicesDirty = true;
+  }
+  bool GetIsVerticesDirty()
+  {
+    return this->IsVerticesDirty;
+  }
+  bool GetIsIndicesDirty()
+  {
+    return this->IsIndicesDirty;
+  }
+  void SetDirty(bool vertices, bool indices)
+  {
+    this->IsVerticesDirty = vertices;
+    this->IsIndicesDirty = indices;
   }
 
   Mesh()

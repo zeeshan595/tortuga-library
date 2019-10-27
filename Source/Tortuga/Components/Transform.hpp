@@ -12,9 +12,57 @@ namespace Components
 {
 struct Transform : public Core::ECS::Component
 {
+private:
+  bool IsStatic = false;
+  bool IsDirty = false;
   glm::vec3 Position;
   glm::vec4 Rotation;
   glm::vec3 Scale;
+
+public:
+  glm::vec3 GetPosition()
+  {
+    return this->Position;
+  }
+  glm::vec4 GetRotation()
+  {
+    return this->Rotation;
+  }
+  glm::vec3 GetScale()
+  {
+    return this->Scale;
+  }
+  void SetPosition(glm::vec3 pos)
+  {
+    this->Position = pos;
+    IsDirty = true;
+  }
+  void SetRotation(glm::vec4 rot)
+  {
+    this->Rotation = rot;
+    IsDirty = true;
+  }
+  void SetScale(glm::vec3 sca)
+  {
+    this->Scale = sca;
+    IsDirty = true;
+  }
+  bool GetIsDirty()
+  {
+    return this->IsDirty;
+  }
+  void SetIsDirty(bool isDirty)
+  {
+    this->IsDirty = isDirty;
+  }
+  bool GetStatic()
+  {
+    return this->IsStatic;
+  }
+  void SetStatic(bool isStatic)
+  {
+    this->IsStatic = isStatic;
+  }
 
   glm::mat4 GetModelMatrix()
   {
