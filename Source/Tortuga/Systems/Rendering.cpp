@@ -224,7 +224,7 @@ void Rendering::Update()
     {
       Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, cameraView->Render.ColorImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
       Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-      Graphics::Vulkan::Command::BlitImage(RenderCommand, cameraView->Render.ColorImage, swapchainImage);
+      Graphics::Vulkan::Command::BlitImage(RenderCommand, cameraView->Render.ColorImage, swapchainImage, camera->GetViewport());
       Graphics::Vulkan::Command::TransferImageLayout(RenderCommand, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
     }
     Graphics::Vulkan::Command::End(RenderCommand);

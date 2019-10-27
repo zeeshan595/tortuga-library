@@ -2,21 +2,43 @@
 
 using namespace Tortuga;
 bool ShouldClose = false;
-float rotation = 0.0f;
 
-struct TempSystem : Core::ECS::System
+//mesh rotation system
+struct ModelRotationSystem : Core::ECS::System
 {
-  void Update()
+  struct RotationComponent : Core::ECS::Component
   {
-    const auto meshes = Core::Engine::GetComponents<Components::Mesh>();
-    for (const auto mesh : meshes)
+    float Rotation;
+  };
+
+  static void OnKeyEvent(Core::Input::KeyCode key, Core::Input::KeyAction action)
+  {
+    if (key != Core::Input::KeyCode::Left && key != Core::Input::KeyCode::Right)
+      return;
+
+    float diff = 0.0f;
+    if (key == Core::Input::KeyCode::Left)
+      diff -= 0.001f;
+    if (key == Core::Input::KeyCode::Right)
+      diff += 0.001f;
+
+    const auto comps = Core::Engine::GetComponents<RotationComponent>();
+    for (const auto comp : comps)
     {
-      const auto transform = Core::Engine::GetComponent<Components::Transform>(mesh->Root);
+      comp->Rotation += diff;
+      const auto transform = Core::Engine::GetComponent<Components::Transform>(comp->Root);
       if (transform != nullptr)
-      {
-        transform->SetRotation(glm::vec4(0, rotation, 0, 1));
-      }
+        transform->SetRotation(glm::vec4(0, comp->Rotation, 0, 1));
     }
+  }
+
+  ModelRotationSystem()
+  {
+    Core::Input::NotifyOnKeyEvent(OnKeyEvent);
+  }
+  ~ModelRotationSystem()
+  {
+    Core::Input::RemoveOnKeyEvent(OnKeyEvent);
   }
 };
 
@@ -25,17 +47,12 @@ int main()
   //setup engine
   Core::Engine::Create();
 
-  //setup events (can use these anywhere)
+  //setup window close event
   Core::Input::NotifyOnWindowClose([] {
     ShouldClose = true;
   });
-  Core::Input::NotifyOnKeyEvent([](Core::Input::KeyCode key, Core::Input::KeyAction action) {
-    if (key == Core::Input::KeyCode::Left)
-      rotation += 0.001f;
-    else if (key == Core::Input::KeyCode::Right)
-      rotation -= 0.001f;
-  });
 
+  //setup camera
   const auto camera = Core::Engine::CreateEntity();
   {
     Core::Engine::AddComponent<Components::Camera>(camera);
@@ -44,18 +61,21 @@ int main()
     Core::Engine::AddComponent<Components::Transform>(camera, t);
   }
 
-  //create a cube with a mesh component
-  const auto cube = Core::Engine::CreateEntity();
+  //create a dragon with a mesh component
+  const auto dragon = Core::Engine::CreateEntity();
   const auto mesh = Utils::IO::LoadObjFile("Assets/Models/Dragon.obj");
   {
-    Core::Engine::AddComponent<Components::Mesh>(cube, Components::Mesh(mesh));
+    Core::Engine::AddComponent<Components::Mesh>(dragon, Components::Mesh(mesh));
     Components::Transform t;
     t.SetScale(glm::vec3(0.5, 0.5, 0.5));
-    Core::Engine::AddComponent<Components::Transform>(cube, t);
+    Core::Engine::AddComponent<Components::Transform>(dragon, t);
+    Core::Engine::AddComponent<ModelRotationSystem::RotationComponent>(dragon);
   }
+
   //add a rendering system to the engine
   Core::Engine::AddSystem<Systems::Rendering>();
-  Core::Engine::AddSystem<TempSystem>();
+  //add a rotation system which can rorate the model
+  Core::Engine::AddSystem<ModelRotationSystem>();
 
   //main loop
   while (!ShouldClose)

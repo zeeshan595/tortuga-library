@@ -367,7 +367,7 @@ void CopyImage(Command data, Image::Image source, Image::Image destination)
   }
   vkCmdCopyImage(data.Command, source.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
 }
-void BlitImage(Command data, Image::Image source, Image::Image destination)
+void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec4 viewport)
 {
   auto subResource = VkImageSubresourceLayers();
   {
@@ -380,11 +380,11 @@ void BlitImage(Command data, Image::Image source, Image::Image destination)
   auto blitInfo = VkImageBlit();
   {
     blitInfo.srcSubresource = subResource;
-    blitInfo.srcOffsets[0] = {0, 0, 0};
-    blitInfo.srcOffsets[1] = {source.Width, source.Height, 1};
+    blitInfo.srcOffsets[0] = {viewport.x * source.Width, viewport.y * source.Height, 0};
+    blitInfo.srcOffsets[1] = {viewport.z * source.Width, viewport.w * source.Height, 1};
     blitInfo.dstSubresource = subResource;
-    blitInfo.dstOffsets[0] = {0, 0, 0};
-    blitInfo.dstOffsets[1] = {destination.Width, destination.Height, 1};
+    blitInfo.dstOffsets[0] = {viewport.x * destination.Width, viewport.y * destination.Height, 0};
+    blitInfo.dstOffsets[1] = {viewport.z * destination.Width, viewport.w * destination.Height, 1};
   }
   vkCmdBlitImage(data.Command, source.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destination.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blitInfo, VK_FILTER_LINEAR);
 }

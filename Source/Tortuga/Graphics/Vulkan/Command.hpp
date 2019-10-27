@@ -56,7 +56,7 @@ void Submit(std::vector<Command> data, VkQueue queue, std::vector<Semaphore::Sem
 void TransferImageLayout(Command data, Image::Image image, VkImageLayout oldLayout, VkImageLayout newLayout);
 void BufferToImage(Command data, Buffer::Buffer buffer, Image::Image image, glm::vec2 offset, glm::vec2 size);
 void CopyImage(Command data, Image::Image source, Image::Image destination);
-void BlitImage(Command data, Image::Image source, Image::Image destination);
+void BlitImage(Command data, Image::Image source, Image::Image destination, glm::vec4 viewport = glm::vec4(0, 0, 1, 1));
 
 } // namespace Command
 } // namespace Vulkan
