@@ -16,5 +16,5 @@ layout(location = 2) in vec3 inNormal;
 
 void main() 
 {
-  gl_Position = vec4(inPosition, 1.) * model * view * projection;
+  gl_Position = projection * view * model * vec4(inPosition, 1.);
 }

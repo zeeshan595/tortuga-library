@@ -15,9 +15,9 @@ struct Transform : public Core::ECS::Component
 private:
   bool IsStatic = false;
   bool IsDirty = false;
-  glm::vec3 Position;
-  glm::vec4 Rotation;
-  glm::vec3 Scale;
+  glm::vec3 Position = glm::vec3(0, 0, 0);
+  glm::vec4 Rotation = glm::vec4(0, 0, 0, 1);
+  glm::vec3 Scale = glm::vec3(1, 1, 1);
 
 public:
   glm::vec3 GetPosition()
