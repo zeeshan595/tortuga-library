@@ -260,7 +260,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
   if (transform != nullptr)
     this->IsStatic = transform->GetStatic();
   const uint32_t verticesSize = sizeof(Graphics::Vertex) * mesh->GetVertices().size();
-  const uint32_t indicesSize = sizeof(uint32_t) * mesh->GetVertices().size();
+  const uint32_t indicesSize = sizeof(uint32_t) * mesh->GetIndices().size();
 
   this->IsTransformDirty = false;
 
