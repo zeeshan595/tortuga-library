@@ -1,8 +1,11 @@
 #ifndef _RENDERING_SYSTEM
 #define _RENDERING_SYSTEM
 
+#define MAXIMUM_NUM_OF_LIGHTS 10
+
 #include <future>
 #include <thread>
+#include <bits/stdc++.h>
 
 #include "../Core/ECS/Entity.hpp"
 #include "../Core/ECS/System.hpp"
@@ -10,11 +13,12 @@
 #include "../Graphics/DisplaySurface.hpp"
 #include "../Graphics/Vertex.hpp"
 #include "../Core/Engine.hpp"
+#include "../Graphics/RenderTarget.hpp"
 
 #include "../Components/Mesh.hpp"
 #include "../Components/Transform.hpp"
 #include "../Components/Camera.hpp"
-#include "../Graphics/RenderTarget.hpp"
+#include "../Components/Light.hpp"
 
 namespace Tortuga
 {
@@ -46,6 +50,14 @@ private:
   std::vector<Graphics::Vulkan::Semaphore::Semaphore> RenderSemaphore;
   std::vector<Graphics::Vulkan::Fence::Fence> RenderFence;
 
+  struct LightInfoStruct
+  {
+    glm::vec4 Color;
+    int32_t Type;
+    float Intensity;
+    float Range;
+  };
+
   struct MeshView : public Core::ECS::Component
   {
     bool IsStatic;
@@ -66,9 +78,15 @@ private:
     Graphics::Vulkan::Command::Command TransformTransferCommand;
     Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
     Graphics::Vulkan::DescriptorSet::DescriptorSet TransformDescriptorSet;
+    Graphics::Vulkan::Buffer::Buffer StagingLightsBuffer;
+    Graphics::Vulkan::Buffer::Buffer LightsBuffer;
+    Graphics::Vulkan::DescriptorSet::DescriptorSet LightsDescriptorSet;
+    Graphics::Vulkan::Command::Command LightTransferCommand;
 
     void Setup(Graphics::Vulkan::Device::Device device, std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> layouts);
     void OnDestroy();
+    std::vector<Components::Light *> GetClosestLights();
+    void UpdateLightsBuffer(std::vector<Components::Light *> lights);
   };
 
   struct CameraView : public Core::ECS::Component
@@ -88,6 +106,8 @@ private:
   void SetupSemaphores(uint32_t size);
 
 public:
+  static uint32_t LightsPerMesh;
+
   Rendering();
   ~Rendering();
 

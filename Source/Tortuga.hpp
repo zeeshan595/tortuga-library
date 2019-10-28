@@ -30,7 +30,10 @@
 #include "./Tortuga/Core/Engine.hpp"
 
 //Components
+#include "./Tortuga/Components/Transform.hpp"
+#include "./Tortuga/Components/Camera.hpp"
 #include "./Tortuga/Components/Mesh.hpp"
+#include "./Tortuga/Components/Light.hpp"
 
 //Systems
 #include "./Tortuga/Systems/Rendering.hpp"

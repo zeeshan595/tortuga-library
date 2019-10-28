@@ -61,6 +61,15 @@ int main()
     Core::Engine::AddComponent<Components::Transform>(camera, t);
   }
 
+  //setup light
+  const auto light = Core::Engine::CreateEntity();
+  {
+    Components::Transform t;
+    t.SetPosition(glm::vec3(0, 7.0f, 0));
+    Core::Engine::AddComponent<Components::Transform>(light, t);
+    Core::Engine::AddComponent<Components::Light>(light);
+  }
+
   //create a dragon with a mesh component
   const auto dragon = Core::Engine::CreateEntity();
   const auto mesh = Utils::IO::LoadObjFile("Assets/Models/Dragon.obj");

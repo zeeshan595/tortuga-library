@@ -1,5 +1,7 @@
 #version 460
 
+#define MAXIMUM_LIGHT_INFOS 10
+
 layout(set = 0, binding = 0) readonly uniform CameraTransform
 {
   mat4 view;
@@ -8,6 +10,21 @@ layout(set = 0, binding = 0) readonly uniform CameraTransform
 layout(set = 1, binding = 0) readonly uniform MeshTransform
 {
   mat4 model;
+};
+struct LightInfo
+{
+  vec4 Color;
+  int Type;
+  float Intensity;
+  float Range;
+};
+layout(set = 2, binding = 0) readonly uniform LightInfoStruct
+{
+  uint lightsAmount;
+  uint lightsReserved1;
+  uint lightsReserved2;
+  uint lightsReserved3;
+  LightInfo lights[10];
 };
 
 layout(location = 0) in vec3 inPosition;

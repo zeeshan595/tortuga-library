@@ -4,6 +4,7 @@ namespace Tortuga
 {
 namespace Systems
 {
+uint32_t Rendering::LightsPerMesh = 3;
 Rendering::Rendering()
 {
   //vulkan instance & display surface
@@ -20,6 +21,8 @@ Rendering::Rendering()
   //view matrix & projection matrix
   DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
   //model matrix
+  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
+  //light infos
   DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
 
   //rendering
@@ -193,8 +196,10 @@ void Rendering::Update()
       const auto cameraDescriptorSet = cameraView->DescriptorSet;
       meshThreads.push_back(std::async(std::launch::async, [device, meshView, descriptorLayouts, renderPass, framebuffer, pipeline, cameraDescriptorSet, viewport, resolutionWidth, resolutionHeight] {
         meshView->Setup(device, descriptorLayouts);
+        const auto lights = meshView->GetClosestLights();
+        meshView->UpdateLightsBuffer(lights);
         Graphics::Vulkan::Command::Begin(meshView->RenderCommand, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, renderPass, 0, framebuffer);
-        Graphics::Vulkan::Command::BindPipeline(meshView->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {cameraDescriptorSet, meshView->TransformDescriptorSet});
+        Graphics::Vulkan::Command::BindPipeline(meshView->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {cameraDescriptorSet, meshView->TransformDescriptorSet, meshView->LightsDescriptorSet});
         Graphics::Vulkan::Command::SetViewport(meshView->RenderCommand, viewport.x * resolutionWidth, viewport.y * resolutionHeight, viewport.z * resolutionWidth, viewport.w * resolutionHeight);
         Graphics::Vulkan::Command::BindVertexBuffer(meshView->RenderCommand, {meshView->VertexBuffer});
         Graphics::Vulkan::Command::BindIndexBuffer(meshView->RenderCommand, meshView->IndexBuffer);
@@ -211,9 +216,8 @@ void Rendering::Update()
       if (mesh->IsUpdated)
         transferCommands.push_back(mesh->TransferCommand);
       if (mesh->IsTransformDirty || !mesh->IsStatic)
-      {
         transferCommands.push_back(mesh->TransformTransferCommand);
-      }
+      transferCommands.push_back(mesh->LightTransferCommand);
     }
     if (transferCommands.size() > 0)
       Graphics::Vulkan::Command::Submit(transferCommands, device.Queues.Transfer[0], {}, {TransferSemaphore[cameraIndex]});
@@ -250,26 +254,25 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
   this->DeviceInUse = device;
   if (this->Root == nullptr)
     return;
-
   const auto mesh = Core::Engine::GetComponent<Components::Mesh>(this->Root);
   const auto transform = Core::Engine::GetComponent<Components::Transform>(this->Root);
   if (mesh == nullptr)
     return;
-
   this->IsStatic = true;
   if (transform != nullptr)
     this->IsStatic = transform->GetStatic();
   const uint32_t verticesSize = sizeof(Graphics::Vertex) * mesh->GetVertices().size();
   const uint32_t indicesSize = sizeof(uint32_t) * mesh->GetIndices().size();
-
   this->IsTransformDirty = false;
 
+  //setup staging transform buffer
   if (this->StagingTransformBuffer.Buffer == VK_NULL_HANDLE)
   {
     this->StagingTransformBuffer = Graphics::Vulkan::Buffer::CreateHost(device, sizeof(glm::mat4), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     this->TransformBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, sizeof(glm::mat4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     IsTransformDirty = true;
   }
+  //setup descriptor pools
   if (this->DescriptorPool.Pool == VK_NULL_HANDLE)
   {
     this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, layouts);
@@ -277,6 +280,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(this->TransformDescriptorSet, {this->TransformBuffer});
   }
 
+  //update mesh transform data
   if (!this->IsStatic || this->IsTransformDirty)
   {
     glm::mat4 matrix = glm::mat4(1.0f);
@@ -286,6 +290,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     Graphics::Vulkan::Buffer::SetData(StagingTransformBuffer, &matrix, StagingTransformBuffer.Size);
   }
 
+  //update mesh vertices
   this->IsUpdated = false;
   if (this->StagingVertexBuffer.Buffer == VK_NULL_HANDLE || mesh->GetIsVerticesDirty())
   {
@@ -300,6 +305,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     this->IsUpdated = true;
   }
 
+  //update mesh indices
   if (this->StagingIndexBuffer.Buffer == VK_NULL_HANDLE || mesh->GetIsIndicesDirty())
   {
     if (this->StagingIndexBuffer.Buffer == VK_NULL_HANDLE || this->StagingIndexBuffer.Size != indicesSize)
@@ -315,9 +321,11 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
   }
   mesh->SetDirty(false, false);
 
+  //if mesh vertices or indices updated then
   if (!IsUpdated)
     return;
 
+  //setup commands & command pools
   if (this->GraphicsCommandPool.CommandPool == VK_NULL_HANDLE)
     this->GraphicsCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Graphics.Index);
   if (this->RenderCommand.Command == VK_NULL_HANDLE)
@@ -339,6 +347,21 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     Graphics::Vulkan::Command::CopyBuffer(this->TransformTransferCommand, this->StagingTransformBuffer, this->TransformBuffer);
     Graphics::Vulkan::Command::End(this->TransformTransferCommand);
   }
+
+  //setup lights info
+  if (this->StagingLightsBuffer.Buffer == VK_NULL_HANDLE)
+  {
+    uint32_t lightsByteSize = sizeof(glm::vec4) + sizeof(LightInfoStruct) * MAXIMUM_NUM_OF_LIGHTS;
+    this->StagingLightsBuffer = Graphics::Vulkan::Buffer::CreateHost(device, lightsByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+    this->LightsBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, lightsByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, layouts);
+    this->LightsDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, this->DescriptorPool, layouts[2]);
+    Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(this->LightsDescriptorSet, {this->LightsBuffer});
+    this->LightTransferCommand = Graphics::Vulkan::Command::Create(device, this->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    Graphics::Vulkan::Command::Begin(this->LightTransferCommand, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+    Graphics::Vulkan::Command::CopyBuffer(this->LightTransferCommand, this->StagingLightsBuffer, this->LightsBuffer);
+    Graphics::Vulkan::Command::End(this->LightTransferCommand);
+  }
 }
 void Rendering::MeshView::OnDestroy()
 {
@@ -350,7 +373,43 @@ void Rendering::MeshView::OnDestroy()
   Graphics::Vulkan::Buffer::Destroy(this->TransformBuffer);
   Graphics::Vulkan::CommandPool::Destroy(this->GraphicsCommandPool);
   Graphics::Vulkan::CommandPool::Destroy(this->TransferCommandPool);
-  Graphics::Vulkan::DescriptorPool::Destroy(DescriptorPool);
+  Graphics::Vulkan::DescriptorPool::Destroy(this->DescriptorPool);
+}
+std::vector<Components::Light *> Rendering::MeshView::GetClosestLights()
+{
+  const auto fullLightsList = Core::Engine::GetComponents<Components::Light>();
+  if (fullLightsList.size() <= Rendering::LightsPerMesh)
+    return fullLightsList;
+
+  const auto transform = Core::Engine::GetComponent<Components::Transform>(this->Root);
+  auto position = glm::vec3(0, 0, 0);
+  if (transform != nullptr)
+    position = transform->GetPosition();
+
+  /*
+  std::sort(fullLightsList.begin(), fullLightsList.end(), [position](Components::Light *left, Components::Light *right) {
+    const auto leftTransform = Core::Engine::GetComponent<Components::Transform>(left->Root);
+    auto leftPosition = glm::vec3(0, 0, 0);
+    if (leftTransform != nullptr)
+      leftPosition = leftTransform->GetPosition();
+    const auto rightTransform = Core::Engine::GetComponent<Components::Transform>(right->Root);
+    auto rightPosition = glm::vec3(0, 0, 0);
+    if (rightTransform != nullptr)
+      rightPosition = rightTransform->GetPosition();
+    return glm::distance(position, leftPosition) < glm::distance(position, rightPosition);
+  });
+  */
+
+  std::vector<Components::Light *> lightsList(Rendering::LightsPerMesh);
+  for (uint32_t i = 0; i < Rendering::LightsPerMesh; i++)
+    lightsList[i] = fullLightsList[i];
+  return lightsList;
+}
+void Rendering::MeshView::UpdateLightsBuffer(std::vector<Components::Light *> lights)
+{
+  uint32_t lightsSize = lights.size();
+  Graphics::Vulkan::Buffer::SetData(this->StagingLightsBuffer, &lightsSize, sizeof(uint32_t));
+  Graphics::Vulkan::Buffer::SetData(this->StagingLightsBuffer, lights.data(), this->StagingLightsBuffer.Size - sizeof(glm::vec4), sizeof(glm::vec4));
 }
 
 //CAMERA VIEW
