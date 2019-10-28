@@ -13,10 +13,12 @@ layout(set = 1, binding = 0) readonly uniform MeshTransform
 };
 struct LightInfo
 {
-  vec4 Color;
-  int Type;
-  float Intensity;
-  float Range;
+  vec4 position;
+  vec4 forward;
+  vec4 color;
+  int type;
+  float intensity;
+  float range;
 };
 layout(set = 2, binding = 0) readonly uniform LightInfoStruct
 {

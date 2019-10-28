@@ -408,8 +408,24 @@ std::vector<Components::Light *> Rendering::MeshView::GetClosestLights()
 void Rendering::MeshView::UpdateLightsBuffer(std::vector<Components::Light *> lights)
 {
   uint32_t lightsSize = lights.size();
+  std::vector<Rendering::LightInfoStruct> lightInfos;
+  for (const auto light : lights)
+  {
+    auto lightInfo = Rendering::LightInfoStruct();
+    lightInfo.Color = light->GetColor();
+    lightInfo.Intensity = light->GetIntensity();
+    lightInfo.Range = light->GetRange();
+    lightInfo.Type = light->GetType();
+
+    const auto lightTransform = Core::Engine::GetComponent<Components::Transform>(light->Root);
+    if (lightTransform != nullptr)
+    {
+      lightInfo.Forward = glm::vec4(lightTransform->GetForward(), 1.0f);
+      lightInfo.Position = glm::vec4(lightTransform->GetPosition(), 1.0f);
+    }
+  }
   Graphics::Vulkan::Buffer::SetData(this->StagingLightsBuffer, &lightsSize, sizeof(uint32_t));
-  Graphics::Vulkan::Buffer::SetData(this->StagingLightsBuffer, lights.data(), this->StagingLightsBuffer.Size - sizeof(glm::vec4), sizeof(glm::vec4));
+  Graphics::Vulkan::Buffer::SetData(this->StagingLightsBuffer, lightInfos.data(), sizeof(Rendering::LightInfoStruct) * lightsSize, sizeof(glm::vec4));
 }
 
 //CAMERA VIEW

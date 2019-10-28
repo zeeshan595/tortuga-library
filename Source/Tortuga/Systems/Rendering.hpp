@@ -52,6 +52,8 @@ private:
 
   struct LightInfoStruct
   {
+    glm::vec4 Position;
+    glm::vec4 Forward;
     glm::vec4 Color;
     int32_t Type;
     float Intensity;
