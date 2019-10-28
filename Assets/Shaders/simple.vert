@@ -1,5 +1,4 @@
 #version 460
-
 #define MAXIMUM_LIGHT_INFOS 10
 
 layout(set = 0, binding = 0) readonly uniform CameraTransform
@@ -33,7 +32,18 @@ layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inTexture;
 layout(location = 2) in vec3 inNormal;
 
+layout(location = 0) out vec3 surfaceNormal;
+layout(location = 1) out vec3 cameraVector;
+layout(location = 2) out vec3 lightVectors[MAXIMUM_LIGHT_INFOS];
+
 void main()
 {
-  gl_Position = projection * view * model * vec4(inPosition, 1.);
+  vec4 worldPosition = model * vec4(inPosition, 1.);
+  surfaceNormal = (model * vec4(inNormal, 0.)).xyz;
+  cameraVector = (inverse(view) * vec4(0., 0., 0., 1.)).xyz - worldPosition.xyz;
+
+  for (uint i = 0; i < 1; i++)
+    lightVectors[i] = lights[i].position.xyz - inPosition;
+
+  gl_Position = projection * view * worldPosition;
 }

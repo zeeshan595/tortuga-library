@@ -23,7 +23,7 @@ Rendering::Rendering()
   //model matrix
   DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
   //light infos
-  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
+  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
 
   //rendering
   {
@@ -351,7 +351,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
   //setup lights info
   if (this->StagingLightsBuffer.Buffer == VK_NULL_HANDLE)
   {
-    uint32_t lightsByteSize = sizeof(glm::vec4) + sizeof(LightInfoStruct) * MAXIMUM_NUM_OF_LIGHTS;
+    uint32_t lightsByteSize = sizeof(glm::vec4) + (sizeof(Rendering::LightInfoStruct) * MAXIMUM_NUM_OF_LIGHTS);
     this->StagingLightsBuffer = Graphics::Vulkan::Buffer::CreateHost(device, lightsByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     this->LightsBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, lightsByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, layouts);
@@ -407,6 +407,9 @@ std::vector<Components::Light *> Rendering::MeshView::GetClosestLights()
 }
 void Rendering::MeshView::UpdateLightsBuffer(std::vector<Components::Light *> lights)
 {
+  if (lights.size() == 0)
+    return;
+
   uint32_t lightsSize = lights.size();
   std::vector<Rendering::LightInfoStruct> lightInfos;
   for (const auto light : lights)
@@ -423,6 +426,7 @@ void Rendering::MeshView::UpdateLightsBuffer(std::vector<Components::Light *> li
       lightInfo.Forward = glm::vec4(lightTransform->GetForward(), 1.0f);
       lightInfo.Position = glm::vec4(lightTransform->GetPosition(), 1.0f);
     }
+    lightInfos.push_back(lightInfo);
   }
   Graphics::Vulkan::Buffer::SetData(this->StagingLightsBuffer, &lightsSize, sizeof(uint32_t));
   Graphics::Vulkan::Buffer::SetData(this->StagingLightsBuffer, lightInfos.data(), sizeof(Rendering::LightInfoStruct) * lightsSize, sizeof(glm::vec4));

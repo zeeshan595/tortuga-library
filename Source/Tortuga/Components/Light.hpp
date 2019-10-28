@@ -17,10 +17,10 @@ enum LightType
 struct Light : Core::ECS::Component
 {
 private:
-  LightType Type;
-  glm::vec4 Color;
-  float Intensity;
-  float Range;
+  LightType Type = LightType::POINT;
+  glm::vec4 Color = glm::vec4(1, 1, 1, 1);
+  float Intensity = 1.0f;
+  float Range = 10.0f;
 
 public:
   LightType GetType()

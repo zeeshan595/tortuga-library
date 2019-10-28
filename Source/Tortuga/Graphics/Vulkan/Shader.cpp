@@ -37,8 +37,8 @@ std::string ResolveShaderIncludes(std::string location, std::string code)
       continue;
     const auto fullMatch = matches[0].str();
     const auto includeFile = matches[1].str();
-    const auto includedShader = Utils::IO::GetFileContents(location + includeFile).data();
-    const auto includeCode = ResolveShaderIncludes(GetFileLocation(location + includeFile), includedShader);
+    const auto includedShader = Utils::IO::GetFileContents(location + "/" + includeFile).data();
+    const auto includeCode = ResolveShaderIncludes(GetFileLocation(location + "/" + includeFile), includedShader);
     const auto includeIndex = fullShader.find(fullMatch);
     fullShader.replace(includeIndex, fullMatch.length(), includeCode);
   }

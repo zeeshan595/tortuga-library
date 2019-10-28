@@ -65,7 +65,7 @@ int main()
   const auto light = Core::Engine::CreateEntity();
   {
     Components::Transform t;
-    t.SetPosition(glm::vec3(0, 7.0f, 0));
+    t.SetPosition(glm::vec3(3, 5, 3));
     Core::Engine::AddComponent<Components::Transform>(light, t);
     Core::Engine::AddComponent<Components::Light>(light);
   }
