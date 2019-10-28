@@ -28,12 +28,12 @@ Rendering::Rendering()
   //rendering
   {
     //vertex shader
-    const auto vertexShader = Graphics::Vulkan::Shader::GetFullShaderCode("Assets/Shaders/simple.vert");
+    const auto vertexShader = Graphics::Vulkan::Shader::GetFullShaderCode("Assets/Shaders/pbr.vert");
     const auto compiledVertex = Graphics::Vulkan::Shader::CompileShader(vertexShader.code, vertexShader.location, vertexShader.type);
     Shaders.push_back(Graphics::Vulkan::Shader::Create(device, compiledVertex, VK_SHADER_STAGE_VERTEX_BIT));
 
     //fragment shader
-    const auto fragmentShader = Graphics::Vulkan::Shader::GetFullShaderCode("Assets/Shaders/simple.frag");
+    const auto fragmentShader = Graphics::Vulkan::Shader::GetFullShaderCode("Assets/Shaders/pbr.frag");
     const auto compiledFragment = Graphics::Vulkan::Shader::CompileShader(fragmentShader.code, fragmentShader.location, fragmentShader.type);
     Shaders.push_back(Graphics::Vulkan::Shader::Create(device, compiledFragment, VK_SHADER_STAGE_FRAGMENT_BIT));
   }

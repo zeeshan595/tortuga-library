@@ -42,8 +42,8 @@ void main()
   surfaceNormal = (model * vec4(inNormal, 0.)).xyz;
   cameraVector = (inverse(view) * vec4(0., 0., 0., 1.)).xyz - worldPosition.xyz;
 
-  for (uint i = 0; i < 1; i++)
-    lightVectors[i] = lights[i].position.xyz - inPosition;
+  for (uint i = 0; i < lightsAmount; i++)
+    lightVectors[i] = lights[i].position.xyz - worldPosition.xyz;
 
   gl_Position = projection * view * worldPosition;
 }
