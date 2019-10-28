@@ -19,15 +19,18 @@ layout(set = 2, binding = 0) readonly uniform LightInfoStruct
   LightInfo lights[10];
 };
 
+layout(set = 3, binding = 0) readonly uniform Material
+{
+  vec4 albedo;
+  float metallic;
+  float roughness;
+};
+
 layout(location = 0) in vec3 surfaceNormal;
 layout(location = 1) in vec3 cameraVector;
 layout(location = 2) in vec3 lightVectors[MAXIMUM_LIGHT_INFOS];
 
 layout(location = 0) out vec4 outColor;
-
-const vec3 albedo = vec3(.3, .3, .3);
-const float metallic = 0.;
-const float roughness = 0.3;
 
 const float PI = 3.14159265359;
 // ----------------------------------------------------------------------------
@@ -80,7 +83,7 @@ void main()
   // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
   // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
   vec3 F0 = vec3(0.04); 
-  F0 = mix(F0, albedo, metallic);
+  F0 = mix(F0, albedo.xyz, metallic);
 
   // reflectance equation
   vec3 Lo = vec3(0.0);
@@ -117,12 +120,12 @@ void main()
     float NdotL = max(dot(N, L), 0.0);        
 
     // add to outgoing radiance Lo
-    Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    Lo += (kD * albedo.xyz / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
   }
 
   // ambient lighting (note that the next IBL tutorial will replace 
   // this ambient lighting with environment lighting).
-  vec3 ambient = vec3(0.03) * albedo;
+  vec3 ambient = vec3(0.03) * albedo.xyz;
 
   vec3 color = ambient + Lo;
   //HDR tonemapping

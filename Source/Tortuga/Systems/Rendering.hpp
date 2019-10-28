@@ -19,6 +19,7 @@
 #include "../Components/Transform.hpp"
 #include "../Components/Camera.hpp"
 #include "../Components/Light.hpp"
+#include "../Components/Material.hpp"
 
 namespace Tortuga
 {
@@ -64,26 +65,36 @@ private:
   {
     bool IsStatic;
     bool IsTransformDirty;
-    bool IsUpdated;
+    bool IsMeshDirty;
+    bool IsMaterialDirty;
     uint32_t IndexCount;
+    //general
     Graphics::Vulkan::Device::Device DeviceInUse;
+    Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
+    Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
+    Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
+    //mesh
     Graphics::Vulkan::Buffer::Buffer StagingVertexBuffer;
     Graphics::Vulkan::Buffer::Buffer VertexBuffer;
     Graphics::Vulkan::Buffer::Buffer StagingIndexBuffer;
     Graphics::Vulkan::Buffer::Buffer IndexBuffer;
-    Graphics::Vulkan::CommandPool::CommandPool GraphicsCommandPool;
-    Graphics::Vulkan::CommandPool::CommandPool TransferCommandPool;
     Graphics::Vulkan::Command::Command RenderCommand;
-    Graphics::Vulkan::Command::Command TransferCommand;
+    Graphics::Vulkan::Command::Command MeshTransferCommand;
+    //transform
     Graphics::Vulkan::Buffer::Buffer StagingTransformBuffer;
     Graphics::Vulkan::Buffer::Buffer TransformBuffer;
     Graphics::Vulkan::Command::Command TransformTransferCommand;
-    Graphics::Vulkan::DescriptorPool::DescriptorPool DescriptorPool;
     Graphics::Vulkan::DescriptorSet::DescriptorSet TransformDescriptorSet;
+    //lights
     Graphics::Vulkan::Buffer::Buffer StagingLightsBuffer;
     Graphics::Vulkan::Buffer::Buffer LightsBuffer;
     Graphics::Vulkan::DescriptorSet::DescriptorSet LightsDescriptorSet;
     Graphics::Vulkan::Command::Command LightTransferCommand;
+    //material
+    Graphics::Vulkan::Buffer::Buffer StagingMaterialBuffer;
+    Graphics::Vulkan::Buffer::Buffer MaterialBuffer;
+    Graphics::Vulkan::DescriptorSet::DescriptorSet MaterialDescriptorSet;
+    Graphics::Vulkan::Command::Command MaterialTransferCommand;
 
     void Setup(Graphics::Vulkan::Device::Device device, std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> layouts);
     void OnDestroy();

@@ -24,6 +24,8 @@ Rendering::Rendering()
   DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
   //light infos
   DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
+  //mesh material
+  DescriptorLayouts.push_back(Graphics::Vulkan::DescriptorLayout::Create(device, {VK_SHADER_STAGE_FRAGMENT_BIT}, {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER}));
 
   //rendering
   {
@@ -199,7 +201,7 @@ void Rendering::Update()
         const auto lights = meshView->GetClosestLights();
         meshView->UpdateLightsBuffer(lights);
         Graphics::Vulkan::Command::Begin(meshView->RenderCommand, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, renderPass, 0, framebuffer);
-        Graphics::Vulkan::Command::BindPipeline(meshView->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {cameraDescriptorSet, meshView->TransformDescriptorSet, meshView->LightsDescriptorSet});
+        Graphics::Vulkan::Command::BindPipeline(meshView->RenderCommand, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline, {cameraDescriptorSet, meshView->TransformDescriptorSet, meshView->LightsDescriptorSet, meshView->MaterialDescriptorSet});
         Graphics::Vulkan::Command::SetViewport(meshView->RenderCommand, viewport.x * resolutionWidth, viewport.y * resolutionHeight, viewport.z * resolutionWidth, viewport.w * resolutionHeight);
         Graphics::Vulkan::Command::BindVertexBuffer(meshView->RenderCommand, {meshView->VertexBuffer});
         Graphics::Vulkan::Command::BindIndexBuffer(meshView->RenderCommand, meshView->IndexBuffer);
@@ -213,11 +215,17 @@ void Rendering::Update()
     for (const auto mesh : meshViews)
     {
       drawCommands.push_back(mesh->RenderCommand);
-      if (mesh->IsUpdated)
-        transferCommands.push_back(mesh->TransferCommand);
+      if (mesh->IsMeshDirty)
+        transferCommands.push_back(mesh->MeshTransferCommand);
       if (mesh->IsTransformDirty || !mesh->IsStatic)
         transferCommands.push_back(mesh->TransformTransferCommand);
+      if (mesh->IsMaterialDirty)
+        transferCommands.push_back(mesh->MaterialTransferCommand);
       transferCommands.push_back(mesh->LightTransferCommand);
+
+      mesh->IsMeshDirty = false;
+      mesh->IsTransformDirty = false;
+      mesh->IsMaterialDirty = false;
     }
     if (transferCommands.size() > 0)
       Graphics::Vulkan::Command::Submit(transferCommands, device.Queues.Transfer[0], {}, {TransferSemaphore[cameraIndex]});
@@ -256,6 +264,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     return;
   const auto mesh = Core::Engine::GetComponent<Components::Mesh>(this->Root);
   const auto transform = Core::Engine::GetComponent<Components::Transform>(this->Root);
+  const auto material = Core::Engine::GetComponent<Components::Material>(this->Root);
   if (mesh == nullptr)
     return;
   this->IsStatic = true;
@@ -274,8 +283,10 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
   }
   //setup descriptor pools
   if (this->DescriptorPool.Pool == VK_NULL_HANDLE)
+    this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, layouts, 3);
+
+  if (this->TransformDescriptorSet.set == VK_NULL_HANDLE)
   {
-    this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, layouts);
     this->TransformDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, this->DescriptorPool, layouts[1]);
     Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(this->TransformDescriptorSet, {this->TransformBuffer});
   }
@@ -291,7 +302,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
   }
 
   //update mesh vertices
-  this->IsUpdated = false;
+  this->IsMeshDirty = false;
   if (this->StagingVertexBuffer.Buffer == VK_NULL_HANDLE || mesh->GetIsVerticesDirty())
   {
     if (this->StagingVertexBuffer.Buffer == VK_NULL_HANDLE || this->StagingVertexBuffer.Size != verticesSize)
@@ -302,7 +313,7 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
       this->VertexBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     }
     Graphics::Vulkan::Buffer::SetData(this->StagingVertexBuffer, mesh->GetVertices().data(), verticesSize);
-    this->IsUpdated = true;
+    this->IsMeshDirty = true;
   }
 
   //update mesh indices
@@ -317,13 +328,9 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     }
     Graphics::Vulkan::Buffer::SetData(this->StagingIndexBuffer, mesh->GetIndices().data(), indicesSize);
     this->IndexCount = mesh->GetIndices().size();
-    this->IsUpdated = true;
+    this->IsMeshDirty = true;
   }
   mesh->SetDirty(false, false);
-
-  //if mesh vertices or indices updated then
-  if (!IsUpdated)
-    return;
 
   //setup commands & command pools
   if (this->GraphicsCommandPool.CommandPool == VK_NULL_HANDLE)
@@ -332,13 +339,13 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     this->RenderCommand = Graphics::Vulkan::Command::Create(device, this->GraphicsCommandPool, Graphics::Vulkan::Command::SECONDARY);
   if (this->TransferCommandPool.CommandPool == VK_NULL_HANDLE)
     this->TransferCommandPool = Graphics::Vulkan::CommandPool::Create(device, device.QueueFamilies.Transfer.Index);
-  if (this->TransferCommand.Command == VK_NULL_HANDLE)
+  if (this->MeshTransferCommand.Command == VK_NULL_HANDLE)
   {
-    this->TransferCommand = Graphics::Vulkan::Command::Create(device, this->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
-    Graphics::Vulkan::Command::Begin(this->TransferCommand, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-    Graphics::Vulkan::Command::CopyBuffer(this->TransferCommand, this->StagingVertexBuffer, this->VertexBuffer);
-    Graphics::Vulkan::Command::CopyBuffer(this->TransferCommand, this->StagingIndexBuffer, this->IndexBuffer);
-    Graphics::Vulkan::Command::End(this->TransferCommand);
+    this->MeshTransferCommand = Graphics::Vulkan::Command::Create(device, this->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    Graphics::Vulkan::Command::Begin(this->MeshTransferCommand, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+    Graphics::Vulkan::Command::CopyBuffer(this->MeshTransferCommand, this->StagingVertexBuffer, this->VertexBuffer);
+    Graphics::Vulkan::Command::CopyBuffer(this->MeshTransferCommand, this->StagingIndexBuffer, this->IndexBuffer);
+    Graphics::Vulkan::Command::End(this->MeshTransferCommand);
   }
   if (this->TransformTransferCommand.Command == VK_NULL_HANDLE)
   {
@@ -354,7 +361,6 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     uint32_t lightsByteSize = sizeof(glm::vec4) + (sizeof(Rendering::LightInfoStruct) * MAXIMUM_NUM_OF_LIGHTS);
     this->StagingLightsBuffer = Graphics::Vulkan::Buffer::CreateHost(device, lightsByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     this->LightsBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, lightsByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
-    this->DescriptorPool = Graphics::Vulkan::DescriptorPool::Create(device, layouts);
     this->LightsDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, this->DescriptorPool, layouts[2]);
     Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(this->LightsDescriptorSet, {this->LightsBuffer});
     this->LightTransferCommand = Graphics::Vulkan::Command::Create(device, this->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
@@ -362,9 +368,41 @@ void Rendering::MeshView::Setup(Graphics::Vulkan::Device::Device device, std::ve
     Graphics::Vulkan::Command::CopyBuffer(this->LightTransferCommand, this->StagingLightsBuffer, this->LightsBuffer);
     Graphics::Vulkan::Command::End(this->LightTransferCommand);
   }
+
+  //setup material info
+  if (this->StagingMaterialBuffer.Buffer == VK_NULL_HANDLE)
+  {
+    uint32_t materialByteSize = sizeof(glm::vec4) + sizeof(float) + sizeof(float);
+    this->StagingMaterialBuffer = Graphics::Vulkan::Buffer::CreateHost(device, materialByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+    this->MaterialBuffer = Graphics::Vulkan::Buffer::CreateDevice(device, materialByteSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+    this->MaterialDescriptorSet = Graphics::Vulkan::DescriptorSet::Create(device, this->DescriptorPool, layouts[3]);
+    Graphics::Vulkan::DescriptorSet::UpdateDescriptorSet(this->MaterialDescriptorSet, {this->MaterialBuffer});
+    this->MaterialTransferCommand = Graphics::Vulkan::Command::Create(device, this->TransferCommandPool, Graphics::Vulkan::Command::PRIMARY);
+    Graphics::Vulkan::Command::Begin(this->MaterialTransferCommand, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+    Graphics::Vulkan::Command::CopyBuffer(this->MaterialTransferCommand, this->StagingMaterialBuffer, this->MaterialBuffer);
+    Graphics::Vulkan::Command::End(this->MaterialTransferCommand);
+    this->IsMaterialDirty = true;
+  }
+
+  if (material != nullptr)
+  {
+    if (material->GetIsDirty())
+      this->IsMaterialDirty = true;
+    if (this->IsMaterialDirty)
+    {
+      glm::vec4 color = glm::vec4(material->GetColor(), 1.0f);
+      float metallic = material->GetMetalic();
+      float roughness = material->GetRoughness();
+      Graphics::Vulkan::Buffer::SetData(this->StagingMaterialBuffer, &color, sizeof(glm::vec4));
+      Graphics::Vulkan::Buffer::SetData(this->StagingMaterialBuffer, &metallic, sizeof(float), sizeof(glm::vec4));
+      Graphics::Vulkan::Buffer::SetData(this->StagingMaterialBuffer, &roughness, sizeof(float), sizeof(glm::vec4) + sizeof(float));
+    }
+  }
 }
 void Rendering::MeshView::OnDestroy()
 {
+  Graphics::Vulkan::Buffer::Destroy(this->StagingMaterialBuffer);
+  Graphics::Vulkan::Buffer::Destroy(this->MaterialBuffer);
   Graphics::Vulkan::Buffer::Destroy(this->StagingVertexBuffer);
   Graphics::Vulkan::Buffer::Destroy(this->VertexBuffer);
   Graphics::Vulkan::Buffer::Destroy(this->StagingIndexBuffer);

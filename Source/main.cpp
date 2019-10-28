@@ -78,6 +78,9 @@ int main()
     Components::Transform t;
     t.SetScale(glm::vec3(0.5, 0.5, 0.5));
     Core::Engine::AddComponent<Components::Transform>(dragon, t);
+    Components::Material m;
+    m.SetColor(glm::vec3(1, 0, 0));
+    Core::Engine::AddComponent<Components::Material>(dragon, m);
     Core::Engine::AddComponent<ModelRotationSystem::RotationComponent>(dragon);
   }
 

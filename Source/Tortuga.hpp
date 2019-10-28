@@ -34,6 +34,7 @@
 #include "./Tortuga/Components/Camera.hpp"
 #include "./Tortuga/Components/Mesh.hpp"
 #include "./Tortuga/Components/Light.hpp"
+#include "./Tortuga/Components/Material.hpp"
 
 //Systems
 #include "./Tortuga/Systems/Rendering.hpp"
