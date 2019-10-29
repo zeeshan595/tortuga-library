@@ -67,18 +67,15 @@ OBJ LoadObjFile(std::string filePath)
 }
 Graphics::Image LoadImageFile(std::string filePath)
 {
-  int32_t width, height, channels;
-  auto pixels = stbi_load(filePath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-  if (pixels == nullptr)
-    Console::Error("Failed to load image file {0}", filePath);
-
   Graphics::Image data = {};
-  data.Width = width;
-  data.Height = height;
-  data.Channels = channels;
-  data.ByteSize = width * height * 4.0f;
-  data.Pixels.resize(width * height);
-  memcpy(data.Pixels.data(), pixels, data.ByteSize);
+  SDL_Surface *surface = IMG_Load_RW(SDL_RWFromFile(filePath.c_str(), "rb"), 1);
+  if (surface == nullptr)
+  {
+    Console::Error("Failed to load image file {0}", filePath);
+    return data;
+  }
+  int bpp = surface->format->BytesPerPixel;
+  
   return data;
 }
 std::string GetFileContents(std::string filePath)

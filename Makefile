@@ -54,12 +54,13 @@ init:
 	make install -C Submodules/Vulkan-Loader/build
 	rm -rf Submodules/Vulkan-Loader/build
 	#SDL2
-	cd Submodules/SDL-mirror/ && sh autogen.sh --prefix=$(PWD)/$(OBJ_DIR) && sh configure --prefix=$(PWD)/$(OBJ_DIR)
-	make -C Submodules/SDL-mirror/
-	make install -C Submodules/SDL-mirror/
-	cd Submodules/SDL-mirror/
-	#stb
-	ln -f -s ../../Submodules/stb/ $(OBJ_DIR)/include/stb
+	cd Submodules/SDL/ && sh autogen.sh --prefix=$(PWD)/$(OBJ_DIR) && sh configure --prefix=$(PWD)/$(OBJ_DIR)
+	make -C Submodules/SDL/
+	make install -C Submodules/SDL/
+	#SDL2 Image
+	cd Submodules/SDL_image/ && sh autogen.sh --prefix=$(PWD)/$(OBJ_DIR) && sh configure --prefix=$(PWD)/$(OBJ_DIR)
+	make -C Submodules/SDL_image/
+	make install -C Submodules/SDL_image/
 	#glm
 	ln -f -s ../../Submodules/glm/glm $(OBJ_DIR)/include/glm
 	#glslang

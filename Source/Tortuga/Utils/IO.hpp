@@ -1,7 +1,8 @@
 #ifndef _UTILS_INPUT_OUTPUT
 #define _UTILS_INPUT_OUTPUT
 
-#include <stb/stb_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <fstream>
 #include <string>
 #include <vector>
