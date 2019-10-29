@@ -7,19 +7,19 @@
 #include <thread>
 #include <bits/stdc++.h>
 
-#include "../Core/ECS/Entity.hpp"
-#include "../Core/ECS/System.hpp"
-#include "../Graphics/Vulkan/Instance.hpp"
-#include "../Graphics/DisplaySurface.hpp"
-#include "../Graphics/Vertex.hpp"
-#include "../Core/Engine.hpp"
-#include "../Graphics/RenderTarget.hpp"
+#include "../../Core/ECS/Entity.hpp"
+#include "../../Core/ECS/System.hpp"
+#include "../../Graphics/Vulkan/Instance.hpp"
+#include "../../Graphics/DisplaySurface.hpp"
+#include "../../Graphics/Vertex.hpp"
+#include "../../Core/Engine.hpp"
+#include "../../Graphics/RenderTarget.hpp"
 
-#include "../Components/Mesh.hpp"
-#include "../Components/Transform.hpp"
-#include "../Components/Camera.hpp"
-#include "../Components/Light.hpp"
-#include "../Components/Material.hpp"
+#include "../../Components/Mesh.hpp"
+#include "../../Components/Transform.hpp"
+#include "../../Components/Camera.hpp"
+#include "../../Components/Light.hpp"
+#include "../../Components/Material.hpp"
 
 namespace Tortuga
 {
@@ -114,6 +114,13 @@ private:
 
     void Setup(Graphics::Vulkan::Device::Device device, Graphics::Vulkan::RenderPass::RenderPass renderPass, std::vector<Graphics::Vulkan::DescriptorLayout::DescriptorLayout> descriptorLayouts);
     void OnDestroy();
+  };
+
+
+  struct LightView : public Core::ECS::Component
+  {
+    Graphics::CameraRender::CameraRender Render;
+    
   };
 
   void SetupSemaphores(uint32_t size);
