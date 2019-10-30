@@ -11,8 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Setup Environment
-      run: sudo apt-get -y update
-      run: sudo apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libwayland-client0 libwayland-dev
+      run: sudo apt-get -y update && sudo apt-get -y install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libwayland-client0 libwayland-dev
     - name: Get Required Dependencies
       run: make init
     - name: Build Application
